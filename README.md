@@ -25,17 +25,19 @@ Ce guide rassemble l'intégralité des fonctionnalités, mécaniques, métiers e
 
 Dès votre arrivée, choisissez votre métier avec la commande `/race`. Chaque métier possède des autorisations de craft exclusives, des bonus uniques et des contreparties équilibrées :
 
-| Métier | Rôle & Spécialité | Bonus Principaux | Restrictions & Malus |
-| :--- | :--- | :--- | :--- |
-| **⛏ Mineur (Nain)** | Extraction minière & géologie | • Seul métier capable de fabriquer les pioches en fer/diamant.<br>• Effet **Haste II permanent** sous la couche $Y \le 0$.<br>• **+15% de chance de doubler** les minerais extraits. | Vitesse de déplacement réduite en plein air. |
-| **🌿 Sylvain (Elfe)** | Agriculture, élevage & nature | • Seul métier à fabriquer des houes & utiliser la poudre d'os.<br>• Récolte rapide des cultures & reproduction animale accélérée.<br>• Potions agricoles exclusives. | -20% de dégâts au corps-à-corps. |
-| **🔨 Forgeron** | Forge lourde, armures & métal | • Seul métier capable de crafter les armures, boucliers et épées.<br>• **+35% de lingots supplémentaires** lors de la fonte des minerais.<br>• **-50% de coût en XP** sur l'enclume. | Consommation de faim augmentée de +25% lors des efforts physiques. |
-| **🏹 Rôdeur** | Chasse à distance & exploration | • Seul métier capable de fabriquer les arcs, arbalètes et flèches.<br>• **+25% de dégâts à distance**.<br>• Vitesse de déplacement accrue en forêt et jungle. | Ne peut pas porter d'armure lourde intégrale. |
-| **🧪 Arcaniste** | Magie, alchimie & enchantements | • Seul métier à fabriquer et utiliser les alambics et tables d'enchantement.<br>• **+30% de gain d'XP** sur toutes les actions.<br>• Durée des potions consommées prolongée de **+25%**.<br>• **-20% de dégâts magiques subis** (potions, poison, wither). | Résistance physique réduite en mêlée. |
-| **⚙ Ingénieur** | Automatisation, redstone & engins | • Seul métier à fabriquer les pistons, distributeurs, entonnoirs et rails.<br>• Maîtrise de la TNT et des engins mécaniques.<br>• **-40% de dégâts subis face aux explosions**. | -20% de dégâts au corps-à-corps. |
+| Métier | Rôle & Spécialité | Crafts & Usages Exclusifs | Bonus Passifs & Actifs | Restrictions & Malus |
+| :--- | :--- | :--- | :--- | :--- |
+| **⛏ Mineur (Nain)** | Extraction minière & géologie | • Pioche en fer (Âge 1)<br>• Pioche & Pelle diamant (Âge 2)<br>• Pioche & Pelle Netherite (Âges 3-4) | • **Haste II** et **Vision Nocturne** permanents sous $Y \le 0$<br>• **+15% de chance de doubler** tous les minerais extraits | • **Lenteur I** en plein air et plein soleil ($Y > 60$)<br>• Incapable de fabriquer des armes ou armures métalliques |
+| **🌿 Sylvain (Elfe)** | Agriculture, élevage & nature | • Houe en fer (Âge 1), diamant (Âge 2), Netherite (Âges 3-4)<br>• Utilisation de la Poudre d'os (Âges 1-2)<br>• Reproduction animale (Âges 1-2)<br>• Pommes Dorées artisanales | • **Aura de Régénération I permanente** pour soi et tous les joueurs à moins de 4 blocs<br>• **Récolte instantanée automatique au clic-droit** sur les cultures à maturité (avec replantage automatique) | • **-20% de dégâts** infligés au corps-à-corps |
+| **🔨 Forgeron** | Forge lourde, armures & métal | • Armures fer complètes, épées & boucliers (Âge 1)<br>• Armures, épée & hache diamant (Âge 2)<br>• Armures, épée & hache Netherite (Âges 3-4)<br>• Enclumes, meules & hauts-fourneaux | • **Résistance au Feu** permanente<br>• **+35% de chance de doubler** un lingot extrait d'un four/haut-fourneau<br>• **-50% de coût en XP** sur l'enclume | • **Consommation de faim augmentée de +25%** lors des efforts physiques |
+| **🏹 Rôdeur** | Chasse à distance & exploration | • **Seul métier capable d'utiliser et fabriquer des Arcs et Arbalètes** jusqu'à l'Âge 3 (compris, débloqué à l'Âge 4)<br>• Flèches et flèches spectrales artisanales | • **Toutes les flèches tirées deviennent des Flèches de Poison (Poison I)**<br>• **+25% de dégâts à distance** sur tous les projectiles<br>• **Vitesse I (Speed I)** permanente dans les biomes naturels (plaines, forêts, jungles, taïgas) | • **Pénalité de lenteur (Slowness I)** si un plastron lourd (diamant ou Netherite) est équipé |
+| **🧪 Arcaniste** | Magie, alchimie & enchantements | • **Seul métier capable d'enchanter des objets** (Table d'enchantement & Livres enchantés sur enclume)<br>• **Seul métier capable d'utiliser et lancer des Potions Jetables (Splash Potions)**<br>• Utilisation et craft d'Alambics exclusifs jusqu'à l'Âge 3 (Alchimie)<br>• Pommes Dorées artisanales | • **+30% d'XP reçue** sur toutes les actions<br>• **Durée des potions consommées prolongée de +25%**<br>• **-20% de dégâts magiques subis** (potions de dégâts, poison, wither, souffle de dragon) | • **+15% de dégâts physiques subis** en combat rapproché (fragilité en mêlée) |
+| **⚙ Ingénieur** | Automatisation, redstone & engins | • Pistons, pistons collants, entonnoirs (hoppers), observateurs, répéteurs, comparateurs, distributeurs, droppers & **TNT** (Âges 1-3) | • **-40% de dégâts subis face aux explosions** (TNT, creepers, lits)<br>• Maîtrise exclusive de la TNT et de l'automatisation | • **-20% de dégâts** infligés au corps-à-corps |
 
 > [!TIP]
-> **Reconversion de Métier** : La première sélection de métier est **100% gratuite**. Vous bénéficiez ensuite de **3 reconversions de métier gratuites**. Une fois ces 3 changements gratuits épuisés, toute reconversion ultérieure coûte **10 000 pièces**.
+> **Commandes de Métier** :
+> * `/race` : Ouvre le menu de sélection ou de reconversion de métier (1ère sélection gratuite + 3 reconversions offertes, puis 10 000 pièces).
+> * `/race show [joueur]` : Ouvre l'**Annuaire interactif des Métiers** affichant la tête, le métier, la guilde, l'âge technologique, le solde et les statistiques de tous les joueurs connectés.
 
 ---
 
@@ -75,20 +77,20 @@ Fondez une guilde avec vos alliés pour revendiquer des terres et bâtir votre f
 Choisissez la spécialisation collective de votre guilde via le menu `/guild spec` :
 
 1. ⚔️ **Légion Guerrière (PvP / Conquête)** :
-   * **Bonus** : +30% de dégâts d'attaque contre les monstres et lors des sièges.
-   * **Contrepartie** : Coût d'achat des territoires augmenté de +20%.
+   * **Bonus** : Effets **Force I** et **Résistance I** permanents dans les claims, **+30% de dégâts d'attaque** contre les monstres et hordes ennemies.
+   * **Contraintes** : Max 1 Nain (Mineur) et 1 Sylvain (Fermier), minerais et récoltes réduits de 25% dans les claims.
 2. ⛏️ **Industrie Souterraine (Minage / Production)** :
-   * **Bonus** : Coût des pièges de Nexus réduit de **-50%**, rendement de minage accru.
-   * **Contrepartie** : +20% de dégâts subis face aux attaques magiques.
+   * **Bonus** : Effet **Haste II** permanent dans les claims sous $Y \le 30$, **drops de minerais bruts multipliés par x1.5**, coût des pièges de Nexus et Golems réduit de **-50%**.
+   * **Contraintes** : Max 1 Rôdeur (combattant à distance), vulnérabilité aux attaques magiques (+20% de dégâts subis).
 3. 🌾 **Enclave Champêtre (Ressources & Santé)** :
-   * **Bonus** : Régénération de santé passive des membres dans leurs claims, double récolte agricole.
-   * **Contrepartie** : PV max du Nexus réduits de 10%.
+   * **Bonus** : Effets **Régénération I** et **Saturation** permanents dans les claims, **double récolte agricole**, **double butin sur les animaux**, **récolte doublée sur le bois et les pierres naturelles** (Andésite, Diorite, Granite, Blackstone, Calcite), reproduction animale accélérée (x3).
+   * **Contraintes** : Interdiction des armures en Netherite, aucun Ingénieur (pas de TNT), max 1 Forgeron.
 4. 💰 **Syndicat Marchand (Commerce & Hordes)** :
-   * **Bonus** : **-30% de réduction sur l'achat de TOUTES les hordes de mercenaires** et taxe réduite à l'Hôtel des Ventes.
-   * **Contrepartie** : Puissance offensive des membres légèrement diminuée.
+   * **Bonus** : **-30% de réduction** sur l'achat de TOUTES les hordes de mercenaires, **+20% de primes** sur l'élimination des monstres, bonus de gain de +25% à l'Hôtel des Ventes.
+   * **Contraintes** : Aucun effet passif de combat, PV max du Nexus réduits de 20%.
 5. 🔮 **Conclave Arcanique (Magie & Runes)** :
-   * **Bonus** : Durée des pièges et des effets alchimiques amplifiée, résistance accrue.
-   * **Contrepartie** : Coût d'achat des claims augmenté de +50%.
+   * **Bonus** : Le Nexus tire automatiquement des **rayons d'énergie magique** sur les assaillants, dégâts magiques subis réduits de **50%**.
+   * **Contraintes** : Coût d'achat des claims augmenté de +50%, max 1 Forgeron et 1 Nain.
 
 > [!IMPORTANT]
 > **Règle de Changement de Spécialisation** : Le premier choix de spécialisation est immédiat. Par la suite, une guilde peut changer de spécialisation **uniquement lorsqu'un NOUVEAU joueur** (qui n'a jamais appartenu à la guilde auparavant) rejoint ses rangs ! Cela valorise le recrutement actif et empêche le changement opportuniste permanent.
@@ -107,12 +109,12 @@ Chaque guilde possède un **Nexus** (Cœur de base) qu'elle doit placer dans ses
 * En jetant une **Pomme Dorée** sur le bloc central du Nexus, vous lui rendez instantanément **+500 PV** (hors période de raid actif).
 
 ### 💣 Les 5 Pièges de Défense (`/nexus traps`)
-* 🔥 **Brasier Infernal** : Enflamme instantanément tous les assaillants à proximité.
-* 🕸️ **Toile d'Entrave** : Ralentit considérablement les ennemis s'approchant du cœur.
-* ⚡ **Foudre de Riposte** : Frappe les envahisseurs de violents éclairs.
-* 🧪 **Brume Toxique** : Inflige poison et faiblesse aux assaillants.
-* 🤖 **Golem Gardien** : Invoque un puissant golem de fer pour défendre le Nexus.
-* *Note : Les pièges sont à usage unique par raid et se réarment après chaque invasion.*
+* 🔥 **Brasier Infernal (250 pièces)** : Enflamme et inflige des brûlures continues aux ennemis à moins de 8 blocs.
+* 🕸️ **Toile d'Entravement (200 pièces)** : Inflige Lenteur III et Cécité aux assaillants approchant du Nexus.
+* ⚡ **Foudre de Riposte (350 pièces)** : Foudroie violemment quiconque frappe le Nexus (+15 dégâts réels).
+* 🧪 **Brume Toxique (300 pièces)** : Émet un nuage de poison (Poison II) asphyxiant les pillards et monstres assaillants.
+* 🤖 **Automate Gardien (500 pièces)** : Invoque un Golem de fer blindé loyal défendant férocement le Nexus.
+* *Note : Les pièges sont financés en priorité par la Banque de Guilde, restent armés pour la prochaine horde et bénéficient d'une réduction de -50% pour l'Industrie Souterraine.*
 
 ---
 
@@ -187,29 +189,30 @@ Lors de l'élimination d'un joueur adverse :
 Le serveur progresse à travers **5 Âges technologiques majeurs**. Pour faire franchir un Âge à votre guilde et débloquer les technologies supérieures et les dimensions, les membres doivent unir leurs forces et faire des dons de **minerais et de récoltes agricoles** via `/age` :
 
 > [!CAUTION]
-> **Restrictions Dimensionnelles par Âge** :
+> **Restrictions Dimensionnelles & Commerce Villageois par Âge** :
 > * 🔥 **Nether** : L'accès au Nether (portails, allumage et téléportations) est **strictement bloqué jusqu'à l'Âge 2 (Métallurgie)**.
 > * 🌌 **L'End** : L'accès à l'End (portails, yeux de l'ender et téléportations) est **strictement bloqué jusqu'à l'Âge 3 (Alchimie)**.
+> * 🛡️ **Commerce Villageois Forgerons** : Les échanges avec les villageois **Armurier** (*Armorer*), **Forgeron d'armes** (*Weaponsmith*) et **Forgeron d'outils** (*Toolsmith*) sont **bloqués jusqu'à l'Âge 3 (Alchimie)** pour valoriser l'artisanat des joueurs.
 
 1. **Âge Rustique (Âge 1 — Départ)** :
-   * *Technologies* : Outils en bois et pierre uniquement (16 claims max). **Dimensions Nether & End verrouillées**.
+   * *Technologies* : Outils en bois et pierre uniquement (16 claims max). **Dimensions Nether & End verrouillées**. Outils en fer réservés aux spécialistes (Nain, Forgeron, Sylvain).
 2. **Âge de la Métallurgie (Âge 2)** :
-   * *Déblocages* : **Accès au Nether débloqué** 🔥, outils en fer universels, boucliers et extension à **32 claims max**.
+   * *Déblocages* : **Accès au Nether débloqué** 🔥, outils en fer universels, boucliers et extension à **32 claims max**. **Les crafts en diamant sont réservés aux métiers spécialisés** (Nain: pioche/pelle, Forgeron: armures/épée/hache, Sylvain: houe).
    * *Objectifs Requis (Quotas réduits de 50%)* :
      * ⛏ 1 250 Lingots de Cuivre | 750 Fer Brut | 1 000 Bûches de Chêne
      * 🌾 **1 500 Blé** | 🥕 **750 Carottes** *(Alimentation & maraîchage)*
 3. **Âge de l'Alchimie (Âge 3)** :
-   * *Déblocages* : **Accès à l'End débloqué** 🌌, armures complètes en fer, alambics, potions T1 et extension à **64 claims max**.
+   * *Déblocages* : **Accès à l'End débloqué** 🌌, **démocratisation complète du diamant pour tous**, armures complètes en fer pour tous et extension à **64 claims max**. **Les crafts en Netherite deviennent accessibles exclusivement aux métiers spécialisés** (Nain: pioche/pelle, Forgeron: armures/épée/hache, Sylvain: houe).
    * *Objectifs Requis* :
      * ⛏ 3 000 Lingots de Fer | 1 000 Lingots d'Or | 500 Verrues du Nether
      * 🥔 **2 500 Pommes de Terre** | 🎋 **2 000 Cannes à Sucre** | 🎃 **800 Citrouilles**
 4. **Âge de Guerre Totale (Âge 4)** :
-   * *Déblocages* : Équipements complets en diamant, potions T2 et extension à **128 claims max**.
+   * *Déblocages* : Alambics, enchantements et redstone avancée démocratisés pour tous, potions T2, engins de siège et extension à **128 claims max**.
    * *Objectifs Requis* :
      * ⛏ 800 Diamants | 1 000 Obsidienne | 400 Perles de l'End
      * ✨ **500 Carottes Dorées** | 🌾 **600 Bottes de Foin** | 🍯 **400 Bouteilles de Miel**
-5. **Âge Mythique & Apex (Âge 5)** :
-   * *Déblocages* : Netherite universelle, balises et **territoires illimités**.
+5. **Âge Mythique & Apex (Âge 5 — Âge Final)** :
+   * *Déblocages* : **Démocratisation complète de la Netherite pour tous**, balises et **territoires illimités**.
    * *Objectifs Requis* :
      * ⛏ 150 Fragments de Netherite | 5 Étoiles du Nether | 64 Souffles de Dragon
      * 🍏 **5 Pommes Dorées Enchantées** | 🌸 **1 000 Fruits de Chorus** *(Flore mystique)*
