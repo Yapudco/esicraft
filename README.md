@@ -67,6 +67,7 @@ Fondez une guilde avec vos alliés pour revendiquer des terres et bâtir votre f
 * **Protection des conteneurs** : Seuls les membres de la guilde peuvent ouvrir les coffres, barils, shulkers, fours et entonnoirs situés dans leurs claims.
 * **Restrictions de combat en zone ennemie** :
   * ❌ **Pose de TNT interdite**.
+  * ❌ **Minecarts avec TNT interdits** (pose, tir via distributeur, pénétration sur rails et explosion bloqués).
   * ❌ **Utilisation d'Ender Pearls interdite** (lancement et téléportation vers un claim adverse bloqués).
   * ❌ **Cristaux de l'End interdits** (pose et explosion bloquées).
 
@@ -83,14 +84,14 @@ Choisissez la spécialisation collective de votre guilde via le menu `/guild spe
    * **Bonus** : Effet **Haste II** permanent dans les claims sous $Y \le 30$, **drops de minerais bruts multipliés par x1.5**, coût des pièges de Nexus et Golems réduit de **-50%**.
    * **Contraintes** : Max 1 Rôdeur (combattant à distance), vulnérabilité aux attaques magiques (+20% de dégâts subis).
 3. 🌾 **Enclave Champêtre (Ressources & Santé)** :
-   * **Bonus** : Effets **Régénération I** et **Saturation** permanents dans les claims, **double récolte agricole**, **double butin sur les animaux**, **récolte doublée sur le bois et les pierres naturelles** (Andésite, Diorite, Granite, Blackstone, Calcite), reproduction animale accélérée (x3).
+   * **Bonus** : **Santé maximale de base augmentée de +2 cœurs (+4.0 PV pour tous les membres)**, effets **Régénération I** et **Saturation** permanents dans les claims, **double récolte agricole**, **double butin sur les animaux**, **récolte doublée sur le bois et les pierres naturelles** (Andésite, Diorite, Granite, Blackstone, Calcite), reproduction animale accélérée (x3).
    * **Contraintes** : Interdiction des armures en Netherite, aucun Ingénieur (pas de TNT), max 1 Forgeron.
 4. 💰 **Syndicat Marchand (Commerce & Économie)** :
-   * **Bonus** : **+20% de primes** sur l'élimination des monstres, **10% des bénéfices de chaque monstre éliminé automatiquement transférés à la banque de guilde**, bonus de gain de +25% à l'Hôtel des Ventes.
-   * **Contraintes** : **Hordes de mercenaires 30% plus chères (+30% sur tous les contrats)**, aucun effet passif de combat, PV max du Nexus réduits de 20%.
+   * **Bonus** : **Privilège exclusif de commerce avec les Villageois et Marchands ambulants dès les Âges 1 à 3** (le commerce avec les villageois est débloqué pour les autres guildes à partir de l'Âge 4 !), **+20% de primes** sur l'élimination des monstres, **10% des bénéfices de chaque monstre éliminé automatiquement transférés à la banque de guilde**, bonus de gain de +25% à l'Hôtel des Ventes.
+   * **Contraintes** : **Aucun Arcaniste autorisé dans la guilde (0 Arcaniste)**, **Hordes de mercenaires 30% plus chères (+30% sur tous les contrats)**, aucun effet passif de combat, PV max du Nexus réduits de 20%.
 5. 🔮 **Conclave Arcanique (Magie & Runes)** :
    * **Bonus** : **+25% de PV max sur le Cœur de Guilde (Nexus)**, **coûts en XP des enchantements et réparations à l'enclume réduits de -50%**, **potions consommées et jetées automatiquement du Tier Supérieur** (+1 niveau d'effet), **enchantements surpuissants débloqués (Niveau IV devient V, et Niveau V devient VI)**, le Nexus tire automatiquement un **rayon d'énergie magique** sur l'assaillant le plus proche (inflige **1 cœur de dégâts par seconde** soit 2.0 PV), dégâts magiques subis réduits de **50%**.
-   * **Contraintes** : Coût d'achat des claims augmenté de +50%, max 1 Forgeron et 1 Nain, **perte immédiate des enchantements de niveau VI / V boostés si la guilde change de spécialisation**.
+   * **Contraintes** : **Santé maximale de base réduite de 2 cœurs (-4.0 PV pour tous les membres)**, coût d'achat des claims augmenté de +50%, max 1 Forgeron et 1 Nain, **perte immédiate des enchantements de niveau VI / V boostés si la guilde change de spécialisation**.
 
 > [!IMPORTANT]
 > **Règle de Changement de Spécialisation** : Le premier choix de spécialisation est immédiat. Par la suite, une guilde peut changer de spécialisation **uniquement lorsqu'un NOUVEAU joueur** (qui n'a jamais appartenu à la guilde auparavant) rejoint ses rangs ! Cela valorise le recrutement actif et empêche le changement opportuniste permanent.
@@ -177,40 +178,40 @@ Chaque monstre éliminé rapporte une prime directement créditée sur votre com
 
 ### ⚔️ Prime de Kill PvP (Hors Guilde)
 Lors de l'élimination d'un joueur adverse :
-* **Le Vainqueur (Killer)** reçoit : **+1 000 pièces + 1% de la fortune** de la victime.
+* **Le Vainqueur (Killer)** reçoit : **+100 pièces + 1% de la fortune** de la victime.
 * **La Victime** perd :
-  * **Si elle a plus de 1 000 pièces** : Elle perd **1 000 pièces + 1% de sa fortune**.
-  * **Si elle a moins de 1 000 pièces** : **Elle perd l'intégralité de son argent** (solde retombant à `0.00 pièce`).
+  * **Si elle a plus de 100 pièces** : Elle perd **100 pièces + 1% de sa fortune**.
+  * **Si elle a moins de 100 pièces** : **Elle perd l'intégralité de son argent** (solde retombant à `0.00 pièce`).
 * *(Règle inactive entre membres d'une même guilde pour protéger les alliés).*
 
 ---
 
 ## ⏳ 7. Progression des Âges Technologiques
 
-Le serveur progresse à travers **5 Âges technologiques majeurs**. Pour faire franchir un Âge à votre guilde et débloquer les technologies supérieures et les dimensions, les membres doivent unir leurs forces et faire des dons de **minerais et de récoltes agricoles** via `/age` :
+Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire franchir un Âge à votre guilde et débloquer les technologies supérieures et les dimensions, les membres doivent unir leurs forces et faire des dons de **minerais et de récoltes agricoles** via `/age` :
 
 > [!CAUTION]
 > **Restrictions Dimensionnelles & Commerce Villageois par Âge** :
 > * 🔥 **Nether** : L'accès au Nether (portails, allumage et téléportations) est **strictement bloqué jusqu'à l'Âge 2 (Métallurgie)**.
 > * 🌌 **L'End** : L'accès à l'End (portails, yeux de l'ender et téléportations) est **strictement bloqué jusqu'à l'Âge 3 (Alchimie)**.
-> * 🛡️ **Commerce Villageois Forgerons** : Les échanges avec les villageois **Armurier** (*Armorer*), **Forgeron d'armes** (*Weaponsmith*) et **Forgeron d'outils** (*Toolsmith*) sont **bloqués jusqu'à l'Âge 3 (Alchimie)** pour valoriser l'artisanat des joueurs.
+> * 🛡️ **Commerce Villageois** : Les échanges avec les villageois et marchands ambulants sont **réservés au Syndicat Marchand pendant les Âges 1 à 3**, puis **démocratisés pour toutes les guildes à partir de l'Âge 4 (Guerre Totale)**.
 
 1. **Âge Rustique (Âge 1 — Départ)** :
    * *Technologies* : Outils en bois et pierre uniquement (16 claims max). **Dimensions Nether & End verrouillées**. Outils en fer réservés aux spécialistes (Nain, Forgeron, Sylvain).
 2. **Âge de la Métallurgie (Âge 2)** :
    * *Déblocages* : **Accès au Nether débloqué** 🔥, outils en fer universels, boucliers et extension à **32 claims max**. **Les crafts en diamant sont réservés aux métiers spécialisés** (Nain: pioche/pelle, Forgeron: armures/épée/hache, Sylvain: houe).
    * *Objectifs Requis (Quotas réduits de 50%)* :
-     * ⛏ 1 250 Lingots de Cuivre | 750 Fer Brut | 1 000 Bûches de Chêne
+     * ⛏ **750 Lingots de Cuivre** | 🐮 **256 Cuirs** | 750 Fer Brut | 1 000 Bûches de Chêne
      * 🌾 **1 500 Blé** | 🥕 **750 Carottes** *(Alimentation & maraîchage)*
 3. **Âge de l'Alchimie (Âge 3)** :
    * *Déblocages* : **Accès à l'End débloqué** 🌌, **démocratisation complète du diamant pour tous**, armures complètes en fer pour tous et extension à **64 claims max**. **Les crafts en Netherite deviennent accessibles exclusivement aux métiers spécialisés** (Nain: pioche/pelle, Forgeron: armures/épée/hache, Sylvain: houe).
    * *Objectifs Requis* :
      * ⛏ 3 000 Lingots de Fer | 1 000 Lingots d'Or | 500 Verrues du Nether
-     * 🥔 **5 000 Pommes de Terre** | 🎋 **5 000 Cannes à Sucre** | 🎃 **800 Citrouilles**
+     * 🥔 **5 000 Pommes de Terre** | 🎋 **5 000 Cannes à Sucre** | 🪶 **3 000 Plumes** | 🎃 **800 Citrouilles**
 4. **Âge de Guerre Totale (Âge 4)** :
-   * *Déblocages* : **TNT et mécanismes offensifs (canons à TNT, brèches, pistons, dispensers, redstone avancée) démocratisés pour tous**, alambics et potions T2 universels, arcs et arbalètes pour tous, et extension à **128 claims max**.
+   * *Déblocages* : **Commerce avec les villageois démocratisé pour tous**, **TNT et mécanismes offensifs (canons à TNT, brèches, pistons, dispensers, redstone avancée) démocratisés pour tous**, alambics et potions T2 universels, arcs et arbalètes pour tous, et extension à **128 claims max**.
    * *Objectifs Requis* :
-     * ⛏ **500 Diamants** | **1 500 Obsidienne** | **500 Perles de l'End**
+     * ⛏ **500 Diamants** | **1 500 Obsidienne** | **500 Perles de l'End** | 🪽 **1 Paire d'Élytres**
      * ✨ **2 500 Carottes Dorées** | 🌾 **800 Bottes de Foin** | 🍯 **500 Bouteilles de Miel**
      * 🔴 **3 500 Poudre de Redstone** | ⚙ **250 Répéteurs** | 🧱 **200 Pistons**
      * 💣 **1 000 Poudres à Canon** | 🧨 **100 Blocs de TNT**
@@ -218,10 +219,10 @@ Le serveur progresse à travers **5 Âges technologiques majeurs**. Pour faire f
      * ⚡ **Mobilité de Guerre** : Effet permanent **Vitesse I (Speed I)**.
      * ⚔ **Combativité** : **+10% de dégâts infligés** (mêlée et tir à distance) et **+25% d'XP supplémentaire**.
      * 🛡 **Blindage de Tranchée** : **-20% de dégâts subis face aux explosions** (TNT et creepers).
-5. **Âge Mythique & Apex (Âge 5 — Âge Final)** :
+5. **Âge Mythique & Apex (Âge 5)** :
    * *Déblocages* : **Démocratisation complète de la Netherite pour tous**, balises et **territoires illimités**.
    * *Objectifs Requis* :
-     * ⛏ 150 Fragments de Netherite | 5 Étoiles du Nether | 64 Souffles de Dragon
+     * ⛏ 150 Fragments de Netherite | 5 Étoiles du Nether
      * 🍏 **5 Pommes Dorées Enchantées** | 🌸 **1 000 Fruits de Chorus**
      * 🌌 **64 Carapaces de Shulker** | 🪐 **2 500 Pierres de l'End** | 🟣 **500 Blocs de Purpur**
      * 🔴 **500 Blocs de Redstone** | 🎛 **200 Comparateurs** | 👁 **200 Observateurs**
@@ -229,6 +230,24 @@ Le serveur progresse à travers **5 Âges technologiques majeurs**. Pour faire f
      * 👑 **Aura Souveraine Permanente** : Effets constants **Hâte I** (minage fluide), **Vitesse I** et **Résistance I**.
      * ⚔ **Puissance Martiale & Savoir** : **+15% de dégâts bruts infligés** au combat et **+50% d'XP supplémentaire** sur toutes les sources.
      * 🏛 **Empire Sans Limites** : Revendications de chunks **100% illimitées** et **accès total à tous les crafts en Netherite** pour tous les membres de la guilde.
+6. 👑 **Âge de Suprématie (Âge 6 — Âge Ultime & Sacré)** :
+   * *Description* : L'apogée ultime et divine de la civilisation sur le serveur, exigeant les reliques et chefs-d'œuvre les plus rares de l'univers.
+   * *Objectifs Requis* :
+     * 🎶 **Tous les Disques de Musique (CDs)** : 13, Cat, Blocks, Chirp, Far, Mall, Mellohi, Stal, Strad, Ward, 11, Wait, Otherside, 5, Pigstep, Relic.
+     * 💀 **Toutes les Têtes de Monstres** : Crâne de Wither Squelette, Tête de Zombie, Crâne de Squelette, Tête d'Ender Dragon, Tête de Creeper, Tête de Piglin.
+     * 📯 **Toutes les Cornes de Chèvre (8 Cornes)**.
+     * ⭐ **64 Étoiles du Nether**.
+     * 🌾 **1 Houe en Netherite** obligatoirement enchantée **Mending (Raccommodage) + Unbreaking III (Solidité 3) + Fortune III (Fortune 3)**.
+     * 🛡 **Tous les Modèles de Forge (Trim Templates)** : Coast, Dune, Eye, Host, Raiser, Rib, Sentry, Shaper, Silence, Snout, Spire, Tide, Vex, Ward, Wayfinder, Wild, Netherite Upgrade.
+     * 🏺 **Tous les Tessons de Poterie (20 Pottery Sherds)** : Angler, Archer, Arms Up, Blade, Brewer, Burn, Danger, Explorer, Friend, Heart, Heartbreak, Howl, Miner, Mourner, Plenty, Prize, Sheaf, Shelter, Skull, Snort.
+     * 🥚 **L'Œuf de l'Ender Dragon** (`1 Dragon Egg`).
+     * 🌿 **Un Buisson Mort** (`1 Dead Bush`).
+   * *🌟 **Récompenses & Titres Suprêmes pour avoir conquis l'Âge 6** :*
+     * 🥚 **Relique Ancestrale** : **1x Œuf d'Ender Dragon** offert à tous les membres.
+     * ⚙ **Pouvoir Divin** : **1x Bloc de Commande (Command Block)** offert à tous les membres.
+     * 💬 **Titre & Préfixe de Tchat Dynamique selon le Temps de Jeu** :
+       * Si votre session active de connexion dure **moins d'1 heure (< 1h)** : Préfixe de gloire **`[Giga Tchad]`** dans le tchat !
+       * Si votre session active de connexion dure **plus d'1 heure (> 1h)** : Préfixe de prestige **`[Gros Nerd]`** dans le tchat !
 
 ---
 
@@ -267,3 +286,6 @@ Le serveur progresse à travers **5 Âges technologiques majeurs**. Pour faire f
 * `/ah` : Ouvrir l'Hôtel des Ventes et le marché des Hordes Noires.
 * `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes.
 * `/age` : Ouvrir le menu de progression des Âges et déposer des ressources.
+
+### 🌐 Navigation & Serveur
+* `/hub` (ou `/lobby`) : Se reconnecter directement au Hub principal du réseau (raccourci vers `/server hub`).
