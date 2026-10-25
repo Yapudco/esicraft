@@ -43,6 +43,7 @@ import fr.esicraft.rail.RailListener;
 import fr.esicraft.rail.RailManager;
 import fr.esicraft.command.RailCommand;
 import fr.esicraft.command.TreatyCommand;
+import fr.esicraft.web.WebServer;
 import fr.esicraft.treaty.AlliedProtectionListener;
 import fr.esicraft.treaty.TreatyGuiListener;
 import fr.esicraft.treaty.TreatyManager;
@@ -68,6 +69,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private HudManager hudManager;
    private RailManager railManager;
    private TreatyManager treatyManager;
+   private WebServer webServer;
    private RaceManager raceManager;
    private GuildManager guildManager;
    private NexusManager nexusManager;
@@ -103,6 +105,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.seasonManager.init();
       this.railManager.load();
       this.treatyManager.load();
+      this.webServer = new WebServer(this);
+      this.webServer.start();
       this.eventManager.start();
       this.hudManager.start();
       this.nexusManager.removeAllHolograms();
@@ -140,6 +144,10 @@ public final class EsicraftPlugin extends JavaPlugin {
          } catch (Exception var2) {
             this.getLogger().warning("Impossible d'arrêter proprement les raids : " + var2.getMessage());
          }
+      }
+
+      if (this.webServer != null) {
+         this.webServer.stop();
       }
 
       if (this.eventManager != null) {
