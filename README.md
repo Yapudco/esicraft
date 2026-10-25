@@ -32,7 +32,7 @@
 5. **Fais avancer ta guilde** en donnant des ressources dans `/age` pour débloquer de nouveaux équipements et dimensions.
 
 > [!TIP]
-> Tape `/guide` pour recevoir le livre de règles en jeu, et `/hud` pour afficher ou masquer le tableau de bord à droite de l'écran.
+> Tape `/guide` pour recevoir le livre de règles en jeu (30 pages : sommaire cliquable, métiers, guildes, Nexus, raids, Âges, argent, traités, train, événements, commandes), et `/hud` pour afficher ou masquer le tableau de bord à droite de l'écran.
 
 ---
 
@@ -290,7 +290,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les 
 | Commande | À quoi elle sert |
 | :--- | :--- |
 | `/race` · `/race show` | Choisir son métier · voir les joueurs connectés |
-| `/guide` | Livre de règles en jeu |
+| `/guide` | Livre de règles en jeu (s'ouvre directement, sommaire cliquable) |
 | `/guild create <nom> <tag>` | Créer une guilde |
 | `/guild invite <joueur>` · `/guild join <nom>` | Inviter · accepter une invitation |
 | `/guild leave` · `/guild kick <joueur>` | Partir · expulser |

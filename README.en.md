@@ -35,7 +35,7 @@
 5. **Level up your guild** by donating resources in `/age` to unlock new gear and dimensions.
 
 > [!TIP]
-> Type `/guide` to get the rule book in game, and `/hud` to show or hide the dashboard on the right of your screen.
+> Type `/guide` to get the in-game rule book (30 pages: clickable table of contents, jobs, guilds, Nexus, raids, Ages, money, treaties, trains, events, commands), and `/hud` to show or hide the dashboard on the right of your screen.
 
 ---
 
@@ -293,7 +293,7 @@ The server has a public website: **`http://<server-address>/`**. It shows online
 | Command | What it does |
 | :--- | :--- |
 | `/race` · `/race show` | Pick your profession · see online players |
-| `/guide` | In-game rule book |
+| `/guide` | In-game rule book (opens right away, clickable contents) |
 | `/guild create <name> <tag>` | Create a guild |
 | `/guild invite <player>` · `/guild join <name>` | Invite · accept an invitation |
 | `/guild leave` · `/guild kick <player>` | Leave · kick |
