@@ -259,6 +259,27 @@ Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire f
 
 ---
 
+## 🎉 8bis. Contrats, Événements & Saisons
+
+### 📜 Contrats quotidiens (`/contrat`)
+Chaque jour (renouvellement à minuit, heure de Paris), chaque joueur ayant un métier reçoit **3 contrats** : un propre à son métier (Mineur : minerais, Sylvain : récoltes, Forgeron : lingots fondus, Rôdeur : kills à distance, Arcaniste : enchantements, Ingénieur : composants de redstone), un contrat de chasse et un contrat de minage/récolte. Chaque contrat rapporte des pièces, et les **3 accomplis donnent +400 pièces**. Les blocs posés par les joueurs, les fermes à mobs répétitives et les poses/reprises de redstone en boucle ne comptent pas.
+
+### 🌍 Événements serveur (toutes les 45 à 90 min, `events.*` dans `config.yml`)
+* 🌑 **Lune de Sang** (10 min) : plus de monstres la nuit, **primes de chasse x2**.
+* ☄ **Pluie de Météorites** (3 min) : des blocs de minerai (jusqu'aux débris antiques) s'écrasent près des joueurs, hors des territoires de guilde.
+* 🧙 **Marché Noir** (5 min) : un marchand ambulant apparaît (coordonnées approximatives annoncées) et échange des objets rares contre des diamants — ouvert à tous, quel que soit l'Âge.
+* ☠ **Boss Mondial** (15 min) : le *Seigneur des Cendres* (800 PV). **3 000 pièces** partagées selon les dégâts infligés ; le meilleur combattant gagne une Étoile du Nether et 8 diamants.
+* Admins : `/evenement <lune|meteores|marchand|boss|stop|status>`.
+
+### 🏆 Saison & mémorial
+* `/classement` : classement mensuel des guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). Le champion reçoit **5 000 pièces** en banque, **500 par membre** et la couronne 👑 dans le tchat.
+* `/histoire` : les 10 derniers événements marquants (conquêtes, raids repoussés, boss, champions).
+
+### 📊 Tableau de bord (`/hud`)
+Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état du raid/immunité, vos contrats, votre solde et l'événement en cours. `/hud` l'active ou le masque (réglage conservé).
+
+---
+
 ## 📋 8. Liste Complète des Commandes
 
 ### 🎭 Métiers & Races
@@ -295,6 +316,7 @@ Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire f
 * `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes (**10 annonces actives max** par joueur, `market.max-listings-per-player`).
 * Dans `/ah` : **pagination** (flèches ◀ ▶), et un **clic sur sa propre annonce l'annule** et rend l'objet.
 * `/age` : Ouvrir le menu de progression des Âges et déposer des ressources.
+* `/contrat`, `/classement`, `/histoire`, `/hud` : contrats du jour, classement de saison, mémorial, tableau de bord.
 
 ### 🌐 Navigation & Serveur
 * `/hub` (ou `/lobby`) : Se reconnecter directement au Hub principal du réseau (raccourci vers `/server hub`).

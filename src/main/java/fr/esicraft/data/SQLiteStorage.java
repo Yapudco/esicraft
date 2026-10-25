@@ -91,6 +91,10 @@ public class SQLiteStorage {
             "    CREATE TABLE IF NOT EXISTS market_listings (\n        id VARCHAR(36) PRIMARY KEY,\n        seller_uuid VARCHAR(36),\n        seller_name VARCHAR(32),\n        item_data TEXT,\n        price DOUBLE,\n        created_at BIGINT\n    );\n"
          );
          statement.executeUpdate("CREATE TABLE IF NOT EXISTS raid_cooldowns (guild_id VARCHAR(36) PRIMARY KEY, last_raid BIGINT);");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS contract_progress (uuid VARCHAR(36), day VARCHAR(10), idx INT, progress INT, claimed INT DEFAULT 0, PRIMARY KEY (uuid, day, idx));");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_stats (guild_id VARCHAR(36) PRIMARY KEY, repelled INT DEFAULT 0, conquests INT DEFAULT 0);");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY AUTOINCREMENT, ts BIGINT, text TEXT);");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS kv (k VARCHAR(64) PRIMARY KEY, v TEXT);");
       }
    }
 
@@ -667,12 +671,56 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM market_listings;");
             statement.executeUpdate("DELETE FROM server_age;");
             statement.executeUpdate("DELETE FROM raid_cooldowns;");
+            statement.executeUpdate("DELETE FROM guild_stats;");
+            statement.executeUpdate("DELETE FROM history;");
             statement.executeUpdate("UPDATE players SET race = 'NONE', guild_id = NULL, guild_role = NULL, coins = 100.0, race_changes_count = 0;");
             this.plugin.getLogger().info("Toutes les données de jeu ont été réinitialisées en base de données.");
          } catch (SQLException var6) {
             this.plugin.getLogger().log(Level.SEVERE, "Erreur lors du reset complet du jeu", (Throwable)var6);
          }
       }
+   }
+
+   /** Écriture SQL générique (contrats, statistiques, historique, kv). Les erreurs sont journalisées, jamais propagées. */
+   public synchronized void exec(String sql, Object... params) {
+      if (this.connection != null) {
+         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+               ps.setObject(i + 1, params[i]);
+            }
+
+            ps.executeUpdate();
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur SQL (" + sql + ") : " + e.getMessage());
+         }
+      }
+   }
+
+   /** Lecture SQL générique : renvoie les lignes sous forme de tableaux de {@code columns} colonnes. */
+   public synchronized List<Object[]> select(String sql, int columns, Object... params) {
+      List<Object[]> rows = new java.util.ArrayList<>();
+      if (this.connection != null) {
+         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+               ps.setObject(i + 1, params[i]);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+               while (rs.next()) {
+                  Object[] row = new Object[columns];
+                  for (int c = 0; c < columns; c++) {
+                     row[c] = rs.getObject(c + 1);
+                  }
+
+                  rows.add(row);
+               }
+            }
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur SQL (" + sql + ") : " + e.getMessage());
+         }
+      }
+
+      return rows;
    }
 
    public synchronized void saveRaidCooldown(String guildId, long lastRaidMs) {

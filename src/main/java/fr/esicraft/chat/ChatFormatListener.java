@@ -34,7 +34,7 @@ public class ChatFormatListener implements Listener, ChatRenderer {
       Guild guild = this.plugin.getGuildManager().getGuildByPlayer(source.getUniqueId());
       StringBuilder prefixBuilder = new StringBuilder();
       if (guild != null) {
-         prefixBuilder.append("&8[&6").append(guild.getTag()).append("&8] ");
+         prefixBuilder.append(this.plugin.getSeasonManager().isChampion(guild.getId()) ? "&6👑 " : "").append("&8[&6").append(guild.getTag()).append("&8] ");
       } else {
          prefixBuilder.append("&8[&7Sans Guilde&8] ");
       }

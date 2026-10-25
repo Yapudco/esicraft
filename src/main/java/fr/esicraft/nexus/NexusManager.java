@@ -434,6 +434,7 @@ public class NexusManager {
       }
 
       if (victorGuild != null && !victorGuild.getId().equals(guild.getId())) {
+         this.plugin.getSeasonManager().recordConquest(victorGuild, guild);
          this.plugin.getGuildManager().registerAnnexation(guild, victorGuild);
       } else {
          guild.setVulnerableUntil(System.currentTimeMillis() + 1800000L);
