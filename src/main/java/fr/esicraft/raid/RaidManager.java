@@ -120,6 +120,21 @@ public class RaidManager implements Listener {
       return this.launchRaid(attackerGuild, targetGuild, raidType, explosiveBreachers, false, buyer);
    }
 
+   /** Siège de Pillards : 1 Ravageur sur 6, 1 Vindicateur sur 3, le reste en Pillards. */
+   private EntityType spawnTypeFor(RaidType raidType, int index) {
+      if (raidType == RaidType.PILLAGER_SIEGE) {
+         if (index % 6 == 0) {
+            return EntityType.RAVAGER;
+         }
+
+         if (index % 3 == 1) {
+            return EntityType.VINDICATOR;
+         }
+      }
+
+      return raidType.getPrimaryMobType();
+   }
+
    public boolean launchCustomRaid(Guild attackerGuild, Guild targetGuild, Map<CustomHordeUnit, Integer> composition, Player buyer) {
       return this.launchCustomRaid(attackerGuild, targetGuild, composition, false, false, buyer);
    }
@@ -240,7 +255,7 @@ public class RaidManager implements Listener {
                      );
                   }
 
-                  this.guildRaidCooldowns.put(targetGuild.getId(), now);
+                  this.setCooldown(targetGuild.getId(), now);
                   Location nexusLoc = targetGuild.getNexus().getLocation();
                   World world = nexusLoc.getWorld();
                   if (world == null) {
@@ -263,7 +278,8 @@ public class RaidManager implements Listener {
                         double z = nexusLoc.getZ() + distance * Math.sin(angle);
                         int y = world.getHighestBlockYAt((int)x, (int)z) + 1;
                         Location spawnLoc = new Location(world, x, (double)y, z);
-                        Entity entity = world.spawnEntity(spawnLoc, raidType.getPrimaryMobType());
+                        EntityType spawnType = this.spawnTypeFor(raidType, i);
+                        Entity entity = world.spawnEntity(spawnLoc, spawnType);
                         if (entity instanceof LivingEntity) {
                            LivingEntity living = (LivingEntity)entity;
                            String tag = "";
@@ -283,7 +299,7 @@ public class RaidManager implements Listener {
                            living.setCustomNameVisible(true);
                            living.setRemoveWhenFarAway(false);
                            living.addScoreboardTag("esicraft_raid_mob");
-                           this.equipMob(living, raidType.getPrimaryMobType());
+                           this.equipMob(living, spawnType);
                            if (lavaImmunity) {
                               living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 24000, 1, false, false));
                            }
@@ -452,7 +468,7 @@ public class RaidManager implements Listener {
                         );
                      }
 
-                     this.guildRaidCooldowns.put(targetGuild.getId(), now);
+                     this.setCooldown(targetGuild.getId(), now);
                      Location nexusLoc = targetGuild.getNexus().getLocation();
                      World world = nexusLoc.getWorld();
                      if (world == null) {
@@ -828,13 +844,25 @@ public class RaidManager implements Listener {
       }
    }
 
+   /** Charge les cooldowns sauvegardés (appelé après l'ouverture de la base) : l'immunité post-raid survit aux redémarrages. */
+   public void loadCooldowns() {
+      this.guildRaidCooldowns.putAll(this.plugin.getDataManager().getStorage().loadRaidCooldowns());
+   }
+
+   private void setCooldown(String guildId, long timestamp) {
+      this.guildRaidCooldowns.put(guildId, timestamp);
+      org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().saveRaidCooldown(guildId, timestamp));
+   }
+
    public void resetAllCooldowns() {
       this.guildRaidCooldowns.clear();
+      org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().clearRaidCooldowns());
    }
 
    public void resetCooldown(String guildId) {
       if (guildId != null) {
          this.guildRaidCooldowns.remove(guildId);
+         org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().deleteRaidCooldown(guildId));
       }
    }
 
@@ -845,7 +873,6 @@ public class RaidManager implements Listener {
 
       this.activeRaids.clear();
       this.guildIdsUnderRaid.clear();
-      this.guildRaidCooldowns.clear();
    }
 
    public boolean stopRaid(String guildId) {
@@ -861,7 +888,7 @@ public class RaidManager implements Listener {
          }
       }
 
-      this.guildRaidCooldowns.remove(guildId);
+      this.resetCooldown(guildId);
       return stopped;
    }
 }

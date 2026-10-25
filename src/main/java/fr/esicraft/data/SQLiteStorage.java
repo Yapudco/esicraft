@@ -90,6 +90,7 @@ public class SQLiteStorage {
          statement.executeUpdate(
             "    CREATE TABLE IF NOT EXISTS market_listings (\n        id VARCHAR(36) PRIMARY KEY,\n        seller_uuid VARCHAR(36),\n        seller_name VARCHAR(32),\n        item_data TEXT,\n        price DOUBLE,\n        created_at BIGINT\n    );\n"
          );
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS raid_cooldowns (guild_id VARCHAR(36) PRIMARY KEY, last_raid BIGINT);");
       }
    }
 
@@ -102,7 +103,7 @@ public class SQLiteStorage {
 
       try (
          Statement st = this.connection.createStatement();
-         ResultSet rs = st.executeQuery("SELECT version FROM schema_version LIMIT 1;");
+         ResultSet rs = st.executeQuery("SELECT MAX(version) AS version FROM schema_version;");
       ) {
          if (rs.next()) {
             currentVersion = rs.getInt("version");
@@ -128,6 +129,15 @@ public class SQLiteStorage {
       if (currentVersion < 5) {
          this.applyMigration("ALTER TABLE guilds ADD COLUMN nexus_traps TEXT DEFAULT '';");
          currentVersion = 5;
+      }
+
+      if (currentVersion < 6) {
+         // v6 : cooldowns de raid persistants (table raid_cooldowns, créée par createTables).
+         currentVersion = 6;
+      }
+
+      try (Statement cleanup = this.connection.createStatement()) {
+         cleanup.executeUpdate("DELETE FROM schema_version WHERE version <> " + currentVersion + ";");
       }
 
       try (PreparedStatement ps = this.connection
@@ -164,6 +174,37 @@ public class SQLiteStorage {
             ps.executeUpdate();
          } catch (SQLException var8) {
             this.plugin.getLogger().log(Level.SEVERE, "Erreur sauvegarde joueur: " + data.getPlayerName(), (Throwable)var8);
+         }
+      }
+   }
+
+   /**
+    * Exécute plusieurs écritures dans UNE seule transaction (un seul fsync au lieu d'un par ligne) : la sauvegarde
+    * périodique de tous les joueurs et guildes devient bien moins coûteuse. En cas d'erreur, tout est annulé proprement.
+    */
+   public synchronized void runInTransaction(Runnable writes) {
+      if (this.connection == null) {
+         writes.run();
+         return;
+      }
+
+      boolean previous = true;
+      try {
+         previous = this.connection.getAutoCommit();
+         this.connection.setAutoCommit(false);
+         writes.run();
+         this.connection.commit();
+      } catch (SQLException | RuntimeException e) {
+         try {
+            this.connection.rollback();
+         } catch (SQLException ignored) {
+         }
+
+         this.plugin.getLogger().log(Level.SEVERE, "Erreur lors de la sauvegarde groupée (annulée)", e);
+      } finally {
+         try {
+            this.connection.setAutoCommit(previous);
+         } catch (SQLException ignored) {
          }
       }
    }
@@ -625,12 +666,62 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM guild_claims;");
             statement.executeUpdate("DELETE FROM market_listings;");
             statement.executeUpdate("DELETE FROM server_age;");
+            statement.executeUpdate("DELETE FROM raid_cooldowns;");
             statement.executeUpdate("UPDATE players SET race = 'NONE', guild_id = NULL, guild_role = NULL, coins = 100.0, race_changes_count = 0;");
             this.plugin.getLogger().info("Toutes les données de jeu ont été réinitialisées en base de données.");
          } catch (SQLException var6) {
             this.plugin.getLogger().log(Level.SEVERE, "Erreur lors du reset complet du jeu", (Throwable)var6);
          }
       }
+   }
+
+   public synchronized void saveRaidCooldown(String guildId, long lastRaidMs) {
+      if (this.connection != null) {
+         try (PreparedStatement ps = this.connection.prepareStatement(
+            "INSERT INTO raid_cooldowns (guild_id, last_raid) VALUES (?, ?) ON CONFLICT(guild_id) DO UPDATE SET last_raid = excluded.last_raid;")) {
+            ps.setString(1, guildId);
+            ps.setLong(2, lastRaidMs);
+            ps.executeUpdate();
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur sauvegarde cooldown de raid", (Throwable)e);
+         }
+      }
+   }
+
+   public synchronized void deleteRaidCooldown(String guildId) {
+      if (this.connection != null) {
+         try (PreparedStatement ps = this.connection.prepareStatement("DELETE FROM raid_cooldowns WHERE guild_id = ?;")) {
+            ps.setString(1, guildId);
+            ps.executeUpdate();
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur suppression cooldown de raid", (Throwable)e);
+         }
+      }
+   }
+
+   public synchronized void clearRaidCooldowns() {
+      if (this.connection != null) {
+         try (Statement st = this.connection.createStatement()) {
+            st.executeUpdate("DELETE FROM raid_cooldowns;");
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur reset cooldowns de raid", (Throwable)e);
+         }
+      }
+   }
+
+   public synchronized Map<String, Long> loadRaidCooldowns() {
+      Map<String, Long> result = new java.util.HashMap<>();
+      if (this.connection != null) {
+         try (Statement st = this.connection.createStatement(); ResultSet rs = st.executeQuery("SELECT guild_id, last_raid FROM raid_cooldowns;")) {
+            while (rs.next()) {
+               result.put(rs.getString("guild_id"), rs.getLong("last_raid"));
+            }
+         } catch (SQLException e) {
+            this.plugin.getLogger().log(Level.WARNING, "Erreur chargement cooldowns de raid", (Throwable)e);
+         }
+      }
+
+      return result;
    }
 
    public synchronized void updateOfflinePlayerBalance(UUID uuid, double amountToAdd) {

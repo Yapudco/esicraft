@@ -576,10 +576,12 @@ public class RaceInteractionListener implements Listener {
 
                PlayerData data = this.plugin.getDataManager().getPlayerData(killer.getUniqueId());
                if (data != null) {
-                  data.addCoins(finalBounty);
+                  boolean shareWithGuild = guild != null && spec == GuildSpecialization.MERCHANT_SYNDICATE;
+                  // 10 % de la prime sont TRANSFÉRÉS à la banque de guilde (et non créés) : le joueur touche 90 %.
+                  double guildShare = shareWithGuild ? finalBounty * 0.1 : 0.0;
+                  data.addCoins(finalBounty - guildShare);
                   String antiFarmNote = antiFarmMultiplier < 0.7 ? " &8[&c-Farm x" + String.format("%.2f", antiFarmMultiplier) + "&8]" : "";
-                  if (guild != null && spec == GuildSpecialization.MERCHANT_SYNDICATE) {
-                     double guildShare = finalBounty * 0.1;
+                  if (shareWithGuild) {
                      guild.depositBank(guildShare);
                      ChatUtil.sendActionbar(
                         killer,

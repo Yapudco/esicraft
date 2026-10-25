@@ -4,6 +4,7 @@ import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.age.AgeType;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildSpecialization;
+import fr.esicraft.guild.listener.SpecializationRulesListener;
 import fr.esicraft.race.Race;
 import fr.esicraft.util.ChunkKey;
 import java.util.Iterator;
@@ -35,8 +36,11 @@ public class RaceBuffTask extends BukkitRunnable {
    private static final PotionEffect AGE_HASTE = new PotionEffect(PotionEffectType.FAST_DIGGING, 60, 0, false, false, true);
    private static final PotionEffect AGE_RESIST = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 0, false, false, true);
 
-   public RaceBuffTask(EsicraftPlugin plugin) {
+   private final SpecializationRulesListener specializationRules;
+
+   public RaceBuffTask(EsicraftPlugin plugin, SpecializationRulesListener specializationRules) {
       this.plugin = plugin;
+      this.specializationRules = specializationRules;
    }
 
    public void run() {
@@ -54,6 +58,7 @@ public class RaceBuffTask extends BukkitRunnable {
 
             player = (Player)var1.next();
             if (player.isValid() && player.getLocation().getWorld() != null) {
+               this.specializationRules.enforceNoNetherite(player);
                Race race = this.plugin.getRaceManager().getRace(player);
                loc = player.getLocation();
                y = loc.getBlockY();

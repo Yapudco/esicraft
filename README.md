@@ -310,10 +310,13 @@ Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire f
 * **Alambic** : l'alimentation par entonnoir est soumise à la même restriction que l'ouverture manuelle.
 * **Sauvegarde** : les écritures de comptes joueurs sont sérialisées (pas de perte d'argent entre une vente HDV et une déconnexion).
 
-## ⚠️ Fonctionnalités annoncées mais pas (encore) implémentées
-* Arcaniste : malus de +15 % de dégâts subis en mêlée.
-* Forgeron : exclusivité sur enclumes, meules et hauts-fourneaux.
-* Enclave Champêtre : reproduction animale x3 et interdiction des armures en Netherite.
-* Industrie Souterraine : interdiction des potions de niveau 2.
-* Siège de Pillards : Ravageurs et Vindicateurs dans la horde prédéfinie.
-* Persistance des cooldowns de raid et des raids actifs après redémarrage.
+## ✅ Détails d'implémentation récents
+* **Arcaniste** : +15 % de dégâts subis en mêlée (attaques directes uniquement).
+* **Forgeron** : enclumes, meules et hauts-fourneaux ne sont **craftables** que par les Forgerons jusqu'à l'Âge 3 (l'usage reste libre : les Arcanistes ont besoin de l'enclume pour leurs livres).
+* **Enclave Champêtre** : reproduction animale accélérée (cooldown des parents et croissance des bébés divisés par 3) ; les armures en Netherite sont retirées automatiquement (équipement, connexion, vérification périodique).
+* **Industrie Souterraine** : boire ou lancer une potion de niveau 2 (`STRONG_*` ou effet d'amplificateur ≥ 1) est refusé.
+* **Siège de Pillards** : 1 Ravageur sur 6 et 1 Vindicateur sur 3, le reste en Pillards.
+* **Syndicat Marchand** : les 10 % de dividende sont désormais **prélevés** sur la prime du joueur (il touche 90 %) et transférés à la banque : plus de création de monnaie.
+* **Cooldowns de raid** : persistés en base (table `raid_cooldowns`, schéma v6) et conservés après un redémarrage.
+* **Raids actifs** : par conception, un raid en cours ne survit pas à un redémarrage (ses monstres sont supprimés), mais l'immunité post-raid, elle, est conservée.
+* **Performances** : la sauvegarde périodique des joueurs et guildes s'exécute en **une seule transaction** SQLite.
