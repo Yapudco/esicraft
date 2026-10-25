@@ -105,6 +105,17 @@ Y sont aussi interdits : la **TNT** (y compris en wagonnet), les **perles de l'E
 
 Les autres protections sautent seulement pendant un raid contre la guilde, et pendant **30 minutes** après la destruction de son Nexus s'il n'y a pas d'annexion.
 
+### 🧩 Le bonus de diversité
+
+Plus ta guilde réunit de **métiers différents**, plus elle est forte (niveau visible dans `/guild info` et sur le site) :
+
+| Métiers différents | Bonus |
+| :--- | :--- |
+| 3 | Primes de monstres +10 % |
+| 4 | Nouvelles terres 10 % moins chères |
+| 5 | Pièges du Nexus 15 % moins chers |
+| 6 | Récompenses des contrats de guilde ×1,5 |
+
 ---
 
 ## 🌟 4. Les spécialisations de guilde
@@ -231,6 +242,10 @@ Ta guilde commence à l'**Âge 1** et peut monter jusqu'à l'**Âge 6**. Pour pa
 Le Syndicat Marchand touche 20 % de plus.
 </details>
 
+### Le contrat de guilde
+
+Dans `/contrat`, sous tes contrats personnels : chaque jour, ta guilde reçoit **trois objectifs, chacun réservé à un métier** (par exemple : un Nain mine, un Forgeron fond des lingots, un Ingénieur pose de la redstone). Seuls les membres du bon métier font avancer leur objectif. Chaque objectif rapporte **200 pièces** à la banque de guilde, et les trois ensemble **750 de plus**. Les objectifs grandissent avec la taille de la guilde.
+
 ### Tuer un joueur
 
 Quand tu tues un joueur d'une autre guilde, tu lui **prends 100 pièces + 1 % de sa fortune** (ou tout ce qu'il a s'il a 100 pièces ou moins). Pas de prime si vous vous êtes déjà affrontés il y a moins de 2 minutes, ni entre membres d'une même guilde.
@@ -281,13 +296,50 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 
 Chaque mois, `/classement` classe les guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). La guilde championne gagne **5 000 pièces**, **500 par membre** et une couronne 👑 dans le tchat. `/histoire` raconte les derniers grands moments du serveur.
 
+### 🍂 Les saisons naturelles (`/climat`)
+
+Le monde change de saison **toutes les deux semaines** (réglable) :
+
+| Saison | Effet |
+| :--- | :--- |
+| 🌸 Printemps | Les cultures poussent plus vite (+50 %) |
+| ☀ Été | +20 % d'expérience |
+| 🍂 Automne | Une chance sur deux d'avoir une récolte bonus |
+| ❄ Hiver | Les cultures poussent deux fois moins vite, primes de monstres +25 % |
+
+### 🆘 L'appel à l'aide (`/aide`)
+
+Pendant un raid ou une attaque de ton Nexus, `/aide` prévient tes **alliés** (alliance ou vassalité). Chaque allié qui rejoint tes terres avant la fin de la horde gagne **250 pièces** si elle est repoussée (6 alliés au plus). Un appel toutes les 10 minutes.
+
+### 🎭 Le déguisement (`/deguisement <guilde>`)
+
+Pour **750 pièces**, tu te fais passer pendant **5 minutes** pour un membre de cette guilde : son nom et son étiquette apparaissent dans le tchat et la liste des joueurs, ton nom au-dessus de la tête est masqué. Ses pièges et son golem t'ignorent, mais ses protections de territoire restent actives. **Infliger des dégâts ou frapper le Nexus te démasque**, et la guilde est prévenue. Un déguisement toutes les 30 minutes ; `/deguisement off` pour l'enlever.
+
+### 📰 Journal de guerre et succès
+
+`/journal` résume les derniers grands faits (raids, conquêtes, traités, trahisons, Âges, événements). `/succes` liste tes **26 succès** (premier métier, conquérant, traître, maître espion, quatre saisons…) et le pourcentage de joueurs qui les ont. Un succès obtenu par moins de 10 % des joueurs est **rare** et annoncé dans le journal.
+
 ### Le jeu en anglais
 
-`/english` traduit le jeu **pour toi seul** : messages, barre d'action, menus, tableau de bord et livre `/guide` (réponse `/francais` pour revenir). Le choix est mémorisé. Les noms de guildes et de joueurs ne sont pas traduits. Pas encore traduits : la barre de boss des événements, le tchat et le site web.
+`/english` traduit le jeu **pour toi seul** : messages, barre d'action, menus, tableau de bord et livre `/guide` (réponse `/francais` pour revenir). Le choix est mémorisé. Les noms de guildes et de joueurs ne sont pas traduits. Pas encore traduits : la barre de boss des événements, le tchat, les entrées du journal de guerre et le site web.
 
 ### Le site web
 
-Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les joueurs connectés, le classement des guildes, la fiche de chaque guilde (membres, traités, statistiques) et les plus riches. Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
+Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à jour tout seul (toutes les 15 secondes). Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
+
+| Page | Contenu |
+| :--- | :--- |
+| Accueil | Joueurs en ligne, top guildes, saison naturelle, raids en cours, journal récent |
+| Guildes · fiche de guilde | Classement ; membres, traités, diversité, trophées, courbes d'évolution, Âges franchis, faits marquants |
+| Joueurs · profil | En ligne, plus riches, annuaire ; profil de chaque joueur (métier, guilde, statistiques, succès) |
+| Raids | Les hordes en cours : cible, attaquant, monstres restants, défenseurs sur place, durée |
+| Journal | Le journal de guerre complet, filtrable par catégorie |
+| Diplomatie | Réseau des alliances, pactes, vassalités et rivalités, carte des rivalités |
+| Musée | Trophées des guildes, tous les succès avec leur rareté, derniers débloqués |
+| Âges | Frise : quand chaque guilde a franchi chaque Âge |
+| Guide | Toutes les règles, avec une recherche |
+
+Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
 
 ---
 
@@ -311,7 +363,11 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les 
 | `/age` | Progression des Âges et dons |
 | `/money` · `/baltop` · `/pay <joueur> <montant>` | Son argent · les plus riches · envoyer des pièces |
 | `/ah` · `/ah sell <prix>` | Hôtel des Ventes et raids · vendre l'objet en main |
-| `/contrat` | Contrats du jour |
+| `/contrat` | Contrats du jour et contrat de guilde |
+| `/aide` | Appeler ses alliés à l'aide pendant une attaque |
+| `/deguisement <guilde>` · `/deguisement off` | Se déguiser en membre d'une autre guilde · enlever le déguisement |
+| `/climat` | Saison naturelle en cours |
+| `/journal` · `/succes [joueur]` | Journal de guerre · succès |
 | `/traite` · `/traite liste` | Traités entre guildes |
 | `/station` · `/rail` | Prendre le train · gérer son réseau (officiers) |
 | `/classement` · `/histoire` | Classement de la saison · grands moments |
@@ -345,6 +401,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les 
 | `rail` | Prix des trajets et des gares, péage max, Âge minimum |
 | `treaties` | Durée des pactes, tribut, indemnité, préavis, protection entre alliés |
 | `web` | Site web : port, nom affiché, informations visibles, anti-flood |
+| `life` | Saisons naturelles (durée), déguisement (prix, durée, délai), récompense de l'appel à l'aide |
 
 ### Le site web
 

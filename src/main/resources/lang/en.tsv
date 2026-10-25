@@ -1339,3 +1339,136 @@ Inconnue	Unknown
  &d! Ouvrez &e/traite &dpour répondre (&7	 &d! Open &e/traite &dto reply (&7
 📜 PACTE DE NON-AGRESSION entre &6	📜 NON-AGGRESSION PACT between &6
  jours) !	 days)!
+  &7Seuls les membres du métier indiqué font avancer chaque objectif.	  &7Only members of the listed job advance each objective.
+&eSaison: 	&eSeason: 
+Choisir son premier métier	Choose your first job
+Fonder une guilde	Found a guild
+Frères d'armes	Brothers in arms
+Rejoindre une guilde	Join a guild
+Premier arpent	First acre
+Revendiquer un territoire	Claim a territory
+Cœur battant	Beating heart
+Poser le Nexus de sa guilde	Place your guild's Nexus
+Métallurgiste	Metallurgist
+Atteindre l'Âge 2 avec sa guilde	Reach Age 2 with your guild
+Seigneur de guerre	Warlord
+Atteindre l'Âge 4 avec sa guilde	Reach Age 4 with your guild
+Suprématie	Supremacy
+Atteindre l'Âge 6 avec sa guilde	Reach Age 6 with your guild
+Chef de horde	Horde master
+Lancer une horde contre une autre guilde	Launch a horde against another guild
+Repousser une horde en défendant son territoire	Repel a horde while defending your land
+Conquérant	Conqueror
+Détruire le Nexus d'une autre guilde	Destroy another guild's Nexus
+Signer un traité	Sign a treaty
+Traître	Traitor
+Rompre un traité	Break a treaty
+Prendre le train	Take the train
+Chef de gare	Stationmaster
+Construire une gare	Build a station
+Accomplir les 3 contrats du jour	Complete the 3 daily contracts
+Esprit d'équipe	Team spirit
+Participer à un contrat de guilde accompli	Take part in a completed guild contract
+Éliminer 500 monstres	Kill 500 monsters
+Tuer un joueur d'une autre guilde	Kill a player from another guild
+Tueur de boss	Boss slayer
+Être le meilleur combattant contre le Seigneur des Cendres	Be the top fighter against the Lord of Ashes
+Fortuné	Wealthy
+Posséder 10 000 pièces	Own 10,000 coins
+Posséder 100 000 pièces	Own 100,000 coins
+Maître espion	Master spy
+Se déguiser en membre d'une autre guilde	Disguise yourself as a member of another guild
+Répondre à l'appel à l'aide d'un allié et repousser la horde	Answer an ally's call for help and repel the horde
+Quatre saisons	Four seasons
+Jouer pendant les quatre saisons naturelles	Play during all four natural seasons
+Gagner une saison avec sa guilde	Win a season with your guild
+&6🏅 Succès débloqué : &e	&6🏅 Achievement unlocked: &e
+ &d(rare : 	 &d(rare: 
+ % des joueurs)	 % of players)
+&cLe déguisement est désactivé sur ce serveur.	&cDisguises are disabled on this server.
+&cVous ne pouvez pas vous déguiser en membre de votre propre guilde.	&cYou cannot disguise yourself as a member of your own guild.
+&cVous êtes déjà déguisé (&e/deguisement off&c pour l'enlever).	&cYou are already disguised (&e/deguisement off&c to remove it).
+&cVotre prochain déguisement sera prêt dans &e	&cYour next disguise will be ready in &e
+ min&c.	 min&c.
+&cIl vous faut &6	&cYou need &6
+ pièces &cpour acheter un déguisement.	 coins &cto buy a disguise.
+&c🎭 Vous avez été démasqué !	&c🎭 You have been unmasked!
+&c🎭 Espion démasqué : &e	&c🎭 Spy unmasked: &e
+ &cse faisait passer pour &e	 &cwas posing as &e
+&7🎭 Votre déguisement est tombé.	&7🎭 Your disguise wore off.
+&a🧩 Contrat de guilde : objectif &f	&a🧩 Guild contract: objective &f
+ &aaccompli ! &6+	 &acompleted! &6+
+ pièces &7(banque)	 coins &7(bank)
+&6&l🧩 Contrat de guilde terminé ! &e+	&6&l🧩 Guild contract complete! &e+
+ pièces &7versées à la banque de guilde.	 coins &7paid into the guild bank.
+  &b&l🧩 CONTRAT DE GUILDE &7(	  &b&l🧩 GUILD CONTRACT &7(
+ par objectif, +	 per objective, +
+ pour les trois, versés à la banque)	 for all three, paid to the bank)
+ &c(aucun membre de ce métier !)	 &c(no member with this job!)
+&7Diversité : &e	&7Diversity: &e
+/6 métiers	/6 jobs
+ &73 métiers : primes de monstres +10 %	 &73 jobs: monster bounties +10 %
+ &74 métiers : terres -10 %	 &74 jobs: land -10 %
+ &75 métiers : pièges du Nexus -15 %	 &75 jobs: Nexus traps -15 %
+ &76 métiers : contrats de guilde ×1,5	 &76 jobs: guild contracts ×1.5
+&cVous devez appartenir à une guilde pour appeler à l'aide.	&cYou must belong to a guild to call for help.
+&cVotre guilde n'est pas attaquée : l'appel à l'aide n'est possible que pendant un raid ou une attaque du Nexus.	&cYour guild is not under attack: you can only call for help during a raid or a Nexus attack.
+&cVotre guilde a déjà appelé à l'aide il y a moins de 10 minutes.	&cYour guild already called for help less than 10 minutes ago.
+&cAucun allié connecté : signez une alliance (&e/traite&c) pour pouvoir appeler à l'aide.	&cNo ally online: sign an alliance (&e/traite&c) to be able to call for help.
+&c&l🆘 APPEL À L'AIDE ! &e	&c&l🆘 CALL FOR HELP! &e
+&7) &cdemande des renforts : son Nexus est attaqué (&e	&7) &crequests reinforcements: their Nexus is under attack (&e
+ %&c). &7Rejoignez ses terres : &6+	 %&c). &7Join their land: &6+
+ pièces &7si la horde est repoussée.	 coins &7if the horde is repelled.
+&c&l🆘 APPEL À L'AIDE	&c&l🆘 CALL FOR HELP
+ a appelé vos alliés à l'aide (	 called your allies for help (
+ joueur	 player
+ prévenu	 warned
+&a🆘 Vous êtes arrivé en renfort chez &e	&a🆘 You arrived as reinforcement at &e
+&a🆘 Merci pour votre aide ! La horde a été repoussée : &6+	&a🆘 Thanks for your help! The horde was repelled: &6+
+  &6&l📰 JOURNAL DE GUERRE &7(12 derniers faits)	  &6&l📰 WAR JOURNAL &7(last 12 events)
+  &7Tout le journal est sur le site web du serveur.	  &7The full journal is on the server website.
+&cUsage : /succes <joueur>	&cUsage: /succes <player>
+  &6&l🏅 SUCCÈS DE &e	  &6&l🏅 ACHIEVEMENTS OF &e
+ &d· rare	 &d· rare
+&7Les saisons naturelles sont désactivées sur ce serveur.	&7Natural seasons are disabled on this server.
+ &7— encore 	 &7— still 
+ jour	 day
+  &7Ensuite : 	  &7Next: 
+&7Usage : &e/deguisement <guilde>&7 (se faire passer pour un de ses membres) ou &e/deguisement off	&7Usage: &e/deguisement <guild>&7 (pose as one of its members) or &e/deguisement off
+&7Vous n'êtes pas déguisé.	&7You are not disguised.
+&5🎭 Vous voilà déguisé en &e	&5🎭 You are now disguised as &e
+&8] &5! Les pièges de &e	&8] &5! The traps of &e
+ &5vous ignorent. Attaquer quoi que ce soit vous démasque.	 &5ignore you. Attacking anything unmasks you.
+Les cultures poussent plus vite (+50 %).	Crops grow faster (+50 %).
+Été	Summer
++20 % d'expérience pour tous.	+20 % experience for everyone.
+Récoltes abondantes : une chance sur deux de récolte bonus.	Abundant harvests: one chance in two of a bonus crop.
+Les cultures poussent deux fois moins vite.	Crops grow half as fast.
+Primes de monstres +25 % (la chasse nourrit).	Monster bounties +25 % (hunting feeds).
+ &7— la saison change !	 &7— the season changes!
+Printemps	Spring
+Automne	Autumn
+Hiver	Winter
+PRINTEMPS	SPRING
+AUTOMNE	AUTUMN
+HIVER	WINTER
+ÉTÉ	SUMMER
+Fondateur	Founder
+Rempart	Bulwark
+Diplomate	Diplomat
+Voyageur	Traveler
+Travailleur	Worker
+Chasseur	Hunter
+Duelliste	Duelist
+Magnat	Tycoon
+Sauveur	Savior
+&5🎭 Déguisé: &f	&5🎭 Disguised: &f
+ lance une horde (	 launches a horde (
+ a repoussé une invasion de monstres.	 repelled a monster invasion.
+ fonde la guilde 	 founds the guild 
+ remplit son contrat de guilde du jour.	 completes its daily guild contract.
+ débloque le succès « 	 unlocks the achievement « 
+ ont répondu à l'appel de 	 answered the call of 
+ a répondu à l'appel de 	 answered the call of 
+ commence.	 begins.
+ entre dans l'	 enters the 

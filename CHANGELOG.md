@@ -2,7 +2,21 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
-## 25/10/2026 (nuit)
+## 25/10/2026 (nuit, suite)
+
+### Nouvelles mécaniques
+- **Déguisement** (`/deguisement <guilde>`) : 750 pièces, 5 minutes, toutes les 30 minutes. Faux nom et étiquette dans le tchat et la liste, nom masqué au-dessus de la tête, pièges et golem de la guilde imitée sans effet. Infliger des dégâts ou frapper le Nexus démasque.
+- **Saisons naturelles** (`/climat`) : printemps, été, automne, hiver, deux semaines chacune. Effets sur la pousse des cultures, l'expérience, les récoltes et les primes.
+- **Bonus de diversité** : 3 à 6 métiers différents dans la guilde donnent des primes, des terres, des pièges et des contrats plus avantageux.
+- **Contrat de guilde** (dans `/contrat`) : trois objectifs par jour, chacun réservé à un métier ; récompense versée à la banque.
+- **Appel à l'aide** (`/aide`) : les alliés venus en renfort sont payés si la horde est repoussée.
+- **Journal de guerre** (`/journal`) et **26 succès** (`/succes`), avec statistiques par joueur.
+
+### Site web
+- Nouvelles pages : journal de guerre filtrable, raids en direct, réseau diplomatique et carte des rivalités, musée des trophées et des succès (rares mis en avant), courbes d'évolution, frise des Âges, profil de chaque joueur, guide consultable avec recherche.
+- Les pages se mettent à jour toutes seules (script local, autorisé par une politique de sécurité qui n'accepte que les scripts du site).
+- Nouvelles API : `/api/journal.json`, `/api/raids.json`.
+
 
 ### Commande `/english`
 - Traduit le jeu en anglais pour le joueur seul (messages, barre d'action, titres, menus, tableau de bord, livre `/guide`) ; `/francais` pour revenir. Choix mémorisé en base.

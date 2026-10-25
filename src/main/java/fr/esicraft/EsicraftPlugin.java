@@ -128,9 +128,9 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
-      this.seasonManager.init();
       this.chronicle.init();
       this.achievements.init();
+      this.seasonManager.init();
       this.natureSeasons.init();
       this.synergy.init();
       this.guildContracts.init();

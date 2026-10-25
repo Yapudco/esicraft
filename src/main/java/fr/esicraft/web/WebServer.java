@@ -219,7 +219,8 @@ public class WebServer {
 
    /** Ce qui doit être lu sur le thread principal (raids, traités, diversité, saison naturelle). */
    private record ExtraCapture(List<WebExtra.RaidView> raids, List<WebExtra.EdgeView> treatyEdges, Map<String, Integer> diversity,
-                               Map<String, List<WebExtra.TrophyView>> trophies, Map<String, List<UUID>> members, WebExtra.NatureView nature) {
+                               Map<String, List<WebExtra.TrophyView>> trophies, Map<String, List<UUID>> members, WebExtra.NatureView nature,
+                               Map<UUID, String[]> memberInfo) {
    }
 
    private ExtraCapture captureExtra(List<WebSnapshot.GuildView> guildViews, boolean showNexus) {
@@ -249,6 +250,7 @@ public class WebServer {
       Map<String, Integer> diversity = new HashMap<>();
       Map<String, List<WebExtra.TrophyView>> trophies = new HashMap<>();
       Map<String, List<UUID>> members = new HashMap<>();
+      Map<UUID, String[]> memberInfo = new HashMap<>();
       var season = this.plugin.getSeasonManager();
       for (Guild g : this.plugin.getGuildManager().getAllGuilds()) {
          for (Treaty t : this.plugin.getTreatyManager().treatiesOf(g.getId())) {
@@ -260,6 +262,10 @@ public class WebServer {
          int d = this.plugin.getSynergy().diversity(g);
          diversity.put(g.getId(), d);
          members.put(g.getId(), new ArrayList<>(g.getMembers().keySet()));
+         for (Map.Entry<UUID, GuildRole> m : g.getMembers().entrySet()) {
+            memberInfo.put(m.getKey(), new String[]{g.getId(), HtmlPages.plain(m.getValue().getDisplayName())});
+         }
+
          List<WebExtra.TrophyView> list = new ArrayList<>();
          if (season.isChampion(g.getId())) {
             list.add(new WebExtra.TrophyView("👑", "Champion de saison", "Couronne de la dernière saison"));
@@ -294,7 +300,7 @@ public class WebServer {
          nature = new WebExtra.NatureView(now.getIcon(), now.getLabel(), ns.remainingDays(), List.of(now.getEffects()), ns.next().display());
       }
 
-      return new ExtraCapture(raids, edges, diversity, trophies, members, nature);
+      return new ExtraCapture(raids, edges, diversity, trophies, members, nature, memberInfo);
    }
 
    private static final java.util.regex.Pattern PLAYER_NAME = java.util.regex.Pattern.compile("[A-Za-z0-9_]{1,16}");
@@ -372,12 +378,9 @@ public class WebServer {
             race = HtmlPages.plain(live.getRace().getDisplayName());
          }
 
-         Guild g = this.plugin.getGuildManager().getGuildByPlayer(uuid);
-         WebSnapshot.GuildView gv = g != null ? snap.guild(g.getId()) : null;
-         String role = null;
-         if (g != null && g.getMembers().get(uuid) != null) {
-            role = HtmlPages.plain(g.getMembers().get(uuid).getDisplayName());
-         }
+         String[] info = c.memberInfo().get(uuid);
+         WebSnapshot.GuildView gv = info != null ? snap.guild(info[0]) : null;
+         String role = info != null ? info[1] : null;
 
          Double coins = null;
          if (showCoins) {
