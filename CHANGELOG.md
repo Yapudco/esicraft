@@ -4,6 +4,9 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Correctif Enclave Druidique
+- Les bêtes de garde attaquent enfin : elles étaient créées « en colère » mais sans cible, donc inoffensives. Elles ciblent maintenant l'assaillant dès qu'elles apparaissent, et les bêtes déjà présentes se retournent contre lui à chaque coup porté au Nexus. Elles choisissent aussi seules l'ennemi le plus proche.
+
 ### Combat PvP
 - Frapper un joueur d'une autre guilde, ou être frappé, met « en combat » pendant 15 secondes (`combat.seconds`, `combat.enabled`) avec compte à rebours dans la barre d'action.
 - `/hub` est bloqué pendant le combat.

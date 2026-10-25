@@ -347,12 +347,22 @@ public class NexusManager {
             }
 
             if (guild.getSpecialization() == GuildSpecialization.DRUIDIC_ENCLAVE) {
-               long guardBeastsCount = loc.getWorld()
-                  .getNearbyEntities(loc, 15.0, 15.0, 15.0)
-                  .stream()
-                  .filter(e -> e.getScoreboardTags().contains("druidic_guard_beast"))
-                  .count();
-               if (guardBeastsCount < 3L) {
+               List<Wolf> guardBeasts = new ArrayList<>();
+               for (Entity near : loc.getWorld().getNearbyEntities(loc, 15.0, 15.0, 15.0)) {
+                  if (near instanceof Wolf w && w.getScoreboardTags().contains("druidic_guard_beast")) {
+                     guardBeasts.add(w);
+                  }
+               }
+
+               // Les bêtes déjà présentes se jettent sur l'assaillant.
+               if (attackerPlayer != null && attackerPlayer.isOnline()) {
+                  for (Wolf w : guardBeasts) {
+                     w.setAngry(true);
+                     w.setTarget(attackerPlayer);
+                  }
+               }
+
+               if (guardBeasts.size() < 3) {
                   Location beastLoc = loc.clone()
                      .add((double)ThreadLocalRandom.current().nextInt(-2, 3), 0.0, (double)ThreadLocalRandom.current().nextInt(-2, 3));
                   loc.getWorld().spawn(beastLoc, Wolf.class, wolf -> {
@@ -360,6 +370,10 @@ public class NexusManager {
                      wolf.setCustomNameVisible(true);
                      wolf.setAngry(true);
                      wolf.addScoreboardTag("druidic_guard_beast");
+                     wolf.setRemoveWhenFarAway(false);
+                     if (attackerPlayer != null && attackerPlayer.isOnline()) {
+                        wolf.setTarget(attackerPlayer);
+                     }
                      wolf.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 1200, 1));
                      wolf.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1200, 1));
                   });
@@ -756,6 +770,28 @@ public class NexusManager {
 
                                     if (bestTarget != null) {
                                        golem.setTarget(bestTarget);
+                                    }
+                                 }
+
+                                 if (entityx instanceof Wolf beast && beast.getScoreboardTags().contains("druidic_guard_beast")) {
+                                    LivingEntity cur = beast.getTarget();
+                                    if (cur == null || cur.isDead() || !NexusManager.this.isEnemy(guildx, cur)) {
+                                       LivingEntity best = null;
+                                       double bd = 400.0;
+                                       for (Entity candidate : nearbyEntities) {
+                                          if (candidate instanceof LivingEntity cl && !cl.isDead() && !(candidate instanceof Wolf) && NexusManager.this.isEnemy(guildx, candidate)) {
+                                             double cd = candidate.getLocation().distanceSquared(beast.getLocation());
+                                             if (cd < bd) {
+                                                bd = cd;
+                                                best = cl;
+                                             }
+                                          }
+                                       }
+
+                                       if (best != null) {
+                                          beast.setAngry(true);
+                                          beast.setTarget(best);
+                                       }
                                     }
                                  }
 
