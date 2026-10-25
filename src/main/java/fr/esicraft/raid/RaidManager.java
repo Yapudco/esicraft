@@ -1,0 +1,793 @@
+package fr.esicraft.raid;
+
+import fr.esicraft.EsicraftPlugin;
+import fr.esicraft.gui.CustomHordeGUI;
+import fr.esicraft.guild.Guild;
+import fr.esicraft.guild.GuildRole;
+import fr.esicraft.guild.GuildSpecialization;
+import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.ChunkKey;
+import java.time.Duration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.Title.Times;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Pillager;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Vindicator;
+import org.bukkit.entity.WitherSkeleton;
+import org.bukkit.entity.Zombie;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+public class RaidManager implements Listener {
+   private final EsicraftPlugin plugin;
+   private final Map<String, ActiveRaid> activeRaids = new ConcurrentHashMap<>();
+   private final Set<String> guildIdsUnderRaid = ConcurrentHashMap.newKeySet();
+   private final Map<UUID, ActiveRaid> mobRaidIndex = new ConcurrentHashMap<>();
+   private final Map<String, Long> guildRaidCooldowns = new ConcurrentHashMap<>();
+   private final Map<UUID, Location> lastMobPositions = new ConcurrentHashMap<>();
+   private final Map<UUID, Integer> mobStuckCounters = new ConcurrentHashMap<>();
+
+   public RaidManager(EsicraftPlugin plugin) {
+      this.plugin = plugin;
+      this.startRaidAITask();
+   }
+
+   public boolean isGuildUnderRaid(String guildId) {
+      return guildId != null && this.guildIdsUnderRaid.contains(guildId);
+   }
+
+   private boolean isDefenderInClaim(Guild guild) {
+      if (guild == null) {
+         return false;
+      } else {
+         for (UUID memberUuid : guild.getMembers().keySet()) {
+            Player member = Bukkit.getPlayer(memberUuid);
+            if (member != null && member.isOnline()) {
+               ChunkKey pChunk = ChunkKey.from(member.getLocation().getChunk());
+               if (guild.isClaimed(pChunk)) {
+                  return true;
+               }
+            }
+         }
+
+         return false;
+      }
+   }
+
+   public boolean launchRaid(Guild attackerGuild, Guild targetGuild, RaidType raidType, Player buyer) {
+      return this.launchRaid(attackerGuild, targetGuild, raidType, false, false, buyer);
+   }
+
+   public boolean launchRaid(Guild attackerGuild, Guild targetGuild, RaidType raidType, boolean explosiveBreachers, Player buyer) {
+      return this.launchRaid(attackerGuild, targetGuild, raidType, explosiveBreachers, false, buyer);
+   }
+
+   public boolean launchCustomRaid(Guild attackerGuild, Guild targetGuild, Map<CustomHordeUnit, Integer> composition, Player buyer) {
+      return this.launchCustomRaid(attackerGuild, targetGuild, composition, false, false, buyer);
+   }
+
+   public boolean launchCustomRaid(Guild attackerGuild, Guild targetGuild, Map<CustomHordeUnit, Integer> composition, boolean explosiveBreachers, Player buyer) {
+      return this.launchCustomRaid(attackerGuild, targetGuild, composition, explosiveBreachers, false, buyer);
+   }
+
+   public boolean launchRaid(Guild attackerGuild, Guild targetGuild, RaidType raidType, boolean explosiveBreachers, boolean lavaImmunity, Player buyer) {
+      if (targetGuild != null && targetGuild.hasNexus() && targetGuild.getNexus().isAlive()) {
+         if (!this.plugin.isNexusDestructionEnabled()) {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&cLes raids et la destruction de Nexus sont temporairement désactivés (/pvp).");
+            }
+
+            return false;
+         } else if (!this.isDefenderInClaim(targetGuild)) {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&c❌ Impossible de lancer cette horde : aucun membre de la guilde ciblée n'est présent sur son territoire claimé !");
+               ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            }
+
+            return false;
+         } else if (this.isGuildUnderRaid(targetGuild.getId())) {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&cUne horde de monstres attaque déjà le Nexus de cette guilde !");
+            }
+
+            return false;
+         } else {
+            boolean isHegemony = this.plugin.getGuildManager().isEconomicHegemony(targetGuild);
+            long now = System.currentTimeMillis();
+            long cooldownMs = isHegemony ? 120000L : (long)(this.plugin.getConfig().getInt("raids.cooldown-minutes-between-raids", 30) * 60) * 1000L;
+            Long lastRaid = this.guildRaidCooldowns.get(targetGuild.getId());
+            if (lastRaid != null && now - lastRaid < cooldownMs) {
+               long remainingMs = cooldownMs - (now - lastRaid);
+               long remainingMin = remainingMs / 60000L;
+               long remainingSec = remainingMs % 60000L / 1000L;
+               String timeStr = remainingMin > 0L ? remainingMin + " min " + remainingSec + " s" : remainingSec + " secondes";
+               if (buyer != null) {
+                  ChatUtil.sendMessage(buyer, "&cCette guilde a récemment subi un raid. Protégée encore &e" + timeStr + "&c.");
+               }
+
+               return false;
+            } else if (attackerGuild == null) {
+               if (buyer != null) {
+                  ChatUtil.sendMessage(buyer, "&c❌ Vous devez faire partie d'une guilde pour lancer une horde de mercenaires !");
+                  ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               }
+
+               return false;
+            } else if (attackerGuild.getId().equals(targetGuild.getId())) {
+               if (buyer != null) {
+                  ChatUtil.sendMessage(buyer, "&c❌ Vous ne pouvez pas lancer de raid mercenaire contre votre propre guilde !");
+                  ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               }
+
+               return false;
+            } else if (buyer != null && !attackerGuild.getRole(buyer.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+               ChatUtil.sendMessage(buyer, "&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !");
+               ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               return false;
+            } else {
+               GuildSpecialization spec = attackerGuild.getSpecialization();
+               double specMultiplier = spec == GuildSpecialization.WARLORD ? 0.7 : (spec == GuildSpecialization.MERCHANT_SYNDICATE ? 1.3 : 1.0);
+               double price = raidType.getBasePrice() * specMultiplier;
+               if (explosiveBreachers) {
+                  price += 2500.0 * specMultiplier;
+               }
+
+               if (lavaImmunity) {
+                  price += 1500.0 * specMultiplier;
+               }
+
+               if (isHegemony) {
+                  price *= 0.5;
+               }
+
+               if (attackerGuild.getBankBalance() < price) {
+                  if (buyer != null) {
+                     ChatUtil.sendMessage(
+                        buyer,
+                        "&c❌ La banque de votre guilde ne possède pas assez de fonds (&e"
+                           + String.format("%.2f", price)
+                           + " pièces &crequises, Solde : &6"
+                           + String.format("%.2f", attackerGuild.getBankBalance())
+                           + "&c)."
+                     );
+                     ChatUtil.sendMessage(buyer, "&7Déposez de l'argent dans la banque de guilde avec &e/guild bank <montant>&7.");
+                     ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                  }
+
+                  return false;
+               } else {
+                  attackerGuild.withdrawBank(price);
+                  this.plugin.getDataManager().saveGuild(attackerGuild);
+                  if (buyer != null) {
+                     String discountTag = isHegemony ? " &6[Cible Hégémonique : -50%]" : "";
+                     ChatUtil.sendMessage(
+                        buyer,
+                        "&a✔ &e" + String.format("%.2f", price) + " pièces &aont été prélevées de la banque de guilde pour financer l'invasion !" + discountTag
+                     );
+                  }
+
+                  this.guildRaidCooldowns.put(targetGuild.getId(), now);
+                  Location nexusLoc = targetGuild.getNexus().getLocation();
+                  World world = nexusLoc.getWorld();
+                  if (world == null) {
+                     return false;
+                  } else {
+                     String raidId = UUID.randomUUID().toString();
+                     String attackerName = attackerGuild.getName();
+                     String attackerGuildId = attackerGuild.getId();
+                     ActiveRaid raid = new ActiveRaid(
+                        raidId, attackerGuildId, attackerName, targetGuild.getId(), raidType, explosiveBreachers, lavaImmunity, nexusLoc
+                     );
+                     this.activeRaids.put(raidId, raid);
+                     this.guildIdsUnderRaid.add(targetGuild.getId());
+                     int count = raidType.getMobCount();
+
+                     for (int i = 0; i < count; i++) {
+                        double angle = (Math.PI * 2) / (double)count * (double)i;
+                        double distance = ThreadLocalRandom.current().nextDouble(28.0, 42.0);
+                        double x = nexusLoc.getX() + distance * Math.cos(angle);
+                        double z = nexusLoc.getZ() + distance * Math.sin(angle);
+                        int y = world.getHighestBlockYAt((int)x, (int)z) + 1;
+                        Location spawnLoc = new Location(world, x, (double)y, z);
+                        Entity entity = world.spawnEntity(spawnLoc, raidType.getPrimaryMobType());
+                        if (entity instanceof LivingEntity) {
+                           LivingEntity living = (LivingEntity)entity;
+                           String tag = "";
+                           if (explosiveBreachers) {
+                              tag = tag + " &c[Sapeur]";
+                           }
+
+                           if (lavaImmunity) {
+                              tag = tag + " &6[Ignifugé]";
+                           }
+
+                           if (tag.isEmpty()) {
+                              tag = " &c[Attaquant]";
+                           }
+
+                           living.customName(ChatUtil.component(raidType.getDisplayName() + tag));
+                           living.setCustomNameVisible(true);
+                           living.setRemoveWhenFarAway(false);
+                           this.equipMob(living, raidType.getPrimaryMobType());
+                           if (lavaImmunity) {
+                              living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 24000, 1, false, false));
+                           }
+
+                           raid.addMob(living.getUniqueId(), raidType.getDamageToNexus());
+                           this.mobRaidIndex.put(living.getUniqueId(), raid);
+                        }
+                     }
+
+                     ChatUtil.broadcast("&4&l⚔️ UNE HORDE DE MONSTRES A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
+                     String details = "&7Type d'invasion : " + raidType.getDisplayName() + " &7par &e" + attackerName;
+                     if (explosiveBreachers) {
+                        details = details + " &c&l[SAPEURS EXPLOSIFS]";
+                     }
+
+                     if (lavaImmunity) {
+                        details = details + " &6&l[RÉSISTANCE LAVE]";
+                     }
+
+                     ChatUtil.broadcast(details);
+                     if (isHegemony) {
+                        ChatUtil.broadcast(
+                           "&6&l⭐ PRIME HÉGÉMONIE FINANCIÈRE : &eLa guilde &c"
+                              + targetGuild.getName()
+                              + " &ea été ciblée pour sa richesse (Coût divisé par 2 & Cooldown de 2 min) !"
+                        );
+                     }
+
+                     this.notifyDefenders(targetGuild);
+                     return true;
+                  }
+               }
+            }
+         }
+      } else {
+         if (buyer != null) {
+            ChatUtil.sendMessage(buyer, "&cCette guilde n'a pas de Nexus actif à attaquer !");
+         }
+
+         return false;
+      }
+   }
+
+   public boolean launchCustomRaid(
+      Guild attackerGuild, Guild targetGuild, Map<CustomHordeUnit, Integer> composition, boolean explosiveBreachers, boolean lavaImmunity, Player buyer
+   ) {
+      if (attackerGuild == null) {
+         if (buyer != null) {
+            ChatUtil.sendMessage(buyer, "&c❌ Vous devez faire partie d'une guilde pour lancer une horde de mercenaires !");
+            ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         }
+
+         return false;
+      } else if (targetGuild != null && attackerGuild.getId().equals(targetGuild.getId())) {
+         if (buyer != null) {
+            ChatUtil.sendMessage(buyer, "&c❌ Vous ne pouvez pas lancer de raid mercenaire contre votre propre guilde !");
+            ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         }
+
+         return false;
+      } else if (buyer != null && !attackerGuild.getRole(buyer.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+         ChatUtil.sendMessage(buyer, "&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !");
+         ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return false;
+      } else if (targetGuild != null && targetGuild.hasNexus() && targetGuild.getNexus().isAlive()) {
+         if (!this.plugin.isNexusDestructionEnabled()) {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&cLes raids et la destruction de Nexus sont temporairement désactivés (/pvp).");
+            }
+
+            return false;
+         } else if (composition != null && !composition.isEmpty() && composition.values().stream().mapToInt(Integer::intValue).sum() != 0) {
+            if (!this.isDefenderInClaim(targetGuild)) {
+               if (buyer != null) {
+                  ChatUtil.sendMessage(
+                     buyer, "&c❌ Impossible de lancer cette horde : aucun membre de la guilde ciblée n'est présent sur son territoire claimé !"
+                  );
+                  ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               }
+
+               return false;
+            } else if (this.isGuildUnderRaid(targetGuild.getId())) {
+               if (buyer != null) {
+                  ChatUtil.sendMessage(buyer, "&cUne horde de monstres attaque déjà le Nexus de cette guilde !");
+               }
+
+               return false;
+            } else {
+               boolean isHegemony = this.plugin.getGuildManager().isEconomicHegemony(targetGuild);
+               long now = System.currentTimeMillis();
+               long cooldownMs = isHegemony ? 120000L : (long)(this.plugin.getConfig().getInt("raids.cooldown-minutes-between-raids", 30) * 60) * 1000L;
+               Long lastRaid = this.guildRaidCooldowns.get(targetGuild.getId());
+               if (lastRaid != null && now - lastRaid < cooldownMs) {
+                  long remainingMs = cooldownMs - (now - lastRaid);
+                  long remainingMin = remainingMs / 60000L;
+                  long remainingSec = remainingMs % 60000L / 1000L;
+                  String timeStr = remainingMin > 0L ? remainingMin + " min " + remainingSec + " s" : remainingSec + " secondes";
+                  if (buyer != null) {
+                     ChatUtil.sendMessage(buyer, "&cCette guilde a récemment subi un raid. Protégée encore &e" + timeStr + "&c.");
+                  }
+
+                  return false;
+               } else {
+                  GuildSpecialization spec = attackerGuild.getSpecialization();
+                  double totalPrice = CustomHordeGUI.getTotalCost(composition, spec, explosiveBreachers, lavaImmunity);
+                  if (isHegemony) {
+                     totalPrice *= 0.5;
+                  }
+
+                  if (attackerGuild.getBankBalance() < totalPrice) {
+                     if (buyer != null) {
+                        ChatUtil.sendMessage(
+                           buyer,
+                           "&c❌ La banque de votre guilde ne possède pas assez de fonds (&e"
+                              + String.format("%.2f", totalPrice)
+                              + " pièces &crequises, Solde : &6"
+                              + String.format("%.2f", attackerGuild.getBankBalance())
+                              + "&c)."
+                        );
+                        ChatUtil.sendMessage(buyer, "&7Déposez de l'argent dans la banque de guilde avec &e/guild bank <montant>&7.");
+                        ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                     }
+
+                     return false;
+                  } else {
+                     attackerGuild.withdrawBank(totalPrice);
+                     this.plugin.getDataManager().saveGuild(attackerGuild);
+                     if (buyer != null) {
+                        String discountTag = isHegemony ? " &6[Cible Hégémonique : -50%]" : "";
+                        ChatUtil.sendMessage(
+                           buyer,
+                           "&a✔ &e"
+                              + String.format("%.2f", totalPrice)
+                              + " pièces &aont été prélevées de la banque de guilde pour financer l'invasion personnalisée !"
+                              + discountTag
+                        );
+                     }
+
+                     this.guildRaidCooldowns.put(targetGuild.getId(), now);
+                     Location nexusLoc = targetGuild.getNexus().getLocation();
+                     World world = nexusLoc.getWorld();
+                     if (world == null) {
+                        return false;
+                     } else {
+                        String raidId = UUID.randomUUID().toString();
+                        String attackerName = attackerGuild.getName();
+                        String attackerGuildId = attackerGuild.getId();
+                        ActiveRaid raid = new ActiveRaid(
+                           raidId,
+                           attackerGuildId,
+                           attackerName,
+                           targetGuild.getId(),
+                           null,
+                           "&4⚔️ Horde Personnalisée Sur-Mesure",
+                           explosiveBreachers,
+                           lavaImmunity,
+                           nexusLoc
+                        );
+                        this.activeRaids.put(raidId, raid);
+                        this.guildIdsUnderRaid.add(targetGuild.getId());
+                        int totalUnits = composition.values().stream().mapToInt(Integer::intValue).sum();
+                        int currentUnitIndex = 0;
+
+                        for (Entry<CustomHordeUnit, Integer> entry : composition.entrySet()) {
+                           CustomHordeUnit unit = entry.getKey();
+                           int amount = entry.getValue();
+
+                           for (int i = 0; i < amount; i++) {
+                              double angle = (Math.PI * 2) / (double)Math.max(1, totalUnits) * (double)currentUnitIndex;
+                              double distance = ThreadLocalRandom.current().nextDouble(28.0, 42.0);
+                              double x = nexusLoc.getX() + distance * Math.cos(angle);
+                              double z = nexusLoc.getZ() + distance * Math.sin(angle);
+                              int y = world.getHighestBlockYAt((int)x, (int)z) + 1;
+                              Location spawnLoc = new Location(world, x, (double)y, z);
+                              if (world.spawnEntity(spawnLoc, unit.getEntityType()) instanceof LivingEntity living) {
+                                 String tag = "";
+                                 if (explosiveBreachers) {
+                                    tag = tag + " &c[Sapeur]";
+                                 }
+
+                                 if (lavaImmunity) {
+                                    tag = tag + " &6[Ignifugé]";
+                                 }
+
+                                 if (tag.isEmpty()) {
+                                    tag = " &c[Attaquant]";
+                                 }
+
+                                 living.customName(ChatUtil.component(unit.getDisplayName() + tag));
+                                 living.setCustomNameVisible(true);
+                                 living.setRemoveWhenFarAway(false);
+                                 this.equipMob(living, unit.getEntityType());
+                                 if (lavaImmunity) {
+                                    living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 24000, 1, false, false));
+                                 }
+
+                                 raid.addMob(living.getUniqueId(), unit.getDamageToNexus());
+                                 this.mobRaidIndex.put(living.getUniqueId(), raid);
+                              }
+
+                              currentUnitIndex++;
+                           }
+                        }
+
+                        ChatUtil.broadcast("&4&l⚔️ UNE HORDE PERSONNALISÉE SUR-MESURE A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
+                        String details = "&7Commanditaire : &e" + attackerName + " &7| Total : &c" + totalUnits + " monstres d'élite";
+                        if (explosiveBreachers) {
+                           details = details + " &c&l[SAPEURS EXPLOSIFS]";
+                        }
+
+                        if (lavaImmunity) {
+                           details = details + " &6&l[RÉSISTANCE LAVE]";
+                        }
+
+                        ChatUtil.broadcast(details);
+                        if (isHegemony) {
+                           ChatUtil.broadcast(
+                              "&6&l⭐ PRIME HÉGÉMONIE FINANCIÈRE : &eLa guilde &c"
+                                 + targetGuild.getName()
+                                 + " &ea été ciblée pour sa richesse (Coût divisé par 2 & Cooldown de 2 min) !"
+                           );
+                        }
+
+                        this.notifyDefenders(targetGuild);
+                        return true;
+                     }
+                  }
+               }
+            }
+         } else {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&cVotre composition de horde est vide.");
+            }
+
+            return false;
+         }
+      } else {
+         if (buyer != null) {
+            ChatUtil.sendMessage(buyer, "&cCette guilde n'a pas de Nexus actif à attaquer !");
+         }
+
+         return false;
+      }
+   }
+
+   private void notifyDefenders(Guild targetGuild) {
+      for (Player p : Bukkit.getOnlinePlayers()) {
+         if (targetGuild.isMember(p.getUniqueId())) {
+            p.showTitle(
+               Title.title(
+                  ChatUtil.component("&4&lINVASION ENNEMIE !"),
+                  ChatUtil.component("&cUne horde attaque votre Nexus !"),
+                  Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(1000L))
+               )
+            );
+            ChatUtil.playSound(p, Sound.EVENT_RAID_HORN, 2.0F, 1.0F);
+         }
+      }
+   }
+
+   private void equipMob(LivingEntity living, EntityType type) {
+      if (living instanceof Zombie zombie) {
+         zombie.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+         zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+         zombie.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_SWORD));
+      } else if (living instanceof Skeleton skeleton) {
+         skeleton.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+         skeleton.getEquipment().setItemInMainHand(new ItemStack(Material.BOW));
+      } else if (living instanceof Pillager pillager) {
+         pillager.getEquipment().setItemInMainHand(new ItemStack(Material.CROSSBOW));
+      } else if (living instanceof Vindicator vindicator) {
+         vindicator.getEquipment().setItemInMainHand(new ItemStack(Material.IRON_AXE));
+      } else if (living instanceof WitherSkeleton witherSkeleton) {
+         witherSkeleton.getEquipment().setItemInMainHand(new ItemStack(Material.STONE_SWORD));
+      } else if (living instanceof Creeper creeper) {
+         creeper.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1));
+      }
+   }
+
+   private void startRaidAITask() {
+      (new BukkitRunnable() {
+            public void run() {
+               for (ActiveRaid raid : RaidManager.this.activeRaids.values()) {
+                  if (raid.isFinished()) {
+                     RaidManager.this.finishRaid(raid, true);
+                  } else {
+                     Guild targetGuild = RaidManager.this.plugin.getGuildManager().getGuildById(raid.getTargetGuildId());
+                     if (targetGuild != null && targetGuild.hasNexus()) {
+                        Location nexusLoc = targetGuild.getNexus().getLocation();
+
+                        for (UUID mobUuid : raid.getAliveMobUuids()) {
+                           if (Bukkit.getEntity(mobUuid) instanceof Mob mob && !mob.isDead()) {
+                              mob.getPathfinder().moveTo(nexusLoc, 1.25);
+                              if (raid.hasLavaImmunity() && mob.getLocation().getBlock().getType() == Material.LAVA) {
+                                 mob.setVelocity(mob.getVelocity().setY(0.12));
+                              }
+
+                              if (raid.hasExplosiveBreachers()) {
+                                 Location lastLoc = RaidManager.this.lastMobPositions.get(mobUuid);
+                                 Location currentLoc = mob.getLocation();
+                                 if (lastLoc != null && lastLoc.getWorld() != null && lastLoc.getWorld().equals(currentLoc.getWorld())) {
+                                    if (lastLoc.distanceSquared(currentLoc) < 0.49) {
+                                       int stuck = RaidManager.this.mobStuckCounters.getOrDefault(mobUuid, 0) + 1;
+                                       RaidManager.this.mobStuckCounters.put(mobUuid, stuck);
+                                       if (stuck >= 3) {
+                                          currentLoc.getWorld().createExplosion(currentLoc, 3.0F, false, true);
+                                          RaidManager.this.cleanFluidsAround(currentLoc, 5);
+                                          currentLoc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, currentLoc.clone().add(0.0, 1.0, 0.0), 4);
+                                          currentLoc.getWorld().playSound(currentLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.8F);
+                                          mob.remove();
+                                          raid.removeMob(mobUuid);
+                                          RaidManager.this.mobRaidIndex.remove(mobUuid);
+                                          RaidManager.this.mobStuckCounters.remove(mobUuid);
+                                          RaidManager.this.lastMobPositions.remove(mobUuid);
+                                          ChatUtil.broadcast(
+                                             "&c\ud83d\udca3 &lSAPEUR DÉTONATEUR : &7Un monstre bloqué a explosé pour ouvrir une brèche et vaporiser l'eau/lave !"
+                                          );
+                                          continue;
+                                       }
+                                    } else {
+                                       RaidManager.this.mobStuckCounters.put(mobUuid, 0);
+                                    }
+                                 }
+
+                                 RaidManager.this.lastMobPositions.put(mobUuid, currentLoc);
+                              }
+
+                              if (mob.getLocation().distanceSquared(nexusLoc) <= 12.25) {
+                                 int damage = raid.getMobDamage(mobUuid);
+                                 RaidManager.this.plugin.getNexusManager().damageNexus(targetGuild, damage, raid.getAttackerGuildName());
+                                 mob.getWorld().spawnParticle(Particle.SWEEP_ATTACK, nexusLoc.clone().add(0.5, 0.5, 0.5), 5);
+                                 mob.remove();
+                                 raid.removeMob(mobUuid);
+                                 RaidManager.this.mobRaidIndex.remove(mobUuid);
+                                 RaidManager.this.mobStuckCounters.remove(mobUuid);
+                                 RaidManager.this.lastMobPositions.remove(mobUuid);
+                              }
+                              continue;
+                           }
+
+                           raid.removeMob(mobUuid);
+                           RaidManager.this.mobRaidIndex.remove(mobUuid);
+                           RaidManager.this.mobStuckCounters.remove(mobUuid);
+                           RaidManager.this.lastMobPositions.remove(mobUuid);
+                        }
+
+                        if (raid.isFinished()) {
+                           RaidManager.this.finishRaid(raid, true);
+                        }
+                     } else {
+                        RaidManager.this.finishRaid(raid, false);
+                     }
+                  }
+               }
+            }
+         })
+         .runTaskTimer(this.plugin, 40L, 40L);
+   }
+
+   public void cleanFluidsAround(Location center, int radius) {
+      if (center != null && center.getWorld() != null) {
+         World world = center.getWorld();
+         int cx = center.getBlockX();
+         int cy = center.getBlockY();
+         int cz = center.getBlockZ();
+         int removed = 0;
+
+         for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+               for (int z = -radius; z <= radius; z++) {
+                  if (x * x + y * y + z * z <= radius * radius) {
+                     Block block = world.getBlockAt(cx + x, cy + y, cz + z);
+                     Material mat = block.getType();
+                     if (mat == Material.WATER || mat == Material.LAVA || mat == Material.BUBBLE_COLUMN) {
+                        block.setType(Material.AIR);
+                        removed++;
+                     }
+                  }
+               }
+            }
+         }
+
+         if (removed > 0) {
+            world.spawnParticle(Particle.SMOKE_LARGE, center.clone().add(0.0, 1.0, 0.0), 25, 1.0, 1.0, 1.0, 0.05);
+            world.playSound(center, Sound.BLOCK_LAVA_EXTINGUISH, 1.5F, 0.8F);
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onRaidEntityExplode(EntityExplodeEvent event) {
+      if (event.getEntity() != null && this.mobRaidIndex.containsKey(event.getEntity().getUniqueId())) {
+         this.cleanFluidsAround(event.getLocation(), 5);
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onLavaOrFireDamage(EntityDamageEvent event) {
+      if (event.getEntity() instanceof LivingEntity living) {
+         ActiveRaid raid = this.mobRaidIndex.get(living.getUniqueId());
+         if (raid != null && raid.hasLavaImmunity()) {
+            DamageCause cause = event.getCause();
+            if (cause == DamageCause.LAVA || cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK || cause == DamageCause.HOT_FLOOR) {
+               event.setCancelled(true);
+               living.setFireTicks(0);
+            }
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH
+   )
+   public void onEntityTarget(EntityTargetLivingEntityEvent event) {
+      if (event.getEntity() instanceof Mob mob) {
+         ActiveRaid raid = this.mobRaidIndex.get(mob.getUniqueId());
+         if (raid != null) {
+            if (event.getTarget() instanceof Player targetPlayer) {
+               String attackerGuildId = raid.getAttackerGuildId();
+               if (attackerGuildId != null) {
+                  Guild attackerGuild = this.plugin.getGuildManager().getGuildById(attackerGuildId);
+                  if (attackerGuild != null && attackerGuild.isMember(targetPlayer.getUniqueId())) {
+                     event.setCancelled(true);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH
+   )
+   public void onEntityDamage(EntityDamageByEntityEvent event) {
+      Entity damager = event.getDamager();
+      if (damager instanceof Projectile projectile && projectile.getShooter() instanceof Entity shooter) {
+         damager = shooter;
+      }
+
+      ActiveRaid raid = this.mobRaidIndex.get(damager.getUniqueId());
+      if (raid != null) {
+         if (event.getEntity() instanceof Player victimPlayer) {
+            String attackerGuildId = raid.getAttackerGuildId();
+            if (attackerGuildId != null) {
+               Guild attackerGuild = this.plugin.getGuildManager().getGuildById(attackerGuildId);
+               if (attackerGuild != null && attackerGuild.isMember(victimPlayer.getUniqueId())) {
+                  event.setCancelled(true);
+               }
+            }
+         }
+      }
+   }
+
+   @EventHandler
+   public void onMobDeath(EntityDeathEvent event) {
+      ActiveRaid raid = this.mobRaidIndex.remove(event.getEntity().getUniqueId());
+      if (raid != null) {
+         raid.removeMob(event.getEntity().getUniqueId());
+         this.mobStuckCounters.remove(event.getEntity().getUniqueId());
+         this.lastMobPositions.remove(event.getEntity().getUniqueId());
+         if (raid.isFinished()) {
+            this.finishRaid(raid, true);
+         }
+      }
+   }
+
+   private void finishRaid(ActiveRaid raid, boolean defended) {
+      if (raid != null) {
+         this.activeRaids.remove(raid.getId());
+         this.guildIdsUnderRaid.remove(raid.getTargetGuildId());
+
+         for (UUID mobUuid : raid.getAliveMobUuids()) {
+            Entity entity = Bukkit.getEntity(mobUuid);
+            if (entity != null && !entity.isDead()) {
+               entity.remove();
+            }
+
+            this.mobRaidIndex.remove(mobUuid);
+            this.mobStuckCounters.remove(mobUuid);
+            this.lastMobPositions.remove(mobUuid);
+         }
+
+         Guild targetGuild = this.plugin.getGuildManager().getGuildById(raid.getTargetGuildId());
+         if (targetGuild != null && targetGuild.hasNexus()) {
+            boolean hadTraps = !targetGuild.getNexus().getActiveTraps().isEmpty();
+            targetGuild.getNexus().clearTraps();
+            this.plugin.getDataManager().saveGuild(targetGuild);
+            if (defended) {
+               ChatUtil.broadcast("&a&l\ud83d\udee1️ La guilde &e" + targetGuild.getName() + " &aa repoussé avec succès l'invasion de monstres !");
+            }
+
+            for (UUID memberUuid : targetGuild.getMembers().keySet()) {
+               Player p = Bukkit.getPlayer(memberUuid);
+               if (p != null && p.isOnline()) {
+                  if (hadTraps) {
+                     ChatUtil.sendMessage(
+                        p, "&6&l[Nexus] &e⚔️ Vos pièges de Nexus ont été consommés lors de cette bataille ! N'oubliez pas de les réarmer via &6/nexus&e."
+                     );
+                  }
+
+                  ChatUtil.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
+               }
+            }
+         }
+      }
+   }
+
+   public void resetAllCooldowns() {
+      this.guildRaidCooldowns.clear();
+   }
+
+   public void resetCooldown(String guildId) {
+      if (guildId != null) {
+         this.guildRaidCooldowns.remove(guildId);
+      }
+   }
+
+   public void stopAllRaids() {
+      for (ActiveRaid raid : this.activeRaids.values()) {
+         this.finishRaid(raid, false);
+      }
+
+      this.activeRaids.clear();
+      this.guildIdsUnderRaid.clear();
+      this.guildRaidCooldowns.clear();
+   }
+
+   public boolean stopRaid(String guildId) {
+      boolean stopped = false;
+      Iterator<Entry<String, ActiveRaid>> it = this.activeRaids.entrySet().iterator();
+
+      while (it.hasNext()) {
+         ActiveRaid raid = it.next().getValue();
+         if (raid.getTargetGuildId().equalsIgnoreCase(guildId) || raid.getAttackerGuildId() != null && raid.getAttackerGuildId().equalsIgnoreCase(guildId)) {
+            this.finishRaid(raid, false);
+            it.remove();
+            stopped = true;
+         }
+      }
+
+      this.guildRaidCooldowns.remove(guildId);
+      return stopped;
+   }
+}
