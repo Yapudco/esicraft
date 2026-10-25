@@ -144,6 +144,8 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 **Points de vie** : les PV du Nexus s'affichent au-dessus de lui (hologramme), y compris après un redémarrage du serveur ou une reconnexion.
 
+**Qui est épargné** : le golem gardien et les pièges ne visent jamais les membres de la guilde ni ceux d'une guilde liée par un traité (alliance, pacte de non-agression ou vassalité).
+
 **Le soigner** : un membre jette une **pomme dorée** dessus (ou fait un clic droit avec) : +500 PV, ou +2 500 PV avec une pomme dorée enchantée. Il faut attendre 30 secondes entre deux soins, et c'est impossible pendant un raid.
 
 ### Les pièges (`/nexus traps`)

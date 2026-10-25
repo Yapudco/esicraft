@@ -147,6 +147,8 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 **Health points**: the Nexus's HP is shown above it (hologram), including after a server restart or a reconnection.
 
+**Who is spared**: the guardian golem and traps never target guild members or members of a guild bound by a treaty (alliance, non-aggression pact or vassalage).
+
 **Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid.
 
 ### Traps (`/nexus traps`)
