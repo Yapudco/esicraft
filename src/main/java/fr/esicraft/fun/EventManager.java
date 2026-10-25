@@ -381,7 +381,7 @@ public class EventManager implements Listener {
          }
       }
 
-      world.spawnParticle(Particle.EXPLOSION_LARGE, impact, 3, 1.0, 0.5, 1.0, 0.0);
+      world.spawnParticle(Particle.EXPLOSION, impact, 3, 1.0, 0.5, 1.0, 0.0);
       world.spawnParticle(Particle.FLAME, impact, 60, 1.5, 0.5, 1.5, 0.05);
       world.playSound(impact, Sound.ENTITY_GENERIC_EXPLODE, 3.0F, 0.6F);
       ChatUtil.broadcast("&6☄ Une météorite s'est écrasée près de &e" + rough(impact) + " &6!");
@@ -464,11 +464,11 @@ public class EventManager implements Listener {
       skeleton.setRemoveWhenFarAway(false);
       skeleton.setGlowing(true);
       skeleton.addScoreboardTag(BOSS_TAG);
-      this.setAttribute(skeleton, Attribute.GENERIC_MAX_HEALTH, 800.0);
+      this.setAttribute(skeleton, Attribute.MAX_HEALTH, 800.0);
       skeleton.setHealth(800.0);
-      this.setAttribute(skeleton, Attribute.GENERIC_ATTACK_DAMAGE, 14.0);
-      this.setAttribute(skeleton, Attribute.GENERIC_MOVEMENT_SPEED, 0.30);
-      this.setAttribute(skeleton, Attribute.GENERIC_FOLLOW_RANGE, 48.0);
+      this.setAttribute(skeleton, Attribute.ATTACK_DAMAGE, 14.0);
+      this.setAttribute(skeleton, Attribute.MOVEMENT_SPEED, 0.30);
+      this.setAttribute(skeleton, Attribute.FOLLOW_RANGE, 48.0);
       skeleton.getEquipment().setItemInMainHand(new ItemStack(Material.NETHERITE_SWORD));
       skeleton.getEquipment().setItemInMainHandDropChance(0.0F);
       this.boss = skeleton;
@@ -481,7 +481,7 @@ public class EventManager implements Listener {
             return;
          }
 
-         double max = this.boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+         double max = this.boss.getAttribute(Attribute.MAX_HEALTH).getValue();
          this.bar.setProgress(Math.max(0.0, Math.min(1.0, this.boss.getHealth() / max)));
       });
       return true;

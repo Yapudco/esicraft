@@ -355,7 +355,7 @@ public class NexusManager {
                      wolf.setCustomNameVisible(true);
                      wolf.setAngry(true);
                      wolf.addScoreboardTag("druidic_guard_beast");
-                     wolf.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1200, 1));
+                     wolf.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 1200, 1));
                      wolf.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1200, 1));
                   });
                   loc.getWorld().playSound(loc, Sound.ENTITY_WOLF_GROWL, 1.2F, 0.8F);
@@ -367,8 +367,8 @@ public class NexusManager {
 
                for (Player defender : loc.getWorld().getPlayers()) {
                   if (guild.isMember(defender.getUniqueId()) && defender.getLocation().distanceSquared(loc) <= 900.0) {
-                     defender.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 1));
-                     defender.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 1));
+                     defender.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 1));
+                     defender.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 1));
                      ChatUtil.sendActionbar(defender, "&c⚔️ Ralliement de Guerre : Force II & Résistance II activées !");
                   }
                }
@@ -449,7 +449,7 @@ public class NexusManager {
          Location loc = nexus.getLocation();
 
          try {
-            loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc.clone().add(0.5, 0.5, 0.5), 5);
+            loc.getWorld().spawnParticle(Particle.EXPLOSION, loc.clone().add(0.5, 0.5, 0.5), 5);
          } catch (Exception var6) {
          }
 
@@ -603,7 +603,7 @@ public class NexusManager {
             if (loc != null && loc.getWorld() != null) {
                try {
                   loc.getWorld().spawnParticle(Particle.HEART, loc.clone().add(0.5, 1.2, 0.5), 10, 0.4, 0.4, 0.4, 0.1);
-                  loc.getWorld().spawnParticle(Particle.TOTEM, loc.clone().add(0.5, 1.0, 0.5), 20, 0.3, 0.5, 0.3, 0.2);
+                  loc.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, loc.clone().add(0.5, 1.0, 0.5), 20, 0.3, 0.5, 0.3, 0.2);
                } catch (Exception var8) {
                }
 
@@ -754,7 +754,7 @@ public class NexusManager {
                                     }
 
                                     if (hasWebTrap && distSq <= 100.0 && entityx instanceof LivingEntity le) {
-                                       le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1, false, false, false));
+                                       le.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 1, false, false, false));
 
                                        try {
                                           loc.getWorld().spawnParticle(Particle.SNOWFLAKE, le.getLocation().add(0.0, 1.0, 0.0), 5);

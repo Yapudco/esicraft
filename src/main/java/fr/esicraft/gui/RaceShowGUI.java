@@ -105,7 +105,7 @@ public class RaceShowGUI {
          lore.add("&e⏳ Âge : &f" + age.getDisplayName());
          lore.add("&e\ud83d\udcb0 Solde : &6" + String.format("%.2f", coins) + " pièces");
          lore.add("");
-         double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH) != null ? target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() : 20.0;
+         double maxHealth = target.getAttribute(Attribute.MAX_HEALTH) != null ? target.getAttribute(Attribute.MAX_HEALTH).getValue() : 20.0;
          lore.add("&c❤ Santé : &f" + String.format("%.1f", target.getHealth()) + " / " + String.format("%.1f", maxHealth) + " HP");
          lore.add("&a✨ Niveau XP : &f" + target.getLevel());
          lore.add("&b\ud83d\udcf6 Ping : &f" + target.getPing() + " ms");

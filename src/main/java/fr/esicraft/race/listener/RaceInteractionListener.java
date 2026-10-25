@@ -161,7 +161,7 @@ public class RaceInteractionListener implements Listener {
 
             if (isDruidic) {
                ChatUtil.sendActionbar(player, "&a\ud83c\udf43 Récolte d'Enclave : Butin agricole doublé !");
-               block.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, block.getLocation().add(0.5, 0.5, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
+               block.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, block.getLocation().add(0.5, 0.5, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
             }
 
             ageable.setAge(0);
@@ -477,7 +477,7 @@ public class RaceInteractionListener implements Listener {
 
                   String category = this.isCrop(block) ? "Agricole" : (this.isWood(blockMat) ? "Bois" : "Pierre Naturelle");
                   ChatUtil.sendActionbar(player, "&a\ud83c\udf43 Récolte d'Enclave : Butin " + category + " doublé !");
-                  block.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, block.getLocation().add(0.5, 0.5, 0.5), 8, 0.2, 0.2, 0.2, 0.05);
+                  block.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, block.getLocation().add(0.5, 0.5, 0.5), 8, 0.2, 0.2, 0.2, 0.05);
                   ChatUtil.playSound(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6F, 1.4F);
                } else if (isIndustry || isDwarf) {
                   for (ItemStack drop : baseDrops) {
@@ -568,7 +568,7 @@ public class RaceInteractionListener implements Listener {
 
             event.getDrops().addAll(extraDrops);
             ChatUtil.sendActionbar(killer, "&a\ud83c\udf43 Élevage d'Enclave : Butin animal doublé !");
-            killer.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, entity.getLocation().add(0.0, 0.5, 0.0), 8, 0.3, 0.3, 0.3, 0.05);
+            killer.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, entity.getLocation().add(0.0, 0.5, 0.0), 8, 0.3, 0.3, 0.3, 0.05);
          } else {
             this.plugin.getAntiFarmManager().registerKill(killer.getUniqueId(), entity.getType());
             double baseBounty = this.getMobBounty(entity);

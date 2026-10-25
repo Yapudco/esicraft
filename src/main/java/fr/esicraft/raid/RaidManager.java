@@ -642,7 +642,7 @@ public class RaidManager implements Listener {
                                        if (stuck >= 3) {
                                           currentLoc.getWorld().createExplosion(currentLoc, 3.0F, false, true);
                                           RaidManager.this.cleanFluidsAround(currentLoc, 5);
-                                          currentLoc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, currentLoc.clone().add(0.0, 1.0, 0.0), 4);
+                                          currentLoc.getWorld().spawnParticle(Particle.EXPLOSION, currentLoc.clone().add(0.0, 1.0, 0.0), 4);
                                           currentLoc.getWorld().playSound(currentLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.8F);
                                           mob.remove();
                                           raid.removeMob(mobUuid);
@@ -718,7 +718,7 @@ public class RaidManager implements Listener {
          }
 
          if (removed > 0) {
-            world.spawnParticle(Particle.SMOKE_LARGE, center.clone().add(0.0, 1.0, 0.0), 25, 1.0, 1.0, 1.0, 0.05);
+            world.spawnParticle(Particle.LARGE_SMOKE, center.clone().add(0.0, 1.0, 0.0), 25, 1.0, 1.0, 1.0, 0.05);
             world.playSound(center, Sound.BLOCK_LAVA_EXTINGUISH, 1.5F, 0.8F);
          }
       }

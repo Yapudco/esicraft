@@ -24,8 +24,8 @@ public class AlliedProtectionListener implements Listener {
       this.plugin = plugin;
    }
 
-   private static final Set<PotionEffectType> HARMFUL = Set.of(PotionEffectType.HARM, PotionEffectType.POISON, PotionEffectType.WITHER,
-      PotionEffectType.WEAKNESS, PotionEffectType.SLOW, PotionEffectType.SLOW_DIGGING, PotionEffectType.BLINDNESS, PotionEffectType.CONFUSION,
+   private static final Set<PotionEffectType> HARMFUL = Set.of(PotionEffectType.INSTANT_DAMAGE, PotionEffectType.POISON, PotionEffectType.WITHER,
+      PotionEffectType.WEAKNESS, PotionEffectType.SLOWNESS, PotionEffectType.MINING_FATIGUE, PotionEffectType.BLINDNESS, PotionEffectType.NAUSEA,
       PotionEffectType.HUNGER, PotionEffectType.LEVITATION, PotionEffectType.DARKNESS, PotionEffectType.UNLUCK);
 
    private boolean allied(Player a, Player b) {

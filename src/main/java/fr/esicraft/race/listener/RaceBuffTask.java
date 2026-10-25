@@ -20,21 +20,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class RaceBuffTask extends BukkitRunnable {
    private final EsicraftPlugin plugin;
-   private static final PotionEffect DWARF_HASTE = new PotionEffect(PotionEffectType.FAST_DIGGING, 60, 1, false, false, true);
+   private static final PotionEffect DWARF_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 1, false, false, true);
    private static final PotionEffect DWARF_NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 240, 0, false, false, false);
-   private static final PotionEffect DWARF_SLOWNESS = new PotionEffect(PotionEffectType.SLOW, 60, 0, false, false, false);
+   private static final PotionEffect DWARF_SLOWNESS = new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false, false);
    private static final PotionEffect RANGER_SPEED = new PotionEffect(PotionEffectType.SPEED, 60, 0, false, false, false);
-   private static final PotionEffect RANGER_SLOWNESS = new PotionEffect(PotionEffectType.SLOW, 60, 0, false, false, true);
+   private static final PotionEffect RANGER_SLOWNESS = new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false, true);
    private static final PotionEffect BLACKSMITH_FIRE_RES = new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 100, 0, false, false, false);
    private static final PotionEffect SYLVAN_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_WARLORD_STRENGTH = new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_WARLORD_RESIST = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_INDUSTRY_HASTE = new PotionEffect(PotionEffectType.FAST_DIGGING, 60, 1, false, false, true);
+   private static final PotionEffect SPEC_WARLORD_STRENGTH = new PotionEffect(PotionEffectType.STRENGTH, 60, 0, false, false, true);
+   private static final PotionEffect SPEC_WARLORD_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 60, 0, false, false, true);
+   private static final PotionEffect SPEC_INDUSTRY_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 1, false, false, true);
    private static final PotionEffect SPEC_DRUID_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 60, 0, false, false, true);
    private static final PotionEffect SPEC_DRUID_SATURATION = new PotionEffect(PotionEffectType.SATURATION, 60, 0, false, false, true);
    private static final PotionEffect AGE_SPEED = new PotionEffect(PotionEffectType.SPEED, 60, 0, false, false, true);
-   private static final PotionEffect AGE_HASTE = new PotionEffect(PotionEffectType.FAST_DIGGING, 60, 0, false, false, true);
-   private static final PotionEffect AGE_RESIST = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 0, false, false, true);
+   private static final PotionEffect AGE_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 0, false, false, true);
+   private static final PotionEffect AGE_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 60, 0, false, false, true);
 
    private final SpecializationRulesListener specializationRules;
 
