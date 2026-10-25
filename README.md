@@ -1,5 +1,7 @@
 # ⚔️ GUIDE OFFICIEL DES JOUEURS — SERVEUR ESICRAFT
 
+🇬🇧 [English version](README.en.md)
+
 Bienvenue sur **Esicraft**, un serveur de survie hardcore stratégique orienté guildes, métiers, économie dynamique et guerres de territoires !
 
 Ce guide rassemble l'intégralité des fonctionnalités, mécaniques, métiers et commandes du serveur pour vous permettre de bâtir votre empire et dominer vos rivaux.
@@ -28,7 +30,7 @@ Dès votre arrivée, choisissez votre métier avec la commande `/race`. Chaque m
 | Métier | Rôle & Spécialité | Crafts & Usages Exclusifs | Bonus Passifs & Actifs | Restrictions & Malus |
 | :--- | :--- | :--- | :--- | :--- |
 | **⛏ Mineur (Nain)** | Extraction minière & géologie | • Pioche en fer (Âge 1)<br>• Pioche & Pelle diamant (Âge 2)<br>• Pioche & Pelle Netherite (Âges 3-4) | • **Haste II** et **Vision Nocturne** permanents sous $Y \le 0$<br>• **+15% de chance de doubler** tous les minerais extraits | • **Lenteur I** en plein air et plein soleil ($Y > 60$)<br>• Incapable de fabriquer des armes ou armures métalliques |
-| **🌿 Sylvain (Elfe)** | Agriculture, élevage & nature | • Houe en fer (Âge 1), diamant (Âge 2), Netherite (Âges 3-4)<br>• Utilisation de la Poudre d'os (Âges 1-2)<br>• Reproduction animale (Âges 1-2)<br>• Pommes Dorées artisanales | • **Aura de Régénération I permanente** pour soi et tous les joueurs à moins de 4 blocs<br>• **Récolte instantanée automatique au clic-droit** sur les cultures à maturité (avec replantage automatique) | • **-20% de dégâts** infligés au corps-à-corps |
+| **🌿 Sylvain (Elfe)** | Agriculture, élevage & nature | • Houe en fer (Âge 1), diamant (Âge 2), Netherite (Âges 3-4)<br>• Utilisation de la Poudre d'os (Âges 1-2)<br>• Reproduction animale (Âges 1-2)<br>• Pommes Dorées artisanales | • **Aura de Régénération I permanente** pour soi et les membres de sa guilde à moins de 4 blocs<br>• **Récolte instantanée automatique au clic-droit** sur les cultures à maturité (avec replantage automatique) | • **-20% de dégâts** infligés au corps-à-corps |
 | **🔨 Forgeron** | Forge lourde, armures & métal | • Armures fer complètes, épées & boucliers (Âge 1)<br>• Armures, épée & hache diamant (Âge 2)<br>• Armures, épée & hache Netherite (Âges 3-4)<br>• Enclumes, meules & hauts-fourneaux | • **Résistance au Feu** permanente<br>• **+35% de chance de doubler** un lingot extrait d'un four/haut-fourneau<br>• **-50% de coût en XP** sur l'enclume | • **Consommation de faim augmentée de +25%** lors des efforts physiques |
 | **🏹 Rôdeur** | Chasse à distance & exploration | • **Seul métier capable d'utiliser et fabriquer des Arcs et Arbalètes** jusqu'à l'Âge 3 (compris, débloqué à l'Âge 4)<br>• Flèches et flèches spectrales artisanales | • **Toutes les flèches tirées deviennent des Flèches de Poison (Poison I)**<br>• **+25% de dégâts à distance** sur tous les projectiles<br>• **Vitesse I (Speed I)** permanente dans les biomes naturels (plaines, forêts, jungles, taïgas) | • **Pénalité de lenteur (Slowness I)** si un plastron lourd (diamant ou Netherite) est équipé |
 | **🧪 Arcaniste** | Magie, alchimie & enchantements | • **Seul métier capable d'enchanter des objets** (Table d'enchantement & Livres enchantés sur enclume)<br>• **Seul métier capable d'utiliser et lancer des Potions Jetables (Splash Potions)**<br>• Utilisation et craft d'Alambics exclusifs jusqu'à l'Âge 3 (Alchimie)<br>• Pommes Dorées artisanales | • **+30% d'XP reçue** sur toutes les actions<br>• **Durée des potions consommées prolongée de +25%**<br>• **-20% de dégâts magiques subis** (potions de dégâts, poison, wither, souffle de dragon) | • **+15% de dégâts physiques subis** en combat rapproché (fragilité en mêlée) |
@@ -92,10 +94,10 @@ Choisissez la spécialisation collective de votre guilde via le menu `/guild spe
    * **Bonus** : **Santé maximale de base augmentée de +2 cœurs (+4.0 PV pour tous les membres)**, effets **Régénération I** et **Saturation** permanents dans les claims, **double récolte agricole**, **double butin sur les animaux**, **récolte doublée sur le bois et les pierres naturelles** (Andésite, Diorite, Granite, Blackstone, Calcite), reproduction animale accélérée (x3).
    * **Contraintes** : Interdiction des armures en Netherite, aucun Ingénieur (pas de TNT), max 1 Forgeron.
 4. 💰 **Syndicat Marchand (Commerce & Économie)** :
-   * **Bonus** : **Privilège exclusif de commerce avec les Villageois et Marchands ambulants dès les Âges 1 à 3** (le commerce avec les villageois est débloqué pour les autres guildes à partir de l'Âge 4 !), **+20% de primes** sur l'élimination des monstres, **10% des bénéfices de chaque monstre éliminé automatiquement transférés à la banque de guilde**, bonus de gain de +25% à l'Hôtel des Ventes.
+   * **Bonus** : **Privilège exclusif de commerce avec les Villageois et Marchands ambulants dès les Âges 1 à 3** (le commerce avec les villageois est débloqué pour les autres guildes à partir de l'Âge 4 !), **+20% de primes** sur l'élimination des monstres, **10% des bénéfices de chaque monstre éliminé automatiquement transférés à la banque de guilde**, **0 % de taxe** à l'Hôtel des Ventes.
    * **Contraintes** : **Aucun Arcaniste autorisé dans la guilde (0 Arcaniste)**, **Hordes de mercenaires 30% plus chères (+30% sur tous les contrats)**, aucun effet passif de combat, PV max du Nexus réduits de 20%.
 5. 🔮 **Conclave Arcanique (Magie & Runes)** :
-   * **Bonus** : **+25% de PV max sur le Cœur de Guilde (Nexus)**, **coûts en XP des enchantements et réparations à l'enclume réduits de -50%**, **potions consommées et jetées automatiquement du Tier Supérieur** (+1 niveau d'effet), **enchantements surpuissants débloqués (Niveau IV devient V, et Niveau V devient VI)**, le Nexus tire automatiquement un **rayon d'énergie magique** sur l'assaillant le plus proche (inflige **1 cœur de dégâts par seconde** soit 2.0 PV), dégâts magiques subis réduits de **50%**.
+   * **Bonus** : **+25% de PV max sur le Cœur de Guilde (Nexus)**, **coûts en XP des enchantements et réparations à l'enclume réduits de -50%**, **potions consommées et jetées automatiquement du Tier Supérieur** (+1 niveau d'effet), **enchantements surpuissants débloqués (Niveau IV devient V, et Niveau V devient VI)**, le Nexus tire automatiquement un **rayon d'énergie magique** sur l'assaillant le plus proche (inflige **1 cœur de dégâts toutes les 2 secondes**, soit 2.0 PV), dégâts magiques subis réduits de **50%**.
    * **Contraintes** : **Santé maximale de base réduite de 2 cœurs (-4.0 PV pour tous les membres)**, coût d'achat des claims augmenté de +50%, max 1 Forgeron et 1 Nain, **perte immédiate des enchantements de niveau VI / V boostés si la guilde change de spécialisation**.
 
 > [!IMPORTANT]
@@ -252,7 +254,7 @@ Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire f
      * 🌿 **Un Buisson Mort** (`1 Dead Bush`).
    * *🌟 **Récompenses & Titres Suprêmes pour avoir conquis l'Âge 6** :*
      * 🥚 **Relique Ancestrale** : **1x Œuf d'Ender Dragon** offert à tous les membres.
-     * ⚙ **Pouvoir Divin** : **1x Bloc de Commande (Command Block)** offert à tous les membres.
+     * 💎 **Trésor** : **1x Bloc de Netherite** offert à tous les membres.
      * 💬 **Titre & Préfixe de Tchat Dynamique selon le Temps de Jeu** :
        * Si votre session active de connexion dure **moins d'1 heure (< 1h)** : Préfixe de gloire **`[Giga Tchad]`** dans le tchat !
        * Si votre session active de connexion dure **plus d'1 heure (> 1h)** : Préfixe de prestige **`[Gros Nerd]`** dans le tchat !
