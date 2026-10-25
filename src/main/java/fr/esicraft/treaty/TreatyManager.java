@@ -399,6 +399,25 @@ public class TreatyManager {
          return "Réservé aux officiers et au chef de guilde concernés.";
       }
 
+      return this.doBreak(t, breaker, actor, false);
+   }
+
+   /**
+    * Agression d'un joueur ou du Nexus d'une guilde liée par un pacte de non-agression : le pacte est rompu
+    * automatiquement (trahison : indemnité et préavis) et une rivalité s'ouvre entre les deux guildes.
+    */
+   public void onAggression(Guild aggressor, Guild victim, Player actor) {
+      if (!this.enabled() || aggressor == null || victim == null || aggressor.getId().equals(victim.getId())) {
+         return;
+      }
+
+      Treaty t = this.between(aggressor.getId(), victim.getId());
+      if (t != null && t.getType() == TreatyType.PACT) {
+         this.doBreak(t, aggressor, actor, true);
+      }
+   }
+
+   private String doBreak(Treaty t, Guild breaker, Player actor, boolean aggression) {
       // Retrait atomique : deux officiers qui cliquent en même temps (menus ouverts sur un traité déjà rompu)
       // ne doivent pas payer deux indemnités ni rompre un traité qui n'existe plus.
       if (this.treaties.remove(t.getId()) == null) {
@@ -430,7 +449,13 @@ public class TreatyManager {
 
       String otherName = other != null ? other.getName() : "?";
       if (betrayal) {
-         ChatUtil.broadcast("&4&l💔 TRAHISON ! &c" + breaker.getName() + " &7rompt son &e" + t.getType().getLabel() + " &7avec &6" + otherName
+         if (aggression && other != null) {
+            this.plugin.getChronicle().rivalry(breaker.getId(), other.getId());
+            ChatUtil.broadcastGuild(other, "&c⚔ &6" + breaker.getName() + " &cvous a agressé malgré le pacte : &4rivalité déclarée&c !");
+            ChatUtil.broadcastGuild(breaker, "&c⚔ Votre agression a rompu le pacte avec &6" + otherName + " &c: trahison et rivalité.");
+         }
+
+         ChatUtil.broadcast("&4&l💔 TRAHISON ! &c" + breaker.getName() + (aggression ? " &7agresse &6" + otherName + " &7et rompt son " : " &7rompt son ") + "&e" + t.getType().getLabel() + " &7avec &6" + otherName
             + (paid > 0.0 ? " &7et lui verse &6" + String.format(Locale.ROOT, "%.0f", paid) + " pièces &7d'indemnité." : "."));
          this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.BETRAYAL, "💔 " + breaker.getName() + " rompt son " + t.getType().getLabel().toLowerCase(Locale.ROOT) + " avec " + otherName + ".",
             breaker.getId(), other != null ? other.getId() : null);

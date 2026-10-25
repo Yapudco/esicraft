@@ -111,6 +111,11 @@ public class Chronicle {
       this.async(() -> this.db().exec("INSERT INTO raid_log (ts, attacker_id, target_id, outcome) VALUES (?, ?, ?, ?);", now, attackerId, targetId, outcome));
    }
 
+   /** Rivalité ouverte par une agression contre une guilde liée par un pacte (comptée comme une hostilité dans les rivalités). */
+   public void rivalry(String aggressorId, String victimId) {
+      this.raid(aggressorId, victimId, "betrayal");
+   }
+
    public void pvpKill(String killerGuild, String victimGuild) {
       if (killerGuild == null || victimGuild == null || killerGuild.equals(victimGuild)) {
          return;
@@ -187,7 +192,7 @@ public class Chronicle {
 
    public List<Rivalry> rivalries() {
       java.util.Map<String, int[]> map = new java.util.HashMap<>();
-      for (Object[] r : this.db().select("SELECT attacker_id, target_id, COUNT(*) FROM raid_log WHERE outcome = 'launched' AND attacker_id IS NOT NULL GROUP BY attacker_id, target_id;", 3)) {
+      for (Object[] r : this.db().select("SELECT attacker_id, target_id, COUNT(*) FROM raid_log WHERE outcome IN ('launched', 'betrayal') AND attacker_id IS NOT NULL GROUP BY attacker_id, target_id;", 3)) {
          map.computeIfAbsent(r[0] + ">" + r[1], k -> new int[2])[0] = (int)num(r[2]);
       }
 

@@ -201,6 +201,7 @@ public class NexusListener implements Listener {
                            ItemStack weapon = attacker.getInventory().getItemInMainHand();
                            int damage = this.getWeaponDamage(weapon.getType());
                            this.plugin.getDisguiseManager().reveal(attacker, true);
+                           this.plugin.getTreatyManager().onAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), guild, attacker);
                            this.plugin.getNexusManager().damageNexus(guild, damage, attacker.getName(), this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), attacker);
                            ChatUtil.sendActionbar(attacker, "&c⚔️ Vous avez infligé &e" + damage + " dégâts &cau Nexus ennemi !");
                         }

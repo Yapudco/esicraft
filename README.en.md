@@ -270,10 +270,12 @@ An officer proposes a treaty to another guild, which has 10 minutes to accept (l
 | Treaty | Duration | Effects |
 | :--- | :--- | :--- |
 | 🤝 **Alliance** | Unlimited | No raids between you · free train travel on each other's land · you can't hurt each other (hits, arrows, potions) |
-| 📜 **Non-aggression pact** | 7 days | No raids between you |
+| 📜 **Non-aggression pact** | 7 days | No raids between you · **hitting a player of the other guild or their Nexus breaks the pact** (betrayal + rivalry) |
 | 👑 **Vassalage** | Unlimited | Like an alliance, but the vassal pays 5% of its bank to its overlord every day |
 
 **Breaking a treaty is a betrayal**: your guild pays up to 500 coins of compensation to the other one, the whole server is told, and you can't attack them for 30 minutes. One exception: an overlord can free its vassal for free.
+
+**Aggression under a pact**: if a player hits a member of the guild you have a pact with (melee, arrow) or attacks their Nexus, the pact is broken automatically. It counts as a betrayal (compensation, 30-minute notice, server announcement) and a **rivalry** opens between the two guilds (shown on the website, diplomacy page).
 
 ### The train (`/station`, `/rail`)
 

@@ -267,10 +267,12 @@ Un officier propose un traité à une autre guilde, qui a 10 minutes pour accept
 | Traité | Durée | Effets |
 | :--- | :--- | :--- |
 | 🤝 **Alliance** | Illimitée | Pas de raid entre vous · trains gratuits chez l'autre · vous ne pouvez pas vous blesser (coups, flèches, potions) |
-| 📜 **Pacte de non-agression** | 7 jours | Pas de raid entre vous |
+| 📜 **Pacte de non-agression** | 7 jours | Pas de raid entre vous · **frapper un joueur de l'autre guilde ou son Nexus rompt le pacte** (trahison + rivalité) |
 | 👑 **Vassalité** | Illimitée | Comme une alliance, mais le vassal verse chaque jour 5 % de sa banque à son suzerain |
 
 **Rompre un traité, c'est une trahison** : ta guilde verse jusqu'à 500 pièces d'indemnité à l'autre, tout le serveur est prévenu, et tu ne peux pas l'attaquer pendant 30 minutes. Seule exception : un suzerain peut libérer son vassal gratuitement.
+
+**Agression sous pacte** : si un joueur frappe un membre de la guilde sous pacte avec lui (coup, flèche) ou attaque son Nexus, le pacte est rompu automatiquement. C'est une trahison (indemnité, préavis de 30 minutes, annonce au serveur) et une **rivalité** s'ouvre entre les deux guildes (visible sur le site, page diplomatie).
 
 ### Le train (`/station`, `/rail`)
 
