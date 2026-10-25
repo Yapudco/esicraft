@@ -78,6 +78,14 @@ commands:
   hud:
     description: Afficher ou masquer le tableau de bord latéral
     usage: /hud
+  english:
+    description: Switch the game to English (menus, messages, rule book) / passer le jeu en anglais
+    aliases: [en, anglais]
+    usage: /english [on|off]
+  francais:
+    description: Repasser le jeu en français / switch the game back to French
+    aliases: [fr, french]
+    usage: /francais
   evenement:
     description: Administration des événements serveur
     permission: esicraft.admin

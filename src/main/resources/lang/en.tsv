@@ -1,0 +1,1341 @@
+# Dictionnaire FR -> EN du plugin (fragments exacts du code, codes couleur & conservés). Utilisé par /english.
+&cVous devez appartenir à une guilde pour faire progresser les Âges !	&cYou must belong to a guild to advance the Ages!
+&cVotre guilde a déjà atteint l'Âge maximal (&e	&cYour guild has already reached the maximum Age (&e
+&cCet item n'est pas requis pour le passage au prochain Âge (&e	&cThis item is not required to reach the next Age (&e
+&c❌ Cette houe en Netherite doit obligatoirement posséder les 3 enchantements :	&c❌ This Netherite hoe must have all 3 enchantments:
+ &e• Raccommodage (Mending)	 &e• Mending
+ &e• Solidité III (Unbreaking III)	 &e• Unbreaking III
+ &e• Fortune III (Fortune III)	 &e• Fortune III
+&eLe quota pour &6	&eThe quota for &6
+ &ea déjà été atteint dans votre guilde !	 &ehas already been reached in your guild!
+&aMerci pour votre don de &e	&aThank you for donating &e
+ &apour la progression de votre guilde !	 &afor your guild's progress!
+&6&l⚔️ PROGRESSION DE GUILDE : &e	&6&l⚔️ GUILD PROGRESS: &e
+ &aest entrée dans l'ère &6	 &ahas entered the era of &6
+&e&l👑 EXPLOIT LÉGENDAIRE : &6La guilde &e	&e&l👑 LEGENDARY FEAT: &6The guild &e
+ &6a conquis l'&eÂge de Suprématie &6!	 &6has conquered the &eAge of Supremacy&6!
+&aNouvel Âge débloqué pour votre guilde !	&aNew Age unlocked for your guild!
+ &6&l✨ VOTRE GUILDE A ATTEINT UN NOUVEL ÂGE ! ✨	 &6&l✨ YOUR GUILD HAS REACHED A NEW AGE! ✨
+ &aVos membres débloquent de nouvelles technologies et crafts !	 &aYour members unlock new technologies and crafts!
+ &e&l🎁 RÉCOMPENSES SUPRÊMES : &a1x Œuf de Dragon &7+ &a1x Bloc de Netherite &7ajoutés à votre inventaire !	 &e&l🎁 SUPREME REWARDS: &a1x Dragon Egg &7+ &a1x Netherite Block &7added to your inventory!
+ &b&l💬 TITRE DE TCHAT ACTIF : &3[Giga Tchad] &7(Session < 1h) ou &5[Gros Nerd] &7(Session > 1h) !	 &b&l💬 CHAT TITLE ACTIVE: &3[Giga Tchad] &7(session < 1h) or &5[Gros Nerd] &7(session > 1h)!
+&6Âge Rustique	&6Rustic Age
+&7Outils bois/pierre uniquement. Débuts de la civilisation (Nether & End verrouillés).	&7Wood/stone tools only. The dawn of civilization (Nether & End locked).
+&fÂge de la Métallurgie	&fAge of Metallurgy
+&7Outils en fer pour tous, diamant réservé aux métiers spécialisés. Accès au Nether.	&7Iron tools for everyone, diamond reserved for specialized jobs. Nether access.
+&dÂge de l'Alchimie	&dAge of Alchemy
+&7Diamant pour tous, Netherite réservée aux métiers spécialisés. Accès à l'End.	&7Diamond for everyone, Netherite reserved for specialized jobs. End access.
+&bÂge de Guerre Totale	&bAge of Total War
+&7Batailles de siège lourdes, alambics et redstone avancée pour tous.	&7Heavy siege battles, brewing stands and advanced redstone for everyone.
+&5Âge Mythique & Apex	&5Mythic & Apex Age
+&7Technologies ultimes et démocratisation de la Netherite pour tous.	&7Ultimate technologies and Netherite for everyone.
+&eÂge de Suprématie	&eAge of Supremacy
+&7Suprématie totale, reliques sacrées et maîtrise absolue de l'univers.	&7Total supremacy, sacred relics and absolute mastery of the universe.
+&c❌ L'accès au Nether est réservé aux joueurs ayant atteint l'&eÂge 2 (&f	&c❌ Nether access is reserved for players who reached &eAge 2 (&f
+&e) &cou supérieur !	&e) &cor higher!
+&c❌ Accès au Nether verrouillé (Requis : Âge 2 - Métallurgie)	&c❌ Nether access locked (Required: Age 2 - Metallurgy)
+&c❌ L'accès à l'End est réservé aux joueurs ayant atteint l'&eÂge 3 (&d	&c❌ End access is reserved for players who reached &eAge 3 (&d
+&c❌ Accès à l'End verrouillé (Requis : Âge 3 - Alchimie)	&c❌ End access locked (Required: Age 3 - Alchemy)
+&c❌ Téléportation vers le Nether annulée ! Votre guilde doit atteindre l'&eÂge 2 (&f	&c❌ Nether teleport cancelled! Your guild must reach &eAge 2 (&f
+&c❌ Téléportation vers l'End annulée ! Votre guilde doit atteindre l'&eÂge 3 (&d	&c❌ End teleport cancelled! Your guild must reach &eAge 3 (&d
+&c❌ Vous devez atteindre l'&eÂge 2 (&f	&c❌ You must reach &eAge 2 (&f
+&e) &cpour allumer un portail du Nether !	&e) &cto light a Nether portal!
+&c❌ Portail du Nether verrouillé (Requis : Âge 2)	&c❌ Nether portal locked (Required: Age 2)
+&c❌ Vous devez atteindre l'&eÂge 3 (&d	&c❌ You must reach &eAge 3 (&d
+&e) &cpour activer le portail de l'End !	&e) &cto activate the End portal!
+&c❌ Portail de l'End verrouillé (Requis : Âge 3)	&c❌ End portal locked (Required: Age 3)
+&c⚠ Vous avez été expulsé du Nether car votre guilde n'a pas encore atteint l'Âge 2 !	&c⚠ You were kicked out of the Nether because your guild has not reached Age 2 yet!
+&c⚠ Vous avez été expulsé de l'End car votre guilde n'a pas encore atteint l'Âge 3 !	&c⚠ You were kicked out of the End because your guild has not reached Age 3 yet!
+&cVous devez tenir l'objet que vous souhaitez donner en main principale.	&cYou must hold the item you want to donate in your main hand.
+  &6&l🏆 CLASSEMENT DES JOUEURS LES PLUS RICHES &7(Top 10)	 &6&l🏆 RICHEST PLAYERS RANKING &7(Top 10)
+  &7Aucune donnée économique disponible pour le moment.	 &7No economic data available yet.
+&cChoisissez d'abord un métier avec &e/race &cpour recevoir des contrats !	&cPick a job with &e/race &cfirst to receive contracts!
+  &6&l📜 CONTRATS DU JOUR &7(	 &6&l📜 TODAY'S CONTRACTS &7(
+  &7Les 3 contrats accomplis : &6+400 pièces &7de bonus. Renouvellement à minuit.	 &7All 3 contracts completed: &6+400 coins &7bonus. Resets at midnight.
+&cUtilisation : /esicraftadmin setage <guilde> <1-5>	&cUsage: /esicraftadmin setage <guild> <1-5>
+&6&l[Admin] &eL'Âge de la guilde &6	&6&l[Admin] &eThe Age of guild &6
+ &ea été défini sur : 	 &ewas set to: 
+&cNiveau d'âge invalide (1 à 5).	&cInvalid Age level (1 to 5).
+&cUtilisation : /esicraftadmin spawnraid <guilde> <TYPE_RAID>	&cUsage: /esicraftadmin spawnraid <guild> <RAID_TYPE>
+&aRaid forcé lancé avec succès sur la guilde &e	&aRaid successfully forced on guild &e
+&cLe raid n'a pas pu être lancé (pas de Nexus, aucun défenseur sur son territoire, raid déjà en cours, cooldown ou /pvp désactivé).	&cThe raid could not be launched (no Nexus, no defender on their land, raid already running, cooldown or /pvp disabled).
+&cType de raid invalide. Types : ARMORED_ZOMBIES, INCENDIARY_SKELETONS, TOXIC_SPIDERS, PILLAGER_SIEGE, NETHER_DEMONS, PHANTOM_SWARM, CREEPER_BLITZ, ENDER_INCURSION	&cInvalid raid type. Types: ARMORED_ZOMBIES, INCENDIARY_SKELETONS, TOXIC_SPIDERS, PILLAGER_SIEGE, NETHER_DEMONS, PHANTOM_SWARM, CREEPER_BLITZ, ENDER_INCURSION
+&cUtilisation : /esicraftadmin givecoins <joueur> <montant>	&cUsage: /esicraftadmin givecoins <player> <amount>
+ pièces &aau joueur &e	 coins &ato player &e
+&cLe montant doit être un nombre positif.	&cThe amount must be a positive number.
+&cUtilisation : /esicraftadmin forcenexus <guilde>	&cUsage: /esicraftadmin forcenexus <guild>
+&cGuilde ou Nexus introuvable.	&cGuild or Nexus not found.
+&aLe Nexus de &e	&aThe Nexus of &e
+ &aa été restauré à 100% de ses PV !	 &awas restored to 100% health!
+  &c&lCommandes Administration Esicraft :	 &c&lEsicraft Admin Commands:
+  &e/esicraftadmin setage <1-6> &7: Définir l'âge	 &e/esicraftadmin setage <1-6> &7: Set the Age
+  &e/esicraftadmin spawnraid <guilde> <type> &7: Lancer un raid	 &e/esicraftadmin spawnraid <guild> <type> &7: Start a raid
+  &e/esicraftadmin givecoins <joueur> <montant> &7: Donner de l'argent	 &e/esicraftadmin givecoins <player> <amount> &7: Give money
+  &e/esicraftadmin forcenexus <guilde> &7: Réparer un Nexus	 &e/esicraftadmin forcenexus <guild> &7: Repair a Nexus
+  &6&l⚔️ ESICRAFT-PLUGIN &7- &eSurvie Stratégique v1.0.0	 &6&l⚔️ ESICRAFT-PLUGIN &7- &eStrategic Survival v1.0.0
+  &7Développé pour des parties épiques à 50+ joueurs.	 &7Built for epic games with 50+ players.
+  &e/race &7: Choisir ou consulter sa classe & métiers	 &e/race &7: Choose or view your class & jobs
+  &e/guild &7: Gestion des guildes, spécialisations & claims	 &e/guild &7: Guild management, specializations & claims
+  &e/nexus &7: Statut & placement du cœur de guilde	 &e/nexus &7: Status & placement of the guild heart
+  &e/age &7: Progression technologique de guilde & dons	 &e/age &7: Guild tech progression & donations
+  &e/ah &7: Marché central & contrats de hordes	 &e/ah &7: Central market & horde contracts
+  &e/guide &7: Obtenir le livre de règles officiel	 &e/guide &7: Get the official rule book
+  &c/money &7: (Admin) Gérer l'argent des joueurs	 &c/money &7: (Admin) Manage player money
+&aConfiguration de &6Esicraft-Plugin &arechargée avec succès !	&aConfiguration of &6Esicraft-Plugin &areloaded successfully!
+&aTableau de bord activé. &7(/hud pour le masquer)	&aDashboard enabled. &7(/hud to hide it)
+&7Tableau de bord masqué. &7(/hud pour le réafficher)	&7Dashboard hidden. &7(/hud to show it again)
+&cPermission refusée.	&cPermission denied.
+&7Usage : /evenement <lune|meteores|marchand|boss|stop|status>	&7Usage: /evenement <lune|meteores|marchand|boss|stop|status>
+&aÉvénement arrêté.	&aEvent stopped.
+&cÉvénement inconnu. Usage : /evenement <lune|meteores|marchand|boss|stop|status>	&cUnknown event. Usage: /evenement <lune|meteores|marchand|boss|stop|status>
+&aÉvénement lancé : 	&aEvent started: 
+&cImpossible de lancer l'événement (déjà un événement actif, aucun joueur ou aucun emplacement valide).	&cCannot start the event (an event is already active, no players, or no valid location).
+&cCette commande est strictement réservée aux administrateurs.	&cThis command is strictly reserved for administrators.
+&4&lRESET GLOBAL !	&4&lGLOBAL RESET!
+&cEffets, guildes et monde réinitialisés	&cEffects, guilds and world reset
+&4&l💥 RÉINITIALISATION GLOBALE DU SERVEUR ! 💥	&4&l💥 GLOBAL SERVER RESET! 💥
+&cToutes les guildes, territoires, cœurs de Nexus et fortunes ont été réinitialisés !	&cAll guilds, territories, Nexus hearts and fortunes have been reset!
+&eChaque joueur repart avec 100 pièces et peut refonder une nouvelle dynastie (&e/guild&e, &e/race&e) !	&eEvery player restarts with 100 coins and can found a new dynasty (&e/guild&e, &e/race&e)!
+&aLe jeu a été réinitialisé avec succès.	&aThe game was reset successfully.
+  &4&l⚠️ ATTENTION : DESTRUCTION TOTALE DES DONNÉES !	 &4&l⚠️ WARNING: TOTAL DATA DESTRUCTION!
+  &cCette action va supprimer DÉFINITIVEMENT :	 &cThis action will PERMANENTLY delete:
+   &8• &cToutes les guildes et leurs territoires (claims)	  &8• &cAll guilds and their territories (claims)
+   &8• &cTous les Nexus et améliorations	  &8• &cAll Nexus and upgrades
+   &8• &cToutes les fortunes et banques (reset à 100 pièces)	  &8• &cAll fortunes and banks (reset to 100 coins)
+   &8• &cTous les items en vente à l'Hôtel des Ventes	  &8• &cAll items for sale at the Auction House
+  &ePour confirmer le reset global, tapez :	 &eTo confirm the global reset, type:
+  &4&l➤ &c/game reset confirm	 &4&l➤ &c/game reset confirm
+  &4&lAdministration du Jeu (/game) :	 &4&lGame administration (/game):
+  &c/game reset confirm &7: Réinitialise totalement le jeu (Guildes, Argent, Nexus, Claims)	 &c/game reset confirm &7: Fully resets the game (Guilds, Money, Nexus, Claims)
+&aUn exemplaire du &6Guide Esicraft &aa été ajouté à votre inventaire !	&aA copy of the &6Esicraft Guide &awas added to your inventory!
+&a✔ Le cooldown et les hordes pour la guilde 	&a✔ The cooldown and hordes for guild 
+ ont été réinitialisés !	 were reset!
+&cGuilde introuvable (	&cGuild not found (
+&a✔ Tous les cooldowns de hordes et les raids ont été réinitialisés pour TOUTES les guildes !	&a✔ All horde cooldowns and raids were reset for ALL guilds!
+&cCette commande est réservée aux joueurs.	&cThis command is reserved for players.
+&cUtilisation : &e/guild create <nom> <tag>	&cUsage: &e/guild create <name> <tag>
+&cLe tag ne doit pas dépasser 6 caractères.	&cThe tag must not exceed 6 characters.
+&cUtilisation : &e/guild invite <joueur>	&cUsage: &e/guild invite <player>
+&cVous n'avez pas de guilde.	&cYou do not have a guild.
+&cSeuls les officiers et chefs peuvent inviter des joueurs.	&cOnly officers and leaders can invite players.
+&cJoueur introuvable ou hors-ligne.	&cPlayer not found or offline.
+&aInvitation envoyée à &e	&aInvitation sent to &e
+&cUtilisation : &e/guild join <nom_guilde>	&cUsage: &e/guild join <guild_name>
+&cGuilde introuvable.	&cGuild not found.
+&cVous n'avez pas d'invitation en attente pour cette guilde.	&cYou have no pending invitation for this guild.
+&cSeul le chef de guilde peut dissoudre la guilde.	&cOnly the guild leader can disband the guild.
+&cUtilisation : /guild kick <joueur>	&cUsage: /guild kick <player>
+&cJoueur introuvable (jamais connecté ou nom incorrect).	&cPlayer not found (never connected or wrong name).
+&cUtilisation : &e/guild promote <joueur> [officier|membre]	&cUsage: &e/guild promote <player> [officer|member]
+&cUtilisation : &e/guild demote <joueur>	&cUsage: &e/guild demote <player>
+&cLe chef ne peut pas être rétrogradé (utilisez &e/guild transfer&c).	&cThe leader cannot be demoted (use &e/guild transfer&c).
+&cCe joueur est déjà au rang le plus bas.	&cThis player already has the lowest rank.
+&cUtilisation : /guild transfer <joueur>	&cUsage: /guild transfer <player>
+&cJoueur introuvable ou hors ligne.	&cPlayer not found or offline.
+&cSeuls les officiers et chefs peuvent claim des territoires.	&cOnly officers and leaders can claim territory.
+&cSeuls les officiers et chefs peuvent unclaim.	&cOnly officers and leaders can unclaim.
+&cSeul le chef ou un officier peut poser le Nexus.	&cOnly the leader or an officer can place the Nexus.
+&eNexus de votre guilde : 	&eYour guild's Nexus: 
+&cNon posé. Faites /guild nexus place	&cNot placed. Run /guild nexus place
+&eSolde de la banque de guilde : &6	&eGuild bank balance: &6
+&aDépôt de &6	&aDeposit of &6
+ pièces &aeffectué dans la banque de guilde !	 coins &amade into the guild bank!
+&cVous n'avez pas assez d'argent sur vous.	&cYou do not have enough money on you.
+&cMontant invalide.	&cInvalid amount.
+&6&lGuilde : &e	&6&lGuild: &e
+&7Chef : &f	&7Leader: &f
+&7Membres : &a	&7Members: &a
+&7Territoires : &e	&7Territory: &e
+ chunks &8(Prochain claim : &6	 chunks &8(Next claim: &6
+&7Nexus : 	&7Nexus: 
+&cNon posé	&cNot placed
+&cUtilisation : &e/guild annex <join|decline>	&cUsage: &e/guild annex <join|decline>
+&cAction invalide. Utilisez &e/guild annex join &cou &e/guild annex decline&c.	&cInvalid action. Use &e/guild annex join &cor &e/guild annex decline&c.
+&cVous n'avez pas la permission d'utiliser cette commande admin.	&cYou do not have permission to use this admin command.
+&a✔ Le cooldown et les hordes actives pour la guilde &e	&a✔ The cooldown and active hordes for guild &e
+ &aont été réinitialisés !	 &awere reset!
+&cGuilde introuvable (&e	&cGuild not found (&e
+&a✔ Tous les cooldowns de hordes et les raids en cours ont été réinitialisés pour TOUTES les guildes !	&a✔ All horde cooldowns and ongoing raids were reset for ALL guilds!
+&cUtilisation : &e/guild cooldown reset [nom_guilde]	&cUsage: &e/guild cooldown reset [guild_name]
+  &6&lCommandes de Guilde Esicraft :	 &6&lEsicraft Guild Commands:
+  &e/guild create <nom> <tag> &7: Fonder une guilde	 &e/guild create <name> <tag> &7: Found a guild
+  &e/guild invite <joueur> &7: Inviter un membre	 &e/guild invite <player> &7: Invite a member
+  &e/guild join <guilde> &7: Accepter une invitation	 &e/guild join <guild> &7: Accept an invitation
+  &e/guild leave &7: Quitter votre guilde actuelle	 &e/guild leave &7: Leave your current guild
+  &e/guild disband &7: Dissoudre votre guilde (Chef)	 &e/guild disband &7: Disband your guild (Leader)
+  &e/guild kick <joueur> &7: Expulser un membre	 &e/guild kick <player> &7: Kick a member
+  &e/guild promote <joueur> &7: Promouvoir Officier / rétrograder	 &e/guild promote <player> &7: Promote to Officer
+  &e/guild demote <joueur> &7: Rétrograder au rang de Membre	 &e/guild demote <player> &7: Demote to Member
+  &e/guild transfer <joueur> &7: Transférer le leadership	 &e/guild transfer <player> &7: Transfer leadership
+  &e/guild claim &7: Revendiquer le chunk actuel	 &e/guild claim &7: Claim the current chunk
+  &e/guild claim show &7: Afficher les claims en surbrillance	 &e/guild claim show &7: Highlight your claims
+  &e/guild unclaim &7: Abandonner le chunk actuel	 &e/guild unclaim &7: Abandon the current chunk
+  &e/guild spec &7: Choisir l'orientation de guilde	 &e/guild spec &7: Choose the guild's orientation
+  &e/guild nexus place &7: Placer le Nexus protecteur	 &e/guild nexus place &7: Place the protective Nexus
+  &e/guild bank <montant> &7: Déposer dans la banque	 &e/guild bank <amount> &7: Deposit into the bank
+  &e/guild info [nom] &7: Voir les détails d'une guilde	 &e/guild info [name] &7: View a guild's details
+  &c/guild cooldown reset [nom] &7: (Admin) Reset cooldown & hordes	 &c/guild cooldown reset [name] &7: (Admin) Reset cooldown & hordes
+&aConnexion au Hub en cours...	&aConnecting to the Hub...
+&cSeul un joueur peut exécuter cette commande.	&cOnly a player can run this command.
+&cUtilisation : &e/ah sell <prix>	&cUsage: &e/ah sell <price>
+&cLe prix doit être compris entre &e1.00 &cet &e1 000 000.00 &cpièces.	&cThe price must be between &e1.00 &cand &e1,000,000.00 &ccoins.
+&cVous devez tenir l'objet à vendre dans votre main principale.	&cYou must hold the item to sell in your main hand.
+&6💰 Votre solde : &e	&6💰 Your balance: &e
+&cSeul &e/money &cest disponible pour les joueurs (les autres sous-commandes sont réservées aux administrateurs).	&cOnly &e/money &cis available to players (the other subcommands are reserved for administrators).
+&aStatistiques anti-farm de &e	&aAnti-farm statistics of &e
+ &aréinitialisées.	 &awere reset.
+&cJoueur introuvable : aucune statistique réinitialisée. (Utilisez &e/money rectify reset all &cpour tout remettre à zéro.)	&cPlayer not found: no statistics reset. (Use &e/money rectify reset all &cto reset everything.)
+&aToutes les statistiques d'éliminations individuelles ont été réinitialisées.	&aAll individual kill statistics were reset.
+  &6&l⚖️ ANTI-FARM INDIVIDUEL DE : &e	 &6&l⚖️ INDIVIDUAL ANTI-FARM FOR: &e
+  &7Facteur serveur : &e	 &7Server factor: &e
+  &7Total de ses éliminations : &f	 &7Total kills: &f
+  &eRépartition & Multiplicateurs appliqués à ce joueur :	 &eBreakdown & multipliers applied to this player:
+   &7Ce joueur n'a encore éliminé aucun monstre.	  &7This player has not killed any monster yet.
+  &7Pour changer le facteur global : &e/money rectify <valeur>	 &7To change the global factor: &e/money rectify <value>
+  &7Pour réinitialiser : &e/money rectify reset [joueur/all]	 &7To reset: &e/money rectify reset [player/all]
+&cUtilisation : /money rectify status <joueur>	&cUsage: /money rectify status <player>
+&aFacteur de rectification anti-farm défini à &6	&aAnti-farm rectification factor set to &6
+&7Chaque joueur verra ses gains réduits individuellement selon sa propre proportion de kills.	&7Each player will have their earnings reduced individually based on their own share of kills.
+&cValeur invalide. Exemple : /money rectify 1.0 ou /money rectify status <joueur>	&cInvalid value. Example: /money rectify 1.0 or /money rectify status <player>
+&cImpossible de charger les données du joueur &e	&cUnable to load player data for &e
+&eSolde de &6	&eBalance of &6
+ pièces&e.	 coins&e.
+&cUtilisation : /money set <joueur> <montant>	&cUsage: /money set <player> <amount>
+&aLe solde de &e	&aThe balance of &e
+ &aa été défini à &6	 &awas set to &6
+ pièces&a.	 coins&a.
+&eUn administrateur a défini votre solde à &6	&eAn administrator set your balance to &6
+&cUtilisation : /money give <joueur> <montant>	&cUsage: /money give <player> <amount>
+&aAjouté &6	&aAdded &6
+ pièces &aau solde de &e	 coins &ato the balance of &e
+ pièces &ad'un administrateur !	 coins &afrom an administrator!
+&cUtilisation : /money take <joueur> <montant>	&cUsage: /money take <player> <amount>
+&eRetiré &6	&eRemoved &6
+ pièces &eau solde de &e	 coins &efrom the balance of &e
+ &e(Nouveau solde : &6	 &e(New balance: &6
+&cUn administrateur vous a retiré &6	&cAn administrator removed &6
+  &6&lAdministration Économique (/money) :	 &6&lEconomy Administration (/money):
+  &e/money get <joueur> &7: Voir le solde d'un joueur	 &e/money get <player> &7: View a player's balance
+  &e/money set <joueur> <montant> &7: Définir le solde	 &e/money set <player> <amount> &7: Set the balance
+  &e/money give <joueur> <montant> &7: Donner de l'argent	 &e/money give <player> <amount> &7: Give money
+  &e/money take <joueur> <montant> &7: Retirer de l'argent	 &e/money take <player> <amount> &7: Take money
+  &e/money rectify <facteur> &7: Définir facteur anti-farm	 &e/money rectify <factor> &7: Set anti-farm factor
+  &e/money rectify status <joueur> &7: Voir stats d'un joueur	 &e/money rectify status <player> &7: View a player's stats
+  &e/money top &7: Voir le classement des riches	 &e/money top &7: View the rich ranking
+&cVous n'appartenez à aucune guilde.	&cYou do not belong to any guild.
+  &5&lCœur de Guilde (Nexus) :	 &5&lGuild Heart (Nexus):
+  &7Points de Vie : &a	 &7Health: &a
+ PV (	 HP (
+  &7Position : &f	 &7Position: &f
+  &7Spécialisation : 	 &7Specialization: 
+  &7Pièges armés : &a	 &7Armed traps: &a
+ / 5 actifs	 / 5 active
+&cVotre guilde ne possède pas de Nexus actif. Posez-le avec &e/guild nexus place &cdans votre claim.	&cYour guild has no active Nexus. Place it with &e/guild nexus place &cin your claim.
+&cSeuls les chefs et officiers peuvent poser le Nexus.	&cOnly leaders and officers can place the Nexus.
+&cUtilisation : &e/pay <joueur> <montant>	&cUsage: &e/pay <player> <amount>
+&cVous ne pouvez pas vous envoyer de l'argent à vous-même !	&cYou cannot send money to yourself!
+&cMontant invalide. Exemple : &e/pay 	&cInvalid amount. Example: &e/pay 
+&cErreur lors du chargement de vos données économiques.	&cError while loading your economy data.
+&cSolde insuffisant ! Vous disposez de &6	&cInsufficient funds! You have &6
+ pièces&c.	 coins&c.
+&cErreur lors du chargement des données du destinataire.	&cError while loading the recipient's data.
+&aVous avez envoyé &6	&aYou sent &6
+ pièces &aà &e	 coins &ato &e
+ &a(Nouveau solde : &6	 &a(New balance: &6
+&aVous avez reçu &6	&aYou received &6
+ pièces &ade la part de &e	 coins &afrom &e
+ &a! (Nouveau solde : &6	 &a! (New balance: &6
+&cLe joueur &e	&cThe player &e
+ &cn'est pas connecté ou introuvable.	 &cis not online or cannot be found.
+&cSeul un joueur en jeu peut effectuer un transfert d'argent.	&cOnly an in-game player can transfer money.
+&cVous n'avez pas la permission d'exécuter cette commande.	&cYou do not have permission to run this command.
+&c&l⚔️ DESTRUCTION DES NEXUS : &a&lACTIVÉE &7!	&c&l⚔️ NEXUS DESTRUCTION: &a&lENABLED &7!
+&eLes Nexus de guilde peuvent désormais être attaqués et détruits !	&eGuild Nexus can now be attacked and destroyed!
+&c&l🛡️ DESTRUCTION DES NEXUS : &c&lDÉSACTIVÉE &7!	&c&l🛡️ NEXUS DESTRUCTION: &c&lDISABLED &7!
+&eLes Nexus de guilde sont temporairement invulnérables à la destruction.	&eGuild Nexus are temporarily invulnerable to destruction.
+&cJoueur &e	&cPlayer &e
+ &cintrouvable ou hors-ligne.	 &cnot found or offline.
+&cCette commande doit être exécutée par un joueur.	&cThis command must be run by a player.
+&cPermission insuffisante.	&cInsufficient permission.
+&cJoueur introuvable.	&cPlayer not found.
+&aLa classe de &e	&aThe class of &e
+ &aa été définie sur &6	 &awas set to &6
+&cClasse invalide. Classes disponibles : DWARF, SYLVAN, BLACKSMITH, RANGER, ARCANIST, ENGINEER, NONE	&cInvalid class. Available classes: DWARF, SYLVAN, BLACKSMITH, RANGER, ARCANIST, ENGINEER, NONE
+&cVous devez appartenir à une guilde pour gérer un réseau ferroviaire.	&cYou must belong to a guild to manage a rail network.
+&cRéservé aux officiers et au chef de guilde.	&cReserved for officers and the guild leader.
+  &6&l🏆 CLASSEMENT DE SAISON &7	 &6&l🏆 SEASON RANKING &7
+ &8(fin dans 	 &8(ends in 
+  &7Aucune guilde pour le moment.	 &7No guild yet.
+ &e← vous	 &e← you
+  &7Points : territoire, Âge, richesse, membres, raids repoussés et conquêtes.	 &7Points: territory, Age, wealth, members, raids repelled and conquests.
+  &7Le champion reçoit &65 000 pièces &7en banque, &6500 &7par membre et la couronne &6👑&7.	 &7The champion receives &65,000 coins &7in the bank, &6500 &7per member and the crown &6👑&7.
+  &6&l📖 MÉMORIAL DES CONQUÊTES &7(10 derniers événements)	 &6&l📖 CONQUEST MEMORIAL &7(last 10 events)
+  &7Rien à signaler… pour l'instant.	 &7Nothing to report… for now.
+&cCommande réservée aux joueurs.	&cCommand reserved for players.
+&cLe réseau ferroviaire est désactivé.	&cThe rail network is disabled.
+&c🚉 Rendez-vous dans une gare (à moins de 	&c🚉 Go to a station (within 
+ blocs d'un panneau &f[Gare]&c) pour voyager.	 blocks of a &f[Gare]&c sign) to travel.
+&cCette gare a perdu son panneau et a été supprimée du réseau.	&cThis station lost its sign and was removed from the network.
+&e🚆 Recherche des lignes en cours…	&e🚆 Searching for lines…
+&7Patientez quelques secondes avant de relancer la recherche.	&7Wait a few seconds before searching again.
+&eLe réseau est très sollicité, réessayez dans un instant.	&eThe network is very busy, try again in a moment.
+&cVous devez appartenir à une guilde pour consulter les traités.	&cYou must belong to a guild to view treaties.
+&7Aucun traité en vigueur.	&7No treaty in force.
+ &7avec &f	 &7with &f
+&6Un livre explicatif des règles &e"Guide Esicraft" &6a été ajouté à votre inventaire !	&6A rule book &e"Esicraft Guide" &6was added to your inventory!
+&7(Vous pourrez toujours en réclamer un nouveau avec &e/guide&7)	&7(You can always get a new one with &e/guide&7)
+ &6&lBienvenue sur Esicraft !	 &6&lWelcome to Esicraft!
+ &7Classe actuelle : &e	 &7Current class: &e
+ &7Âge de Guilde : &6	 &7Guild Age: &6
+ &7Solde personnel : &a	 &7Personal balance: &a
+ &c⚠ Vous n'avez pas encore choisi de classe ! Faites &e/race &cpour débuter.	 &c⚠ You have not chosen a class yet! Use &e/race &cto begin.
+&c⚠️ Anti-Farm : Vous avez combattu &e	&c⚠️ Anti-Farm: You fought &e
+ &ctrop récemment pour obtenir une nouvelle prime.	 &ctoo recently to earn a new bounty.
+&e⚔️ Vous avez éliminé &c	&e⚔️ You eliminated &c
+ &emais sa bourse était vide ! Aucune prime récoltée.	 &ebut their purse was empty! No bounty collected.
+&cVous avez été éliminé par &e	&cYou were eliminated by &e
+ &c(votre bourse était déjà vide).	 &c(your purse was already empty).
+  &a&l⚔️ PRIME DE VICTOIRE PvP !	 &a&l⚔️ PVP VICTORY BOUNTY!
+  &7Victime : &e	 &7Victim: &e
+  &7Pillage intégral : &6+	 &7Full looting: &6+
+ pièces &7(Victime fauchée)	 coins &7(Victim wiped out)
+  &7Prime de base : &6+100.00 pièces	 &7Base bounty: &6+100.00 coins
+  &7Pillage (1% fortune) : &6+	 &7Looting (1% of fortune): &6+
+  &a&lTotal crédité : &e+	 &a&lTotal credited: &e+
+ pièces &a!	 coins &a!
+ pièces (Kill: 	 coins (Kill: 
+  &c&l☠️ DÉFAITE AU COMBAT PvP !	 &c&l☠️ PVP DEFEAT!
+  &7Vainqueur : &e	 &7Winner: &e
+  &c&l⚠️ Solde inférieur à 100 pièces : Vous avez perdu TOUT votre argent !	 &c&l⚠️ Balance under 100 coins: You lost ALL your money!
+  &c• Montant total perdu : &c-	 &c• Total amount lost: &c-
+ pièces &7(Nouveau solde : &e0.00 pièces&7)	 coins &7(New balance: &e0.00 coins&7)
+  &7Pénalité de mort : &c-100.00 pièces	 &7Death penalty: &c-100.00 coins
+  &7Pillage (1% fortune) : &c-	 &7Looting (1% of fortune): &c-
+  &c&lTotal débité : &c-	 &c&lTotal debited: &c-
+ pièces &7(Nouveau solde : &e	 coins &7(New balance: &e
+ pièces (Tué par 	 coins (Killed by 
+&a✔ Contrat accompli : &f	&a✔ Contract completed: &f
+&6&l★ Tous les contrats du jour sont accomplis ! &e+	&6&l★ All of today's contracts are completed! &e+
+ pièces de bonus.	 bonus coins.
+Extraire {n} minerais	Mine {n} ores
+Récolter {n} cultures mûres	Harvest {n} ripe crops
+Éliminer {n} monstres	Kill {n} monsters
+Éliminer {n} monstres à distance	Kill {n} monsters at range
+Fondre {n} lingots	Smelt {n} ingots
+Enchanter {n} objets	Enchant {n} items
+Poser {n} composants de redstone	Place {n} redstone components
+🌑 Lune de Sang	🌑 Blood Moon
+☄ Pluie de Météorites	☄ Meteor Shower
+🧙 Marché Noir	🧙 Black Market
+☠ Boss Mondial	☠ World Boss
+ s'est déclenché sur le serveur.	 has started on the server.
+&7🌑 La Lune de Sang s'efface… l'aube revient.	&7🌑 The Blood Moon fades… dawn returns.
+&7☄ La pluie de météorites est terminée. Fouillez les cratères restants !	&7☄ The meteor shower is over. Search the remaining craters!
+&7🧙 Le Marchand du Marché Noir a plié bagage et disparu dans la nuit.	&7🧙 The Black Market Merchant packed up and vanished into the night.
+&7☠ Le Seigneur des Cendres s'est évanoui dans les flammes… personne ne l'a terrassé.	&7☠ The Lord of Ashes vanished in the flames… nobody slew him.
+&4&l🌑 LUNE DE SANG &c— Primes x2, monstres en nombre !	&4&l🌑 BLOOD MOON &c— Bounties x2, monsters galore!
+&4&l🌑 LA LUNE DE SANG SE LÈVE ! &cPendant 10 minutes, les monstres sont plus nombreux, mais toutes les &6primes de chasse sont doublées&c !	&4&l🌑 THE BLOOD MOON RISES! &cFor 10 minutes, monsters are more numerous, but all &6hunting bounties are doubled&c!
+&6&l☄ PLUIE DE MÉTÉORITES &e— Cherchez les cratères !	&6&l☄ METEOR SHOWER &e— Find the craters!
+&6&l☄ UNE PLUIE DE MÉTÉORITES S'ABAT SUR LE MONDE ! &eDes blocs de minerai rares tombent près des joueurs, hors des territoires de guilde. Soyez les premiers !	&6&l☄ A METEOR SHOWER FALLS ON THE WORLD! &eRare ore blocks fall near players, outside guild territories. Be the first!
+&6☄ Une météorite s'est écrasée près de &e	&6☄ A meteor crashed near &e
+&5&l🧙 Marchand du Marché Noir	&5&l🧙 Black Market Merchant
+&5&l🧙 MARCHÉ NOIR &d— Un marchand rôde près de 	&5&l🧙 BLACK MARKET &d— A merchant lurks near 
+&5&l🧙 UN MARCHAND DU MARCHÉ NOIR EST APPARU près de &d	&5&l🧙 A BLACK MARKET MERCHANT HAS APPEARED near &d
+ &5! &7Il échange des objets rares contre des &bdiamants&7 — pendant 5 minutes seulement.	 &5! &7He trades rare items for &bdiamonds&7 — for 5 minutes only.
+&4&l☠ Seigneur des Cendres	&4&l☠ Lord of Ashes
+&4&l☠ SEIGNEUR DES CENDRES &c— 	&4&l☠ LORD OF ASHES &c— 
+&4&l☠ LE SEIGNEUR DES CENDRES S'EST ÉVEILLÉ près de &c	&4&l☠ THE LORD OF ASHES HAS AWAKENED near &c
+ &4! &7Alliez-vous pour le terrasser en 15 minutes : &6	 &4! &7Team up to slay him within 15 minutes: &6
+ pièces &7à se partager selon les dégâts infligés !	 coins &7to share based on damage dealt!
+&6&l☠ LE SEIGNEUR DES CENDRES EST TOMBÉ ! &eHonneur aux combattants :	&6&l☠ THE LORD OF ASHES HAS FALLEN! &eHonor to the fighters:
+ dégâts &8(&6+	 damage &8(&6+
+ pièces&8)	 coins&8)
+&7Le plus grand pourfendeur, &e	&7The greatest slayer, &e
+&7, voit tomber une &fÉtoile du Nether &7et &b8 diamants&7 !	&7, receives a &fNether Star &7and &b8 diamonds&7!
+☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : 	☠ The Lord of Ashes was slain (best fighter: 
+Aucun événement en cours. Prochain tirage dans ~	No event in progress. Next draw in ~
+Événement actif : 	Active event: 
+ s restantes)	 s left)
+&eGuilde: &f	&eGuild: &f
+&eÂge: &f	&eAge: &f
+&cRaid: EN COURS !	&cRaid: IN PROGRESS!
+&aProtégé: 	&aProtected: 
+&7Raid: aucun	&7Raid: none
+&eTraités: &d	&eTreaties: &d
+&eContrats: &f	&eContracts: &f
+&eSolde: &6	&eBalance: &6
+ a repoussé une invasion de monstres.	 repelled a monster invasion.
+ a détruit le Nexus de 	 destroyed the Nexus of 
+ et annexé ses terres.	 and annexed its land.
+&6&l👑 FIN DE SAISON 	&6&l👑 END OF SEASON 
+ ! &eLa guilde &6&l	 ! &eThe guild &6&l
+ &eest sacrée championne avec &f	 &ewas crowned champion with &f
+&7Récompense : &6	&7Reward: &6
+ pièces en banque de guilde &7et &6	 coins in the guild bank &7and &6
+ pièces &7par membre. Une nouvelle saison commence !	 coins &7per member. A new season begins!
+ remporte la saison 	 wins season 
+Âge de Guilde : Progression	Guild Age: Progress
+&cVous devez faire partie d'une guilde pour faire progresser les Âges (&e/guild create &cou &e/guild join&c).	&cYou must be part of a guild to advance the Ages (&e/guild create &cor &e/guild join&c).
+&8» &6Âge de Guilde : Progression	&8» &6Guild Age: Progress
+&7Niveau actuel : &e	&7Current level: &e
+&7Membres dans la guilde : &e	&7Members in the guild: &e
+&7Échelle d'objectifs : &e100% &7(Quotas de reliques fixes)	&7Goal scale: &e100% &7(Fixed relic quotas)
+&7Échelle d'objectifs : &6	&7Goal scale: &6
+% &7(+30%/j. jusqu'à 5, +50%/j. dès 6)	% &7(+30%/day up to 5, +50%/day from 6)
+&7Échelle d'objectifs : &a100% (Base solo)	&7Goal scale: &a100% (Solo base)
+&eProchain Âge : &a	&eNext Age: &a
+&a&lFÉLICITATIONS ! &7Âge Suprême Maximal Atteint !	&a&lCONGRATULATIONS! &7Supreme Age reached!
+&6&lGuilde 	&6&lGuild 
+&e&l➤ ÂGE ACTUEL DE VOTRE GUILDE	&e&l➤ YOUR GUILD'S CURRENT AGE
+&aDébloqué	&aUnlocked
+&cVerrouillé	&cLocked
+&7Progression : &f	&7Progress: &f
+&a✔ Objectif complété pour ce matériau !	&a✔ Goal completed for this material!
+&e➤ Cliquez avec cet item dans votre inventaire pour faire un don !	&e➤ Click with this item in your inventory to donate!
+Matériau	Material
+Disque de Musique (	Music Disc (
+Modèle de Forge (	Smithing Template (
+Tesson de Poterie (	Pottery Sherd (
+Lingots de Cuivre	Copper Ingots
+Blocs de Cuivre	Copper Blocks
+Cuir (Tannerie)	Leather (Tannery)
+Fer Brut	Raw Iron
+Bûches de Chêne	Oak Logs
+Blé (Récolte Agricole)	Wheat (Farm Harvest)
+Carottes (Maraîchage)	Carrots (Market Gardening)
+Plumes (Élevage & Archerie)	Feathers (Husbandry & Archery)
+Pommes de Terre (Rations)	Potatoes (Rations)
+Cannes à Sucre (Papeterie & Alchimie)	Sugar Cane (Paper & Alchemy)
+Tranches de Pastèque	Melon Slices
+Betteraves (Agriculture)	Beetroots (Agriculture)
+Lapis-Lazuli (Minage Magique)	Lapis Lazuli (Magic Mining)
+Quartz du Nether	Nether Quartz
+Bâtons de Blaze (Forteresse)	Blaze Rods (Fortress)
+Crème de Magma	Magma Cream
+Larmes de Ghast	Ghast Tears
+Poussière de Lumite (Glowstone)	Glowstone Dust
+Yeux d'Araignée (Alchimie)	Spider Eyes (Alchemy)
+Lingots de Fer	Iron Ingots
+Blocs de Fer (Blindage Lourd)	Iron Blocks (Heavy Armor)
+Lingots d'Or	Gold Ingots
+Blocs d'Or Massif	Solid Gold Blocks
+Verrues du Nether	Nether Wart
+Blocs de Diamant	Diamond Blocks
+Émeraudes (Trésor)	Emeralds (Treasure)
+Blocs d'Émeraude	Emerald Blocks
+Obsidienne Pleureuse	Crying Obsidian
+Perles de l'End	Ender Pearls
+Carottes Dorées (Rations d'Élite)	Golden Carrots (Elite Rations)
+Pommes Dorées (Rations de Siège)	Golden Apples (Siege Rations)
+Bottes de Foin (Fourrage)	Hay Bales (Fodder)
+Bouteilles de Miel (Apiculture)	Honey Bottles (Beekeeping)
+Boules de Slime	Slimeballs
+Poudre de Redstone	Redstone Dust
+Blocs de Redstone	Redstone Blocks
+Répéteurs de Redstone	Redstone Repeaters
+Comparateurs de Redstone	Redstone Comparators
+Pistons Collants	Sticky Pistons
+Distributeurs (Artillerie de Siège)	Dispensers (Siege Artillery)
+Entonnoirs Industriels	Industrial Hoppers
+Cibles de Redstone	Redstone Targets
+Poudre à Canon (Munitions)	Gunpowder (Ammunition)
+Blocs de TNT (Armement de Siège)	TNT Blocks (Siege Weaponry)
+Feux d'Artifice (Munitions Balistiques)	Fireworks (Ballistic Ammunition)
+Enclumes de Forge de Guerre	War Forge Anvils
+Élytres (Ailes de Vol)	Elytra (Flight Wings)
+Lingots de Netherite Purs	Pure Netherite Ingots
+Fragments de Netherite	Netherite Scraps
+Blocs de Netherite Massifs	Solid Netherite Blocks
+Étoiles du Nether	Nether Stars
+Balises (Phares Célestes)	Beacons (Celestial Lighthouses)
+Totems d'Immortalité	Totems of Undying
+Éclats d'Écho (Cités Anciennes)	Echo Shards (Ancient Cities)
+Catalyseurs de Sculk (Deep Dark)	Sculk Catalysts (Deep Dark)
+Hurleurs de Sculk (Deep Dark)	Sculk Shriekers (Deep Dark)
+Capteurs de Sculk	Sculk Sensors
+Souffles de Dragon	Dragon's Breath
+Pommes Dorées Enchantées (Récolte Sacrée)	Enchanted Golden Apples (Sacred Harvest)
+Fruits de Chorus (Flore de l'End)	Chorus Fruit (End Flora)
+Fruits de Chorus Éclatés	Popped Chorus Fruit
+Carapaces de Shulker	Shulker Shells
+Pierre de l'End	End Stone
+Blocs de Purpur	Purpur Blocks
+Houe en Netherite (Mending + Unbreaking 3 + Fortune 3)	Netherite Hoe (Mending + Unbreaking 3 + Fortune 3)
+Œuf d'Ender Dragon (Relique Légendaire)	Ender Dragon Egg (Legendary Relic)
+Buisson Mort Sacré	Sacred Dead Bush
+Cornes de Chèvre	Goat Horns
+Crâne de Wither Squelette	Wither Skeleton Skull
+Tête de Zombie	Zombie Head
+Crâne de Squelette	Skeleton Skull
+Tête d'Ender Dragon	Ender Dragon Head
+Tête de Creeper	Creeper Head
+Tête de Piglin	Piglin Head
+Choix d'Allégeance de Guilde	Guild Allegiance Choice
+&8» &4Vaincu : Choix d'Allégeance	&8» &4Defeated: Allegiance Choice
+&4&lVOTRE GUILDE A ÉTÉ VAINCUE !	&4&lYOUR GUILD HAS BEEN DEFEATED!
+&7Votre Nexus a été détruit par &6	&7Your Nexus was destroyed by &6
+&7Tous les territoires ont été annexés par le vainqueur.	&7All territories were annexed by the winner.
+&eFaites votre choix d'avenir :	&eMake your choice for the future:
+&a&l🟢 REJOINDRE LA GUILDE VAINQUEUR	&a&l🟢 JOIN THE WINNING GUILD
+&7Prêtez allégeance à &6	&7Pledge allegiance to &6
+&7Vous deviendrez membre à part entière de leur guilde.	&7You will become a full member of their guild.
+&7Vous conserverez l'accès aux territoires annexés.	&7You keep access to the annexed territories.
+&a➤ Cliquez pour prêter allégeance !	&a➤ Click to pledge allegiance!
+&c&l🔴 REFUSER ET RESTER INDÉPENDANT	&c&l🔴 REFUSE AND STAY INDEPENDENT
+&7Refusez de servir la guilde vainqueur.	&7Refuse to serve the winning guild.
+&7Vous redeviendrez un joueur sans guilde (nomade).	&7You become a guildless player again (nomad).
+&7Vous pourrez fonder ou rejoindre une autre guilde plus tard.	&7You can found or join another guild later.
+&c➤ Cliquez pour refuser l'annexion !	&c➤ Click to refuse the annexation!
+Créateur de Horde Personnalisée	Custom Horde Builder
+&c❌ Vous devez faire partie d'une guilde pour créer et lancer des hordes sur-mesure !	&c❌ You must be part of a guild to create and launch custom hordes!
+&c❌ Seuls les Officiers et le Chef de guilde ont l'autorisation de créer et lancer des hordes !	&c❌ Only Officers and the Guild Leader may create and launch hordes!
+&8» &4Créateur de Horde Sur-Mesure	&8» &4Custom Horde Builder
+&6&lComposition de votre Horde Personnalisée	&6&lYour Custom Horde Composition
+&c• Total Monstres : &e	&c• Total Monsters: &e
+ &7(Illimité)	 &7(Unlimited)
+&c• Dégâts Nexus cumulés : &e	&c• Combined Nexus damage: &e
+&6• Prix Total (Banque Guilde) : &e	&6• Total Price (Guild Bank): &e
+&c• Sapeurs Explosifs : &aACTIVÉS (+2 500 pièces)	&c• Explosive Sappers: &aENABLED (+2,500 coins)
+&7• Sapeurs Explosifs : &cDÉSACTIVÉS	&7• Explosive Sappers: &cDISABLED
+&6• Résistance Lave & Feu : &aACTIVÉE (+1 500 pièces)	&6• Lava & Fire Resistance: &aENABLED (+1,500 coins)
+&7• Résistance Lave & Feu : &cDÉSACTIVÉE	&7• Lava & Fire Resistance: &cDISABLED
+&7Ajustez les effectifs ci-dessous avec les clics.	&7Adjust the numbers below with clicks.
+&6• Coût unitaire : &e	&6• Unit cost: &e
+&c• Dégâts Nexus : &e	&c• Nexus damage: &e
+ PV / unité	 HP / unit
+&e• Quantité actuelle : 	&e• Current quantity: 
+&7(Sous-total : &6	&7(Subtotal: &6
+ pièces&7)	 coins&7)
+&a[Clic Gauche] &7: +1 unité &8(+5 avec Shift)	&a[Left Click] &7: +1 unit &8(+5 with Shift)
+&c[Clic Droit] &7: -1 unité &8(-5 avec Shift)	&c[Right Click] &7: -1 unit &8(-5 with Shift)
+&c⬅ Retour aux Contrats Standards	&c⬅ Back to Standard Contracts
+&c❌ Réinitialiser la composition	&c❌ Reset composition
+&7Remet le compte de toutes les unités à zéro.	&7Sets every unit count back to zero.
+&a&l⚔️ Lancer l'Invasion Personnalisée	&a&l⚔️ Launch the Custom Invasion
+&7Unités prêtes : &e	&7Units ready: &e
+&7Coût total : &6	&7Total cost: &6
+&e➤ Cliquez pour sélectionner la guilde cible !	&e➤ Click to select the target guild!
+&c❌ Fonds insuffisants dans la banque de guilde !	&c❌ Insufficient funds in the guild bank!
+&c⚔️ Composition Vide	&c⚔️ Empty Composition
+&7Ajoutez au moins 1 unité pour attaquer.	&7Add at least 1 unit to attack.
+&cSeuls les chefs et officiers peuvent modifier la spécialisation.	&cOnly leaders and officers can change the specialization.
+&cVous n'avez pas de &e	&cYou have no &e
+ &cdans votre inventaire à déposer.	 &cin your inventory to donate.
+&cVeuillez ajouter au moins une unité à votre composition de horde !	&cPlease add at least one unit to your horde composition!
+&cSeuls les officiers et chefs peuvent acheter des pièges de Nexus.	&cOnly officers and leaders can buy Nexus traps.
+&aCe piège est déjà armé pour la prochaine horde !	&aThis trap is already armed for the next horde!
+&aCoût de &6	&aCost of &6
+ pièces &adébité de la banque de guilde.	 coins &adebited from the guild bank.
+&cSolde insuffisant dans la banque de guilde et sur votre compte (&6	&cInsufficient funds in the guild bank and on your account (&6
+ pièces requises&c).	 coins required&c).
+ pièces &adébité de votre solde personnel.	 coins &adebited from your personal balance.
+&a✨ Piège 	&a✨ Trap 
+ &aarmé pour la prochaine horde !	 &aarmed for the next horde!
+Gestion de Guilde	Guild Management
+&cVous n'avez pas de guilde. Utilisez &e/guild create <nom> <tag> &cpour en fonder une !	&cYou have no guild. Use &e/guild create <name> <tag> &cto found one!
+&8» &6Gestion de Guilde : 	&8» &6Guild Management: 
+&7Votre rôle : &a	&7Your role: &a
+&7Âge technologique : 	&7Tech Age: 
+ &7(Niveau 	 &7(Level 
+&7Membres : &f	&7Members: &f
+&7Territoires Claimés : &e	&7Claimed territory: &e
+&7Banque : &6	&7Bank: &6
+&e&lSpécialisation de Guilde	&e&lGuild Specialization
+&7Orientation actuelle : 	&7Current orientation: 
+&e➤ Cliquez pour modifier la spécialisation.	&e➤ Click to change the specialization.
+&aActif (	&aActive (
+ PV)	 HP)
+&cDétruit / Inexistant	&cDestroyed / Nonexistent
+&5&lCœur de Guilde (Nexus)	&5&lGuild Heart (Nexus)
+&7État : 	&7Status: 
+&7Emplacement : 	&7Location: 
+&cNon placé	&cNot placed
+&e➤ Cliquez pour ouvrir le menu des pièges défensifs !	&e➤ Click to open the defensive traps menu!
+&e➤ Utilisez &6/guild nexus place &epour poser le Nexus dans votre claim.	&e➤ Use &6/guild nexus place &eto place the Nexus in your claim.
+&7Effectif actuel de la guilde :	&7Current guild roster:
+&b&lMembres de la Guilde	&b&lGuild Members
+&a&lTerritoires & Claims	&a&lTerritory & Claims
+&7Chunks occupés : &e	&7Chunks held: &e
+&e➤ Cliquez pour afficher/masquer la bordure visuelle des claims !	&e➤ Click to show/hide the visual claim border!
+&7(/guild claim pour revendiquer le chunk actuel)	&7(/guild claim to claim the current chunk)
+Spécialisations de Guilde	Guild Specializations
+&8» &6Spécialisations de Guilde	&8» &6Guild Specializations
+&a&lBonus de Guilde :	&a&lGuild Bonuses:
+&c&lContraintes & Quotas :	&c&lConstraints & Quotas:
+&a✔ &lSpécialisation Active	&a✔ &lActive Specialization
+&e➤ Cliquez pour adopter cette spécialisation !	&e➤ Click to adopt this specialization!
+&7La spécialisation confère de puissants atouts collectifs	&7A specialization grants powerful collective perks
+&7mais impose des contraintes de composition raciale.	&7but imposes constraints on job composition.
+&eSpécialisation actuelle : &a	&eCurrent specialization: &a
+&a✨ Choix initial disponible !	&a✨ Initial choice available!
+&a✨ Changement disponible : &eDÉBLOQUÉ	&a✨ Change available: &eUNLOCKED
+&7(Un nouveau membre a rejoint la guilde !)	&7(A new member joined the guild!)
+&c🔒 Changement verrouillé : &cNÉCESSITE UN NOUVEAU JOUEUR	&c🔒 Change locked: &cREQUIRES A NEW PLAYER
+&7Un &enouveau joueur historique &7doit rejoindre la guilde	&7A &enew, never-seen player &7must join the guild
+&7pour débloquer un changement de spécialisation.	&7to unlock a specialization change.
+&6&lOrientation Stratégique	&6&lStrategic Orientation
+Hôtel des Ventes Central	Central Auction House
+&8» &6Hôtel des Ventes Central &7(	&8» &6Central Auction House &7(
+&6&lVotre Solde : &e	&6&lYour Balance: &e
+&7Pour mettre en vente un objet :	&7To put an item up for sale:
+&e/ah sell <prix> &7avec l'objet en main.	&e/ah sell <price> &7with the item in hand.
+&4&l⚔️ Contrats de Hordes & Mercenaires	&4&l⚔️ Horde & Mercenary Contracts
+&7Achetez une armée de monstres	&7Buy an army of monsters
+&7pour assaillir le Nexus d'une guilde rivale !	&7to assault a rival guild's Nexus!
+&e➤ Cliquez pour ouvrir les contrats d'invasion !	&e➤ Click to open the invasion contracts!
+&7Vendeur : &e	&7Seller: &e
+&7Prix : &6	&7Price: &6
+&c➤ Votre annonce : cliquez pour l'ANNULER et récupérer l'objet.	&c➤ Your listing: click to CANCEL it and get the item back.
+&e➤ Cliquez pour ACHETER cet objet !	&e➤ Click to BUY this item!
+Contrats de Hordes Noires	Black Horde Contracts
+&c❌ Vous devez faire partie d'une guilde pour recruter et lancer des hordes de mercenaires !	&c❌ You must be part of a guild to recruit and launch mercenary hordes!
+&c❌ Seuls les Officiers et le Chef de guilde ont l'autorisation de recruter et lancer des hordes !	&c❌ Only Officers and the Guild Leader may recruit and launch hordes!
+&8» &4Contrats de Hordes Noires	&8» &4Black Horde Contracts
+&a⚡ Réduction Légion Guerrière : &6-30% sur tous les contrats !	&a⚡ Warrior Legion discount: &6-30% on all contracts!
+&c⚠️ Malus Syndicat Marchand : &c+30% sur tous les contrats !	&c⚠️ Merchant Syndicate penalty: &c+30% on all contracts!
+&4&lMarché Noir : Contrats de Mercenaires	&4&lBlack Market: Mercenary Contracts
+&7Guilde : &6	&7Guild: &6
+&7Banque de Guilde : &a	&7Guild Bank: &a
+&7Commanditez des attaques de monstres payées par la guilde.	&7Sponsor monster attacks paid for by the guild.
+&c(Réservé aux Officiers & Chefs de guilde)	&c(Reserved for Officers & Guild Leaders)
+&c• Effectif : &e	&c• Headcount: &e
+ monstres	 monsters
+&c• Dégâts Nexus / impact : &e	&c• Nexus damage / impact: &e
+&6• Prix (Banque Guilde) : &e	&6• Price (Guild Bank): &e
+ &a(-30% Légion)	 &a(-30% Legion)
+ &c(+30% Syndicat)	 &c(+30% Syndicate)
+&c• Sapeurs Explosifs : &aINCLUS (+	&c• Explosive Sappers: &aINCLUDED (+
+&6• Résistance Lave & Feu : &aINCLUSE (+	&6• Lava & Fire Resistance: &aINCLUDED (+
+&a✔ Fonds disponibles en banque de guilde.	&a✔ Funds available in the guild bank.
+&e➤ Cliquez pour choisir la guilde cible !	&e➤ Click to choose the target guild!
+&c❌ Fonds insuffisants en banque de guilde !	&c❌ Insufficient funds in the guild bank!
+&7(Déposez avec &e/guild bank <montant>&7)	&7(Deposit with &e/guild bank <amount>&7)
+&6&l🛠️ Créer une Horde Personnalisée	&6&l🛠️ Create a Custom Horde
+&7Composez vous-même votre armée monstre unité par unité.	&7Build your monster army yourself, unit by unit.
+&7Choisissez parmi 8 classes de monstres (Zombies, Ravageurs, Sorcières...).	&7Choose from 8 monster classes (Zombies, Ravagers, Witches...).
+&7Payé directement par la banque de guilde !	&7Paid directly by the guild bank!
+&e➤ Cliquez pour ouvrir le Créateur de Horde !	&e➤ Click to open the Horde Builder!
+&c&l💣 Sapeurs Explosifs : &a&lACTIVÉS	&c&l💣 Explosive Sappers: &a&lENABLED
+&7💣 Sapeurs Explosifs : &c&lDÉSACTIVÉS	&7💣 Explosive Sappers: &c&lDISABLED
+&7Permet aux monstres bloqués par des murs ou des tranchées	&7Lets monsters blocked by walls or trenches
+&7d'exploser pour créer une brèche vers le Nexus ennemi.	&7explode to breach the way to the enemy Nexus.
+&6• Surcoût : &e+	&6• Surcharge: &e+
+&e➤ Cliquez pour activer/désactiver cette option !	&e➤ Click to enable/disable this option!
+&6&l🔥 Ignifugation (Lave & Feu) : &a&lACTIVÉE	&6&l🔥 Fireproofing (Lava & Fire): &a&lENABLED
+&7🔥 Ignifugation (Lave & Feu) : &c&lDÉSACTIVÉE	&7🔥 Fireproofing (Lava & Fire): &c&lDISABLED
+&7Immunise totalement vos monstres contre la lave et les flammes.	&7Makes your monsters completely immune to lava and flames.
+&7Ils traversent les douves de lave protectrices sans aucun dégât !	&7They cross protective lava moats without any damage!
+&c⬅ Retour à l'Hôtel des Ventes	&c⬅ Back to the Auction House
+&c❌ Vous devez faire partie d'une guilde pour lancer un raid !	&c❌ You must be part of a guild to launch a raid!
+&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !	&c❌ Only Officers and the Guild Leader can launch mercenary hordes!
+&8» &cCible : 	&8» &cTarget: 
+&8» &cCible : Horde Personnalisée	&8» &cTarget: Custom Horde
+&7Chef : &e	&7Leader: &e
+&7Nexus : &a	&7Nexus: &a
+&7Banque : &a	&7Bank: &a
+&6&l⭐ HÉGÉMONIE ÉCONOMIQUE &e(Cible Prioritaire) :	&6&l⭐ ECONOMIC HEGEMONY &e(Priority Target):
+&a✔ Coût de raid : &6-50% (Moitié prix !)	&a✔ Raid cost: &6-50% (Half price!)
+&a✔ Cooldown de raid : &e2 minutes seulement !	&a✔ Raid cooldown: &eonly 2 minutes!
+&4➤ Cliquez pour LANCER L'INVASION sur cette guilde !	&4➤ Click to LAUNCH THE INVASION on this guild!
+&c⬅ Retour	&c⬅ Back
+Défenses & Pièges du Nexus	Nexus Defenses & Traps
+&8&lDéfenses & Pièges du Nexus	&8&lNexus Defenses & Traps
+&6&lCœur de Guilde : &e	&6&lGuild Heart: &e
+&7Santé : &a	&7Health: &a
+ PV	 HP
+&7Banque de Guilde : &6	&7Guild Bank: &6
+&7Spécialisation : 	&7Specialization: 
+&a⚡ Réduction Spéciale Industrie : &6-50% sur tous les pièges !	&a⚡ Special Industry discount: &6-50% on all traps!
+&8(Les pièges restent armés jusqu'à la fin de la prochaine horde)	&8(Traps stay armed until the end of the next horde)
+&7Statut : 	&7Status: 
+&a✔ ACTIF &7(Armé pour la prochaine horde)	&a✔ ACTIVE &7(Armed for the next horde)
+&c✖ INACTIF &7(Non armé)	&c✖ INACTIVE &7(Not armed)
+&7Coût d'armement : &6	&7Arming cost: &6
+&a✔ Piège actuellement armé et fonctionnel !	&a✔ Trap currently armed and working!
+&7(Sera consommé et à racheter après la prochaine attaque)	&7(Will be used up and must be rebought after the next attack)
+&e▶ Cliquez pour acheter et armer ce piège !	&e▶ Click to buy and arm this trap!
+&8(Priorité débit : Banque de guilde puis solde personnel)	&8(Debit priority: guild bank, then personal balance)
+&cVotre guilde ne possède pas de Nexus actif. Posez-le avec &e/guild nexus place&c.	&cYour guild has no active Nexus. Place it with &e/guild nexus place&c.
+Choix de Classe & Métier	Class & Job Selection
+&8» &6Choix de Classe & Métier	&8» &6Class & Job Selection
+&e&lCrafts Exclusifs :	&e&lExclusive Crafts:
+&6&lAvantages & Malus :	&6&lPerks & Drawbacks:
+&a✔ &lVotre Métier Actuel	&a✔ &lYour Current Job
+&a✨ &lPremière sélection GRATUITE !	&a✨ &lFirst pick is FREE!
+&7(Puis 3 reconversions gratuites supplémentaires)	&7(Then 3 more free changes)
+&e➤ Cliquez pour choisir ce métier !	&e➤ Click to choose this job!
+&a✨ &lReconversion GRATUITE &7(&e	&a✨ &lFREE retraining &7(&e
+ restante(s)&7)	 left&7)
+&6• Coût de reconversion : &e10 000 pièces &7(3 gratuits épuisés)	&6• Retraining cost: &e10,000 coins &7(3 free used up)
+&e➤ Cliquez pour changer de métier !	&e➤ Click to change job!
+&6&lSystème de Métiers Esicraft	&6&lEsicraft Job System
+&7Chaque métier débloque des crafts uniques	&7Each job unlocks unique crafts
+&7et des compétences passives adaptées à votre jeu.	&7and passive skills that fit your playstyle.
+&eMétier actuel : &a	&eCurrent job: &a
+&eVotre solde : &6	&eYour balance: &6
+&a✨ Première sélection gratuite !	&a✨ First pick is free!
+&a✨ Changements gratuits restants : &e	&a✨ Free changes left: &e
+&c⚠ Changements gratuits épuisés (Coût : 10 000 pièces)	&c⚠ Free changes used up (Cost: 10,000 coins)
+&8» &6Métiers & Joueurs en ligne &7(Page 	&8» &6Jobs & Online Players &7(Page 
+&7Joueurs connectés : &e	&7Players online: &e
+&6&lRépartition des Métiers :	&6&lJob Breakdown:
+ &8• &7Sans Métier : &c	 &8• &7No Job: &c
+&6&l📊 Annuaire des Joueurs & Métiers	&6&l📊 Player & Job Directory
+&e🎭 Métier : &f	&e🎭 Job: &f
+&e🏛 Guilde : &6	&e🏛 Guild: &6
+&e🎖 Rôle : &f	&e🎖 Role: &f
+&e🏛 Guilde : &7Aucune	&e🏛 Guild: &7None
+&e⏳ Âge : &f	&e⏳ Age: &f
+&e💰 Solde : &6	&e💰 Balance: &6
+&c❤ Santé : &f	&c❤ Health: &f
+&a✨ Niveau XP : &f	&a✨ XP Level: &f
+&b📶 Ping : &f	&b📶 Ping: &f
+&d🌍 Monde : &f	&d🌍 World: &f
+ &a(Vous)	 &a(You)
+&e« Page Précédente &7(	&e« Previous Page &7(
+&cFermer le menu	&cClose menu
+&ePage Suivante » &7(	&eNext Page » &7(
+&c✖ Surbrillance des claims désactivée.	&c✖ Claim highlight disabled.
+&cSurbrillance des chunks claimés désactivée.	&cClaimed chunk highlight disabled.
+&a✨ Surbrillance des claims activée !	&a✨ Claim highlight enabled!
+&a✔ Bordures des chunks claimés affichées en surbrillance !	&a✔ Claimed chunk borders are now highlighted!
+&7• &aVert &7= Votre Guilde  |  &cRouge &7= Guildes Ennemies	&7• &aGreen &7= Your Guild  |  &cRed &7= Enemy Guilds
+&7(Tapez à nouveau &e/guild claim show &7pour désactiver)	&7(Type &e/guild claim show &7again to disable)
+&7Surbrillance des claims terminée.	&7Claim highlight finished.
+&cNom de guilde invalide ! 3 à 24 caractères alphanumériques, tirets et underscores uniquement.	&cInvalid guild name! 3 to 24 alphanumeric characters, dashes and underscores only.
+&cTag invalide ! 2 à 6 caractères alphanumériques uniquement.	&cInvalid tag! 2 to 6 alphanumeric characters only.
+&cCe nom de guilde est déjà utilisé !	&cThis guild name is already taken!
+&cVous n'avez pas assez d'argent pour fonder une guilde (&e	&cYou do not have enough money to found a guild (&e
+ pièces &crequises).	 coins &crequired).
+&6&l[Guildes] &e	&6&l[Guilds] &e
+ &aa fondé la guilde &6	 &afounded the guild &6
+&e⚠ &lIMPORTANT : &eVous avez &61 heure &epour revendiquer un chunk (&e/guild claim&e) et poser votre Nexus (&e/guild nexus place&e) sous peine de dissolution automatique de la guilde !	&e⚠ &lIMPORTANT: &eYou have &61 hour &eto claim a chunk (&e/guild claim&e) and place your Nexus (&e/guild nexus place&e) or the guild will be automatically disbanded!
+&cVous appartenez déjà à une guilde !	&cYou already belong to a guild!
+&c❌ Impossible de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !	&c❌ Cannot disband the guild: your Nexus is under attack or was attacked less than 10 minutes ago!
+&c&l[Guildes] &7La guilde &c	&c&l[Guilds] &7The guild &c
+ &7a été dissoute.	 &7was disbanded.
+&cVous ne faites pas partie de cette guilde.	&cYou are not part of this guild.
+&aVous avez quitté et dissous votre guilde.	&aYou left and disbanded your guild.
+&cVous êtes le chef de la guilde ! Transférez le leadership (&e/guild transfer <joueur>&c) ou dissolvez la guilde (&e/guild disband&c).	&cYou are the guild leader! Transfer leadership (&e/guild transfer <player>&c) or disband the guild (&e/guild disband&c).
+&aVous avez quitté la guilde &6	&aYou left the guild &6
+ &aavec succès.	 &asuccessfully.
+ &ca quitté la guilde.	 &cleft the guild.
+&cCe joueur ne fait pas partie de votre guilde.	&cThis player is not part of your guild.
+&cSeuls les chefs et officiers peuvent expulser des membres.	&cOnly leaders and officers can kick members.
+&cVous ne pouvez pas expulser un membre ayant un rang égal ou supérieur au vôtre.	&cYou cannot kick a member of equal or higher rank than yours.
+&aVous avez expulsé &e	&aYou kicked &e
+le joueur	the player
+ &ade la guilde.	 &afrom the guild.
+&cVous avez été expulsé de la guilde &6	&cYou were kicked from the guild &6
+&cSeul le chef actuel peut transférer le leadership.	&cOnly the current leader can transfer leadership.
+&cLe nouveau chef doit déjà être membre de la guilde.	&cThe new leader must already be a member of the guild.
+ &aa cédé le leadership de la guilde &6	 &atransferred leadership of the guild &6
+&cLe chef de guilde ne peut pas être rétrogradé via cette commande (utilisez &e/guild transfer <joueur>&c).	&cThe guild leader cannot be demoted with this command (use &e/guild transfer <player>&c).
+&cSeul le Chef de guilde peut promouvoir ou rétrograder des membres.	&cOnly the Guild Leader can promote or demote members.
+&cPour céder le rôle de chef, utilisez &e/guild transfer <joueur>&c.	&cTo hand over the leader role, use &e/guild transfer <player>&c.
+Ce joueur	This player
+ possède déjà le rang 	 already has the rank 
+&6&l[Guilde] &eVotre rang a été modifié : vous êtes maintenant 	&6&l[Guild] &eYour rank was changed: you are now 
+Le joueur	The player
+&6&l[Guilde] &a⭐ &e	&6&l[Guild] &a⭐ &e
+ &aa été promu au rang d'&eOfficier &apar le chef &e	 &awas promoted to &eOfficer &aby the leader &e
+&6&l[Guilde] &e	&6&l[Guild] &e
+ &aa été rétrogradé au rang de simple 	 &awas demoted to a regular 
+ &epar le chef &e	 &eby the leader &e
+&cCe chunk est déjà revendiqué par la guilde &e	&cThis chunk is already claimed by the guild &e
+&c❌ Territoire non contigu : Vos claims doivent obligatoirement être collés (adjacents) à un chunk déjà possédé par votre guilde !	&c❌ Non-contiguous territory: Your claims must be adjacent to a chunk your guild already owns!
+&7(Positionnez-vous sur un chunk limitrophe à vos claims actuels pour l'acheter).	&7(Stand on a chunk bordering your current claims to buy it).
+&c❌ Revendication impossible : La spécialisation Rôdeur Solitaire interdit formellement la présence de coffres dans ses claims !	&c❌ Claim impossible: the Lone Ranger specialization strictly forbids chests in its claims!
+&7Veuillez retirer tous les coffres / tonneaux / boîtes shulker présents dans ce chunk avant de le revendiquer.	&7Please remove all chests / barrels / shulker boxes in this chunk before claiming it.
+&c❌ Votre guilde a atteint sa limite maximale de claims pour l'	&c❌ Your guild reached its maximum claim limit for 
+ max&c) !	 max&c)!
+&7Passez à l'Âge supérieur avec &e/age &7pour débloquer plus de territoires (16 ➔ 32 ➔ 64 ➔ 128 ➔ Illimité).	&7Reach the next Age with &e/age &7to unlock more land (16 ➔ 32 ➔ 64 ➔ 128 ➔ Unlimited).
+&c❌ La banque de votre guilde ne possède pas assez de fonds pour acheter ce claim n°	&c❌ Your guild bank does not have enough funds to buy claim no. 
+ pièces &crequises, Solde : &6	 coins &crequired, Balance: &6
+&7Déposez de l'argent dans la banque de guilde avec &e/guild bank <montant>&7.	&7Deposit money into the guild bank with &e/guild bank <amount>&7.
+Illimité	Unlimited
+&a✔ Chunk revendiqué avec succès pour votre guilde ! (&7X: 	&a✔ Chunk successfully claimed for your guild! (&7X: 
+&7• Coût prélevé (Banque) : &6	&7• Cost charged (Bank): &6
+ pièces &8| &7Claims totaux : &e	 coins &8| &7Total claims: &e
+&7• Prix du prochain claim (n°	&7• Price of the next claim (no. 
+ pièces&7.	 coins&7.
+&cCe chunk n'appartient pas à votre guilde.	&cThis chunk does not belong to your guild.
+&c❌ Impossible d'abandonner ce chunk : le Nexus de votre guilde y est implanté !	&c❌ Cannot abandon this chunk: your guild's Nexus is in it!
+&7Un Nexus ne peut pas être déplacé : le chunk qui l'abrite ne peut pas être abandonné.	&7A Nexus cannot be moved: the chunk that hosts it cannot be abandoned.
+&c❌ Impossible d'abandonner ce chunk : il couperait votre territoire en plusieurs morceaux non contigus !	&c❌ Cannot abandon this chunk: it would split your territory into non-contiguous pieces!
+&eChunk abandonné avec succès.	&eChunk successfully abandoned.
+&c❌ Votre guilde ne peut pas changer de spécialisation pour le moment !	&c❌ Your guild cannot change specialization right now!
+&7Un &enouveau joueur &7(qui n'a jamais appartenu à votre guilde) doit la rejoindre pour débloquer un changement.	&7A &enew player &7(who never belonged to your guild) must join it to unlock a change.
+&cLa composition actuelle de votre guilde ne respecte pas les contraintes de cette spécialisation !	&cYour guild's current composition does not meet this specialization's constraints!
+&c❌ La spécialisation Rôdeur Solitaire exige d'être strictement le seul membre de la guilde !	&c❌ The Lone Ranger specialization requires being strictly the only guild member!
+&c❌ Seul un Rôdeur peut choisir la spécialisation Rôdeur Solitaire !	&c❌ Only a Ranger can choose the Lone Ranger specialization!
+&c❌ Vous ne pouvez pas adopter la voie du Rôdeur Solitaire car vous avez déjà appartenu à une guilde par le passé !	&c❌ You cannot follow the Lone Ranger path because you already belonged to a guild in the past!
+&aSpécialisation de guilde mise à jour avec succès : 	&aGuild specialization successfully updated: 
+&c❌ La spécialisation Rôdeur Solitaire interdit formellement d'inviter d'autres membres (1 membre max) !	&c❌ The Lone Ranger specialization strictly forbids inviting other members (1 member max)!
+ est Arcaniste : le Syndicat Marchand interdit formellement les Arcanistes dans ses rangs !	 is an Arcanist: the Merchant Syndicate strictly forbids Arcanists in its ranks!
+&c❌ L'arrivée de 	&c❌ The arrival of 
+ (métier 	 (job 
+) est impossible : guilde pleine (	) is impossible: guild full (
+ max) ou contraintes de 	 max) or constraints of 
+&aVous avez reçu une invitation à rejoindre la guilde &6	&aYou received an invitation to join the guild &6
+ &a! Faites &e/guild join 	 &a! Run &e/guild join 
+ &apour accepter.	 &ato accept.
+&c❌ Vous êtes déjà dans une guilde ! Quittez-la d'abord avec &e/guild leave&c.	&c❌ You are already in a guild! Leave it first with &e/guild leave&c.
+&c❌ Cette invitation a expiré ou n'existe pas.	&c❌ This invitation has expired or does not exist.
+&c❌ Cette guilde est sous la spécialisation Rôdeur Solitaire et ne peut accueillir aucun autre membre !	&c❌ This guild follows the Lone Ranger specialization and cannot accept any other member!
+&c❌ Vous êtes Arcaniste : le Syndicat Marchand interdit formellement les Arcanistes dans ses rangs !	&c❌ You are an Arcanist: the Merchant Syndicate strictly forbids Arcanists in its ranks!
+&c❌ Impossible de rejoindre : guilde pleine (	&c❌ Cannot join: guild full (
+ membres max) ou métier incompatible avec 	 members max) or job incompatible with 
+&a✨ Votre arrivée en tant que nouveau membre débloque un changement de spécialisation pour la guilde !	&a✨ Your arrival as a new member unlocks a specialization change for the guild!
+&aVous avez rejoint la guilde &6	&aYou joined the guild &6
+&4&l💥 VOTRE GUILDE A ÉTÉ VAINCUE PAR LA GUILDE &6	&4&l💥 YOUR GUILD WAS DEFEATED BY THE GUILD &6
+&eTous vos territoires ont été &cANNEXÉS &epar les vainqueurs (	&eAll your territories were &cANNEXED &eby the victors (
+&6💰 Trésorerie de guilde pillée et fusionnée : &e	&6💰 Guild treasury looted and merged: &e
+&7Options d'avenir :	&7Options for the future:
+&a• Rejoindre le vainqueur : &e/guild annex join	&a• Join the winner: &e/guild annex join
+&c• Rester indépendant : &e/guild annex decline	&c• Stay independent: &e/guild annex decline
+&4&l⚔️ [ANNEXION] &eLa guilde &6	&4&l⚔️ [ANNEXATION] &eThe guild &6
+ &aa conquis et annexé tous les territoires de &c	 &aconquered and annexed all the territories of &c
+ claims) !	 claims)!
+&6💰 [TRÉSOR DE GUERRE] &eLa totalité de la trésorerie de &c	&6💰 [WAR CHEST] &eThe entire treasury of &c
+ pièces&8) &aa été fusionnée dans la Banque de &6	 coins&8) &awas merged into the Bank of &6
+&cVous n'avez aucune offre d'annexion en attente.	&cYou have no pending annexation offer.
+&cVous êtes déjà dans une guilde : l'offre d'annexion n'est plus valable.	&cYou are already in a guild: the annexation offer is no longer valid.
+&cLa guilde victorieuse n'existe plus.	&cThe winning guild no longer exists.
+&c❌ Votre métier ne respecte pas les contraintes de la guilde victorieuse : vous restez sans guilde.	&c❌ Your job does not meet the winning guild's constraints: you stay guildless.
+&a&l[Allégeance] &e	&a&l[Allegiance] &e
+ &aa prêté allégeance et a rejoint la guilde victorieuse &6	 &apledged allegiance and joined the winning guild &6
+&aVous avez refusé de rejoindre la guilde victorieuse. Vous êtes désormais libre et sans guilde.	&aYou refused to join the winning guild. You are now free and guildless.
+&7Recrue	&7Recruit
+&aMembre	&aMember
+&eOfficier	&eOfficer
+&6Chef	&6Leader
+&7Non Spécialisée	&7Unspecialized
+&7Aucune orientation choisie pour la guilde.	&7No orientation chosen for the guild.
+&7Aucun bonus de claim.	&7No claim bonus.
+&7Aucune contrainte de composition.	&7No composition constraint.
+&c⚔️ Légion Guerrière	&c⚔️ Warrior Legion
+&7Domination martiale & conquête.	&7Martial dominance & conquest.
+&a+ Force 1 & Résistance 1 en claim	&a+ Strength 1 & Resistance 1 in claims
+&a+ Hordes mercenaires à -30%	&a+ Mercenary hordes -30%
+&a+ +30% dégâts vs monstres/hordes	&a+ +30% damage vs monsters/hordes
+&a+ Pillage aux âges supérieurs	&a+ Looting in higher Ages
+&c- Max 1 Nain et 1 Sylvain	&c- Max 1 Dwarf and 1 Sylvan
+&c- Min 50% Rôdeurs / Forgerons	&c- Min 50% Rangers / Blacksmiths
+&c- -25% récoltes & minerais	&c- -25% harvests & ores
+&6⛏️ Industrie Souterraine	&6⛏️ Underground Industry
+&7Extraction industrielle lourde.	&7Heavy industrial extraction.
+&a+ Haste 2 en claim sous Y=30	&a+ Haste 2 in claims below Y=30
+&a+ Minerais bruts x1.5	&a+ Raw ores x1.5
+&a+ Pièges & Golems Nexus à -50%	&a+ Nexus traps & Golems -50%
+&c- Max 1 Rôdeur	&c- Max 1 Ranger
+&c- Potions niveau 2 interdites	&c- Level 2 potions forbidden
+&c- +20% dégâts monstres magiques	&c- +20% magic monster damage
+&a🍃 Enclave Champêtre	&a🍃 Pastoral Enclave
+&7Harmonie et autosuffisance.	&7Harmony and self-sufficiency.
+&a+ Santé max : +2 cœurs (+4 PV)	&a+ Max health: +2 hearts (+4 HP)
+&a+ Régen 1 & Saturation en claim	&a+ Regen 1 & Saturation in claims
+&a+ Double récolte champs & animaux	&a+ Double field & animal harvests
+&a+ Bois & pierres décoratives x2	&a+ Decorative wood & stone x2
+&a+ Reproduction animale x3	&a+ Animal breeding x3
+&c- Pas d'Ingénieur autorisant TNT	&c- No Engineer allowing TNT
+&c- Max 1 Forgeron (Armures fer max)	&c- Max 1 Blacksmith (iron armor max)
+&c- Armures Netherite interdites	&c- Netherite armor forbidden
+&e💰 Syndicat Marchand	&e💰 Merchant Syndicate
+&7Monopole économique & commerce.	&7Economic monopoly & trade.
+&a+ Commerce exclusif Villageois	&a+ Exclusive Villager trading
+&a+ Primes monstres +20% (+10% clan)	&a+ Monster bounties +20% (+10% clan)
+&a+ Aucune taxe à l'Hôtel des Ventes	&a+ No Auction House tax
+&a+ Dividendes de guilde	&a+ Guild dividends
+&c- 0 Arcaniste autorisé	&c- 0 Arcanists allowed
+&c- Hordes mercenaires à +30%	&c- Mercenary hordes +30%
+&c- Aucun bonus de combat	&c- No combat bonus
+&c- Nexus : -20% PV max	&c- Nexus: -20% max HP
+&d🔮 Conclave Arcanique	&d🔮 Arcane Conclave
+&7Magie et arcanes défensives.	&7Magic and defensive arcana.
+&a+ Nexus : +25% PV max	&a+ Nexus: +25% max HP
+&a+ Enchantements & enclumes : -50% XP	&a+ Enchantments & anvils: -50% XP
+&a+ Potions améliorées (+1 tier)	&a+ Improved potions (+1 tier)
+&a+ Enchants surpuissants (IV➔V, V➔VI)	&a+ Overpowered enchants (IV➔V, V➔VI)
+&a+ Rayon magique de Nexus (1 cœur / 2 s)	&a+ Magic Nexus beam (1 heart / 2 s)
+&a+ -50% dégâts magiques subis	&a+ -50% magic damage taken
+&c- Santé max : -2 cœurs (-4 PV)	&c- Max health: -2 hearts (-4 HP)
+&c- Coût des claims : +50%	&c- Claim cost: +50%
+&c- Max 1 Forgeron et 1 Nain	&c- Max 1 Blacksmith and 1 Dwarf
+&c- Perte des enchants V-VI si quit	&c- Lose V-VI enchants if you leave
+&2🏹 Rôdeur Solitaire	&2🏹 Lone Ranger
+&7Voie solitaire de chasseur d'élite.	&7The lone path of the elite hunter.
+&a+ Vitesse 1 permanent	&a+ Permanent Speed 1
+&a+ Armures Netherite dès l'Âge 3	&a+ Netherite armor from Age 3
+&a+ Enchants & Livres dès l'Âge 3	&a+ Enchants & Books from Age 3
+&c- Strictement 1 seul membre (Rôdeur)	&c- Strictly 1 single member (Ranger)
+&c- N'avoir jamais rejoint d'autre guilde	&c- Never joined another guild
+&c- Aucun coffre dans les claims	&c- No chests in claims
+&c- Nexus réduit à 2 500 PV max	&c- Nexus reduced to 2,500 max HP
+&c❌ Vous ne pouvez pas casser de blocs sur le territoire de &6	&c❌ You cannot break blocks on the territory of &6
+&c❌ La spécialisation Rôdeur Solitaire interdit d'avoir des coffres dans ses claims !	&c❌ The Lone Ranger specialization forbids chests in its claims!
+&c❌ Vous ne pouvez pas poser de coffres ou conteneurs de stockage sur votre territoire de Rôdeur Solitaire !	&c❌ You cannot place chests or storage containers on your Lone Ranger territory!
+&c❌ La pose de TNT est strictement interdite sur le territoire d'une autre guilde !	&c❌ Placing TNT is strictly forbidden on another guild's territory!
+&c❌ Vous ne pouvez pas poser de blocs sur le territoire de &6	&c❌ You cannot place blocks on the territory of &6
+&c❌ Vous ne pouvez pas vider de seau sur le territoire de &6	&c❌ You cannot empty a bucket on the territory of &6
+&c❌ Vous ne pouvez pas remplir de seau sur le territoire de &6	&c❌ You cannot fill a bucket on the territory of &6
+&c❌ L'utilisation de Cristaux de l'End est interdite sur le territoire d'une autre guilde !	&c❌ End Crystals are forbidden on another guild's territory!
+&c❌ L'utilisation de Minecarts avec TNT est strictement interdite sur le territoire d'une autre guilde !	&c❌ TNT Minecarts are strictly forbidden on another guild's territory!
+&c❌ Vous ne pouvez pas attaquer les animaux/entités sur le territoire de &6	&c❌ You cannot attack animals/entities on the territory of &6
+&c❌ L'utilisation des Ender Pearls est interdite sur le territoire d'une autre guilde !	&c❌ Ender Pearls are forbidden on another guild's territory!
+&c❌ Accès refusé : Seuls les membres de &e	&c❌ Access denied: Only members of &e
+ &cpeuvent ouvrir les coffres et conteneurs de ce territoire !	 &ccan open the chests and containers of this territory!
+&c❌ Vous ne pouvez pas vous téléporter (Ender Pearl / Fruit de Chorus) dans le territoire de la guilde &6	&c❌ You cannot teleport (Ender Pearl / Chorus Fruit) into the territory of the guild &6
+&c❌ Impossible de verser de la lave à moins de 5 blocs d'un autre joueur !	&c❌ You cannot pour lava within 5 blocks of another player!
+&8[&6Territoire&8] &a	&8[&6Territory&8] &a
+&8] &7- Spé: 	&8] &7- Spec: 
+&8[&7Terres Sauvages&8] &7Zone Neutre	&8[&7Wilderness&8] &7Neutral Zone
+&c❌ Les armures en Netherite sont interdites dans une &aEnclave Champêtre &c!	&c❌ Netherite armor is forbidden in a &aPastoral Enclave&c!
+&c❌ Les potions de niveau 2 sont interdites dans l'&6Industrie Souterraine &c!	&c❌ Level 2 potions are forbidden in &6Underground Industry&c!
+&cVotre inventaire est plein : libérez de la place pour récupérer l'objet.	&cYour inventory is full: free some space to get the item back.
+&aAnnonce annulée : l'objet a été rendu à votre inventaire.	&aListing cancelled: the item was returned to your inventory.
+&c❌ Vous avez déjà &e	&c❌ You already have &e
+ &cannonces actives : annulez-en une (clic sur votre annonce dans /ah) avant d'en créer une autre.	 &cactive listings: cancel one (click your listing in /ah) before creating another.
+&aVotre objet &e	&aYour item &e
+ &aa été mis en vente pour &6	 &awas put up for sale for &6
+&cCet article n'est plus disponible.	&cThis item is no longer available.
+&cVous ne pouvez pas acheter votre propre article !	&cYou cannot buy your own item!
+&cVous n'avez pas assez d'argent pour acheter cet article (&e	&cYou do not have enough money to buy this item (&e
+&cVotre inventaire est plein !	&cYour inventory is full!
+&aVotre article a été acheté par &e	&aYour item was bought by &e
+ &apour &6	 &afor &6
+&aAchat réussi pour &6	&aPurchase successful for &6
+L'Obsidienne Pleureuse	Crying Obsidian
+La lave	Lava
+&e[Admin] Nexus de la guilde &6	&e[Admin] Nexus of the guild &6
+ &cretiré (désindexé, hologramme supprimé). La guilde dispose d'1 h pour en reposer un.	 &cremoved (unindexed, hologram deleted). The guild has 1 h to place a new one.
+&c🛡️ Le Nexus est indestructible à la pioche ! Frappez-le avec une arme.	&c🛡️ The Nexus cannot be broken with a pickaxe! Hit it with a weapon.
+ est strictement interdite dans le périmètre du Nexus (16 blocs) !	 is strictly forbidden within the Nexus perimeter (16 blocks)!
+&c❌ Seuls les membres de la guilde peuvent soigner leur Nexus !	&c❌ Only guild members can heal their Nexus!
+&c🛡️ La destruction des Nexus est temporairement désactivée par un admin (/pvp) !	&c🛡️ Nexus destruction is temporarily disabled by an admin (/pvp)!
+&cVous ne pouvez pas attaquer le Nexus de votre propre guilde !	&cYou cannot attack your own guild's Nexus!
+&c🛡️ Attaque impossible : aucun défenseur n'est présent sur le territoire !	&c🛡️ Attack impossible: no defender is present on the territory!
+&cLe Nexus ne peut être attaqué que si au moins un membre de la guilde est connecté et présent sur son territoire (Anti-Backstab) !	&cThe Nexus can only be attacked if at least one guild member is online and present on its territory (Anti-Backstab)!
+&c⚔️ Vous avez infligé &e	&c⚔️ You dealt &e
+ dégâts &cau Nexus ennemi !	 damage &cto the enemy Nexus!
+&c❌ Votre guilde possède déjà un Nexus ! Il ne peut pas être reposé.	&c❌ Your guild already has a Nexus! It cannot be placed again.
+&c❌ Le Nexus ne peut être posé que dans un chunk revendiqué (claim) par votre guilde !	&c❌ The Nexus can only be placed in a chunk claimed by your guild!
+&7Faites &e/guild claim &7pour revendiquer ce chunk d'abord.	&7Run &e/guild claim &7to claim this chunk first.
+&c❌ Pose du Nexus refusée !	&c❌ Nexus placement denied!
+&cPrésence de &e	&cPresence of &e
+ &cdans le périmètre de 16 blocs du Nexus (en X: 	 &cwithin 16 blocks of the Nexus (at X: 
+&7Vous devez retirer toute &elave&7, &eeau &7et &eobsidienne &7à moins de 16 blocs avant de pouvoir poser le Nexus.	&7You must remove all &elava&7, &ewater &7and &eobsidian &7within 16 blocks before you can place the Nexus.
+&a✔ Cœur de Guilde (Nexus) placé avec succès dans votre claim !	&a✔ Guild Heart (Nexus) successfully placed in your claim!
+&7Le Nexus est maintenant protégé. Vos membres peuvent désormais progresser en toute sécurité.	&7The Nexus is now protected. Your members can now progress safely.
+ PV 	 HP 
+&e⚡ &lRIPOSTE DU NEXUS : &cVous avez été foudroyé pour avoir attaqué le Cœur de Guilde !	&e⚡ &lNEXUS RETALIATION: &cYou were struck by lightning for attacking the Guild Heart!
+&a&l[Bête de Garde : 	&a&l[Guardian Beast: 
+&c⚔️ Ralliement de Guerre : Force II & Résistance II activées !	&c⚔️ War Rally: Strength II & Resistance II activated!
+&c🚨 ALERTE : Votre Nexus est attaqué par &e	&c🚨 ALERT: Your Nexus is under attack by &e
+&4&l💥 LE NEXUS DE LA GUILDE &c	&4&l💥 THE GUILD NEXUS OF &c
+ &4&lA ÉTÉ DÉTRUIT PAR 	 &4&lWAS DESTROYED BY 
+&eLeur territoire est désormais &cVULNÉRABLE &ependant 30 minutes !	&eTheir territory is now &cVULNERABLE &efor 30 minutes!
+&6&l[Gardien : 	&6&l[Guardian: 
+&6🤖 Votre Automate Gardien a été reconstruit au pied du Nexus.	&6🤖 Your Guardian Automaton was rebuilt at the foot of the Nexus.
+&c❌ Le Nexus vient d'être soigné : réessayez dans &e	&c❌ The Nexus was just healed: try again in &e
+&c❌ Impossible de soigner le Nexus : une invasion de monstres est en cours !	&c❌ Cannot heal the Nexus: a monster invasion is in progress!
+&eLe Nexus a déjà sa santé maximale (&a	&eThe Nexus already has its maximum health (&a
+ PV&e) !	 HP&e)!
+ PV restaurés au Nexus ! (&e	 HP restored to the Nexus! (&e
+ PV&a)	 HP&a)
+&aVous avez restauré &e	&aYou restored &e
+ PV &aau Nexus grâce à une Pomme Dorée !	 HP &ato the Nexus with a Golden Apple!
+&4&l[Guildes] &cLa guilde &6	&4&l[Guilds] &cThe guild &6
+ &ca été automatiquement dissoute : aucun Nexus n'a été placé dans l'heure suivant sa création !	 &cwas automatically disbanded: no Nexus was placed within the hour following its creation!
+&c🔥 Brasier Infernal	&c🔥 Infernal Blaze
+&7Enflamme les intrus et monstres à moins de 8 blocs (1 cœur toutes les 2 s + brûlure).	&7Sets intruders and monsters within 8 blocks on fire (1 heart every 2 s + burning).
+&7🕸️ Toile d'Entravement	&7🕸️ Entangling Web
+&7Inflige Lenteur II aux assaillants à moins de 10 blocs du Nexus.	&7Inflicts Slowness II on attackers within 10 blocks of the Nexus.
+&e⚡ Foudre de Riposte	&e⚡ Retaliation Lightning
+&7Foudroie quiconque frappe le Nexus (4 cœurs, au plus un éclair toutes les 5 s par joueur).	&7Strikes anyone hitting the Nexus (4 hearts, at most one bolt every 5 s per player).
+&2🧪 Brume Toxique	&2🧪 Toxic Fumes
+&7Émet un nuage toxique (Poison I) à moins de 8 blocs ; le poison ne tue jamais, il affaiblit.	&7Emits a toxic cloud (Poison I) within 8 blocks; the poison never kills, it weakens.
+&6🤖 Automate Gardien (Golem)	&6🤖 Guardian Automaton (Golem)
+&7Invoque un Golem de fer qui attaque les ennemis ; reconstruit 5 min après sa mort.	&7Summons an Iron Golem that attacks enemies; rebuilt 5 min after its death.
+&7Sans Métier	&7No Job
+&7Aucune spécialisation choisie.	&7No specialization chosen.
+&c• Impossible de miner ou casser des blocs sans métier !	&c• Cannot mine or break blocks without a job!
+&c- Choisissez un métier avec /race pour jouer.	&c- Pick a job with /race to play.
+&6Mineur (Nain)	&6Miner (Dwarf)
+&7Extraction et excavation souterraine.	&7Underground mining and excavation.
+&e• Pioches (Fer A1, Dia A2, Neth A3)	&e• Pickaxes (Iron A1, Dia A2, Neth A3)
+&e• Pelles (Dia A2, Neth A3)	&e• Shovels (Dia A2, Neth A3)
+&a+ 15% double minage	&a+ 15% double mining
+&c- Lenteur 1 en plein air (Y>60)	&c- Slowness 1 outdoors (Y>60)
+&c- Ni armes ni armures fer/dia	&c- No iron/diamond weapons or armor
+&aSylvain (Elfe)	&aSylvan (Elf)
+&7Agriculture et élevage accéléré.	&7Accelerated farming and husbandry.
+&e• Houes (Fer A1, Dia A2, Neth A3)	&e• Hoes (Iron A1, Dia A2, Neth A3)
+&e• Poudre d'os (A1-A2)	&e• Bone Meal (A1-A2)
+&e• Pommes Dorées (A1-A3)	&e• Golden Apples (A1-A3)
+&a+ Aura Régen 1 (4 blocs)	&a+ Regen 1 Aura (4 blocks)
+&a+ Récolte clic-droit	&a+ Right-click harvest
+&c- -20% dégâts au corps-à-corps	&c- -20% melee damage
+&cForgeron de Guerre	&cWar Blacksmith
+&7Forge lourde, armures et épées.	&7Heavy forging, armor and swords.
+&e• Armures & Épées fer (Âge 1)	&e• Iron Armor & Swords (Age 1)
+&e• Armures & Épées diamant (Âge 2)	&e• Diamond Armor & Swords (Age 2)
+&e• Armures Netherite (Âges 3-4)	&e• Netherite Armor (Ages 3-4)
+&e• Enclumes & Hauts-fourneaux	&e• Anvils & Blast Furnaces
+&a+ Résistance au Feu permanente	&a+ Permanent Fire Resistance
+&a+ +35% lingots fondus	&a+ +35% smelted ingots
+&a+ -50% coût XP sur l'enclume	&a+ -50% anvil XP cost
+&c- Faim accrue (+25%)	&c- Increased hunger (+25%)
+&2Rôdeur & Chasseur	&2Ranger & Hunter
+&7Tir à l'arc et traque à distance.	&7Bow shooting and long-range tracking.
+&e• Arcs & Arbalètes (Âges 1-3)	&e• Bows & Crossbows (Ages 1-3)
+&a+ Flèches de Poison 1	&a+ Poison 1 Arrows
+&a+ +25% dégâts à distance	&a+ +25% ranged damage
+&a+ Vitesse 1 en forêt/plaine	&a+ Speed 1 in forest/plains
+&c- Lenteur si plastron lourd	&c- Slowness with a heavy chestplate
+&dArcaniste & Alchimiste	&dArcanist & Alchemist
+&7Magie, potions et enchantements.	&7Magic, potions and enchantments.
+&e• Enchants & Livres (Âges 1-3)	&e• Enchants & Books (Ages 1-3)
+&e• Splash Potions exclusives	&e• Exclusive Splash Potions
+&e• Alambics (Âges 1-2)	&e• Brewing Stands (Ages 1-2)
+&e• Pommes Dorées (Âges 1-3)	&e• Golden Apples (Ages 1-3)
+&a+ +30% d'XP reçue	&a+ +30% XP gained
+&a+ Durée potions +25%	&a+ Potion duration +25%
+&a+ -20% dégâts magiques	&a+ -20% magic damage
+&c- +15% dégâts en mêlée subis	&c- +15% melee damage taken
+&6Ingénieur & Bâtisseur	&6Engineer & Builder
+&7Redstone, explosifs et pièges.	&7Redstone, explosives and traps.
+&e• Pistons, Répéteurs, Comparateurs	&e• Pistons, Repeaters, Comparators
+&e• Observateurs, Entonnoirs	&e• Observers, Hoppers
+&e• Distributeurs & TNT (Âges 1-3)	&e• Dispensers & TNT (Ages 1-3)
+&a+ -40% dégâts d'explosions	&a+ -40% explosion damage
+&a+ Maîtrise exclusive redstone/TNT	&a+ Exclusive redstone/TNT mastery
+&c- -20% dégâts corps-à-corps	&c- -20% melee damage
+&cVous appartenez déjà à la classe &e	&cYou already belong to the class &e
+&c❌ Votre guilde (Syndicat Marchand) interdit formellement les Arcanistes dans ses rangs !	&c❌ Your guild (Merchant Syndicate) strictly forbids Arcanists in its ranks!
+&c❌ Votre guilde (	&c❌ Your guild (
+&c) n'autorise pas cette composition de métier !	&c) does not allow this job composition!
+&c❌ Reconversion impossible pour le moment : prochain changement de métier dans &e	&c❌ Retraining impossible for now: next job change in &e
+&a✨ Reconversion de métier gratuite appliquée ! (&e	&a✨ Free job retraining applied! (&e
+ &achangement(s) gratuit(s) restant(s)).	 &afree change(s) left).
+&cSolde insuffisant pour changer de métier !	&cInsufficient balance to change job!
+&cVous avez utilisé vos &e3 changements gratuits&c. La reconversion coûte désormais &6	&cYou used your &e3 free changes&c. Retraining now costs &6
+ pièces &c(Votre solde : &e	 coins &c(Your balance: &e
+ pièces &aont été débitées pour votre reconversion.	 coins &awere debited for your retraining.
+&a✨ Première sélection de métier gratuite ! (Vous disposez de 3 changements gratuits supplémentaires).	&a✨ First job pick is free! (You have 3 more free changes).
+&aVous êtes désormais : &e	&aYou are now: &e
+&c❌ Craft verrouillé ! &7	&c❌ Craft locked! &7
+&cVous n'avez pas la classe ou l'Âge requis pour fabriquer cet objet ! (&7	&cYou do not have the class or Age required to craft this item! (&7
+&c❌ Forge verrouillée ! &7	&c❌ Forge locked! &7
+&cVous n'avez pas la classe ou l'Âge requis pour forger cet objet ! (&7	&cYou do not have the class or Age required to forge this item! (&7
+Requis: Nain / Forgeron ou Âge 2 (Métallurgie)	Required: Dwarf / Blacksmith or Age 2 (Metallurgy)
+Requis: Forgeron ou Âge 3 (Alchimie)	Required: Blacksmith or Age 3 (Alchemy)
+Requis: Forgeron (Âge 2+) ou Âge 4 (Guerre Totale)	Required: Blacksmith (Age 2+) or Age 4 (Total War)
+Requis: Métiers spécialisés (Âge 2) ou Âge 3 (Alchimie)	Required: Specialized jobs (Age 2) or Age 3 (Alchemy)
+Requis: Spécialistes / Rôdeur Solitaire (Âge 3+) ou Âge 5	Required: Specialists / Lone Ranger (Age 3+) or Age 5
+Requis: Arcaniste, Rôdeur Solitaire (Âge 3) ou Âge 4	Required: Arcanist, Lone Ranger (Age 3) or Age 4
+Requis: Arcaniste ou Âge 3 (Alchimie)	Required: Arcanist or Age 3 (Alchemy)
+Requis: Ingénieur ou Âge 4	Required: Engineer or Age 4
+Niveau technologique insuffisant	Insufficient technology level
+&6🛡️ Blindage d'Ingénieur : -40% dégâts d'explosion !	&6🛡️ Engineer Armor: -40% explosion damage!
+&d🔮 Magie Arcanique : Potion Tier Supérieur (+1) & Durée +25% !	&d🔮 Arcane Magic: Higher Tier Potion (+1) & Duration +25%!
+&d🔮 Conclave Arcanique : Potion améliorée au Tier Supérieur (+1) !	&d🔮 Arcane Conclave: Potion upgraded to the next Tier (+1)!
+&d✨ Alchimie Arcanique : Durée des potions +25% !	&d✨ Arcane Alchemy: Potion duration +25%!
+&c❌ Seuls les Arcanistes (ou Âge 4+ / Rôdeur Solitaire Âge 3+) peuvent appliquer des livres enchantés !	&c❌ Only Arcanists (or Age 4+ / Lone Ranger Age 3+) can apply enchanted books!
+&e⚠️ Vos enchantements ont été ramenés à leur niveau standard (spécialisation non-arcanique).	&e⚠️ Your enchantments were brought back to their standard level (non-arcane specialization).
+&c❌ L'utilisation de la Table d'Enchantement est réservée aux Arcanistes (ou Rôdeur Solitaire Âge 3+) jusqu'à l'Âge 4 !	&c❌ The Enchanting Table is reserved for Arcanists (or Lone Ranger Age 3+) until Age 4!
+&c❌ L'utilisation de l'Alambic est réservée aux Arcanistes jusqu'à l'Âge 3 (Alchimie) !	&c❌ The Brewing Stand is reserved for Arcanists until Age 3 (Alchemy)!
+&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) !	&c❌ Only Arcanists can throw Splash Potions!
+&c❌ L'utilisation de l'arc est réservée aux Rôdeurs jusqu'à l'Âge 4 (Guerre Totale) !	&c❌ The bow is reserved for Rangers until Age 4 (Total War)!
+&c❌ Seuls les Sylvains (ou Âge de guilde 3+) peuvent utiliser la Bone Meal !	&c❌ Only Sylvans (or guild Age 3+) can use Bone Meal!
+&c❌ Territoire protégé de la guilde &6	&c❌ Protected territory of the guild &6
+&a🍃 Récolte d'Enclave : Butin agricole doublé !	&a🍃 Enclave Harvest: Farm loot doubled!
+&c❌ L'enchantement est réservé aux Arcanistes (ou Rôdeur Solitaire Âge 3+) jusqu'à l'Âge 4 !	&c❌ Enchanting is reserved for Arcanists (or Lone Ranger Age 3+) until Age 4!
+&d🔮 Conclave Arcanique : -50% Coût XP & Enchantements renforcés (IV→V, V→VI) !	&d🔮 Arcane Conclave: -50% XP Cost & boosted enchantments (IV→V, V→VI)!
+&c❌ Le commerce avec les villageois est réservé aux membres du &eSyndicat Marchand &cou aux guildes ayant atteint l'&6Âge 4 (Guerre Totale)&c !	&c❌ Trading with villagers is reserved for members of the &eMerchant Syndicate &cor guilds that reached &6Age 4 (Total War)&c!
+&c❌ La forge de livres enchantés est réservée aux Arcanistes (ou Rôdeur Solitaire Âge 3+) jusqu'à l'Âge 4 !	&c❌ Forging enchanted books is reserved for Arcanists (or Lone Ranger Age 3+) until Age 4!
+&c❌ Seuls les Arcanistes (ou Rôdeur Solitaire Âge 3+) peuvent combiner et forger des livres enchantés sur l'enclume avant l'Âge 4 !	&c❌ Only Arcanists (or Lone Ranger Age 3+) can combine and forge enchanted books on the anvil before Age 4!
+&c❌ Seuls les Sylvains (ou Âge de guilde 3+) peuvent reproduire les animaux !	&c❌ Only Sylvans (or guild Age 3+) can breed animals!
+&c❌ Vous devez d'abord choisir un métier avec &e/race &cpour pouvoir miner et casser des blocs !	&c❌ You must first pick a job with &e/race &cto be able to mine and break blocks!
+&c⚔️ Malus Légion Guerrière : Récoltes et minerais réduits de 25% !	&c⚔️ Warrior Legion Penalty: Harvests and ores reduced by 25%!
+Pierre Naturelle	Natural Stone
+&a🍃 Récolte d'Enclave : Butin 	&a🍃 Enclave Harvest: Loot 
+ doublé !	 doubled!
+&6⛏️ Bonus Industrie (x1.5) & Nain !	&6⛏️ Industry Bonus (x1.5) & Dwarf!
+&6⛏️ Bonus Industrie Souterraine : &a+	&6⛏️ Underground Industry Bonus: &a+
+&6⛏️ Bonus Nain : Minerais doublés !	&6⛏️ Dwarf Bonus: Ores doubled!
+&c🔨 Maîtrise de la Forge : +	&c🔨 Forge Mastery: +
+ gratuit(s) !	 free!
+&a🍃 Élevage d'Enclave : Butin animal doublé !	&a🍃 Enclave Husbandry: Animal loot doubled!
+ pièces &7(	 coins &7(
+ guilde]	 guild]
+Horde Noire	Black Horde
+Horde Personnalisée	Custom Horde
+&2Zombie Cuirassé	&2Armored Zombie
+&7Fantassin lourd équipé d'une armure en fer.	&7Heavy infantry wearing iron armor.
+&fSquelette Archer	&fSkeleton Archer
+&7Tireur d'élite à distance harcelant les défenses.	&7Long-range sharpshooter harassing the defenses.
+&cAraignée Venimeuse	&cVenomous Spider
+&7Créature rapide franchissant les obstacles et empoisonnant.	&7Fast creature that climbs obstacles and poisons.
+&7Pillard Arbalétrier	&7Crossbow Pillager
+&7Tireur perçant avec des tirs d'arbalète lourds.	&7Piercing shooter with heavy crossbow shots.
+&4Vindicateur Brutal	&4Brutal Vindicator
+&7Guerrier d'assaut fendant les armures à la hache.	&7Assault warrior cleaving armor with an axe.
+&5Sorcière Alchimiste	&5Alchemist Witch
+&7Lanceuse de potions nocives (poison, lenteur, dégâts instantanés).	&7Thrower of harmful potions (poison, slowness, instant damage).
+&8Squelette du Wither	&8Wither Skeleton
+&7Démon du Nether infligeant l'effet de décomposition Wither.	&7Nether demon inflicting the Wither decay effect.
+&6Ravageur Monstrueux	&6Monstrous Ravager
+&7Bête colossale de siège écrasant tout sur son passage.	&7Colossal siege beast crushing everything in its path.
+&cLes raids et la destruction de Nexus sont temporairement désactivés (/pvp).	&cRaids and Nexus destruction are temporarily disabled (/pvp).
+&c❌ Impossible de lancer cette horde : aucun membre de la guilde ciblée n'est présent sur son territoire claimé !	&c❌ Cannot launch this horde: no member of the targeted guild is present on their claimed territory!
+&cUne horde de monstres attaque déjà le Nexus de cette guilde !	&cA monster horde is already attacking this guild's Nexus!
+ secondes	 seconds
+&cCette guilde a récemment subi un raid. Protégée encore &e	&cThis guild recently suffered a raid. Protected for another &e
+&c❌ Vous devez faire partie d'une guilde pour lancer une horde de mercenaires !	&c❌ You must be part of a guild to launch a mercenary horde!
+&c❌ Vous ne pouvez pas lancer de raid mercenaire contre votre propre guilde !	&c❌ You cannot launch a mercenary raid against your own guild!
+&c❌ La banque de votre guilde ne possède pas assez de fonds (&e	&c❌ Your guild bank does not have enough funds (&e
+&c❌ Le monde du Nexus ciblé est introuvable : aucun fonds n'a été prélevé.	&c❌ The targeted Nexus world cannot be found: no funds were taken.
+ &6[Cible Hégémonique : -50%]	 &6[Hegemonic Target: -50%]
+ pièces &aont été prélevées de la banque de guilde pour financer l'invasion !	 coins &awere taken from the guild bank to fund the invasion!
+ &c[Sapeur]	 &c[Sapper]
+ &6[Ignifugé]	 &6[Fireproof]
+ &c[Attaquant]	 &c[Attacker]
+&4&l⚔️ UNE HORDE DE MONSTRES A ÉTÉ LANCEE SUR LA GUILDE &c	&4&l⚔️ A MONSTER HORDE WAS LAUNCHED ON THE GUILD &c
+&7Type d'invasion : 	&7Invasion type: 
+ &7par &e	 &7by &e
+ &c&l[SAPEURS EXPLOSIFS]	 &c&l[EXPLOSIVE SAPPERS]
+ &6&l[RÉSISTANCE LAVE]	 &6&l[LAVA RESISTANCE]
+&6&l⭐ PRIME HÉGÉMONIE FINANCIÈRE : &eLa guilde &c	&6&l⭐ FINANCIAL HEGEMONY BOUNTY: &eThe guild &c
+ &ea été ciblée pour sa richesse (Coût divisé par 2 & Cooldown de 2 min) !	 &ewas targeted for its wealth (Cost halved & 2 min cooldown)!
+&cCette guilde n'a pas de Nexus actif à attaquer !	&cThis guild has no active Nexus to attack!
+&c❌ Une horde personnalisée ne peut pas dépasser &e	&c❌ A custom horde cannot exceed &e
+ &cmonstres au total (et les quantités doivent être positives).	 &cmonsters in total (and quantities must be positive).
+ pièces &aont été prélevées de la banque de guilde pour financer l'invasion personnalisée !	 coins &awere taken from the guild bank to fund the custom invasion!
+&4⚔️ Horde Personnalisée Sur-Mesure	&4⚔️ Custom Tailor-Made Horde
+&4&l⚔️ UNE HORDE PERSONNALISÉE SUR-MESURE A ÉTÉ LANCEE SUR LA GUILDE &c	&4&l⚔️ A CUSTOM TAILOR-MADE HORDE WAS LAUNCHED ON THE GUILD &c
+&7Commanditaire : &e	&7Sponsor: &e
+ &7| Total : &c	 &7| Total: &c
+ monstres d'élite	 elite monsters
+&cVotre composition de horde est vide.	&cYour horde composition is empty.
+&4&lINVASION ENNEMIE !	&4&lENEMY INVASION!
+&cUne horde attaque votre Nexus !	&cA horde is attacking your Nexus!
+&c💣 &lSAPEUR DÉTONATEUR : &7Un monstre bloqué a explosé pour ouvrir une brèche et vaporiser l'eau/lave !	&c💣 &lDETONATOR SAPPER: &7A blocked monster exploded to open a breach and vaporize the water/lava!
+&a&l🛡️ La guilde &e	&a&l🛡️ The guild &e
+ &aa repoussé avec succès l'invasion de monstres !	 &asuccessfully repelled the monster invasion!
+&6&l[Nexus] &e⚔️ Vos pièges de Nexus ont été consommés lors de cette bataille ! N'oubliez pas de les réarmer via &6/nexus&e.	&6&l[Nexus] &e⚔️ Your Nexus traps were used up in this battle! Don't forget to re-arm them via &6/nexus&e.
+&2🧟 Horde de Zombies Cuirassés	&2🧟 Armored Zombie Horde
+&7Zombies équipés de casques et plastrons en fer ciblant le Nexus.	&7Zombies in iron helmets and chestplates targeting the Nexus.
+&f🏹 Légion Squelette Incendiaire	&f🏹 Incendiary Skeleton Legion
+&7Squelettes aux flèches enflammées pour incendier les défenses.	&7Skeletons with flaming arrows to set the defenses ablaze.
+&c🕷️ Essaim d'Araignées Venimeuses	&c🕷️ Venomous Spider Swarm
+&7Araignées venimeuses rapides sautant par-dessus les murailles.	&7Fast venomous spiders leaping over the walls.
+&4👺 Siège de Pillards & Ravageurs	&4👺 Pillager & Ravager Siege
+&7Attaque de siège lourde avec Ravageurs et Vindicators d'élite.	&7Heavy siege assault with Ravagers and elite Vindicators.
+&8🔥 Fléau Démoniaque du Nether	&8🔥 Nether Demonic Scourge
+&7Squelettes du Wither et Démons ardents armés d'épées en pierre maudite.	&7Wither Skeletons and fiery Demons armed with cursed stone swords.
+&9🦇 Volée de Monstres Aériens	&9🦇 Flying Monster Flock
+&7Nuée de Phantoms agressifs fondant depuis les cieux sur le Nexus.	&7Swarm of aggressive Phantoms diving from the skies onto the Nexus.
+&a💥 Commando Kamikaze Express	&a💥 Express Kamikaze Commando
+&7Creepers survoltés dotés d'une vitesse accrue fonçant vers le cœur.	&7Supercharged Creepers with increased speed rushing toward the heart.
+&5🔮 Incursion de l'End	&5🔮 End Incursion
+&7Endermen d'élite infligeant de lourds dégâts d'annihilation.	&7Elite Endermen dealing heavy annihilation damage.
+&8» &6🚆 Gare de 	&8» &6🚆 Station of 
+&e◀ Page précédente	&e◀ Previous page
+&ePage suivante ▶	&eNext page ▶
+&7Destinations accessibles : &f	&7Reachable destinations: &f
+&7Chaque guilde dont vous traversez le territoire	&7Every guild whose territory you cross
+&7peut prélever un &6péage&7 (gratuit pour ses alliées).	&7can charge a &6toll&7 (free for its allies).
+&cLignes coupées par : &f	&cLines cut by: &f
+&eRéseau très vaste : recherche limitée.	&eVery large network: search limited.
+&6&lRéseau ferroviaire	&6&lRail Network
+&cAucune gare reliée	&cNo connected station
+&7Aucune autre gare n'est reliée par une ligne de rails	&7No other station is linked by a continuous
+&7continue à celle-ci (ou les guildes traversées	&7rail line to this one (or the guilds crossed
+&7vous interdisent le passage).	&7forbid you passage).
+&7Guilde : &f	&7Guild: &f
+&7Distance : &f	&7Distance: &f
+ blocs &8(	 blocks &8(
+&c❌ Passage interdit sur cette ligne	&c❌ Passage forbidden on this line
+&7Tarif de gare : &6	&7Station fare: &6
+&7Péage &f	&7Toll &f
+&7 : &aGratuit (alliée)	&7 : &aFree (ally)
+&eTotal : &6	&eTotal: &6
+ pièces	 coins
+&a▶ Clic pour voyager	&a▶ Click to travel
+&8» &6🚆 Réseau de 	&8» &6🚆 Network of 
+&6&lPéage : 	&6&lToll: 
+&7Prélevé sur chaque voyageur (hors alliés)	&7Charged on every traveler (except allies)
+&7dont la ligne traverse vos territoires.	&7whose line crosses your territories.
+&7Versé directement à la banque de guilde.	&7Paid directly into the guild bank.
+&b&lRelations entre guildes	&b&lGuild relations
+&7Rendez une guilde &aalliée &7(passage gratuit)	&7Make a guild &aallied &7(free passage)
+&7ou &cbannie &7(vos terres lui sont fermées :	&7or &cbanned &7(your lands are closed to it:
+&7ses lignes qui les traversent sont coupées).	&7its lines crossing them are cut).
+&eClic pour gérer	&eClick to manage
+&7Monde : &f	&7World: &f
+&7Panneau : &f	&7Sign: &f
+&cMaj + clic : démanteler la gare	&cShift + click: dismantle the station
+&7Créer une gare	&7Create a station
+&7Posez un panneau avec :	&7Place a sign with:
+&fNom de la gare	&fStation name
+&7à moins de 2 blocs d'un rail.	&7within 2 blocks of a rail.
+&8» &bRelations ferroviaires	&8» &bRail relations
+&7Relation : 	&7Relation: 
+&d🔒 Imposée par un traité (/traite)	&d🔒 Imposed by a treaty (/traite)
+&eClic pour changer (Normale → Alliée → Bannie)	&eClick to change (Normal → Allied → Banned)
+&cRetour	&cBack
+&7Aucune autre guilde pour le moment	&7No other guild yet
+&cRéservé aux officiers de la guilde.	&cReserved for guild officers.
+&e🚉 Gare &6	&e🚉 Station &6
+ &edémantelée (pensez à retirer le panneau).	 &edismantled (remember to remove the sign).
+&c❌ Un traité impose le passage gratuit à &6	&c❌ A treaty imposes free passage for &6
+&c : rompez-le pour changer la relation.	&c : break it to change the relation.
+ a défini la relation ferroviaire avec &f	 set the rail relation with &f
+Le réseau ferroviaire est désactivé.	The rail network is disabled.
+Seuls les officiers et le chef d'une guilde peuvent créer une gare.	Only officers and the leader of a guild can create a station.
+Votre guilde doit avoir atteint l'Âge 	Your guild must have reached Age 
+ pour créer des gares.	 to create stations.
+Nom de gare invalide (ligne 2) : 3 à 20 caractères (lettres, chiffres, espace, ' _ -).	Invalid station name (line 2): 3 to 20 characters (letters, digits, space, ' _ -).
+Une gare porte déjà ce nom.	A station already has this name.
+Vous ne pouvez pas créer une gare sur le territoire d'une autre guilde.	You cannot create a station on another guild's territory.
+Votre guilde possède déjà le maximum de gares (	Your guild already has the maximum number of stations (
+Aucun rail à proximité : posez le panneau à moins de 2 blocs d'un rail.	No rail nearby: place the sign within 2 blocks of a rail.
+La banque de guilde doit contenir 	The guild bank must contain 
+ pièces.	 coins.
+&a🚉 Gare &e	&a🚉 Station &e
+ &acréée ! Les voyageurs ouvrent le menu avec &e/station &aà moins de 8 blocs. Gérez péages et relations avec &e/rail&a.	 &acreated! Travelers open the menu with &e/station &awithin 8 blocks. Manage tolls and relations with &e/rail&a.
+&cRefusé	&cDenied
+&c❌ Cette gare appartient à une autre guilde (ou réservée aux officiers).	&c❌ This station belongs to another guild (or is reserved for officers).
+&e🚉 La gare &6	&e🚉 The station &6
+ &eest démantelée.	 &eis dismantled.
+&cCette gare n'existe plus.	&cThis station no longer exists.
+&c❌ Une guilde traversée par cette ligne vous interdit désormais le passage.	&c❌ A guild crossed by this line now forbids you passage.
+&c❌ Il vous faut &6	&c❌ You need &6
+ pièces &cpour ce trajet.	 coins &cfor this trip.
+&a🚆 Bon voyage ! Arrivée à &e	&a🚆 Have a good trip! Arrival at &e
+ pièces)	 coins)
+&cLe voyage a échoué, vous avez été remboursé.	&cThe trip failed, you were refunded.
+&fNormale	&fNormal
+Le péage de votre guilde s'applique.	Your guild's toll applies.
+&aAlliée (gratuit)	&aAllied (free)
+Passage gratuit sur vos terres.	Free passage on your lands.
+&cBannie	&cBanned
+Passage interdit : les lignes qui traversent vos terres sont coupées.	Passage forbidden: lines crossing your lands are cut.
+&8» &dTraités de &f	&8» &dTreaties of &f
+&6Vous êtes suzerain	&6You are the suzerain
+&6Vous êtes vassal	&6You are a vassal
+&7Avec : &f	&7With: &f
+&cShift + clic : ROMPRE (indemnité 	&cShift + click: BREAK (indemnity 
+ pièces + préavis)	 coins + notice)
+&eShift + clic : mettre fin au traité	&eShift + click: end the treaty
+&7Aucun traité en vigueur	&7No treaty in force
+&7De : &f	&7From: &f
+ suzerain, vous vassal	 suzerain, you vassal
+&6Vous suzerain, 	&6You suzerain, 
+&aClic gauche : accepter	&aLeft click: accept
+&cClic droit : refuser	&cRight click: refuse
+&a➕ Proposer un traité	&a➕ Propose a treaty
+&7Alliance, pacte de non-agression	&7Alliance, non-aggression pact
+&7ou vassalité avec une autre guilde.	&7or vassalage with another guild.
+&bComment ça marche ?	&bHow does it work?
+&dAlliance &7: pas de raid, rails gratuits, pas de PvP.	&dAlliance &7: no raids, free rails, no PvP.
+&dPacte &7: pas de raid pendant la durée du pacte.	&dPact &7: no raids for the duration of the pact.
+&dVassalité &7: tribut quotidien au suzerain + alliance.	&dVassalage &7: daily tribute to the suzerain + alliance.
+&cRompre un traité = indemnité + préavis avant de	&cBreaking a treaty = indemnity + notice before
+&cpouvoir attaquer l'ancien partenaire.	&cbeing able to attack the former partner.
+&8» &dAvec quelle guilde ?	&8» &dWith which guild?
+&7Âge : &f	&7Age: &f
+&eClic pour choisir	&eClick to choose
+&7Aucune guilde disponible	&7No guild available
+&8» &dTraité avec &f	&8» &dTreaty with &f
+&7Durée : &eillimitée	&7Duration: &eunlimited
+&eClic : proposer	&eClick: propose
+&dPacte de non-agression	&dNon-aggression pact
+&7Durée : &e	&7Duration: &e
+ jours	 days
+&dVous êtes SUZERAIN	&dYou are the SUZERAIN
+&dVous êtes VASSAL	&dYou are a VASSAL
+&7Vous prêtez allégeance à &f	&7You pledge allegiance to &f
+&7Vous lui versez un tribut quotidien.	&7You pay it a daily tribute.
+Réservé aux officiers et au chef de guilde.	Reserved for officers and the guild leader.
+&a📜 Proposition de 	&a📜 Proposal of 
+ envoyée à &6	 sent to &6
+&e📜 Le 	&e📜 The 
+ entre &6	 between &6
+ &eet &6	 &eand &6
+ &es'est achevé.	 &ehas ended.
+📜 Fin du 	📜 End of the 
+ entre 	 between 
+ et 	 and 
+&6👑 Tribut quotidien versé à &e	&6👑 Daily tribute paid to &e
+&6👑 Tribut de &e	&6👑 Tribute from &e
+&c❌ Un &e	&c❌ A &e
+ &cvous lie à &6	 &cbinds you to &6
+&c : rompez-le d'abord (&e/traite&c).	&c : break it first (&e/traite&c).
+Les traités sont désactivés.	Treaties are disabled.
+Guilde cible invalide.	Invalid target guild.
+Un traité lie déjà vos guildes : rompez-le d'abord.	A treaty already binds your guilds: break it first.
+Une proposition est déjà en attente entre vos deux guildes.	A proposal is already pending between your two guilds.
+Suzerain invalide.	Invalid suzerain.
+Cette guilde est déjà vassale d'une autre guilde.	This guild is already a vassal of another guild.
+ &dvous propose un &e	 &doffers you a &e
+ suzerain, vous vassal)	 suzerain, you vassal)
+ &d(vous suzerain, 	 &d(you suzerain, 
+Cette proposition n'est plus valable.	This proposal is no longer valid.
+Un traité lie déjà vos guildes.	A treaty already binds your guilds.
+Le vassal désigné est déjà vassal d'une autre guilde.	The designated vassal is already a vassal of another guild.
+🤝 ALLIANCE conclue entre &6	🤝 ALLIANCE concluded between &6
+👑 VASSALITÉ : &6	👑 VASSALAGE: &6
+ &eprête allégeance à &6	 &epledges allegiance to &6
+ a refusé votre proposition de 	 refused your proposal of 
+Réservé aux officiers et au chef de guilde concernés.	Reserved for the officers and leader of the guild concerned.
+Ce traité n'existe plus.	This treaty no longer exists.
+&4&l💔 TRAHISON ! &c	&4&l💔 BETRAYAL! &c
+ &7rompt son &e	 &7breaks its &e
+ &7avec &6	 &7with &6
+ &7et lui verse &6	 &7and pays it &6
+ pièces &7d'indemnité.	 coins &7in indemnity.
+ rompt son 	 breaks its 
+ avec 	 with 
+ libère son vassal &6	 releases its vassal &6
+&e : la vassalité prend fin.	&e : the vassalage ends.
+ libère son vassal 	 releases its vassal 
+&7Aucun raid entre les deux guildes.	&7No raids between the two guilds.
+&7Passage ferroviaire &agratuit &7sur les terres de l'autre.	&7&afree &7rail passage on the other's lands.
+&7Pas de dégâts entre joueurs alliés.	&7No damage between allied players.
+Pacte de non-agression	Non-aggression pact
+&7Aucun raid entre les deux guildes	&7No raids between the two guilds
+&7pendant la durée du pacte.	&7for the duration of the pact.
+Vassalité	Vassalage
+&7Aucun raid entre suzerain et vassal.	&7No raids between suzerain and vassal.
+&7Le vassal verse un &6tribut quotidien &7au suzerain.	&7The vassal pays a &6daily tribute &7to the suzerain.
+&7Passage ferroviaire gratuit et pas de dégâts entre joueurs.	&7Free rail passage and no damage between players.
+Âge	Age
+pièces	coins
+pièce	coin
+Citrouilles	Pumpkins
+Diamants	Diamonds
+Observateurs	Observers
+Obsidienne	Obsidian
+Inconnu	Unknown
+Inconnue	Unknown
+&7Tarif de base : &6	&7Base fare: &6
+ pièce(s)	 coin(s)
+&8Maximum : 	&8Maximum: 
+&8Coût : 	&8Cost: 
+ pièces (banque)	 coins (bank)
+&6🚆 Péage perçu : &e+	&6🚆 Toll collected: &e+
+ pièces &7(passage de 	 coins &7(passage of 
+&7Expire dans : &e	&7Expires in: &e
+&7En attente de réponse.	&7Waiting for a reply.
+&cClic : annuler	&cClick: cancel
+ devient votre vassal.	 becomes your vassal.
+&7Tribut : &e	&7Tribute: &e
+% &7de sa banque / jour	% &7of its bank / day
+&c❌ Vous avez rompu un traité avec &6	&c❌ You broke a treaty with &6
+&c : préavis de &e	&c : notice of &e
+ &cavant de pouvoir l'attaquer.	 &cbefore you can attack them.
+ &d! Ouvrez &e/traite &dpour répondre (&7	 &d! Open &e/traite &dto reply (&7
+📜 PACTE DE NON-AGRESSION entre &6	📜 NON-AGGRESSION PACT between &6
+ jours) !	 days)!

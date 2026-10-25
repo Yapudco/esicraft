@@ -6,6 +6,7 @@ import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildRole;
 import fr.esicraft.guild.GuildSpecialization;
 import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.Lang;
 import fr.esicraft.util.ChunkKey;
 import java.time.Duration;
 import java.util.Iterator;
@@ -585,8 +586,8 @@ public class RaidManager implements Listener {
          if (targetGuild.isMember(p.getUniqueId())) {
             p.showTitle(
                Title.title(
-                  ChatUtil.component("&4&lINVASION ENNEMIE !"),
-                  ChatUtil.component("&cUne horde attaque votre Nexus !"),
+                  ChatUtil.component(Lang.tr(p, "&4&lINVASION ENNEMIE !")),
+                  ChatUtil.component(Lang.tr(p, "&cUne horde attaque votre Nexus !")),
                   Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(1000L))
                )
             );

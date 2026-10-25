@@ -281,6 +281,10 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 
 Chaque mois, `/classement` classe les guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). La guilde championne gagne **5 000 pièces**, **500 par membre** et une couronne 👑 dans le tchat. `/histoire` raconte les derniers grands moments du serveur.
 
+### Le jeu en anglais
+
+`/english` traduit le jeu **pour toi seul** : messages, barre d'action, menus, tableau de bord et livre `/guide` (réponse `/francais` pour revenir). Le choix est mémorisé. Les noms de guildes et de joueurs ne sont pas traduits. Pas encore traduits : la barre de boss des événements, le tchat et le site web.
+
 ### Le site web
 
 Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les joueurs connectés, le classement des guildes, la fiche de chaque guilde (membres, traités, statistiques) et les plus riches. Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
@@ -312,6 +316,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les 
 | `/station` · `/rail` | Prendre le train · gérer son réseau (officiers) |
 | `/classement` · `/histoire` | Classement de la saison · grands moments |
 | `/hud` | Afficher ou masquer le tableau de bord |
+| `/english` · `/francais` | Passer le jeu en anglais (menus, messages, tableau de bord, livre) · revenir au français |
 | `/hub` | Retourner au hub |
 
 ---

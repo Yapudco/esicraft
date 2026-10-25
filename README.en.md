@@ -284,6 +284,10 @@ The rail network lets you **teleport from station to station**, as long as a **c
 
 Every month, `/classement` ranks the guilds (land, Age, wealth, members, raids repelled, conquests). The champion guild wins **5,000 coins**, **500 per member** and a 👑 crown in chat. `/histoire` tells the latest big moments on the server.
 
+### Playing in English
+
+`/english` translates the game **for you only**: messages, action bar, menus, dashboard and the `/guide` book (`/francais` goes back). Your choice is remembered. Guild and player names are not translated. Not translated yet: the event boss bar, chat and the website.
+
 ### The website
 
 The server has a public website: **`http://<server-address>/`**. It shows online players, the guild ranking, a page for each guild (members, treaties, stats) and the richest players. It shows **no coordinates**: nothing that helps find a base.
@@ -314,6 +318,7 @@ The server has a public website: **`http://<server-address>/`**. It shows online
 | `/traite` · `/traite liste` | Guild treaties |
 | `/station` · `/rail` | Take the train · manage your network (officers) |
 | `/classement` · `/histoire` | Season ranking · big moments |
+| `/english` · `/francais` | Switch the game to English (menus, messages, dashboard, rule book) · back to French |
 | `/hud` | Show or hide the dashboard |
 | `/hub` | Go back to the hub |
 

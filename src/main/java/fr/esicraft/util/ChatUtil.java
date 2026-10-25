@@ -24,25 +24,30 @@ public final class ChatUtil {
       return message == null ? "" : LegacyComponentSerializer.legacySection().serialize(SERIALIZER.deserialize(message));
    }
 
+   /** Texte d'un composant avec codes &, pour le retraduire. */
+   public static String toLegacy(Component component) {
+      return SERIALIZER.serialize(component);
+   }
+
    public static Component component(String message) {
       return message == null ? Component.empty() : SERIALIZER.deserialize(message);
    }
 
    public static void sendMessage(CommandSender sender, String message) {
       if (sender != null && message != null) {
-         sender.sendMessage(component("&8[&6&lEsicraft&8] &r" + message));
+         sender.sendMessage(component("&8[&6&lEsicraft&8] &r" + Lang.tr(sender, message)));
       }
    }
 
    public static void sendRaw(CommandSender sender, String message) {
       if (sender != null && message != null) {
-         sender.sendMessage(component(message));
+         sender.sendMessage(component(Lang.tr(sender, message)));
       }
    }
 
    public static void sendActionbar(Player player, String message) {
       if (player != null && player.isOnline() && message != null) {
-         player.sendActionBar(component(message));
+         player.sendActionBar(component(Lang.tr(player, message)));
       }
    }
 
@@ -53,7 +58,23 @@ public final class ChatUtil {
    }
 
    public static void broadcast(String message) {
-      Bukkit.broadcast(component("&8[&6&lEsicraft&8] &r" + message));
+      if (message != null) {
+         Component french = component("&8[&6&lEsicraft&8] &r" + message);
+         Component english = null;
+         for (Player p : Bukkit.getOnlinePlayers()) {
+            if (Lang.isEnglish(p)) {
+               if (english == null) {
+                  english = component("&8[&6&lEsicraft&8] &r" + Lang.toEnglish(message));
+               }
+
+               p.sendMessage(english);
+            } else {
+               p.sendMessage(french);
+            }
+         }
+
+         Bukkit.getConsoleSender().sendMessage(french);
+      }
    }
 
    public static void broadcastGuild(Guild guild, String message) {

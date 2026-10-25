@@ -3,6 +3,7 @@ package fr.esicraft.age;
 import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.Lang;
 import java.time.Duration;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -240,8 +241,8 @@ public class AgeManager {
                if (member != null && member.isOnline()) {
                   member.showTitle(
                      Title.title(
-                        ChatUtil.component(next.getDisplayName()),
-                        ChatUtil.component("&aNouvel Âge débloqué pour votre guilde !"),
+                        ChatUtil.component(Lang.tr(member, next.getDisplayName())),
+                        ChatUtil.component(Lang.tr(member, "&aNouvel Âge débloqué pour votre guilde !")),
                         Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(1000L))
                      )
                   );
