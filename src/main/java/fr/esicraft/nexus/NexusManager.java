@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -332,10 +333,10 @@ public class NexusManager {
          if (loc != null && loc.getWorld() != null) {
             loc.getWorld().spawnParticle(Particle.CRIT, loc.clone().add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.1);
             loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_LAND, 1.0F, 0.6F);
-            if (nexus.hasTrap(NexusTrapType.LIGHTNING_STRIKE)) {
-               if (attackerPlayer != null && attackerPlayer.isOnline()) {
+            if (nexus.hasTrap(NexusTrapType.LIGHTNING_STRIKE) && attackerPlayer != null && attackerPlayer.isOnline() && this.lightningReady(attackerPlayer)) {
+               {
                   loc.getWorld().strikeLightningEffect(attackerPlayer.getLocation());
-                  attackerPlayer.damage(15.0);
+                  attackerPlayer.damage(LIGHTNING_DAMAGE);
                   ChatUtil.sendMessage(attackerPlayer, "&e⚡ &lRIPOSTE DU NEXUS : &cVous avez été foudroyé pour avoir attaqué le Cœur de Guilde !");
                }
             }
@@ -396,14 +397,44 @@ public class NexusManager {
       }
    }
 
+   /** Dégâts de la Foudre de Riposte (4 cœurs) et délai minimal entre deux coups de foudre sur un même joueur. */
+   private static final double LIGHTNING_DAMAGE = 8.0;
+   private static final long LIGHTNING_COOLDOWN_MS = 5000L;
+   private final Map<UUID, Long> lastLightning = new java.util.concurrent.ConcurrentHashMap<>();
+
+   private boolean lightningReady(Player attacker) {
+      long now = System.currentTimeMillis();
+      Long last = this.lastLightning.get(attacker.getUniqueId());
+      if (last != null && now - last < LIGHTNING_COOLDOWN_MS) {
+         return false;
+      }
+
+      this.lastLightning.put(attacker.getUniqueId(), now);
+      if (this.lastLightning.size() > 500) {
+         this.lastLightning.entrySet().removeIf(e -> now - e.getValue() > LIGHTNING_COOLDOWN_MS);
+      }
+
+      return true;
+   }
+
    private boolean isEnemy(Guild guild, Entity entity) {
       if (entity instanceof Monster) {
          return true;
+      } else if (entity instanceof Player player) {
+         // Seuls les joueurs en mode survie / aventure, non-membres, non-alliés et présents dans le claim sont visés (pas les simples passants)
+         org.bukkit.GameMode mode = player.getGameMode();
+         if ((mode == org.bukkit.GameMode.CREATIVE || mode == org.bukkit.GameMode.SPECTATOR) || guild.isMember(player.getUniqueId())) {
+            return false;
+         }
+
+         Guild other = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+         if (other != null && this.plugin.getTreatyManager().areFriends(guild.getId(), other.getId())) {
+            return false;
+         }
+
+         return guild.isClaimed(ChunkKey.from(player.getLocation().getChunk()));
       } else {
-         // Les joueurs non-membres ne sont visés que s'ils se trouvent dans le claim de la guilde (pas les simples passants)
-         return entity instanceof Player player
-            ? !guild.isMember(player.getUniqueId()) && guild.isClaimed(ChunkKey.from(player.getLocation().getChunk()))
-            : false;
+         return false;
       }
    }
 
@@ -441,6 +472,72 @@ public class NexusManager {
          this.plugin.getDataManager().saveGuild(guild);
          ChatUtil.broadcast("&4&l\ud83d\udca5 LE NEXUS DE LA GUILDE &c" + guild.getName() + " &4&lA ÉTÉ DÉTRUIT PAR " + killer + " !");
          ChatUtil.broadcast("&eLeur territoire est désormais &cVULNÉRABLE &ependant 30 minutes !");
+      }
+   }
+
+   private static final long GUARDIAN_RESPAWN_MS = 300000L;
+   private final Map<String, Long> guardianMissingSince = new java.util.concurrent.ConcurrentHashMap<>();
+
+   public static String guardianTag(Guild guild) {
+      return "esicraft_guardian_" + guild.getId();
+   }
+
+   /** Invoque (ou ré-invoque) le Golem Gardien d'une guilde au pied du Nexus. */
+   public void spawnGuardian(Guild guild, Location nexusLoc) {
+      if (nexusLoc == null || nexusLoc.getWorld() == null) {
+         return;
+      }
+
+      Location spawnLoc = nexusLoc.clone().add(1.0, 0.0, 1.0);
+      String tag = guardianTag(guild);
+      spawnLoc.getWorld().spawn(spawnLoc, org.bukkit.entity.IronGolem.class, g -> {
+         g.customName(ChatUtil.component("&6&l[Gardien : " + guild.getName() + "]"));
+         g.setCustomNameVisible(true);
+         g.setPlayerCreated(false);
+         g.setRemoveWhenFarAway(false);
+         g.addScoreboardTag(tag);
+      });
+   }
+
+   /** Supprime tous les golems gardiens d'une guilde (piège consommé ou guilde détruite). */
+   public void removeGuardians(Guild guild, Location nexusLoc) {
+      this.guardianMissingSince.remove(guild.getId());
+      if (nexusLoc == null || nexusLoc.getWorld() == null) {
+         return;
+      }
+
+      String tag = guardianTag(guild);
+      for (Entity e : nexusLoc.getWorld().getNearbyEntities(nexusLoc, 64.0, 64.0, 64.0)) {
+         if (e.getScoreboardTags().contains(tag)) {
+            e.remove();
+         }
+      }
+   }
+
+   /** Un golem tué est remplacé 5 minutes plus tard tant que le piège est armé. */
+   private void maintainGuardian(Guild guild, Location nexusLoc, Collection<Entity> nearby) {
+      String tag = guardianTag(guild);
+      for (Entity e : nearby) {
+         if (e.getScoreboardTags().contains(tag)) {
+            this.guardianMissingSince.remove(guild.getId());
+            return;
+         }
+      }
+
+      // Pas de golem à proximité : peut-être parti au loin, on élargit la recherche avant de conclure qu'il est mort.
+      for (Entity e : nexusLoc.getWorld().getNearbyEntities(nexusLoc, 64.0, 64.0, 64.0)) {
+         if (e.getScoreboardTags().contains(tag)) {
+            this.guardianMissingSince.remove(guild.getId());
+            return;
+         }
+      }
+
+      long now = System.currentTimeMillis();
+      Long since = this.guardianMissingSince.putIfAbsent(guild.getId(), now);
+      if (since != null && now - since >= GUARDIAN_RESPAWN_MS) {
+         this.guardianMissingSince.remove(guild.getId());
+         this.spawnGuardian(guild, nexusLoc);
+         ChatUtil.broadcastGuild(guild, "&6🤖 Votre Automate Gardien a été reconstruit au pied du Nexus.");
       }
    }
 
@@ -618,6 +715,10 @@ public class NexusManager {
                                  }
                               }
 
+                              if (nexus.hasTrap(NexusTrapType.GUARDIAN_GOLEM)) {
+                                 NexusManager.this.maintainGuardian(guildx, loc, nearbyEntities);
+                              }
+
                               for (Entity entityx : nearbyEntities) {
                                  double distSq = entityx.getLocation().distanceSquared(loc);
                                  if (entityx instanceof org.bukkit.entity.IronGolem golem && golem.getScoreboardTags().contains("esicraft_guardian_" + guildx.getId())) {
@@ -641,9 +742,9 @@ public class NexusManager {
 
                                  if (NexusManager.this.isEnemy(guildx, entityx)) {
                                     if (hasFlameTrap && distSq <= 64.0) {
-                                       entityx.setFireTicks(100);
+                                       entityx.setFireTicks(60);
                                        if (entityx instanceof Damageable d) {
-                                          d.damage(4.0);
+                                          d.damage(2.0);
                                        }
 
                                        try {
@@ -653,8 +754,7 @@ public class NexusManager {
                                     }
 
                                     if (hasWebTrap && distSq <= 100.0 && entityx instanceof LivingEntity le) {
-                                       le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false, false));
-                                       le.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 0, false, false, false));
+                                       le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1, false, false, false));
 
                                        try {
                                           loc.getWorld().spawnParticle(Particle.SNOWFLAKE, le.getLocation().add(0.0, 1.0, 0.0), 5);
@@ -663,7 +763,7 @@ public class NexusManager {
                                     }
 
                                     if (hasPoisonTrap && distSq <= 64.0 && entityx instanceof LivingEntity le) {
-                                       le.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1, false, false, true));
+                                       le.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 0, false, false, true));
                                     }
                                  }
 

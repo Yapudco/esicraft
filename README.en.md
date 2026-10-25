@@ -136,15 +136,15 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 ### Traps (`/nexus traps`)
 
-Paid from the guild bank, they stay active (even after a restart) and only target intruders standing on your land.
+Paid from the guild bank, they stay armed (even after a restart) until the **end of the next horde**; you then have to buy them again. They target monsters and **intruders** standing on your land, never members, treaty allies, or players in creative/spectator mode.
 
 | Trap | Price | Effect |
 | :--- | :--- | :--- |
-| 🔥 Infernal Blaze | 250 | Sets enemies within 8 blocks on fire |
-| 🕸️ Binding Web | 200 | Slowness III and Blindness for anyone approaching |
-| ⚡ Retaliation Lightning | 350 | Strikes anyone who hits the Nexus |
-| 🧪 Toxic Mist | 300 | Poison II cloud |
-| 🤖 Guardian Automaton | 500 | An iron golem defends the Nexus |
+| 🔥 Infernal Blaze | 250 | Within 8 blocks: 1 heart of damage every 2 s plus burning |
+| 🕸️ Binding Web | 200 | Slowness II within 10 blocks |
+| ⚡ Retaliation Lightning | 350 | Strikes anyone who hits the Nexus: 4 hearts, at most one bolt every 5 s per player |
+| 🧪 Toxic Mist | 300 | Poison I within 8 blocks (poison never kills, it only weakens) |
+| 🤖 Guardian Automaton | 500 | An iron golem attacks enemies; rebuilt 5 min after it dies |
 
 ---
 
@@ -269,7 +269,7 @@ The rail network lets you **teleport from station to station**, as long as a **c
 
 ## 🎉 10. Server life
 
-### Events (every 45 to 90 minutes)
+### Events (one every 1 to 2 days)
 
 | Event | Duration | What happens |
 | :--- | :--- | :--- |

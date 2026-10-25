@@ -333,22 +333,8 @@ public class GUIListener implements Listener {
                         if (paid) {
                            nexus.addTrap(targetTrap);
                            if (targetTrap == NexusTrapType.GUARDIAN_GOLEM && nexus.getLocation() != null && nexus.getLocation().getWorld() != null) {
-                              Location spawnLoc = nexus.getLocation().clone().add(1.0, 0.0, 1.0);
-                              String guardianTag = "esicraft_guardian_" + guild.getId();
-
-                              for (org.bukkit.entity.Entity old : spawnLoc.getWorld().getNearbyEntities(spawnLoc, 32.0, 32.0, 32.0)) {
-                                 if (old.getScoreboardTags().contains(guardianTag)) {
-                                    old.remove();
-                                 }
-                              }
-
-                              spawnLoc.getWorld().spawn(spawnLoc, IronGolem.class, g -> {
-                                 g.customName(ChatUtil.component("&6&l[Gardien : " + guild.getName() + "]"));
-                                 g.setCustomNameVisible(true);
-                                 g.setPlayerCreated(false);
-                                 g.setRemoveWhenFarAway(false);
-                                 g.addScoreboardTag(guardianTag);
-                              });
+                              this.plugin.getNexusManager().removeGuardians(guild, nexus.getLocation());
+                              this.plugin.getNexusManager().spawnGuardian(guild, nexus.getLocation());
                            }
 
                            this.plugin.getDataManager().saveGuild(guild);

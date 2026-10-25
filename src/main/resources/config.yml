@@ -229,8 +229,8 @@ races:
 # Événements serveur aléatoires (Lune de Sang, Météorites, Marché Noir, Boss Mondial)
 events:
   enabled: true
-  min-interval-minutes: 45
-  max-interval-minutes: 90
+  min-interval-minutes: 1440   # 24 h minimum entre deux événements
+  max-interval-minutes: 2880   # 48 h maximum : un événement tous les 1 à 2 jours
 
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:

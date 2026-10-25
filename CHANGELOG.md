@@ -2,6 +2,20 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 25/10/2026 (soir)
+
+### Pièges du Nexus rééquilibrés
+- **Foudre** : 15 dégâts à *chaque* coup (un joueur mourait en 2 coups) → 4 cœurs, au plus un éclair toutes les 5 s par joueur.
+- **Brasier** : 2 cœurs toutes les 2 s + brûlure de 5 s → 1 cœur toutes les 2 s + brûlure de 3 s.
+- **Toile** : Lenteur III + Cécité permanentes → Lenteur II seule.
+- **Brume** : Poison II → Poison I.
+- Les pièges ne visent plus les alliés (traité), ni les joueurs en créatif ou spectateur.
+- **Golem Gardien** : reconstruit 5 min après sa mort tant que le piège est armé, et supprimé quand le piège est consommé (il restait avant indéfiniment).
+- La documentation indiquait que les pièges restaient armés indéfiniment : ils sont en fait consommés à la fin de la prochaine horde (corrigé dans les README).
+
+### Événements
+- Un événement tous les 1 à 2 jours (au lieu de 45 à 90 minutes). L'échéance est conservée en base : un redémarrage ne la remet plus à zéro.
+
 ## 25/10/2026
 
 ### Documentation

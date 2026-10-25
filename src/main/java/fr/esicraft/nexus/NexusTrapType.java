@@ -4,15 +4,15 @@ import org.bukkit.Material;
 
 public enum NexusTrapType {
    INFERNAL_FLAMES(
-      "&c\ud83d\udd25 Brasier Infernal", Material.BLAZE_POWDER, 250.0, "&7Enflamme et inflige des brûlures continues aux ennemis à moins de 8 blocs."
+      "&c\ud83d\udd25 Brasier Infernal", Material.BLAZE_POWDER, 250.0, "&7Enflamme les intrus et monstres à moins de 8 blocs (1 cœur toutes les 2 s + brûlure)."
    ),
-   SLOWDOWN_WEB("&7\ud83d\udd78️ Toile d'Entravement", Material.COBWEB, 200.0, "&7Inflige Lenteur III et Cécité aux assaillants approchant du Nexus."),
-   LIGHTNING_STRIKE("&e⚡ Foudre de Riposte", Material.LIGHTNING_ROD, 350.0, "&7Foudroie violemment quiconque ose frapper le Nexus (+15 dégâts réels)."),
+   SLOWDOWN_WEB("&7\ud83d\udd78️ Toile d'Entravement", Material.COBWEB, 200.0, "&7Inflige Lenteur II aux assaillants à moins de 10 blocs du Nexus."),
+   LIGHTNING_STRIKE("&e⚡ Foudre de Riposte", Material.LIGHTNING_ROD, 350.0, "&7Foudroie quiconque frappe le Nexus (4 cœurs, au plus un éclair toutes les 5 s par joueur)."),
    POISON_MIST(
-      "&2\ud83e\uddea Brume Toxique", Material.DRAGON_BREATH, 300.0, "&7Émet un nuage toxique (Poison II) asphyxiant les pillards et monstres de horde."
+      "&2\ud83e\uddea Brume Toxique", Material.DRAGON_BREATH, 300.0, "&7Émet un nuage toxique (Poison I) à moins de 8 blocs ; le poison ne tue jamais, il affaiblit."
    ),
    GUARDIAN_GOLEM(
-      "&6\ud83e\udd16 Automate Gardien (Golem)", Material.IRON_BLOCK, 500.0, "&7Invoque un Golem de fer blindé loyal attaquant férocement tous les ennemis."
+      "&6\ud83e\udd16 Automate Gardien (Golem)", Material.IRON_BLOCK, 500.0, "&7Invoque un Golem de fer qui attaque les ennemis ; reconstruit 5 min après sa mort."
    );
 
    private final String displayName;
