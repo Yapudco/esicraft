@@ -46,6 +46,7 @@ public class DataManager {
          this.plugin.getMarketManager().registerListing(listing);
       }
 
+      this.plugin.getRaidManager().loadCooldowns();
       this.plugin.getLogger().info("Marché initialisé : " + loadedListings.size() + " annonce(s) chargée(s).");
       int interval = this.plugin.getConfig().getInt("storage.save-interval-seconds", 180) * 20;
       Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveAll, (long)interval, (long)interval);
@@ -181,14 +182,15 @@ public class DataManager {
    }
 
    public void saveAll() {
-      for (PlayerData data : this.players.values()) {
-         this.storage.savePlayerData(data);
-      }
+      this.storage.runInTransaction(() -> {
+         for (PlayerData data : this.players.values()) {
+            this.storage.savePlayerData(data);
+         }
 
-      for (Guild guild : this.plugin.getGuildManager().getAllGuilds()) {
-         this.storage.saveGuild(guild);
-      }
-
+         for (Guild guild : this.plugin.getGuildManager().getAllGuilds()) {
+            this.storage.saveGuild(guild);
+         }
+      });
       this.refreshServerWealthCache();
    }
 

@@ -32,6 +32,7 @@ public class CraftRestrictionListener implements Listener {
    private static final EnumSet<Material> NETHERITE_GEAR = EnumSet.noneOf(Material.class);
    private static final EnumSet<Material> ARMOR_MATERIALS = EnumSet.noneOf(Material.class);
    private static final EnumSet<Material> PICKAXE_MATERIALS = EnumSet.noneOf(Material.class);
+   private static final EnumSet<Material> FORGE_STATIONS = EnumSet.of(Material.ANVIL, Material.GRINDSTONE, Material.BLAST_FURNACE);
    private static final EnumSet<Material> ADVANCED_REDSTONE = EnumSet.of(
       Material.PISTON,
       Material.STICKY_PISTON,
@@ -193,6 +194,8 @@ public class CraftRestrictionListener implements Listener {
             }
          } else if (mat == Material.BREWING_STAND) {
             return ageLevel >= 3 ? true : race == Race.ARCANIST;
+         } else if (FORGE_STATIONS.contains(mat)) {
+            return ageLevel >= 3 ? true : race == Race.BLACKSMITH;
          } else if (mat == Material.GOLDEN_APPLE) {
             return ageLevel >= 4 ? true : race == Race.ARCANIST || race == Race.SYLVAN;
          } else if (!this.isAdvancedRedstone(mat)) {
@@ -234,6 +237,8 @@ public class CraftRestrictionListener implements Listener {
          return "Requis: Arcaniste, Rôdeur Solitaire (Âge 3) ou Âge 4";
       } else if (mat == Material.BREWING_STAND) {
          return "Requis: Arcaniste ou Âge 3 (Alchimie)";
+      } else if (FORGE_STATIONS.contains(mat)) {
+         return "Requis: Forgeron ou Âge 3 (Alchimie)";
       } else {
          return this.isAdvancedRedstone(mat) ? "Requis: Ingénieur ou Âge 4" : "Niveau technologique insuffisant";
       }

@@ -107,6 +107,11 @@ public class RaceCombatListener implements Listener {
       }
 
       if (event.getEntity() instanceof Player victim) {
+         // Arcaniste : fragilité en mêlée (+15 % de dégâts physiques subis)
+         if (event.getCause() == DamageCause.ENTITY_ATTACK && this.plugin.getRaceManager().getRace(victim) == Race.ARCANIST) {
+            event.setDamage(event.getDamage() * 1.15);
+         }
+
          Guild guildx = this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId());
          if (guildx != null && guildx.getSpecialization() == GuildSpecialization.UNDERGROUND_INDUSTRY) {
             Entity damager = event.getDamager();

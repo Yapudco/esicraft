@@ -31,6 +31,7 @@ import fr.esicraft.nexus.NexusManager;
 import fr.esicraft.race.RaceManager;
 import fr.esicraft.race.listener.CraftRestrictionListener;
 import fr.esicraft.race.listener.RaceBuffTask;
+import fr.esicraft.guild.listener.SpecializationRulesListener;
 import fr.esicraft.race.listener.RaceCombatListener;
 import fr.esicraft.race.listener.RaceInteractionListener;
 import fr.esicraft.raid.RaidManager;
@@ -43,6 +44,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private static EsicraftPlugin instance;
    private DataManager dataManager;
    private AgeManager ageManager;
+   private SpecializationRulesListener specializationRules;
    private RaceManager raceManager;
    private GuildManager guildManager;
    private NexusManager nexusManager;
@@ -70,12 +72,14 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       this.nexusManager.removeAllHolograms();
+      this.specializationRules = new SpecializationRulesListener(this);
       PluginManager pm = Bukkit.getPluginManager();
       pm.registerEvents(new PlayerConnectionListener(this), this);
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
       pm.registerEvents(new RaceCombatListener(this), this);
       pm.registerEvents(new GuildClaimListener(this), this);
+      pm.registerEvents(this.specializationRules, this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
       pm.registerEvents(new GUIListener(this), this);
@@ -84,7 +88,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new AgeDimensionListener(this), this);
       this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
       this.registerCommands();
-      new RaceBuffTask(this).runTaskTimer(this, 40L, 40L);
+      new RaceBuffTask(this, this.specializationRules).runTaskTimer(this, 40L, 40L);
       this.getLogger().info("Esicraft-Plugin a été activé avec succès !");
    }
 

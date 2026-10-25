@@ -19,7 +19,14 @@ jobs:
           cache: maven
 
       - name: Compile and package
-        run: mvn -B -ntp clean package
+        shell: bash
+        run: |
+          set +e
+          mvn -B -ntp clean package 2>&1 | tee build.log
+          status=${PIPESTATUS[0]}
+          # Remonte les erreurs de compilation en annotations lisibles (visibles sans télécharger les logs).
+          grep -E '^\[ERROR\] .*\.java' build.log | sed 's/^\[ERROR\] //' | head -30 | while read -r line; do echo "::error::${line}"; done
+          exit $status
 
       - name: Upload plugin jar
         uses: actions/upload-artifact@v4
