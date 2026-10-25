@@ -327,6 +327,38 @@ Pour **750 pièces**, tu te fais passer pendant **5 minutes** pour un membre de 
 
 `/journal` résume les derniers grands faits (raids, conquêtes, traités, trahisons, Âges, événements). `/succes` liste tes **26 succès** (premier métier, conquérant, traître, maître espion, quatre saisons…) et le pourcentage de joueurs qui les ont. Un succès obtenu par moins de 10 % des joueurs est **rare** et annoncé dans le journal.
 
+### 🏦 Banque de guilde : prêts et coffre commun (`/banque`)
+
+Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
+
+- `/banque pret <guilde> <montant>` : un officier propose un prêt (de 100 à 20 000 pièces). L'autre guilde l'accepte avec `/banque accepter <guilde>` (ou `refuser`). Les pièces passent d'une banque à l'autre ; la guilde emprunteuse doit rendre le montant **+ 10 % d'intérêts** sous **5 jours**.
+- `/banque dettes` liste les prêts · `/banque rembourser <guilde> [montant]` rembourse (en plusieurs fois possible) · `/banque pardonner <guilde>` efface une dette.
+- `/banque coffre <guilde>` ouvre un **coffre commun** de 54 cases partagé par les deux guildes (accessible tant qu'un traité les lie).
+- **Une dette impayée pèse sur les territoires** : dès l'échéance dépassée, la guilde ne peut plus revendiquer de chunk, et **un chunk lui est saisi toutes les 24 h** (jamais celui du Nexus, jamais un chunk qui couperait le territoire). Chaque chunk saisi efface 300 pièces de dette.
+
+### ❤ Réputation (`/merci <joueur>`)
+
+Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier la même personne **une fois par jour**. Les points s'affichent dans le **tab** (❤), sur le **profil du site** et dans le classement « Les plus honorables » de la page Joueurs. `/merci` seul montre ta réputation et le top 3.
+
+### 🎓 Parrainage (`/parrain <joueur>`)
+
+Un joueur avancé (métier choisi, en guilde, 5 h de jeu) peut guider une **recrue** (arrivée depuis moins de 14 jours, 5 recrues au plus). La recrue accepte avec `/parrain accepter`. Le parrain est récompensé quand elle atteint des jalons : **premier métier** (+200 pièces, +50 pour la recrue) et **premier territoire** de sa guilde (+300, +100 pour la recrue). `/parrain` montre l'avancement.
+
+### ⛓ Rançon
+
+Un coup qui devrait **tuer** un joueur d'une autre guilde le **capture** à la place : il est immobilisé et invulnérable pendant 90 secondes. Son ravisseur choisit :
+
+- `/rancon prix <montant>` fixe la rançon (100 à 2 000 pièces ; par défaut 15 % de la fortune du captif) ;
+- le captif paie avec `/rancon payer` : 30 % pour le ravisseur, 70 % pour la banque de sa guilde ;
+- `/rancon liberer` le libère gratuitement, `/rancon executer` le tue (prime de mort habituelle).
+
+Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mourir. Après une libération, il ne peut pas être recapturé pendant 10 minutes.
+
+### ⚖ Équilibre : revanche et rattrapage
+
+- **Revanche** : la guilde qui perd un raid obtient **24 h de hordes à -50 %** contre son vainqueur.
+- **Rattrapage** : les guildes **sous la médiane** de la saison touchent jusqu'à **+25 %** sur les primes de monstres (4 guildes au moins). Le bonus diminue à mesure qu'elles rattrapent et disparaît à la médiane.
+
 ### Le jeu en anglais
 
 `/english` traduit le jeu **pour toi seul** : messages, barre d'action, menus, tableau de bord et livre `/guide` (réponse `/francais` pour revenir). Le choix est mémorisé. Les noms de guildes et de joueurs ne sont pas traduits. Pas encore traduits : la barre de boss des événements, le tchat, les entrées du journal de guerre et le site web.
@@ -344,8 +376,10 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à 
 | Journal | Le journal de guerre complet, filtrable par catégorie |
 | Diplomatie | Réseau des alliances, pactes, vassalités et rivalités, carte des rivalités |
 | Musée | Trophées des guildes, tous les succès avec leur rareté, derniers débloqués |
-| Âges | Frise : quand chaque guilde a franchi chaque Âge |
+| Âges | Frise sur un vrai axe de temps (guildes masquables une à une) et prérequis du prochain Âge de chaque guilde |
 | Guide | Toutes les règles, avec une recherche |
+
+Le logo du serveur s'affiche dans l'en-tête. Le site existe aussi **en anglais** : bouton **EN** / **FR** en haut à droite, ou `?lang=en` à la fin de l'adresse (le choix est retenu par le navigateur). Il réutilise le dictionnaire de `/english` (`lang/en.tsv`). Les profils affichent la **réputation** ❤.
 
 Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
 
@@ -381,6 +415,10 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/classement` · `/histoire` | Classement de la saison · grands moments |
 | `/hud` | Afficher ou masquer le tableau de bord |
 | `/english` · `/francais` | Passer le jeu en anglais (menus, messages, tableau de bord, livre) · revenir au français |
+| `/banque` | Prêts entre guildes, dettes, coffre commun |
+| `/merci <joueur>` | Offrir un point d'honneur (une fois par jour et par personne) |
+| `/parrain <joueur>` | Parrainer une recrue (`accepter` / `refuser` pour répondre) |
+| `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
 | `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
 
 ---

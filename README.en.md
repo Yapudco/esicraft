@@ -330,6 +330,38 @@ For **750 coins** you pose for **5 minutes** as a member of that guild: their na
 
 `/journal` sums up the latest big events (raids, conquests, treaties, betrayals, Ages, events). `/succes` lists your **26 achievements** (first profession, conqueror, traitor, master spy, four seasons…) and the share of players who have them. An achievement held by fewer than 10 % of players is **rare** and announced in the journal.
 
+### 🏦 Guild bank: loans and shared chest (`/banque`)
+
+Between two guilds **bound by a treaty** (alliance, pact or vassalage):
+
+- `/banque pret <guild> <amount>`: an officer offers a loan (100 to 20,000 coins). The other guild accepts with `/banque accepter <guild>` (or `refuser`). The coins move from one bank to the other; the borrowing guild must give back the amount **+ 10% interest** within **5 days**.
+- `/banque dettes` lists loans · `/banque rembourser <guild> [amount]` repays (in several payments if needed) · `/banque pardonner <guild>` forgives a debt.
+- `/banque coffre <guild>` opens a 54-slot **shared chest** used by both guilds (available as long as a treaty binds them).
+- **An unpaid debt weighs on the land**: once the deadline has passed, the guild can no longer claim chunks, and **one chunk is seized every 24 h** (never the Nexus chunk, never one that would split the territory). Each seized chunk wipes 300 coins of debt.
+
+### ❤ Reputation (`/merci <player>`)
+
+Thank a helpful player: they gain **1 honor point**. You can thank the same person **once a day**. Points show in the **tab list** (❤), on the **website profile** and in the "Most honorable" ranking on the Players page. `/merci` alone shows your reputation and the top 3.
+
+### 🎓 Mentoring (`/parrain <player>`)
+
+An advanced player (profession chosen, in a guild, 5 h played) can guide a **recruit** (joined less than 14 days ago, 5 recruits at most). The recruit accepts with `/parrain accepter`. The mentor is rewarded when the recruit reaches milestones: **first profession** (+200 coins, +50 for the recruit) and **first territory** of their guild (+300, +100 for the recruit). `/parrain` shows progress.
+
+### ⛓ Ransom
+
+A blow that would **kill** a player from another guild **captures** them instead: they are immobilized and invulnerable for 90 seconds. Their captor chooses:
+
+- `/rancon prix <amount>` sets the ransom (100 to 2,000 coins; by default 15% of the captive's fortune);
+- the captive pays with `/rancon payer`: 30% to the captor, 70% to their guild's bank;
+- `/rancon liberer` frees them for nothing, `/rancon executer` kills them (usual kill bounty).
+
+With no decision, they are executed. Logging out while captive counts as dying. After release, they can't be captured again for 10 minutes.
+
+### ⚖ Balance: revenge and catch-up
+
+- **Revenge**: the guild that loses a raid gets **24 h of hordes at -50%** against its victor.
+- **Catch-up**: guilds **below the season median** earn up to **+25%** on monster bounties (at least 4 guilds). The bonus shrinks as they catch up and vanishes at the median.
+
 ### Playing in English
 
 `/english` translates the game **for you only**: messages, action bar, menus, dashboard and the `/guide` book (`/francais` goes back). Your choice is remembered. Guild and player names are not translated. Not translated yet: the event boss bar, chat, the war journal entries and the website.
@@ -347,7 +379,7 @@ The server has a public website: **`http://<server-address>/`**, which updates i
 | Journal | The full war journal, filterable by category |
 | Diplomacy (*Diplomatie*) | Network of alliances, pacts, vassalages and rivalries, rivalry heat map |
 | Museum (*Musée*) | Guild trophies, every achievement with its rarity, latest unlocks |
-| Ages (*Âges*) | Timeline: when each guild reached each Age |
+| Ages (*Âges*) | Timeline on a real time axis (guilds can be hidden one by one) and each guild's requirements for the next Age |
 | Guide | All the rules, with a search box |
 
 Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
@@ -384,6 +416,10 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/classement` · `/histoire` | Season ranking · big moments |
 | `/english` · `/francais` | Switch the game to English (menus, messages, dashboard, rule book) · back to French |
 | `/hud` | Show or hide the dashboard |
+| `/banque` | Loans between guilds, debts, shared chest |
+| `/merci <player>` | Give an honor point (once a day per person) |
+| `/parrain <player>` | Mentor a recruit (`accepter` / `refuser` to answer) |
+| `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |
 | `/hub` | Go back to the hub (blocked during PvP combat) |
 
 ---

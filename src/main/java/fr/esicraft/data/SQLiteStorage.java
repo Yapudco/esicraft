@@ -678,7 +678,7 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM raid_cooldowns;");
             statement.executeUpdate("DELETE FROM guild_stats;");
             statement.executeUpdate("DELETE FROM history;");
-            for (String table : new String[]{"journal", "raid_log", "pvp_log", "guild_history", "age_log", "guild_contract"}) {
+            for (String table : new String[]{"journal", "raid_log", "pvp_log", "pvp_events", "rivalry_reset", "guild_history", "age_log", "guild_contract", "revenge", "loans", "shared_chests", "mentoring"}) {
                try {
                   statement.executeUpdate("DELETE FROM " + table + ";");
                } catch (SQLException ignored) {

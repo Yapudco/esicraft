@@ -125,6 +125,23 @@ commands:
     aliases: [traites, treaty]
     usage: /traite [liste]
 
+  merci:
+    description: Remercier un joueur (+1 point d'honneur, une fois par jour et par personne)
+    aliases: [thanks, honneur]
+    usage: /merci [joueur]
+  parrain:
+    description: Parrainer une recrue ou répondre à une proposition de parrainage
+    aliases: [mentor, parrainage]
+    usage: /parrain <joueur|accepter|refuser>
+  rancon:
+    description: Gérer un prisonnier capturé en combat (rançon, libération, exécution)
+    aliases: [ransom]
+    usage: /rancon [payer|prix <montant>|liberer|executer]
+  banque:
+    description: Banque de guilde (prêts entre guildes, dettes, coffre commun)
+    aliases: [bank, pret]
+    usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
+
 permissions:
   esicraft.user:
     description: Permission de base pour utiliser les fonctionnalités de jeu

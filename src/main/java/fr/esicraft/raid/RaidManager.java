@@ -216,6 +216,7 @@ public class RaidManager implements Listener {
                   price *= 0.5;
                }
 
+               price *= this.plugin.getBalance().raidPriceFactor(attackerGuild, targetGuild);
                if (attackerGuild == null) {
                   price = 0.0;
                }
@@ -435,6 +436,8 @@ public class RaidManager implements Listener {
                   if (isHegemony) {
                      totalPrice *= 0.5;
                   }
+
+                  totalPrice *= this.plugin.getBalance().raidPriceFactor(attackerGuild, targetGuild);
 
                   if (attackerGuild.getBankBalance() < totalPrice) {
                      if (buyer != null) {
@@ -705,6 +708,7 @@ public class RaidManager implements Listener {
                            RaidManager.this.finishRaid(raid, true);
                         }
                      } else {
+                        RaidManager.this.plugin.getBalance().recordRaidLoss(targetGuild, RaidManager.this.plugin.getGuildManager().getGuildById(raid.getAttackerGuildId()));
                         RaidManager.this.finishRaid(raid, false);
                      }
                   }

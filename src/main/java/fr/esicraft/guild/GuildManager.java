@@ -471,6 +471,10 @@ public class GuildManager {
          if (existing != null) {
             ChatUtil.sendMessage(player, "&cCe chunk est déjà revendiqué par la guilde &e" + existing.getName() + " &c!");
             return false;
+         } else if (this.plugin.getLoans().hasOverdue(guild.getId())) {
+            ChatUtil.sendMessage(player, "&c❌ Votre guilde a une dette impayée : plus aucune revendication tant qu'elle n'est pas remboursée (&e/banque dettes&c).");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            return false;
          } else if (!guild.getClaimedChunks().isEmpty() && !this.isAdjacentToGuildClaims(guild, chunkKey)) {
             ChatUtil.sendMessage(
                player, "&c❌ Territoire non contigu : Vos claims doivent obligatoirement être collés (adjacents) à un chunk déjà possédé par votre guilde !"
@@ -589,6 +593,47 @@ public class GuildManager {
 
          return seen.size() == remaining.size();
       }
+   }
+
+   /**
+    * Saisie d'un chunk pour dette impayée : retire un chunk qui n'abrite pas le Nexus et dont la perte ne coupe pas le territoire
+    * (de préférence en périphérie). Renvoie le chunk retiré, ou null si aucun ne peut l'être.
+    */
+   public ChunkKey seizeOneChunk(Guild guild) {
+      if (guild == null || guild.getClaimedChunks().size() <= 1) {
+         return null;
+      }
+
+      ChunkKey nexusChunk = guild.hasNexus() && guild.getNexus().getLocation() != null ? ChunkKey.from(guild.getNexus().getLocation().getChunk()) : null;
+      ChunkKey best = null;
+      int bestNeighbors = Integer.MAX_VALUE;
+      for (ChunkKey ck : guild.getClaimedChunks()) {
+         if (ck.equals(nexusChunk) || !this.remainsConnectedWithout(guild, ck)) {
+            continue;
+         }
+
+         int neighbors = 0;
+         for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+               if ((dx != 0 || dz != 0) && guild.isClaimed(new ChunkKey(ck.getWorldName(), ck.getX() + dx, ck.getZ() + dz))) {
+                  neighbors++;
+               }
+            }
+         }
+
+         if (neighbors < bestNeighbors) {
+            bestNeighbors = neighbors;
+            best = ck;
+         }
+      }
+
+      if (best != null) {
+         guild.removeClaim(best);
+         this.chunkClaims.remove(best);
+         this.plugin.getDataManager().saveGuild(guild);
+      }
+
+      return best;
    }
 
    public boolean unclaimChunk(Guild guild, Player player) {
@@ -1037,9 +1082,9 @@ public class GuildManager {
       if (player != null && player.isOnline() && this.plugin.getDisguiseManager().get(player.getUniqueId()) == null) {
          Guild guild = this.getGuildByPlayer(player.getUniqueId());
          if (guild != null) {
-            player.playerListName(ChatUtil.component("&8[&6" + guild.getTag() + "&8] &f" + player.getName()));
+            player.playerListName(ChatUtil.component("&8[&6" + guild.getTag() + "&8] &f" + player.getName() + this.plugin.getReputation().tabSuffix(player.getUniqueId())));
          } else {
-            player.playerListName(ChatUtil.component("&8[&7Sans Guilde&8] &f" + player.getName()));
+            player.playerListName(ChatUtil.component("&8[&7Sans Guilde&8] &f" + player.getName() + this.plugin.getReputation().tabSuffix(player.getUniqueId())));
          }
       }
    }

@@ -674,30 +674,32 @@ final class ExtraPages {
    // ------------------------------------------------------------------ frise des Âges
 
    static String ages(WebSnapshot s, WebExtra x) {
-      StringBuilder b = new StringBuilder(hero("⏳ Frise des Âges", "La course aux Âges : quand chaque guilde a franchi chaque étape, de l'Âge Rustique à la Suprématie."));
-      return b.append(agesTimeline(s, x.ages(), null)).toString();
+      StringBuilder b = new StringBuilder(hero("⏳ Frise des Âges", "La course aux Âges sur un vrai axe de temps : à quel moment chaque guilde a franchi chaque Âge, et ce qu'il lui manque pour le suivant."));
+      return b.append(agesTimeline(s, x, null)).toString();
    }
 
    private static final String[] AGE_SHORT = {"Rustique", "Métallurgie", "Alchimie", "Guerre Totale", "Mythique", "Suprématie"};
+   private static final long[] TICK_STEPS = {3600000L, 7200000L, 21600000L, 43200000L, 86400000L, 172800000L, 604800000L, 1209600000L, 2592000000L, 7776000000L};
 
    /**
-    * Frise des Âges : une colonne par Âge (1 à 6), une ligne par guilde. Chaque Âge atteint porte sa date ; les Âges non
-    * atteints restent vides. Le premier à franchir chaque Âge est marqué d'une étoile.
+    * Frise des Âges : courbe en escalier par guilde sur un axe de temps proportionnel (abscisse = date, ordonnée = Âge).
+    * Les guildes se masquent ou s'affichent une à une (script), et chaque guilde a un menu déroulant listant les
+    * prérequis du prochain Âge, déposés ou non.
     */
-   static String agesTimeline(WebSnapshot s, List<Chronicle.AgeMark> marks, String onlyGuild) {
-      Map<String, Map<Integer, Long>> byGuild = new LinkedHashMap<>();
+   static String agesTimeline(WebSnapshot s, WebExtra x, String onlyGuild) {
+      Map<String, java.util.TreeMap<Integer, Long>> byGuild = new LinkedHashMap<>();
       for (WebSnapshot.GuildView g : s.guilds()) {
          if (onlyGuild == null || g.id().equals(onlyGuild)) {
-            byGuild.put(g.id(), new HashMap<>());
+            byGuild.put(g.id(), new java.util.TreeMap<>());
          }
       }
 
-      Map<Integer, Long> firstAt = new HashMap<>();
-      for (Chronicle.AgeMark m : marks) {
-         Map<Integer, Long> reached = byGuild.get(m.guildId());
+      long min = Long.MAX_VALUE;
+      for (Chronicle.AgeMark m : x.ages()) {
+         java.util.TreeMap<Integer, Long> reached = byGuild.get(m.guildId());
          if (reached != null && m.age() >= 1 && m.age() <= 6) {
             reached.merge(m.age(), m.ts(), Math::min);
-            firstAt.merge(m.age(), m.ts(), Math::min);
+            min = Math.min(min, m.ts());
          }
       }
 
@@ -706,75 +708,150 @@ final class ExtraPages {
          return empty("Aucun passage d'Âge enregistré pour le moment.");
       }
 
+      long now = Math.max(s.generatedAt(), min + 3600000L);
       List<String> ids = new ArrayList<>(byGuild.keySet());
       ids.sort((a, c) -> {
          int byAge = Integer.compare(s.guild(c).ageLevel(), s.guild(a).ageLevel());
-         return byAge != 0 ? byAge : Long.compare(byGuild.get(a).values().stream().max(Long::compare).orElse(0L), byGuild.get(c).values().stream().max(Long::compare).orElse(0L));
+         return byAge != 0 ? byAge : s.guild(a).name().compareToIgnoreCase(s.guild(c).name());
       });
-      if (ids.size() > 14) {
-         ids = ids.subList(0, 14);
+      if (ids.size() > 30) {
+         ids = ids.subList(0, 30);
       }
 
-      int w = 780;
-      int left = 150;
-      int right = 20;
-      int head = 52;
-      int rowH = 62;
-      int h = head + ids.size() * rowH + 8;
-      double colW = (w - left - right) / 6.0;
+      int w = 840;
+      int left = 112;
+      int right = 28;
+      int top = 20;
+      int rowH = 46;
+      int bottom = 44;
+      int h = top + 5 * rowH + 14 + bottom;
+      double pw = w - left - right - 24;
+      double x0 = left + 12;
+      long span = now - min;
+      long step = TICK_STEPS[TICK_STEPS.length - 1];
+      for (long candidate : TICK_STEPS) {
+         if (span / candidate <= 7L) {
+            step = candidate;
+            break;
+         }
+      }
+
       StringBuilder svg = new StringBuilder("<div class=\"card scroll\"><svg class=\"chart frise\" viewBox=\"0 0 " + w + " " + h + "\" role=\"img\" aria-label=\"Frise des Âges\">");
       for (int a = 1; a <= 6; a++) {
-         double cx = left + colW * (a - 0.5);
-         svg.append("<rect x=\"").append(fmt(left + colW * (a - 1) + 3)).append("\" y=\"4\" width=\"").append(fmt(colW - 6)).append("\" height=\"").append(h - 8)
-            .append("\" rx=\"10\" fill=\"var(--card2)\" fill-opacity=\"").append(a % 2 == 0 ? ".5" : ".25").append("\"/>")
-            .append("<text x=\"").append(fmt(cx)).append("\" y=\"24\" text-anchor=\"middle\" class=\"lbl\">Âge ").append(a).append("</text>")
-            .append("<text x=\"").append(fmt(cx)).append("\" y=\"40\" text-anchor=\"middle\">").append(AGE_SHORT[a - 1]).append("</text>");
+         double y = top + (6 - a) * rowH + 14;
+         svg.append("<line class=\"gl\" x1=\"").append(left).append("\" x2=\"").append(w - right).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y)).append("\"/>")
+            .append("<text x=\"").append(left - 10).append("\" y=\"").append(fmt(y - 2)).append("\" text-anchor=\"end\" class=\"lbl\">Âge ").append(a).append("</text>")
+            .append("<text x=\"").append(left - 10).append("\" y=\"").append(fmt(y + 11)).append("\" text-anchor=\"end\">").append(AGE_SHORT[a - 1]).append("</text>");
       }
 
-      int row = 0;
+      long offsetMs = ZONE.getRules().getOffset(Instant.ofEpochMilli(min)).getTotalSeconds() * 1000L;
+      long firstTick = ((min + offsetMs + step - 1) / step) * step - offsetMs;
+      DateTimeFormatter tickFmt = step < 86400000L ? DAY_TIME : DAY;
+      double axisY = top + 5 * rowH + 14;
+      for (long t = firstTick; t <= now; t += step) {
+         double tx = x0 + pw * (t - min) / (double)(now - min);
+         svg.append("<line class=\"gl\" x1=\"").append(fmt(tx)).append("\" x2=\"").append(fmt(tx)).append("\" y1=\"").append(top).append("\" y2=\"").append(fmt(axisY + 5)).append("\" stroke-dasharray=\"2 4\"/>")
+            .append("<text x=\"").append(fmt(tx)).append("\" y=\"").append(fmt(axisY + 20)).append("\" text-anchor=\"middle\">").append(tickFmt.format(Instant.ofEpochMilli(t))).append("</text>");
+      }
+
+      double nowX = x0 + pw;
+      svg.append("<line x1=\"").append(fmt(nowX)).append("\" x2=\"").append(fmt(nowX)).append("\" y1=\"").append(top).append("\" y2=\"").append(fmt(axisY + 5))
+         .append("\" stroke=\"var(--acc)\" stroke-width=\"1.5\"/><text x=\"").append(fmt(nowX)).append("\" y=\"").append(fmt(axisY + 36)).append("\" text-anchor=\"end\" class=\"lbl\">maintenant</text>");
+
+      int gi = 0;
       for (String id : ids) {
          WebSnapshot.GuildView g = s.guild(id);
-         Map<Integer, Long> reached = byGuild.get(id);
-         double y = head + row++ * rowH + 22;
+         java.util.TreeMap<Integer, Long> reached = byGuild.get(id);
          String c = color(hue(id));
-         svg.append("<a href=\"/guilde/").append(esc(id)).append("\"><text x=\"").append(left - 14).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"end\" class=\"lbl\">")
-            .append(esc(g.name())).append("</text></a>");
-         int top = reached.keySet().stream().max(Integer::compare).orElse(1);
-         // Trait plein entre les Âges franchis, pointillé vers le suivant.
-         svg.append("<line x1=\"").append(fmt(left + colW * 0.5)).append("\" x2=\"").append(fmt(left + colW * (top - 0.5))).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y))
-            .append("\" stroke=\"").append(c).append("\" stroke-width=\"3\" stroke-opacity=\".6\"/>");
-         if (top < 6) {
-            svg.append("<line x1=\"").append(fmt(left + colW * (top - 0.5))).append("\" x2=\"").append(fmt(left + colW * (top + 0.5))).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y))
-               .append("\" stroke=\"").append(c).append("\" stroke-width=\"2\" stroke-opacity=\".35\" stroke-dasharray=\"3 5\"/>");
+         double dy = ((gi++ % 7) - 3) * 1.6;
+         List<Map.Entry<Integer, Long>> pts = new ArrayList<>(reached.entrySet());
+         pts.sort(Map.Entry.comparingByValue());
+         StringBuilder d = new StringBuilder();
+         double lastY = 0;
+         for (int i = 0; i < pts.size(); i++) {
+            double px = x0 + pw * (pts.get(i).getValue() - min) / (double)(now - min);
+            double py = top + (6 - pts.get(i).getKey()) * rowH + 14 + dy;
+            d.append(i == 0 ? "M" : "H").append(fmt(px)).append(i == 0 ? " " : " V").append(fmt(py));
+            lastY = py;
          }
 
-         for (int a = 1; a <= 6; a++) {
-            double cx = left + colW * (a - 0.5);
-            Long ts = reached.get(a);
-            if (ts == null) {
-               svg.append("<circle cx=\"").append(fmt(cx)).append("\" cy=\"").append(fmt(y)).append("\" r=\"9\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"2\"><title>")
-                  .append(esc(g.name())).append(" : Âge ").append(a).append(" pas encore atteint</title></circle>");
-               continue;
-            }
-
-            boolean current = a == top;
-            boolean first = ts.equals(firstAt.get(a)) && byGuild.size() > 1;
-            Long prev = reached.get(a - 1);
-            String delay = prev == null ? "" : " (" + fr.esicraft.treaty.TreatyManager.formatDuration(ts - prev) + " après l'Âge " + (a - 1) + ")";
-            svg.append("<circle cx=\"").append(fmt(cx)).append("\" cy=\"").append(fmt(y)).append("\" r=\"").append(current ? 13 : 11).append("\" fill=\"").append(c)
-               .append("\" stroke=\"").append(current ? "var(--tx)" : "var(--bg)").append("\" stroke-width=\"2\"><title>").append(esc(g.name())).append(" : Âge ").append(a).append(" (")
-               .append(AGE_SHORT[a - 1]).append(") le ").append(DAY_TIME.format(Instant.ofEpochMilli(ts))).append(delay).append(first ? " — premier à l'atteindre" : "").append("</title></circle>")
-               .append("<text x=\"").append(fmt(cx)).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"middle\" class=\"num\">").append(a).append("</text>")
-               .append("<text x=\"").append(fmt(cx)).append("\" y=\"").append(fmt(y + 27)).append("\" text-anchor=\"middle\">").append(DAY_TIME.format(Instant.ofEpochMilli(ts))).append("</text>");
-            if (first) {
-               svg.append("<text x=\"").append(fmt(cx + 20)).append("\" y=\"").append(fmt(y + 4)).append("\" class=\"lbl\" style=\"fill:#fbbf24\">★</text>");
-            }
+         d.append(" H").append(fmt(nowX));
+         svg.append("<g class=\"fg\" data-gid=\"").append(esc(id)).append("\"><path d=\"").append(d).append("\" fill=\"none\" stroke=\"").append(c)
+            .append("\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-opacity=\".85\"/>");
+         int top1 = reached.lastKey();
+         for (Map.Entry<Integer, Long> e : pts) {
+            double px = x0 + pw * (e.getValue() - min) / (double)(now - min);
+            double py = top + (6 - e.getKey()) * rowH + 14 + dy;
+            Long prev = reached.get(e.getKey() - 1);
+            String delay = prev == null ? "" : " (" + fr.esicraft.treaty.TreatyManager.formatDuration(e.getValue() - prev) + " après l'Âge " + (e.getKey() - 1) + ")";
+            svg.append("<circle cx=\"").append(fmt(px)).append("\" cy=\"").append(fmt(py)).append("\" r=\"").append(e.getKey() == top1 ? 7 : 5).append("\" fill=\"").append(c)
+               .append("\" stroke=\"").append(e.getKey() == top1 ? "var(--tx)" : "var(--bg)").append("\" stroke-width=\"2\"><title>").append(esc(g.name())).append(" : Âge ").append(e.getKey())
+               .append(" (").append(AGE_SHORT[e.getKey() - 1]).append(") le ").append(DAY_TIME.format(Instant.ofEpochMilli(e.getValue()))).append(esc(delay)).append("</title></circle>");
          }
+
+         svg.append("</g>");
       }
 
-      svg.append("</svg></div><p class=\"mut\" style=\"font-size:.8rem;margin:8px 0 0\">Chaque ligne est une guilde, chaque colonne un Âge. Le disque plein porte la date du passage ; ")
-         .append("le disque cerclé est l'Âge actuel ; ★ marque la première guilde à l'avoir atteint ; un cercle vide n'est pas encore atteint. Survolez un disque pour le délai depuis l'Âge précédent.</p>");
-      return svg.toString();
+      svg.append("</svg></div>");
+      StringBuilder b = new StringBuilder();
+      if (onlyGuild == null && ids.size() > 1) {
+         b.append("<div class=\"legend\" style=\"margin:0 0 10px\"><button type=\"button\" class=\"chip\" data-all=\"hide\">Tout masquer</button><button type=\"button\" class=\"chip\" data-all=\"show\">Tout afficher</button>");
+         for (String id : ids) {
+            b.append("<button type=\"button\" class=\"chip gk on\" data-gid=\"").append(esc(id)).append("\"><i class=\"sw\" style=\"background:").append(color(hue(id))).append("\"></i>")
+               .append(esc(s.guild(id).name())).append("</button>");
+         }
+
+         b.append("</div>");
+      }
+
+      b.append(svg).append("<p class=\"mut\" style=\"font-size:.8rem;margin:8px 0 0\">Abscisse : le temps réel (les écarts sont proportionnels). Ordonnée : l'Âge atteint. Chaque marche est un passage d'Âge ; le gros point est l'Âge actuel. Survolez un point pour sa date et le délai depuis l'Âge précédent.</p>");
+      b.append("<h2>📋 Prérequis du prochain Âge</h2><div class=\"fdl\">");
+      for (String id : ids) {
+         WebSnapshot.GuildView g = s.guild(id);
+         WebExtra.AgeProgress prog = x.ageProgress().get(id);
+         java.util.TreeMap<Integer, Long> reached = byGuild.get(id);
+         int pct = 100;
+         if (prog != null && !prog.reqs().isEmpty()) {
+            double sum = 0;
+            for (WebExtra.ReqView r : prog.reqs()) {
+               sum += r.required() <= 0 ? 1.0 : Math.min(1.0, r.donated() / (double)r.required());
+            }
+
+            pct = (int)Math.round(100.0 * sum / prog.reqs().size());
+         }
+
+         b.append("<details class=\"fd card\" data-gid=\"").append(esc(id)).append("\"><summary><i class=\"sw\" style=\"background:").append(color(hue(id))).append("\"></i><b>")
+            .append(esc(g.name())).append("</b><span class=\"mut\"> Âge ").append(g.ageLevel()).append(" · ").append(AGE_SHORT[Math.max(0, Math.min(5, g.ageLevel() - 1))]).append("</span>");
+         if (prog != null) {
+            b.append("<span class=\"chip ").append(pct >= 100 ? "ok" : "acc").append("\">→ Âge ").append(prog.nextLevel()).append(" : ").append(pct).append(" %</span>");
+         } else {
+            b.append("<span class=\"chip ok\">👑 Âge maximal</span>");
+         }
+
+         b.append("</summary><div class=\"fdb\">");
+         if (prog != null) {
+            b.append("<div class=\"s mut\">Pour atteindre l'Âge ").append(prog.nextLevel()).append(" (").append(AGE_SHORT[prog.nextLevel() - 1]).append("), la guilde doit déposer (<b>/age</b>) :</div><div class=\"reqs\">");
+            for (WebExtra.ReqView r : prog.reqs()) {
+               boolean done = r.donated() >= r.required();
+               int rp = r.required() <= 0 ? 100 : (int)Math.min(100L, Math.round(100.0 * r.donated() / r.required()));
+               b.append("<div class=\"req ").append(done ? "ok" : "ko").append("\"><span class=\"ck\">").append(done ? "✔" : "✖").append("</span><span class=\"rn\">").append(esc(r.item()))
+                  .append("</span><span class=\"rv\">").append(money(r.donated())).append(" / ").append(money(r.required())).append("</span><div class=\"bar\"><i style=\"width:").append(Math.max(2, rp)).append("%\"></i></div></div>");
+            }
+
+            b.append("</div><div class=\"s mut\" style=\"margin-top:6px\">Les quantités augmentent avec la taille de la guilde (").append(prog.members()).append(" membre(s) comptés).</div>");
+         } else {
+            b.append("<div class=\"s mut\">Cette guilde a atteint le dernier Âge.</div>");
+         }
+
+         b.append("<div class=\"chips\" style=\"margin-top:8px\">");
+         for (Map.Entry<Integer, Long> e : reached.entrySet()) {
+            b.append("<span class=\"chip\">Âge ").append(e.getKey()).append(" · ").append(DAY_TIME.format(Instant.ofEpochMilli(e.getValue()))).append("</span>");
+         }
+
+         b.append("</div></div></details>");
+      }
+
+      return b.append("</div>").toString();
    }
 
    // ------------------------------------------------------------------ fiche de guilde (blocs ajoutés)
@@ -798,7 +875,7 @@ final class ExtraPages {
       }
 
       b.append(guildCurves(g, x));
-      b.append("<h2>⏳ Âges franchis</h2>").append(agesTimeline(s, x.ages(), g.id()));
+      b.append("<h2>⏳ Âges franchis</h2>").append(agesTimeline(s, x, g.id()));
       List<WebExtra.JournalView> mine = new ArrayList<>();
       for (WebExtra.JournalView e : x.journal()) {
          if (g.id().equals(e.guildA()) || g.id().equals(e.guildB())) {
@@ -829,7 +906,7 @@ final class ExtraPages {
       for (WebExtra.ProfileView p : x.profiles()) {
          b.append("<a class=\"person row\" href=\"").append(profileLink(p.name())).append("\">").append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
             .append(esc(p.name())).append("</div><div class=\"s\">").append(esc(p.race())).append(" · ").append(p.guildName() != null ? esc(p.guildName()) : "sans guilde")
-            .append("</div></div><span class=\"chip\">🏅 ").append(p.achievements().size()).append("</span></a>");
+            .append("</div></div>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + "</span>" : "").append("<span class=\"chip\">🏅 ").append(p.achievements().size()).append("</span></a>");
       }
 
       return b.append("</div>").toString();
@@ -845,8 +922,8 @@ final class ExtraPages {
          b.append("<span class=\"chip\">Sans guilde</span>");
       }
 
-      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section>");
-      b.append("<div class=\"grid\" style=\"margin-top:16px\">").append(stat("🏅", p.achievements().size() + " / " + x.achievements().size(), "Succès"));
+      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + " honneur</span>" : "").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section>");
+      b.append("<div class=\"grid\" style=\"margin-top:16px\">").append(stat("🏅", p.achievements().size() + " / " + x.achievements().size(), "Succès")).append(stat("❤", String.valueOf(p.reputation()), "Réputation"));
       if (p.coins() != null) {
          b.append(stat("💰", money(p.coins()), "Pièces"));
       }
@@ -997,6 +1074,14 @@ final class ExtraPages {
    static final String APP_JS = """
       (function () {
         'use strict';
+        try {
+          var storedLang = localStorage.getItem('lang');
+          if (storedLang === 'en' && !/[?&]lang=/.test(location.search)) { location.replace(location.pathname + '?lang=en' + location.hash); return; }
+        } catch (e) {}
+        document.addEventListener('click', function (ev) {
+          var a = ev.target.closest ? ev.target.closest('a[data-lang]') : null;
+          if (a) { try { localStorage.setItem('lang', a.getAttribute('data-lang')); } catch (e) {} }
+        });
         var filter = '';
         function applyFilter() {
           document.querySelectorAll('.fb').forEach(function (b) { b.classList.toggle('on', (b.getAttribute('data-f') || '') === filter); });
@@ -1022,6 +1107,32 @@ final class ExtraPages {
             var none = document.getElementById('none'); if (none) { none.hidden = shown > 0; }
           });
         }
+        var fr = { off: {}, open: {} };
+        function applyFr() {
+          document.querySelectorAll('.gk').forEach(function (b) { b.classList.toggle('on', !fr.off[b.getAttribute('data-gid')]); });
+          document.querySelectorAll('.fg, .fd').forEach(function (e) {
+            var id = e.getAttribute('data-gid');
+            e.style.display = fr.off[id] ? 'none' : '';
+            if (e.tagName === 'DETAILS') { e.open = !!fr.open[id]; }
+          });
+        }
+        document.addEventListener('click', function (ev) {
+          var t = ev.target.closest ? ev.target : null;
+          if (!t) { return; }
+          var gk = t.closest('.gk');
+          if (gk) { var id = gk.getAttribute('data-gid'); fr.off[id] = !fr.off[id]; applyFr(); return; }
+          var all = t.closest('[data-all]');
+          if (all) {
+            var hide = all.getAttribute('data-all') === 'hide';
+            document.querySelectorAll('.gk').forEach(function (b) { fr.off[b.getAttribute('data-gid')] = hide; });
+            applyFr();
+          }
+        });
+        document.addEventListener('toggle', function (ev) {
+          var d = ev.target;
+          if (d && d.classList && d.classList.contains('fd')) { fr.open[d.getAttribute('data-gid')] = d.open; }
+        }, true);
+        applyFr();
         var net = { z: 1, x: 0, y: 0, focus: '', off: {}, moved: false };
         function applyNet() {
           var g = document.getElementById('netg');
@@ -1095,7 +1206,7 @@ final class ExtraPages {
         var stamp = document.getElementById('stamp');
         function refresh() {
           if (document.hidden) { return; }
-          fetch(location.pathname, { cache: 'no-store', credentials: 'omit' }).then(function (r) { return r.ok ? r.text() : null; }).then(function (html) {
+          fetch(location.pathname + location.search, { cache: 'no-store', credentials: 'omit' }).then(function (r) { return r.ok ? r.text() : null; }).then(function (html) {
             if (!html) { return; }
             var next = new DOMParser().parseFromString(html, 'text/html').querySelector('main');
             if (!next) { return; }
@@ -1104,6 +1215,7 @@ final class ExtraPages {
             window.scrollTo(0, y);
             applyFilter();
             applyNet();
+            applyFr();
             stamp = document.getElementById('stamp');
             if (stamp) { stamp.classList.add('flash'); setTimeout(function () { stamp && stamp.classList.remove('flash'); }, 900); }
           }).catch(function () {});

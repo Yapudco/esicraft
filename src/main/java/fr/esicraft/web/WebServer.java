@@ -47,6 +47,9 @@ public class WebServer {
 
    private final EsicraftPlugin plugin;
    private volatile Map<String, Page> pages = Map.of();
+   private volatile Map<String, Page> pagesEn = Map.of();
+   private volatile Page notFoundEn = new Page(404, "text/plain; charset=utf-8", "Not found".getBytes(StandardCharsets.UTF_8));
+   private static final byte[] LOGO = loadLogo();
    private volatile Page notFound = new Page(404, "text/plain; charset=utf-8", "Introuvable".getBytes(StandardCharsets.UTF_8));
    private final Map<String, long[]> hits = new ConcurrentHashMap<>();
    private volatile long lastErrorLog;
@@ -100,6 +103,14 @@ public class WebServer {
 
       long period = Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 15L)) * 20L;
       this.refreshTask = Bukkit.getScheduler().runTaskTimer(this.plugin, this::capture, 40L, period);
+   }
+
+   private static byte[] loadLogo() {
+      try (java.io.InputStream in = WebServer.class.getResourceAsStream("/web/logo.png")) {
+         return in != null ? in.readAllBytes() : new byte[0];
+      } catch (IOException e) {
+         return new byte[0];
+      }
    }
 
    private static void setIfAbsent(String key, String value) {
@@ -220,7 +231,7 @@ public class WebServer {
    /** Ce qui doit être lu sur le thread principal (raids, traités, diversité, saison naturelle). */
    private record ExtraCapture(List<WebExtra.RaidView> raids, List<WebExtra.EdgeView> treatyEdges, Map<String, Integer> diversity,
                                Map<String, List<WebExtra.TrophyView>> trophies, Map<String, List<UUID>> members, WebExtra.NatureView nature,
-                               Map<UUID, String[]> memberInfo) {
+                               Map<UUID, String[]> memberInfo, Map<String, WebExtra.AgeProgress> ageProgress) {
    }
 
    private ExtraCapture captureExtra(List<WebSnapshot.GuildView> guildViews, boolean showNexus) {
@@ -251,12 +262,25 @@ public class WebServer {
       Map<String, List<WebExtra.TrophyView>> trophies = new HashMap<>();
       Map<String, List<UUID>> members = new HashMap<>();
       Map<UUID, String[]> memberInfo = new HashMap<>();
+      Map<String, WebExtra.AgeProgress> ageProgress = new HashMap<>();
       var season = this.plugin.getSeasonManager();
       for (Guild g : this.plugin.getGuildManager().getAllGuilds()) {
          for (Treaty t : this.plugin.getTreatyManager().treatiesOf(g.getId())) {
             if (seen.add(t.getId())) {
                edges.add(new WebExtra.EdgeView(t.getAId(), t.getBId(), t.getType().name(), 1, 0, 0, t.getSuzerainId() == null ? "" : t.getSuzerainId()));
             }
+         }
+
+         fr.esicraft.age.AgeType nextAge = g.getCurrentAge().getNextAge();
+         if (nextAge != null) {
+            List<WebExtra.ReqView> reqs = new ArrayList<>();
+            for (Map.Entry<org.bukkit.Material, Integer> e : this.plugin.getAgeManager().getRequirementsForGuild(g, nextAge).entrySet()) {
+               String raw = e.getKey().name().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+               reqs.add(new WebExtra.ReqView(Character.toUpperCase(raw.charAt(0)) + raw.substring(1), Math.min(g.getDonatedAmount(e.getKey()), e.getValue()), e.getValue()));
+            }
+
+            reqs.sort(java.util.Comparator.comparing(WebExtra.ReqView::item));
+            ageProgress.put(g.getId(), new WebExtra.AgeProgress(nextAge.getLevel(), HtmlPages.plain(nextAge.getDisplayName()), reqs, g.getEffectiveMemberCount()));
          }
 
          int d = this.plugin.getSynergy().diversity(g);
@@ -300,7 +324,7 @@ public class WebServer {
          nature = new WebExtra.NatureView(now.getIcon(), now.getLabel(), ns.remainingDays(), List.of(now.getEffects()), ns.next().display());
       }
 
-      return new ExtraCapture(raids, edges, diversity, trophies, members, nature, memberInfo);
+      return new ExtraCapture(raids, edges, diversity, trophies, members, nature, memberInfo, ageProgress);
    }
 
    private static final java.util.regex.Pattern PLAYER_NAME = java.util.regex.Pattern.compile("[A-Za-z0-9_]{1,16}");
@@ -391,7 +415,7 @@ public class WebServer {
          achievements.of(uuid).entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(e -> owned.add(e.getKey().name()));
          profiles.add(new WebExtra.ProfileView(name.toLowerCase(java.util.Locale.ROOT), name, race, gv != null ? gv.id() : null, gv != null ? gv.name() : null, role,
             gv != null ? gv.age() : HtmlPages.plain(fr.esicraft.age.AgeType.RUSTIC.getDisplayName()), coins, visibleNames.contains(name.toLowerCase(java.util.Locale.ROOT)),
-            owned, achievements.statsOf(uuid)));
+            owned, achievements.statsOf(uuid), this.plugin.getReputation().get(uuid)));
       }
 
       List<WebExtra.AchievementView> catalog = new ArrayList<>();
@@ -427,7 +451,7 @@ public class WebServer {
          trophies.put(e.getKey(), List.copyOf(list));
       }
 
-      return new WebExtra(journal, c.raids(), edges, curves, ages, catalog, unlocks, trophies, profiles, c.nature(), c.diversity(), achievements.knownPlayers());
+      return new WebExtra(journal, c.raids(), edges, curves, ages, catalog, unlocks, trophies, profiles, c.nature(), c.diversity(), achievements.knownPlayers(), c.ageProgress());
    }
 
    /** Rend toutes les pages une fois pour toutes ; les requêtes ne font ensuite qu'une recherche dans une table. */
@@ -459,8 +483,44 @@ public class WebServer {
          map.put("/joueur/" + p.key(), html(200, HtmlPages.page(name, "joueurs", p.name(), ExtraPages.profile(s, p, x), s, live, raid)));
       }
 
-      this.notFound = html(404, HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s, 0, raid));
-      this.pages = Map.copyOf(map);
+      if (LOGO.length > 0) {
+         map.put("/assets/logo.png", new Page(200, "image/png", LOGO));
+      }
+
+      java.util.List<String> names = new java.util.ArrayList<>();
+      for (WebSnapshot.GuildView g : s.guilds()) {
+         names.add(HtmlPages.esc(g.name()));
+         names.add(HtmlPages.esc(g.tag()));
+      }
+
+      for (WebExtra.ProfileView p : x.profiles()) {
+         names.add(HtmlPages.esc(p.name()));
+      }
+
+      for (WebSnapshot.OnlineView o : s.online()) {
+         names.add(HtmlPages.esc(o.name()));
+      }
+
+      // Chaque page HTML existe en français (par défaut) et en anglais (?lang=en, dictionnaire de /english).
+      Map<String, Page> french = new HashMap<>();
+      Map<String, Page> english = new HashMap<>();
+      for (Map.Entry<String, Page> e : map.entrySet()) {
+         Page p = e.getValue();
+         if (p.type().equals(HTML)) {
+            String raw = new String(p.body(), StandardCharsets.UTF_8);
+            french.put(e.getKey(), html(p.status(), WebI18n.french(raw)));
+            english.put(e.getKey(), html(p.status(), WebI18n.english(raw, names)));
+         } else {
+            french.put(e.getKey(), p);
+            english.put(e.getKey(), p);
+         }
+      }
+
+      String missing = HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s, 0, raid);
+      this.notFound = html(404, WebI18n.french(missing));
+      this.notFoundEn = html(404, WebI18n.english(missing, names));
+      this.pagesEn = Map.copyOf(english);
+      this.pages = Map.copyOf(french);
    }
 
    private static Page html(int status, String body) {
@@ -523,12 +583,14 @@ public class WebServer {
             path = path.toLowerCase(java.util.Locale.ROOT);
          }
 
-         Page page = this.pages.get(path);
+         String query = ex.getRequestURI().getRawQuery();
+         boolean english = query != null && query.contains("lang=en");
+         Page page = (english ? this.pagesEn : this.pages).get(path);
          if (page != null && page.type().equals(JSON)) {
             ex.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
          }
 
-         this.send(ex, page != null ? page : this.notFound, method.equals("HEAD"));
+         this.send(ex, page != null ? page : english ? this.notFoundEn : this.notFound, method.equals("HEAD"));
       } catch (IOException e) {
          // client parti en cours de route : rien à faire
       } catch (RuntimeException e) {
@@ -551,7 +613,7 @@ public class WebServer {
       h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
       h.set("Cross-Origin-Opener-Policy", "same-origin");
       h.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-      h.set("Cache-Control", page.status() != 200 ? "no-store" : page.type().equals(JS) ? "public, max-age=300" : "public, max-age=10");
+      h.set("Cache-Control", page.status() != 200 ? "no-store" : page.type().equals(JS) ? "public, max-age=300" : page.type().startsWith("image/") ? "public, max-age=3600" : "public, max-age=10");
       if (head) {
          ex.sendResponseHeaders(page.status(), -1);
          return;

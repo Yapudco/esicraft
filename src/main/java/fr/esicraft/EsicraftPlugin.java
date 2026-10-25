@@ -49,6 +49,11 @@ import fr.esicraft.util.Lang;
 import fr.esicraft.life.AchievementManager;
 import fr.esicraft.life.Chronicle;
 import fr.esicraft.combat.CombatManager;
+import fr.esicraft.economy.BalanceManager;
+import fr.esicraft.economy.LoanManager;
+import fr.esicraft.social.MentorManager;
+import fr.esicraft.social.RansomManager;
+import fr.esicraft.social.ReputationManager;
 import fr.esicraft.life.DisguiseManager;
 import fr.esicraft.life.GuildContractManager;
 import fr.esicraft.life.GuildSynergy;
@@ -97,6 +102,11 @@ public final class EsicraftPlugin extends JavaPlugin {
    private HelpCallManager helpCalls;
    private DisguiseManager disguiseManager;
    private CombatManager combatManager;
+   private BalanceManager balance;
+   private LoanManager loans;
+   private ReputationManager reputation;
+   private MentorManager mentors;
+   private RansomManager ransom;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -128,6 +138,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.helpCalls = new HelpCallManager(this);
       this.disguiseManager = new DisguiseManager(this);
       this.combatManager = new CombatManager(this);
+      this.balance = new BalanceManager(this);
+      this.loans = new LoanManager(this);
+      this.reputation = new ReputationManager(this);
+      this.mentors = new MentorManager(this);
+      this.ransom = new RansomManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
@@ -138,6 +153,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.synergy.init();
       this.guildContracts.init();
       this.helpCalls.init();
+      this.balance.init();
+      this.loans.init();
+      this.reputation.init();
+      this.mentors.init();
+      this.ransom.start();
       this.disguiseManager.init();
       this.railManager.load();
       this.treatyManager.load();
@@ -153,6 +173,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.natureSeasons, this);
       pm.registerEvents(this.disguiseManager, this);
       pm.registerEvents(this.combatManager, this);
+      pm.registerEvents(this.ransom, this);
+      pm.registerEvents(this.loans, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -215,6 +237,10 @@ public final class EsicraftPlugin extends JavaPlugin {
          this.nexusManager.removeAllHolograms();
       }
 
+      if (this.loans != null) {
+         this.loans.shutdown();
+      }
+
       if (this.dataManager != null) {
          this.dataManager.close();
       }
@@ -223,6 +249,14 @@ public final class EsicraftPlugin extends JavaPlugin {
    }
 
    private void registerCommands() {
+      Objects.requireNonNull(this.getCommand("merci")).setExecutor(this.reputation);
+      Objects.requireNonNull(this.getCommand("merci")).setTabCompleter(this.reputation);
+      Objects.requireNonNull(this.getCommand("parrain")).setExecutor(this.mentors);
+      Objects.requireNonNull(this.getCommand("parrain")).setTabCompleter(this.mentors);
+      Objects.requireNonNull(this.getCommand("rancon")).setExecutor(this.ransom);
+      Objects.requireNonNull(this.getCommand("rancon")).setTabCompleter(this.ransom);
+      Objects.requireNonNull(this.getCommand("banque")).setExecutor(this.loans);
+      Objects.requireNonNull(this.getCommand("banque")).setTabCompleter(this.loans);
       Objects.requireNonNull(this.getCommand("esicraft")).setExecutor(new EsicraftCommand(this));
       RaceCommand raceCommand = new RaceCommand(this);
       Objects.requireNonNull(this.getCommand("race")).setExecutor(raceCommand);
@@ -297,6 +331,26 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public HelpCallManager getHelpCalls() {
       return this.helpCalls;
+   }
+
+   public BalanceManager getBalance() {
+      return this.balance;
+   }
+
+   public LoanManager getLoans() {
+      return this.loans;
+   }
+
+   public ReputationManager getReputation() {
+      return this.reputation;
+   }
+
+   public MentorManager getMentors() {
+      return this.mentors;
+   }
+
+   public RansomManager getRansom() {
+      return this.ransom;
    }
 
    public CombatManager getCombatManager() {
