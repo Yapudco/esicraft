@@ -13,9 +13,9 @@
     <description>Plugin de survie hardcore avec Guildes, Spécialisations, Races, Âges technologiques, Nexus et Hordes de monstres.</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <paper.version>1.20.4-R0.1-SNAPSHOT</paper.version>
+        <paper.version>26.2.build.112-stable</paper.version>
     </properties>
 
     <repositories>
