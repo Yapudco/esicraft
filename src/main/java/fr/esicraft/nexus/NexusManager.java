@@ -298,7 +298,6 @@ public class NexusManager {
       }
 
       this.holograms.clear();
-      this.nexusLocationIndex.clear();
 
       for (World world : Bukkit.getWorlds()) {
          for (ArmorStand as : world.getEntitiesByClass(ArmorStand.class)) {
@@ -308,6 +307,11 @@ public class NexusManager {
             }
          }
       }
+   }
+
+   public void clearIndex() {
+      this.nexusLocationIndex.clear();
+      this.activeNexusGuilds.clear();
    }
 
    private String getHealthBar(int current, int max) {
@@ -668,6 +672,13 @@ public class NexusManager {
                      Nexus nexus = guildx.getNexus();
                      Location loc = nexus.getLocation();
                      if (loc != null && loc.getWorld() != null && loc.getChunk().isLoaded()) {
+                        if (nexus.isAlive()) {
+                           ArmorStand holo = NexusManager.this.holograms.get(guildId);
+                           if (holo == null || !holo.isValid()) {
+                              NexusManager.this.updateHologram(guildx);
+                           }
+                        }
+
                         try {
                            loc.getWorld().spawnParticle(Particle.PORTAL, loc.clone().add(0.5, 0.8, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
                         } catch (Exception var23) {
