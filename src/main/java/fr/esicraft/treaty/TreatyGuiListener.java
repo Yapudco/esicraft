@@ -57,7 +57,11 @@ public class TreatyGuiListener implements Listener {
          Proposal p = holder.receivedSlots.get(slot - 27);
          error = right ? tm.refuse(guild, p, player) : tm.accept(guild, p, player);
       } else if (slot >= 36 && slot - 36 < holder.sentSlots.size()) {
-         tm.cancel(holder.sentSlots.get(slot - 36));
+         if (!guild.hasRoleAtLeast(player.getUniqueId(), fr.esicraft.guild.GuildRole.OFFICER)) {
+            error = "Réservé aux officiers et au chef de guilde.";
+         } else {
+            tm.cancel(holder.sentSlots.get(slot - 36));
+         }
       } else {
          return;
       }
