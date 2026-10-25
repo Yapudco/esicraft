@@ -372,7 +372,14 @@ final class ExtraPages {
       }
 
       long topScore = Math.max(1L, nodes.get(0).score());
-      StringBuilder svg = new StringBuilder("<svg class=\"net\" viewBox=\"0 0 440 430\" role=\"img\" aria-label=\"Réseau des guildes\">");
+      java.util.Map<String, Double> radii = new HashMap<>();
+      for (WebSnapshot.GuildView g : nodes) {
+         radii.put(g.id(), 15 + 11.0 * g.score() / topScore);
+      }
+
+      StringBuilder svg = new StringBuilder("<svg class=\"net\" viewBox=\"0 0 440 430\" role=\"img\" aria-label=\"Réseau des guildes\">"
+         + "<defs><marker id=\"arrv\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"#c084fc\"/></marker></defs>"
+         + "<g id=\"netg\">");
       int rivalries = 0;
       int treaties = 0;
       for (WebExtra.EdgeView e : x.edges()) {
@@ -394,26 +401,59 @@ final class ExtraPages {
             treaties++;
          }
 
-         svg.append("<line x1=\"").append(fmt(a[0])).append("\" y1=\"").append(fmt(a[1])).append("\" x2=\"").append(fmt(c[0])).append("\" y2=\"").append(fmt(c[1]))
-            .append("\" ").append(style).append("><title>").append(esc(edgeLabel(s, e))).append("</title></line>");
+         String marker = "";
+         double x1 = a[0];
+         double y1 = a[1];
+         double x2 = c[0];
+         double y2 = c[1];
+         if (e.kind().equals("VASSALAGE") && !e.suzerain().isEmpty()) {
+            // Flèche du vassal vers son suzerain (allégeance), arrêtée au bord du cercle du suzerain.
+            boolean aIsSuzerain = e.suzerain().equals(e.a());
+            double[] from = aIsSuzerain ? c : a;
+            double[] to = aIsSuzerain ? a : c;
+            double rTo = radii.getOrDefault(aIsSuzerain ? e.a() : e.b(), 18.0) + 4;
+            double dx = to[0] - from[0];
+            double dy = to[1] - from[1];
+            double len = Math.max(1.0, Math.hypot(dx, dy));
+            x1 = from[0];
+            y1 = from[1];
+            x2 = to[0] - dx / len * rTo;
+            y2 = to[1] - dy / len * rTo;
+            marker = " marker-end=\"url(#arrv)\"";
+         }
+
+         svg.append("<line class=\"edge\" data-k=\"").append(e.kind()).append("\" data-a=\"").append(esc(e.a())).append("\" data-b=\"").append(esc(e.b()))
+            .append("\" x1=\"").append(fmt(x1)).append("\" y1=\"").append(fmt(y1)).append("\" x2=\"").append(fmt(x2)).append("\" y2=\"").append(fmt(y2))
+            .append("\" ").append(style).append(marker).append("><title>").append(esc(edgeLabel(s, e))).append("</title></line>");
       }
 
       for (WebSnapshot.GuildView g : nodes) {
          double[] p = pos.get(g.id());
          double r = 15 + 11.0 * g.score() / topScore;
-         svg.append("<a href=\"/guilde/").append(esc(g.id())).append("\"><circle cx=\"").append(fmt(p[0])).append("\" cy=\"").append(fmt(p[1])).append("\" r=\"").append(fmt(r))
+         svg.append("<a class=\"node\" data-id=\"").append(esc(g.id())).append("\" href=\"/guilde/").append(esc(g.id())).append("\"><circle cx=\"").append(fmt(p[0])).append("\" cy=\"").append(fmt(p[1])).append("\" r=\"").append(fmt(r))
             .append("\" fill=\"").append(color(hue(g.id()))).append("\" stroke=\"var(--bg)\" stroke-width=\"3\"><title>").append(esc(g.name())).append("</title></circle>")
             .append("<text x=\"").append(fmt(p[0])).append("\" y=\"").append(fmt(p[1] + 4)).append("\" text-anchor=\"middle\" class=\"tag\">").append(esc(g.tag()))
             .append("</text><text x=\"").append(fmt(p[0])).append("\" y=\"").append(fmt(p[1] + r + 14)).append("\" text-anchor=\"middle\">").append(esc(g.name()))
             .append("</text></a>");
       }
 
-      svg.append("</svg>");
-      b.append("<div class=\"card\">").append(svg).append("<div class=\"legend\" style=\"justify-content:center\">")
-         .append("<span class=\"chip\"><i class=\"sw\" style=\"background:#34d399\"></i>Alliance</span>")
-         .append("<span class=\"chip\"><i class=\"sw\" style=\"background:#60a5fa\"></i>Pacte de non-agression</span>")
-         .append("<span class=\"chip\"><i class=\"sw\" style=\"background:#c084fc\"></i>Vassalité</span>")
-         .append("<span class=\"chip\"><i class=\"sw\" style=\"background:#f87171\"></i>Rivalité (épaisseur = intensité)</span></div></div>");
+      svg.append("</g></svg>");
+      StringBuilder focus = new StringBuilder("<select id=\"netfocus\" class=\"nsel\" aria-label=\"Guilde à mettre en avant\"><option value=\"\">Toutes les guildes</option>");
+      for (WebSnapshot.GuildView g : nodes) {
+         focus.append("<option value=\"").append(esc(g.id())).append("\">").append(esc(g.name())).append("</option>");
+      }
+
+      focus.append("</select>");
+      b.append("<div class=\"card\"><div class=\"nettools\">").append(focus)
+         .append("<span class=\"zb\"><button type=\"button\" class=\"chip\" data-z=\"out\" aria-label=\"Dézoomer\">−</button>")
+         .append("<button type=\"button\" class=\"chip\" data-z=\"in\" aria-label=\"Zoomer\">+</button>")
+         .append("<button type=\"button\" class=\"chip\" data-z=\"reset\">Recentrer</button></span></div>")
+         .append(svg).append("<div class=\"legend\" style=\"justify-content:center\">")
+         .append("<button type=\"button\" class=\"chip nk on\" data-nk=\"ALLIANCE\"><i class=\"sw\" style=\"background:#34d399\"></i>Alliance</button>")
+         .append("<button type=\"button\" class=\"chip nk on\" data-nk=\"PACT\"><i class=\"sw\" style=\"background:#60a5fa\"></i>Pacte de non-agression</button>")
+         .append("<button type=\"button\" class=\"chip nk on\" data-nk=\"VASSALAGE\"><i class=\"sw\" style=\"background:#c084fc\"></i>Vassalité (flèche : vassal → suzerain)</button>")
+         .append("<button type=\"button\" class=\"chip nk on\" data-nk=\"RIVALRY\"><i class=\"sw\" style=\"background:#f87171\"></i>Rivalité (épaisseur = intensité)</button></div>")
+         .append("<p class=\"mut\" style=\"text-align:center;font-size:.8rem;margin:8px 0 0\">Molette ou boutons pour zoomer, glisser pour déplacer. Cliquez un type pour le masquer ou l'afficher.</p></div>");
       if (treaties == 0 && rivalries == 0) {
          b.append("<p class=\"mut\" style=\"text-align:center\">Aucun traité ni rivalité pour le moment : le réseau se dessinera au fil des alliances et des raids.</p>");
       }
@@ -947,6 +987,73 @@ final class ExtraPages {
             var none = document.getElementById('none'); if (none) { none.hidden = shown > 0; }
           });
         }
+        var net = { z: 1, x: 0, y: 0, focus: '', off: {}, moved: false };
+        function applyNet() {
+          var g = document.getElementById('netg');
+          if (!g) { return; }
+          g.setAttribute('transform', 'translate(' + net.x + ' ' + net.y + ') scale(' + net.z + ')');
+          var sel = document.getElementById('netfocus');
+          if (sel) { sel.value = net.focus; }
+          document.querySelectorAll('.nk').forEach(function (b) { b.classList.toggle('on', !net.off[b.getAttribute('data-nk')]); });
+          var linked = {};
+          document.querySelectorAll('.net .edge').forEach(function (l) {
+            var k = l.getAttribute('data-k'), a = l.getAttribute('data-a'), b = l.getAttribute('data-b');
+            var hide = !!net.off[k];
+            l.style.display = hide ? 'none' : '';
+            var rel = !net.focus || a === net.focus || b === net.focus;
+            l.style.opacity = rel ? '' : '0.07';
+            if (!hide && net.focus && rel) { linked[a] = true; linked[b] = true; }
+          });
+          document.querySelectorAll('.net .node').forEach(function (n) {
+            var id = n.getAttribute('data-id');
+            n.style.opacity = (!net.focus || id === net.focus || linked[id]) ? '' : '0.25';
+          });
+        }
+        function zoomTo(nz, cx, cy) {
+          nz = Math.max(0.5, Math.min(5, nz));
+          net.x = cx - (cx - net.x) * nz / net.z;
+          net.y = cy - (cy - net.y) * nz / net.z;
+          net.z = nz;
+          applyNet();
+        }
+        document.addEventListener('click', function (ev) {
+          var t = ev.target.closest ? ev.target : null;
+          if (!t) { return; }
+          var nk = t.closest('.nk');
+          if (nk) { var k = nk.getAttribute('data-nk'); net.off[k] = !net.off[k]; applyNet(); return; }
+          var z = t.closest('[data-z]');
+          if (z) {
+            var m = z.getAttribute('data-z');
+            if (m === 'reset') { net.z = 1; net.x = 0; net.y = 0; applyNet(); } else { zoomTo(net.z * (m === 'in' ? 1.3 : 1 / 1.3), 220, 215); }
+            return;
+          }
+          if (net.moved && t.closest('.net')) { ev.preventDefault(); net.moved = false; }
+        }, true);
+        document.addEventListener('change', function (ev) {
+          if (ev.target && ev.target.id === 'netfocus') { net.focus = ev.target.value; applyNet(); }
+        });
+        document.addEventListener('wheel', function (ev) {
+          var svg = ev.target.closest ? ev.target.closest('.net') : null;
+          if (!svg) { return; }
+          ev.preventDefault();
+          var r = svg.getBoundingClientRect(), k = 440 / r.width;
+          zoomTo(net.z * (ev.deltaY < 0 ? 1.15 : 1 / 1.15), (ev.clientX - r.left) * k, (ev.clientY - r.top) * k);
+        }, { passive: false });
+        var drag = null;
+        document.addEventListener('pointerdown', function (ev) {
+          var svg = ev.target.closest ? ev.target.closest('.net') : null;
+          if (!svg) { return; }
+          drag = { px: ev.clientX, py: ev.clientY, x: net.x, y: net.y, k: 440 / svg.getBoundingClientRect().width };
+          net.moved = false;
+        });
+        document.addEventListener('pointermove', function (ev) {
+          if (!drag) { return; }
+          var dx = ev.clientX - drag.px, dy = ev.clientY - drag.py;
+          if (Math.abs(dx) + Math.abs(dy) > 4) { net.moved = true; }
+          if (net.moved) { net.x = drag.x + dx * drag.k; net.y = drag.y + dy * drag.k; applyNet(); }
+        });
+        document.addEventListener('pointerup', function () { drag = null; });
+        applyNet();
         var live = parseInt(document.body.getAttribute('data-live') || '0', 10);
         var main = document.querySelector('main');
         if (!live || !main || !window.fetch || !window.DOMParser) { return; }
@@ -961,6 +1068,7 @@ final class ExtraPages {
             main.innerHTML = next.innerHTML;
             window.scrollTo(0, y);
             applyFilter();
+            applyNet();
             stamp = document.getElementById('stamp');
             if (stamp) { stamp.classList.add('flash'); setTimeout(function () { stamp && stamp.classList.remove('flash'); }, 900); }
           }).catch(function () {});

@@ -4,6 +4,13 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Site : réseau diplomatique
+- Zoom et dézoom du graphe (molette, boutons + / − / Recentrer), déplacement en glissant.
+- Mise en avant d'une guilde : le sélecteur atténue fortement les liaisons qui ne la concernent pas.
+- Filtre par type de liaison : cliquer sur Alliance, Pacte de non-agression, Vassalité ou Rivalité dans la légende masque ou affiche ce type.
+- Les vassalités ont une flèche du vassal vers son suzerain.
+- L'état (zoom, guilde, filtres) est conservé pendant les mises à jour automatiques de la page.
+
 ### Correctif Enclave Druidique
 - Les bêtes de garde attaquent enfin : elles étaient créées « en colère » mais sans cible, donc inoffensives. Elles ciblent maintenant l'assaillant dès qu'elles apparaissent, et les bêtes déjà présentes se retournent contre lui à chaque coup porté au Nexus. Elles choisissent aussi seules l'ennemi le plus proche.
 

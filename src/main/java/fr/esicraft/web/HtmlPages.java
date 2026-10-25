@@ -95,6 +95,10 @@ final class HtmlPages {
       .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
       .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
       .net a:hover circle{stroke:var(--acc)}
+      .net{touch-action:none;cursor:grab;overflow:hidden}.net .node,.net .edge{transition:opacity .2s}
+      .nettools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-bottom:8px}.zb{display:inline-flex;gap:6px}
+      .nsel{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font:inherit;font-size:.85rem}
+      button.chip{cursor:pointer;font:inherit;color:var(--tx)}.nk:not(.on){opacity:.4;text-decoration:line-through}
       .scroll{overflow-x:auto}.heat{border-collapse:separate;border-spacing:4px;width:100%}.heat th,.heat td{padding:7px 8px;text-align:center;font-size:.8rem;border-radius:8px;white-space:nowrap}
       .heat th{color:var(--mut);font-weight:700}
       .filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 16px}.fb{cursor:pointer;font:inherit;font-size:.82rem;padding:6px 12px}.fb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}

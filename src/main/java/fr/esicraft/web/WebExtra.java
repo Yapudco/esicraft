@@ -18,7 +18,8 @@ record WebExtra(List<JournalView> journal, List<RaidView> raids, List<EdgeView> 
    }
 
    /** kind : ALLIANCE, PACT, VASSALAGE ou RIVALRY (poids = 3 × raids + joueurs tués). */
-   record EdgeView(String a, String b, String kind, int weight, int raids, int kills) {
+   /** suzerain : id du suzerain pour une vassalité, sinon vide. */
+   record EdgeView(String a, String b, String kind, int weight, int raids, int kills, String suzerain) {
    }
 
    record AchievementView(String id, String icon, String title, String description, int holders, double percent, boolean rare) {

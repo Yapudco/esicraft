@@ -255,7 +255,7 @@ public class WebServer {
       for (Guild g : this.plugin.getGuildManager().getAllGuilds()) {
          for (Treaty t : this.plugin.getTreatyManager().treatiesOf(g.getId())) {
             if (seen.add(t.getId())) {
-               edges.add(new WebExtra.EdgeView(t.getAId(), t.getBId(), t.getType().name(), 1, 0, 0));
+               edges.add(new WebExtra.EdgeView(t.getAId(), t.getBId(), t.getType().name(), 1, 0, 0, t.getSuzerainId() == null ? "" : t.getSuzerainId()));
             }
          }
 
@@ -333,7 +333,7 @@ public class WebServer {
          String[] ids = e.getKey().split("\\|", 2);
          int raids = e.getValue()[0];
          int kills = e.getValue()[1];
-         edges.add(new WebExtra.EdgeView(ids[0], ids[1], "RIVALRY", raids * 3 + kills, raids, kills));
+         edges.add(new WebExtra.EdgeView(ids[0], ids[1], "RIVALRY", raids * 3 + kills, raids, kills, ""));
       }
 
       Map<String, List<fr.esicraft.life.Chronicle.Point>> curves = new HashMap<>();
