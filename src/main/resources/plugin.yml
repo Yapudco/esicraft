@@ -1,7 +1,7 @@
 name: Esicraft-Plugin
 version: '1.0.0-SNAPSHOT'
 main: fr.esicraft.EsicraftPlugin
-api-version: '1.20'
+api-version: '26.2'
 authors: [ Antigravity ]
 description: Plugin de survie hardcore stratégique avec Guildes, Races, Nexus et Âges de Guilde.
 

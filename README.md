@@ -323,7 +323,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**. Il montre les 
 
 ### Installation
 
-- **Serveur** : Paper 1.20.4, Java 17 ou plus.
+- **Serveur** : Paper 26.2, Java 25.
 - **Compiler** : `.\mvnw.cmd package` sous Windows, `./mvnw package` sous Linux/macOS. Le plugin est créé dans `target/`. Chaque modification poussée sur GitHub est aussi compilée automatiquement (GitHub Actions).
 - **Installer** : copier le `.jar` dans le dossier `plugins/` du serveur et redémarrer. Les données sont stockées dans une base SQLite dans le dossier du plugin.
 

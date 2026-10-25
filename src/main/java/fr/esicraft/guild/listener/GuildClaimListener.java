@@ -173,7 +173,7 @@ public class GuildClaimListener implements Listener {
                   return;
                }
 
-               if (entity.getType() == EntityType.MINECART_TNT || entity instanceof ExplosiveMinecart) {
+               if (entity.getType() == EntityType.TNT_MINECART || entity instanceof ExplosiveMinecart) {
                   event.setCancelled(true);
                   entity.remove();
                   ChatUtil.sendMessage(player, "&c❌ L'utilisation de Minecarts avec TNT est strictement interdite sur le territoire d'une autre guilde !");
@@ -506,7 +506,7 @@ public class GuildClaimListener implements Listener {
    )
    public void onVehicleCreate(VehicleCreateEvent event) {
       Vehicle vehicle = event.getVehicle();
-      if (vehicle.getType() == EntityType.MINECART_TNT || vehicle instanceof ExplosiveMinecart) {
+      if (vehicle.getType() == EntityType.TNT_MINECART || vehicle instanceof ExplosiveMinecart) {
          ChunkKey chunkKey = ChunkKey.from(vehicle.getLocation().getChunk());
          Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
          if (guild != null) {
@@ -521,7 +521,7 @@ public class GuildClaimListener implements Listener {
    )
    public void onVehicleMove(VehicleMoveEvent event) {
       Vehicle vehicle = event.getVehicle();
-      if (vehicle.getType() == EntityType.MINECART_TNT || vehicle instanceof ExplosiveMinecart) {
+      if (vehicle.getType() == EntityType.TNT_MINECART || vehicle instanceof ExplosiveMinecart) {
          int fromX = event.getFrom().getBlockX() >> 4;
          int fromZ = event.getFrom().getBlockZ() >> 4;
          int toX = event.getTo().getBlockX() >> 4;
@@ -541,7 +541,7 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onExplosionPrime(ExplosionPrimeEvent event) {
-      if (event.getEntity() != null && (event.getEntity().getType() == EntityType.MINECART_TNT || event.getEntity() instanceof ExplosiveMinecart)) {
+      if (event.getEntity() != null && (event.getEntity().getType() == EntityType.TNT_MINECART || event.getEntity() instanceof ExplosiveMinecart)) {
          ChunkKey chunkKey = ChunkKey.from(event.getEntity().getLocation().getChunk());
          Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
          if (guild != null) {

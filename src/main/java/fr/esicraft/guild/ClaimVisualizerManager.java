@@ -124,6 +124,6 @@ public class ClaimVisualizerManager {
    }
 
    private void spawnParticle(Player player, World world, DustOptions dust, double x, double y, double z) {
-      player.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0, 0.0, 0.0, 0.0, dust);
+      player.spawnParticle(Particle.DUST, x, y, z, 1, 0.0, 0.0, 0.0, 0.0, dust);
    }
 }

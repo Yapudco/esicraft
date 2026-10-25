@@ -131,7 +131,7 @@ public class RaceManager {
    }
 
    public void applyRaceAttributes(Player player, Race race) {
-      AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+      AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
       if (maxHealth != null) {
          double baseHealth = race != null ? race.getBaseHealth() : 20.0;
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());

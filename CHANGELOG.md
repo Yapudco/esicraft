@@ -4,6 +4,11 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (nuit)
 
+### Compatibilité Paper 26.2
+- Le plugin cible maintenant Paper 26.2 et Java 25 (il visait Paper 1.20.4 / Java 17 et ne pouvait pas fonctionner sur un serveur 26.2).
+- Constantes d'API renommées (effets de potion, attributs, particules, enchantements, wagonnet TNT).
+- Un objet de `config.yml` qui n'existe plus dans cette version est signalé dans la console au lieu d'être ignoré en silence.
+
 ### Anti « lava cast » et inondations
 - Lave et eau ne passent plus d'un territoire à un autre, y compris pendant un raid (avant, l'exception de raid laissait inonder la cible).
 - Un distributeur ne peut plus verser un seau de lave ou d'eau sur le territoire d'une autre guilde.

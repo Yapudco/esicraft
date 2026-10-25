@@ -112,7 +112,7 @@ public class ItemBuilder {
                try {
                   Enchantment ench = Enchantment.getByKey(NamespacedKey.minecraft("unbreaking"));
                   if (ench == null) {
-                     ench = Enchantment.DURABILITY;
+                     ench = Enchantment.UNBREAKING;
                   }
 
                   if (ench != null) {
