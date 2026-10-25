@@ -98,6 +98,8 @@ public class SQLiteStorage {
          statement.executeUpdate("CREATE TABLE IF NOT EXISTS stations (id VARCHAR(36) PRIMARY KEY, name VARCHAR(32), guild_id VARCHAR(36), world VARCHAR(64), sx INT, sy INT, sz INT, rx INT, ry INT, rz INT);");
          statement.executeUpdate("CREATE TABLE IF NOT EXISTS rail_policy (guild_id VARCHAR(36) PRIMARY KEY, toll DOUBLE);");
          statement.executeUpdate("CREATE TABLE IF NOT EXISTS rail_relations (owner_id VARCHAR(36), other_id VARCHAR(36), relation VARCHAR(16), PRIMARY KEY (owner_id, other_id));");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS treaties (id VARCHAR(36) PRIMARY KEY, a_id VARCHAR(36), b_id VARCHAR(36), type VARCHAR(16), suzerain_id VARCHAR(36), created_at BIGINT, expires_at BIGINT, last_tribute BIGINT);");
+         statement.executeUpdate("CREATE TABLE IF NOT EXISTS treaty_grace (breaker_id VARCHAR(36), victim_id VARCHAR(36), until BIGINT, PRIMARY KEY (breaker_id, victim_id));");
       }
    }
 
@@ -679,6 +681,8 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM stations;");
             statement.executeUpdate("DELETE FROM rail_policy;");
             statement.executeUpdate("DELETE FROM rail_relations;");
+            statement.executeUpdate("DELETE FROM treaties;");
+            statement.executeUpdate("DELETE FROM treaty_grace;");
             statement.executeUpdate("UPDATE players SET race = 'NONE', guild_id = NULL, guild_role = NULL, coins = 100.0, race_changes_count = 0;");
             this.plugin.getLogger().info("Toutes les données de jeu ont été réinitialisées en base de données.");
          } catch (SQLException var6) {

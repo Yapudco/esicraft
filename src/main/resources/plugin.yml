@@ -92,6 +92,10 @@ commands:
     description: Gérer le réseau ferroviaire de votre guilde (péage, relations)
     aliases: [reseau, gare]
     usage: /rail
+  traite:
+    description: Traités entre guildes (alliance, pacte de non-agression, vassalité)
+    aliases: [traites, treaty]
+    usage: /traite [liste]
 
 permissions:
   esicraft.user:

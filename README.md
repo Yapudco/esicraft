@@ -281,6 +281,14 @@ Chaque jour (renouvellement à minuit, heure de Paris), chaque joueur ayant un m
 * **Coopération & rivalités (`/rail`, officiers)** : fixez votre péage (0 à `rail.max-toll`) et, pour chaque autre guilde, une relation **Normale / Alliée (gratuit) / Bannie**. Une guilde bannie ne peut plus franchir vos terres : **les lignes qui les traversent sont coupées** pour elle (la recherche contourne la zone, ou la gare devient inaccessible).
 * **Créer une gare** : un officier pose un panneau avec `[Gare]` en ligne 1 et le nom en ligne 2, à moins de 2 blocs d'un rail (Âge 2 minimum, `rail.station-creation-cost` en banque de guilde, 6 gares max par guilde, hors territoire d'une autre guilde). Casser le panneau supprime la gare (officiers de la guilde propriétaire seulement).
 
+### 📜 Traités entre guildes (`/traite`)
+Menu réservé aux **officiers** pour agir (tous les membres peuvent consulter avec `/traite liste`). Une proposition est envoyée à l'autre guilde (valable `treaties.proposal-minutes`, 10 min) qui l'accepte (clic gauche) ou la refuse (clic droit).
+* **🤝 Alliance** (illimitée) : aucun raid entre les deux guildes, **passage ferroviaire gratuit** (relation verrouillée dans `/rail`) et **pas de dégâts entre joueurs alliés** (`treaties.protect-allies-pvp`).
+* **📜 Pacte de non-agression** (`treaties.pact-days`, 7 jours) : aucun raid entre les deux guildes pendant la durée du pacte.
+* **👑 Vassalité** : le vassal verse chaque jour `treaties.vassal-tribute-percent` (5 %) de sa banque au suzerain ; mêmes avantages qu'une alliance. Une guilde ne peut être vassale que d'une seule autre. Le suzerain peut libérer son vassal sans pénalité.
+* **💔 Trahison** : rompre une alliance, un pacte en cours ou son suzerain coûte une **indemnité** (`treaties.break-indemnity`, 500 pièces max, plafonnée à la banque) versée à l'ex-partenaire, annoncée à tout le serveur, et interdit d'attaquer cette guilde pendant `treaties.break-grace-minutes` (30 min).
+* Les traités sont sauvegardés en base (tables `treaties`, `treaty_grace`), inscrits au mémorial de saison, et supprimés si une guilde disparaît. La règle du « défenseur présent » pour les raids reste inchangée.
+
 ### 📊 Tableau de bord (`/hud`)
 Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état du raid/immunité, vos contrats, votre solde et l'événement en cours. `/hud` l'active ou le masque (réglage conservé).
 
@@ -322,6 +330,7 @@ Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état d
 * `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes (**10 annonces actives max** par joueur, `market.max-listings-per-player`).
 * Dans `/ah` : **pagination** (flèches ◀ ▶), et un **clic sur sa propre annonce l'annule** et rend l'objet.
 * `/age` : Ouvrir le menu de progression des Âges et déposer des ressources.
+* `/traite [liste]` : traités entre guildes (alliance, pacte, vassalité).
 * `/station`, `/rail` : voyager entre gares / gérer péages, relations et gares de sa guilde.
 * `/contrat`, `/classement`, `/histoire`, `/hud` : contrats du jour, classement de saison, mémorial, tableau de bord.
 
@@ -349,3 +358,5 @@ Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état d
 * **Cooldowns de raid** : persistés en base (table `raid_cooldowns`, schéma v6) et conservés après un redémarrage.
 * **Raids actifs** : par conception, un raid en cours ne survit pas à un redémarrage (ses monstres sont supprimés), mais l'immunité post-raid, elle, est conservée.
 * **Performances** : la sauvegarde périodique des joueurs et guildes s'exécute en **une seule transaction** SQLite.
+* **Traités** : nouveau paquet `fr.esicraft.treaty` (gestionnaire, menus, protection PvP alliée), branché dans les deux points d'entrée des raids et dans `RailManager.getRelation`.
+* **Optimisation HUD** : le tableau latéral n'est plus reconstruit toutes les 2 s ; il n'est mis à jour que si son contenu a changé et seules les lignes obsolètes sont retirées (moins de paquets scoreboard).

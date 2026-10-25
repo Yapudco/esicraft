@@ -23,6 +23,8 @@ public class HudManager {
    private final EsicraftPlugin plugin;
    private final Map<UUID, Scoreboard> boards = new ConcurrentHashMap<>();
    private final Set<UUID> disabled = new HashSet<>();
+   /** Dernières lignes affichées par joueur : on ne touche au scoreboard que si le contenu change. */
+   private final Map<UUID, List<String>> lastLines = new ConcurrentHashMap<>();
 
    public HudManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -64,10 +66,12 @@ public class HudManager {
 
    public void onQuit(Player player) {
       this.boards.remove(player.getUniqueId());
+      this.lastLines.remove(player.getUniqueId());
    }
 
    private void hide(Player player) {
       this.boards.remove(player.getUniqueId());
+      this.lastLines.remove(player.getUniqueId());
       player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
    }
 
@@ -97,14 +101,25 @@ public class HudManager {
       }
 
       List<String> lines = this.buildLines(player);
-      for (String entry : new ArrayList<>(board.getEntries())) {
-         board.resetScores(entry);
+      List<String> previous = this.lastLines.get(player.getUniqueId());
+      if (lines.equals(previous)) {
+         return;
+      }
+
+      if (previous != null) {
+         for (String old : previous) {
+            if (!lines.contains(old)) {
+               board.resetScores(old);
+            }
+         }
       }
 
       int score = lines.size();
       for (String line : lines) {
          objective.getScore(line).setScore(score--);
       }
+
+      this.lastLines.put(player.getUniqueId(), lines);
    }
 
    private List<String> buildLines(Player player) {
@@ -122,6 +137,13 @@ public class HudManager {
          } else {
             long cd = this.plugin.getRaidManager().getCooldownRemainingMs(guild);
             raw.add(cd > 0 ? "&aProtégé: " + (cd / 60000L) + " min" : "&7Raid: aucun");
+         }
+      }
+
+      if (guild != null) {
+         int treaties = this.plugin.getTreatyManager().treatiesOf(guild.getId()).size();
+         if (treaties > 0) {
+            raw.add("&eTraités: &d" + treaties);
          }
       }
 
