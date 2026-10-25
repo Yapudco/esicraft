@@ -142,6 +142,8 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 **Zone de sécurité de 16 blocs** autour du Nexus : pas d'eau, de lave ni d'obsidienne (y compris pleureuse). Le Nexus ne peut pas être posé s'il y en a déjà, et on ne peut pas en ajouter ensuite. Ça empêche les douves et les murs incassables.
 
+**Points de vie** : les PV du Nexus s'affichent au-dessus de lui (hologramme), y compris après un redémarrage du serveur ou une reconnexion.
+
 **Le soigner** : un membre jette une **pomme dorée** dessus (ou fait un clic droit avec) : +500 PV, ou +2 500 PV avec une pomme dorée enchantée. Il faut attendre 30 secondes entre deux soins, et c'est impossible pendant un raid.
 
 ### Les pièges (`/nexus traps`)
