@@ -6,7 +6,10 @@ import fr.esicraft.chat.ChatFormatListener;
 import fr.esicraft.command.AgeCommand;
 import fr.esicraft.command.BaltopCommand;
 import fr.esicraft.command.EsicraftAdminCommand;
+import fr.esicraft.command.ContractCommand;
 import fr.esicraft.command.EsicraftCommand;
+import fr.esicraft.command.FunCommand;
+import fr.esicraft.command.SeasonCommand;
 import fr.esicraft.command.GameCommand;
 import fr.esicraft.command.GuideCommand;
 import fr.esicraft.command.GuildCommand;
@@ -35,6 +38,11 @@ import fr.esicraft.guild.listener.SpecializationRulesListener;
 import fr.esicraft.race.listener.RaceCombatListener;
 import fr.esicraft.race.listener.RaceInteractionListener;
 import fr.esicraft.raid.RaidManager;
+import fr.esicraft.fun.ContractListener;
+import fr.esicraft.fun.ContractManager;
+import fr.esicraft.fun.EventManager;
+import fr.esicraft.fun.HudManager;
+import fr.esicraft.fun.SeasonManager;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -45,6 +53,10 @@ public final class EsicraftPlugin extends JavaPlugin {
    private DataManager dataManager;
    private AgeManager ageManager;
    private SpecializationRulesListener specializationRules;
+   private ContractManager contractManager;
+   private SeasonManager seasonManager;
+   private EventManager eventManager;
+   private HudManager hudManager;
    private RaceManager raceManager;
    private GuildManager guildManager;
    private NexusManager nexusManager;
@@ -69,8 +81,15 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.marketManager = new MarketManager(this);
       this.antiFarmManager = new AntiFarmManager(this);
       this.claimVisualizerManager = new ClaimVisualizerManager(this);
+      this.contractManager = new ContractManager(this);
+      this.seasonManager = new SeasonManager(this);
+      this.eventManager = new EventManager(this);
+      this.hudManager = new HudManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
+      this.seasonManager.init();
+      this.eventManager.start();
+      this.hudManager.start();
       this.nexusManager.removeAllHolograms();
       this.specializationRules = new SpecializationRulesListener(this);
       PluginManager pm = Bukkit.getPluginManager();
@@ -80,6 +99,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new RaceCombatListener(this), this);
       pm.registerEvents(new GuildClaimListener(this), this);
       pm.registerEvents(this.specializationRules, this);
+      pm.registerEvents(new ContractListener(this), this);
+      pm.registerEvents(this.eventManager, this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
       pm.registerEvents(new GUIListener(this), this);
@@ -100,6 +121,14 @@ public final class EsicraftPlugin extends JavaPlugin {
          } catch (Exception var2) {
             this.getLogger().warning("Impossible d'arrêter proprement les raids : " + var2.getMessage());
          }
+      }
+
+      if (this.eventManager != null) {
+         this.eventManager.shutdown();
+      }
+
+      if (this.contractManager != null) {
+         this.contractManager.flush();
       }
 
       if (this.nexusManager != null) {
@@ -136,6 +165,14 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("pvp")).setTabCompleter(pvpCommand);
       Objects.requireNonNull(this.getCommand("esicraftadmin")).setExecutor(new EsicraftAdminCommand(this));
       Objects.requireNonNull(this.getCommand("hub")).setExecutor(new HubCommand(this));
+      Objects.requireNonNull(this.getCommand("contrat")).setExecutor(new ContractCommand(this));
+      SeasonCommand seasonCommand = new SeasonCommand(this);
+      Objects.requireNonNull(this.getCommand("classement")).setExecutor(seasonCommand);
+      Objects.requireNonNull(this.getCommand("histoire")).setExecutor(seasonCommand);
+      FunCommand funCommand = new FunCommand(this);
+      Objects.requireNonNull(this.getCommand("hud")).setExecutor(funCommand);
+      Objects.requireNonNull(this.getCommand("evenement")).setExecutor(funCommand);
+      Objects.requireNonNull(this.getCommand("evenement")).setTabCompleter(funCommand);
    }
 
    public boolean isNexusDestructionEnabled() {
@@ -156,6 +193,22 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public AgeManager getAgeManager() {
       return this.ageManager;
+   }
+
+   public ContractManager getContractManager() {
+      return this.contractManager;
+   }
+
+   public SeasonManager getSeasonManager() {
+      return this.seasonManager;
+   }
+
+   public EventManager getEventManager() {
+      return this.eventManager;
+   }
+
+   public HudManager getHudManager() {
+      return this.hudManager;
    }
 
    public RaceManager getRaceManager() {

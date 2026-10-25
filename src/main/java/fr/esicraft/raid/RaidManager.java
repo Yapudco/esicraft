@@ -825,6 +825,7 @@ public class RaidManager implements Listener {
             targetGuild.getNexus().clearTraps();
             this.plugin.getDataManager().saveGuild(targetGuild);
             if (defended) {
+               this.plugin.getSeasonManager().recordRepelled(targetGuild);
                ChatUtil.broadcast("&a&l\ud83d\udee1️ La guilde &e" + targetGuild.getName() + " &aa repoussé avec succès l'invasion de monstres !");
             }
 
@@ -842,6 +843,19 @@ public class RaidManager implements Listener {
             }
          }
       }
+   }
+
+   /** Temps d'immunité post-raid restant (ms) pour cette guilde, 0 si elle peut être attaquée. */
+   public long getCooldownRemainingMs(Guild guild) {
+      Long lastRaid = this.guildRaidCooldowns.get(guild.getId());
+      if (lastRaid == null) {
+         return 0L;
+      }
+
+      long cooldownMs = this.plugin.getGuildManager().isEconomicHegemony(guild)
+         ? 120000L
+         : (long)(this.plugin.getConfig().getInt("raids.cooldown-minutes-between-raids", 30) * 60) * 1000L;
+      return Math.max(0L, cooldownMs - (System.currentTimeMillis() - lastRaid));
    }
 
    /** Charge les cooldowns sauvegardés (appelé après l'ouverture de la base) : l'immunité post-raid survit aux redémarrages. */

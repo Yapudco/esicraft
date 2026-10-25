@@ -166,6 +166,7 @@ public class RaceInteractionListener implements Listener {
 
             ageable.setAge(0);
             block.setBlockData(ageable);
+            this.plugin.getContractManager().addProgress(player, fr.esicraft.fun.ContractType.HARVEST, 1);
             ChatUtil.playSound(player, Sound.BLOCK_CROP_BREAK, 1.0F, 1.2F);
             event.setCancelled(true);
          }
@@ -324,6 +325,10 @@ public class RaceInteractionListener implements Listener {
       if (event.getRightClicked() instanceof AbstractVillager
          || event.getRightClicked() instanceof Villager
          || event.getRightClicked() instanceof WanderingTrader) {
+         if (event.getRightClicked().getScoreboardTags().contains(fr.esicraft.fun.EventManager.TRADER_TAG)) {
+            return; // Marchand du Marché Noir : ouvert à tous
+         }
+
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          boolean isMerchantSyndicate = guild != null && guild.getSpecialization() == GuildSpecialization.MERCHANT_SYNDICATE;
          boolean canTrade = isMerchantSyndicate || age.getLevel() >= 4;
@@ -570,6 +575,7 @@ public class RaceInteractionListener implements Listener {
             if (baseBounty > 0.0) {
                double antiFarmMultiplier = this.plugin.getAntiFarmManager().getMultiplier(killer.getUniqueId(), entity.getType());
                double finalBounty = baseBounty * antiFarmMultiplier;
+               finalBounty *= this.plugin.getEventManager().getBountyMultiplier();
                if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
                   finalBounty *= 1.2;
                }

@@ -63,6 +63,27 @@ commands:
     aliases: [lobby, mainhub]
     usage: /hub
 
+  contrat:
+    description: Voir vos contrats quotidiens
+    aliases: [contrats, quetes, daily]
+    usage: /contrat
+  classement:
+    description: Classement de saison des guildes
+    aliases: [saison, topguildes]
+    usage: /classement
+  histoire:
+    description: Mémorial des conquêtes et événements du serveur
+    aliases: [memorial]
+    usage: /histoire
+  hud:
+    description: Afficher ou masquer le tableau de bord latéral
+    usage: /hud
+  evenement:
+    description: Administration des événements serveur
+    permission: esicraft.admin
+    aliases: [event]
+    usage: /evenement <lune|meteores|marchand|boss|stop|status>
+
 permissions:
   esicraft.user:
     description: Permission de base pour utiliser les fonctionnalités de jeu
