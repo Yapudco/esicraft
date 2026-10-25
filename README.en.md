@@ -384,7 +384,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/classement` · `/histoire` | Season ranking · big moments |
 | `/english` · `/francais` | Switch the game to English (menus, messages, dashboard, rule book) · back to French |
 | `/hud` | Show or hide the dashboard |
-| `/hub` | Go back to the hub |
+| `/hub` | Go back to the hub (blocked during PvP combat) |
 
 ---
 

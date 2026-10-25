@@ -4,6 +4,11 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Combat PvP
+- Frapper un joueur d'une autre guilde, ou être frappé, met « en combat » pendant 15 secondes (`combat.seconds`, `combat.enabled`) avec compte à rebours dans la barre d'action.
+- `/hub` est bloqué pendant le combat.
+- Se déconnecter en combat est puni : le joueur meurt sur place et lâche ses objets, avec une annonce au serveur. Un kick ou un arrêt du serveur n'est pas puni.
+
 ### Nexus
 - Le golem gardien et les pièges du Nexus (flammes, toile, poison, rayon du Conclave) épargnent désormais aussi les joueurs d'une guilde liée par un pacte de non-agression (comme pour l'alliance et la vassalité). Frapper le Nexus rompt le pacte avant que les défenses ne réagissent.
 

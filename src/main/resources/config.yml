@@ -243,10 +243,14 @@ rail:
   min-age-level: 2             # Âge minimal de la guilde pour créer une gare
   search-max-rails: 30000      # Plafond de rails explorés par recherche
 
-# Traités entre guildes (/traite)
 rivalry:
   half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours
 
+combat:
+  enabled: true
+  seconds: 15                 # Durée du combat PvP après un coup (pas de /hub, déconnexion punie par la mort)
+
+# Traités entre guildes (/traite)
 treaties:
   enabled: true
   proposal-minutes: 10         # Durée de validité d'une proposition

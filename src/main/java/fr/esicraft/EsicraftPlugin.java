@@ -48,6 +48,7 @@ import fr.esicraft.web.WebServer;
 import fr.esicraft.util.Lang;
 import fr.esicraft.life.AchievementManager;
 import fr.esicraft.life.Chronicle;
+import fr.esicraft.combat.CombatManager;
 import fr.esicraft.life.DisguiseManager;
 import fr.esicraft.life.GuildContractManager;
 import fr.esicraft.life.GuildSynergy;
@@ -95,6 +96,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private GuildContractManager guildContracts;
    private HelpCallManager helpCalls;
    private DisguiseManager disguiseManager;
+   private CombatManager combatManager;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -125,6 +127,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.guildContracts = new GuildContractManager(this);
       this.helpCalls = new HelpCallManager(this);
       this.disguiseManager = new DisguiseManager(this);
+      this.combatManager = new CombatManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
@@ -149,6 +152,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new LangListener(this), this);
       pm.registerEvents(this.natureSeasons, this);
       pm.registerEvents(this.disguiseManager, this);
+      pm.registerEvents(this.combatManager, this);
+      this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
       pm.registerEvents(new RaceCombatListener(this), this);
@@ -292,6 +297,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public HelpCallManager getHelpCalls() {
       return this.helpCalls;
+   }
+
+   public CombatManager getCombatManager() {
+      return this.combatManager;
    }
 
    public DisguiseManager getDisguiseManager() {
