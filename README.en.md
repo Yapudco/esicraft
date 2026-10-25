@@ -108,6 +108,17 @@ Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **
 
 The other protections only drop during a raid against that guild, and for **30 minutes** after its Nexus is destroyed if there's no annexation.
 
+### 🧩 The diversity bonus
+
+The more **different professions** your guild brings together, the stronger it gets (shown in `/guild info` and on the website):
+
+| Different professions | Bonus |
+| :--- | :--- |
+| 3 | Monster bounties +10 % |
+| 4 | New land 10 % cheaper |
+| 5 | Nexus traps 15 % cheaper |
+| 6 | Guild contract rewards ×1.5 |
+
 ---
 
 ## 🌟 4. Guild specializations
@@ -234,6 +245,10 @@ Your guild starts at **Age 1** and can go up to **Age 6**. To reach the next Age
 The Merchant Syndicate earns 20% more.
 </details>
 
+### The guild contract
+
+In `/contrat`, below your personal contracts: every day your guild gets **three objectives, each reserved for one profession** (for example: a Dwarf mines, a Blacksmith smelts ingots, an Engineer places redstone). Only members with the right profession advance their objective. Each objective pays **200 coins** into the guild bank, and all three together **750 more**. Objectives grow with the size of the guild.
+
 ### Killing a player
 
 When you kill a player from another guild, you **take 100 coins + 1% of their fortune** from them (or everything they have if they have 100 coins or less). No bounty if you already fought each other less than 2 minutes ago, or between members of the same guild.
@@ -284,13 +299,50 @@ The rail network lets you **teleport from station to station**, as long as a **c
 
 Every month, `/classement` ranks the guilds (land, Age, wealth, members, raids repelled, conquests). The champion guild wins **5,000 coins**, **500 per member** and a 👑 crown in chat. `/histoire` tells the latest big moments on the server.
 
+### 🍂 Natural seasons (`/climat`)
+
+The world changes season **every two weeks** (configurable):
+
+| Season | Effect |
+| :--- | :--- |
+| 🌸 Spring | Crops grow faster (+50 %) |
+| ☀ Summer | +20 % experience |
+| 🍂 Autumn | One chance in two of a bonus crop |
+| ❄ Winter | Crops grow half as fast, monster bounties +25 % |
+
+### 🆘 Calling for help (`/aide`)
+
+During a raid or an attack on your Nexus, `/aide` warns your **allies** (alliance or vassalage). Each ally who reaches your land before the horde ends earns **250 coins** if it is repelled (6 allies max). One call every 10 minutes.
+
+### 🎭 Disguise (`/deguisement <guild>`)
+
+For **750 coins** you pose for **5 minutes** as a member of that guild: their name and tag show in chat and the player list, and the name above your head is hidden. Their traps and golem ignore you, but their land protections still apply. **Dealing damage or hitting the Nexus unmasks you**, and the guild is warned. One disguise every 30 minutes; `/deguisement off` removes it.
+
+### 📰 War journal and achievements
+
+`/journal` sums up the latest big events (raids, conquests, treaties, betrayals, Ages, events). `/succes` lists your **26 achievements** (first profession, conqueror, traitor, master spy, four seasons…) and the share of players who have them. An achievement held by fewer than 10 % of players is **rare** and announced in the journal.
+
 ### Playing in English
 
-`/english` translates the game **for you only**: messages, action bar, menus, dashboard and the `/guide` book (`/francais` goes back). Your choice is remembered. Guild and player names are not translated. Not translated yet: the event boss bar, chat and the website.
+`/english` translates the game **for you only**: messages, action bar, menus, dashboard and the `/guide` book (`/francais` goes back). Your choice is remembered. Guild and player names are not translated. Not translated yet: the event boss bar, chat, the war journal entries and the website.
 
 ### The website
 
-The server has a public website: **`http://<server-address>/`**. It shows online players, the guild ranking, a page for each guild (members, treaties, stats) and the richest players. It shows **no coordinates**: nothing that helps find a base.
+The server has a public website: **`http://<server-address>/`**, which updates itself (every 15 seconds). It shows **no coordinates**: nothing that helps find a base. The website is in French.
+
+| Page | Content |
+| :--- | :--- |
+| Home (*Accueil*) | Online players, top guilds, natural season, ongoing raids, recent journal |
+| Guilds · guild page | Ranking; members, treaties, diversity, trophies, growth curves, Ages reached, highlights |
+| Players · profile | Online, richest, directory; each player's profile (profession, guild, stats, achievements) |
+| Raids | Ongoing hordes: target, attacker, monsters left, defenders on site, duration |
+| Journal | The full war journal, filterable by category |
+| Diplomacy (*Diplomatie*) | Network of alliances, pacts, vassalages and rivalries, rivalry heat map |
+| Museum (*Musée*) | Guild trophies, every achievement with its rarity, latest unlocks |
+| Ages (*Âges*) | Timeline: when each guild reached each Age |
+| Guide | All the rules, with a search box |
+
+Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
 
 ---
 
@@ -314,7 +366,11 @@ The server has a public website: **`http://<server-address>/`**. It shows online
 | `/age` | Age progression and donations |
 | `/money` · `/baltop` · `/pay <player> <amount>` | Your money · richest players · send coins |
 | `/ah` · `/ah sell <price>` | Auction House and raids · sell the item in your hand |
-| `/contrat` | Daily contracts |
+| `/contrat` | Daily contracts and guild contract |
+| `/aide` | Call your allies for help during an attack |
+| `/deguisement <guild>` · `/deguisement off` | Disguise as a member of another guild · remove the disguise |
+| `/climat` | Current natural season |
+| `/journal` · `/succes [player]` | War journal · achievements |
 | `/traite` · `/traite liste` | Guild treaties |
 | `/station` · `/rail` | Take the train · manage your network (officers) |
 | `/classement` · `/histoire` | Season ranking · big moments |
@@ -348,6 +404,7 @@ The server has a public website: **`http://<server-address>/`**. It shows online
 | `rail` | Trip and station prices, max toll, minimum Age |
 | `treaties` | Pact duration, tribute, compensation, grace period, ally protection |
 | `web` | Website: port, displayed name, visible information, anti-flood |
+| `life` | Natural seasons (length), disguise (price, duration, cooldown), call-for-help reward |
 
 ### The website
 

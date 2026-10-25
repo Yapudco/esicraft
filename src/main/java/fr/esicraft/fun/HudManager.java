@@ -88,6 +88,7 @@ public class HudManager {
       Scoreboard board = this.boards.get(player.getUniqueId());
       if (board == null) {
          board = Bukkit.getScoreboardManager().getNewScoreboard();
+         this.plugin.getDisguiseManager().syncBoard(board);
          board.registerNewObjective("esicraft", Criteria.DUMMY, ChatUtil.component("&6&lESICRAFT"));
          board.getObjective("esicraft").setDisplaySlot(DisplaySlot.SIDEBAR);
          this.boards.put(player.getUniqueId(), board);
@@ -152,6 +153,16 @@ public class HudManager {
       raw.add("&eContrats: &f" + contracts.completedCount() + "/" + ContractManager.CONTRACTS_PER_DAY);
       if (data != null) {
          raw.add("&eSolde: &6" + String.format("%,.0f", data.getCoins()));
+      }
+
+      if (this.plugin.getNatureSeasons().isEnabled()) {
+         var nature = this.plugin.getNatureSeasons().current();
+         raw.add("&eSaison: " + nature.getColor() + nature.display() + " &7(" + this.plugin.getNatureSeasons().remainingDays() + " j)");
+      }
+
+      var disguise = this.plugin.getDisguiseManager().get(player.getUniqueId());
+      if (disguise != null) {
+         raw.add("&5🎭 Déguisé: &f" + ((disguise.until() - System.currentTimeMillis()) / 1000L) + " s");
       }
 
       EventManager events = this.plugin.getEventManager();

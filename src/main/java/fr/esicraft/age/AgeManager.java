@@ -232,6 +232,19 @@ public class AgeManager {
             guild.clearDonations();
             this.plugin.getDataManager().saveGuild(guild);
             ChatUtil.broadcast("&6&l⚔️ PROGRESSION DE GUILDE : &e" + guild.getName() + " &aest entrée dans l'ère &6" + next.getDisplayName() + " &a!");
+            this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.AGE, guild.getName() + " entre dans l'" + ChatUtil.color(next.getDisplayName()).replaceAll("§.", "") + ".", guild.getId(), null);
+            this.plugin.getChronicle().ageReached(guild, next.getLevel());
+            if (next.getLevel() >= 2) {
+               this.plugin.getAchievements().grantGuild(guild, fr.esicraft.life.Achievement.AGE_2, false);
+            }
+
+            if (next.getLevel() >= 4) {
+               this.plugin.getAchievements().grantGuild(guild, fr.esicraft.life.Achievement.AGE_4, false);
+            }
+
+            if (next.getLevel() >= 6) {
+               this.plugin.getAchievements().grantGuild(guild, fr.esicraft.life.Achievement.AGE_6, false);
+            }
             if (next == AgeType.SUPREMACY) {
                ChatUtil.broadcast("&e&l\ud83d\udc51 EXPLOIT LÉGENDAIRE : &6La guilde &e" + guild.getName() + " &6a conquis l'&eÂge de Suprématie &6!");
             }

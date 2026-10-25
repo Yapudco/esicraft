@@ -97,7 +97,8 @@ public final class BookUtil {
       // 28-29 : commandes
       pages.add(p("&4&lCOMMANDES (1/2)&r", "&1/race &1/guild &1/age", "&1/guild claim", "&1/guild spec", "&1/guild bank <$>", "&1/guild nexus place", "&1/nexus traps", "&1/guild annex", "&1/ah &0(+ raids)", "&1/ah sell <prix>", "&1/contrat"));
       pages.add(p("&4&lCOMMANDES (2/2)&r", "&1/traite &1/station", "&1/rail", "&1/money &1/baltop", "&1/pay <joueur> <$>", "&1/classement", "&1/histoire", "&1/hud", "&1/hub", "&1/guide", "&1/english"));
-      // 30 : conseils
+      pages.add(p("&4&lCOMMANDES (3/3)&r", "&1/contrat&0 : contrats", "&0du jour et de guilde", "&1/aide&0 : appeler ses", "&0alliés pendant un raid", "&1/deguisement <guilde>", "&0: espionner (750 p.)", "&1/climat&0 : saison", "&0naturelle", "&1/journal&0 : journal", "&0de guerre", "&1/succes&0 : vos succès"));
+      // 31 : conseils
       pages.add(p("&4&lCONSEILS&r", "&0• Un raid exige un", "&0  défenseur en ligne", "&0  chez la cible : reste", "&0  connecté pour te", "&0  défendre.", "&0• Soigne ton Nexus", "&0  avant une attaque.", "&0• Un traité protège", "&0  des raids.", "&0• Trop riche = cible.", "&2Bon jeu !"));
       return pages;
    }
@@ -133,6 +134,7 @@ public final class BookUtil {
       pages.add(p("&4&lSEASONS & SITE&r", "&1/classement&0: each", "&0month, the best guild", "&0wins 5000 + 500 per", "&0member and a crown.", "&1/histoire&0: great", "&0moments.", "&1/hud&0: dashboard.", "&0Public website:", "&1http://<server ip>", "&0ranking, players."));
       pages.add(p("&4&lCOMMANDS (1/2)&r", "&1/race &1/guild &1/age", "&1/guild claim", "&1/guild spec", "&1/guild bank <$>", "&1/guild nexus place", "&1/nexus traps", "&1/guild annex", "&1/ah &0(+ raids)", "&1/ah sell <price>", "&1/contrat"));
       pages.add(p("&4&lCOMMANDS (2/2)&r", "&1/traite &1/station", "&1/rail", "&1/money &1/baltop", "&1/pay <player> <$>", "&1/classement", "&1/histoire", "&1/hud", "&1/hub", "&1/guide", "&1/english &1/francais"));
+      pages.add(p("&4&lCOMMANDS (3/3)&r", "&1/contrat&0: daily and", "&0guild contracts", "&1/aide&0: call your allies", "&0during a raid", "&1/deguisement <guild>", "&0: spy (750 coins)", "&1/climat&0: natural", "&0season", "&1/journal&0: war", "&0journal", "&1/succes&0: achievements"));
       pages.add(p("&4&lTIPS&r", "&0• A raid needs a", "&0  defender online at the", "&0  target: stay connected", "&0  to defend yourself.", "&0• Heal your Nexus", "&0  before an attack.", "&0• A treaty protects", "&0  from raids.", "&0• Too rich = target.", "&2Have fun!"));
       return pages;
    }

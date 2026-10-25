@@ -46,6 +46,14 @@ import fr.esicraft.command.RailCommand;
 import fr.esicraft.command.TreatyCommand;
 import fr.esicraft.web.WebServer;
 import fr.esicraft.util.Lang;
+import fr.esicraft.life.AchievementManager;
+import fr.esicraft.life.Chronicle;
+import fr.esicraft.life.DisguiseManager;
+import fr.esicraft.life.GuildContractManager;
+import fr.esicraft.life.GuildSynergy;
+import fr.esicraft.life.HelpCallManager;
+import fr.esicraft.life.LifeCommand;
+import fr.esicraft.life.NatureSeasonManager;
 import fr.esicraft.util.LangListener;
 import fr.esicraft.treaty.AlliedProtectionListener;
 import fr.esicraft.treaty.TreatyGuiListener;
@@ -80,6 +88,13 @@ public final class EsicraftPlugin extends JavaPlugin {
    private MarketManager marketManager;
    private AntiFarmManager antiFarmManager;
    private ClaimVisualizerManager claimVisualizerManager;
+   private Chronicle chronicle;
+   private AchievementManager achievements;
+   private NatureSeasonManager natureSeasons;
+   private GuildSynergy synergy;
+   private GuildContractManager guildContracts;
+   private HelpCallManager helpCalls;
+   private DisguiseManager disguiseManager;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -103,10 +118,24 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.hudManager = new HudManager(this);
       this.railManager = new RailManager(this);
       this.treatyManager = new TreatyManager(this);
+      this.chronicle = new Chronicle(this);
+      this.achievements = new AchievementManager(this);
+      this.natureSeasons = new NatureSeasonManager(this);
+      this.synergy = new GuildSynergy(this);
+      this.guildContracts = new GuildContractManager(this);
+      this.helpCalls = new HelpCallManager(this);
+      this.disguiseManager = new DisguiseManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
+      this.chronicle.init();
+      this.achievements.init();
       this.seasonManager.init();
+      this.natureSeasons.init();
+      this.synergy.init();
+      this.guildContracts.init();
+      this.helpCalls.init();
+      this.disguiseManager.init();
       this.railManager.load();
       this.treatyManager.load();
       this.webServer = new WebServer(this);
@@ -118,6 +147,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       PluginManager pm = Bukkit.getPluginManager();
       pm.registerEvents(new PlayerConnectionListener(this), this);
       pm.registerEvents(new LangListener(this), this);
+      pm.registerEvents(this.natureSeasons, this);
+      pm.registerEvents(this.disguiseManager, this);
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
       pm.registerEvents(new RaceCombatListener(this), this);
@@ -143,6 +174,18 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public void onDisable() {
       this.getLogger().info("Arrêt de Esicraft-Plugin en cours...");
+      try {
+         if (this.achievements != null) {
+            this.achievements.shutdown();
+         }
+
+         if (this.guildContracts != null) {
+            this.guildContracts.flush();
+         }
+      } catch (RuntimeException e) {
+         this.getLogger().warning("Sauvegarde des succès / contrats de guilde impossible : " + e.getMessage());
+      }
+
       if (this.raidManager != null) {
          try {
             this.raidManager.stopAllRaids();
@@ -207,6 +250,12 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("station")).setExecutor(new StationCommand(this));
       Objects.requireNonNull(this.getCommand("rail")).setExecutor(new RailCommand(this));
       Objects.requireNonNull(this.getCommand("traite")).setExecutor(new TreatyCommand(this));
+      LifeCommand lifeCommand = new LifeCommand(this);
+      for (String name : new String[]{"journal", "succes", "climat", "aide", "deguisement"}) {
+         Objects.requireNonNull(this.getCommand(name)).setExecutor(lifeCommand);
+         Objects.requireNonNull(this.getCommand(name)).setTabCompleter(lifeCommand);
+      }
+
       FunCommand funCommand = new FunCommand(this);
       Objects.requireNonNull(this.getCommand("hud")).setExecutor(funCommand);
       Objects.requireNonNull(this.getCommand("evenement")).setExecutor(funCommand);
@@ -219,6 +268,34 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public void setNexusDestructionEnabled(boolean enabled) {
       this.nexusDestructionEnabled = enabled;
+   }
+
+   public Chronicle getChronicle() {
+      return this.chronicle;
+   }
+
+   public AchievementManager getAchievements() {
+      return this.achievements;
+   }
+
+   public NatureSeasonManager getNatureSeasons() {
+      return this.natureSeasons;
+   }
+
+   public GuildSynergy getSynergy() {
+      return this.synergy;
+   }
+
+   public GuildContractManager getGuildContracts() {
+      return this.guildContracts;
+   }
+
+   public HelpCallManager getHelpCalls() {
+      return this.helpCalls;
+   }
+
+   public DisguiseManager getDisguiseManager() {
+      return this.disguiseManager;
    }
 
    public static EsicraftPlugin getInstance() {

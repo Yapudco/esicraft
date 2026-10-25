@@ -364,7 +364,9 @@ public class TreatyManager {
             + (p.suzerainId().equals(from.getId()) ? from.getName() : target.getName()) + " &e!";
       };
       ChatUtil.broadcast("&e&l" + text);
-      this.plugin.getSeasonManager().addHistory(ChatUtil.color(text).replaceAll("§.", ""));
+      this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.TREATY, ChatUtil.color(text).replaceAll("§.", ""), from.getId(), target.getId());
+      this.plugin.getAchievements().grantGuild(from, fr.esicraft.life.Achievement.DIPLOMAT, true);
+      this.plugin.getAchievements().grantGuild(target, fr.esicraft.life.Achievement.DIPLOMAT, true);
       return null;
    }
 
@@ -430,10 +432,15 @@ public class TreatyManager {
       if (betrayal) {
          ChatUtil.broadcast("&4&l💔 TRAHISON ! &c" + breaker.getName() + " &7rompt son &e" + t.getType().getLabel() + " &7avec &6" + otherName
             + (paid > 0.0 ? " &7et lui verse &6" + String.format(Locale.ROOT, "%.0f", paid) + " pièces &7d'indemnité." : "."));
-         this.plugin.getSeasonManager().addHistory("💔 " + breaker.getName() + " rompt son " + t.getType().getLabel().toLowerCase(Locale.ROOT) + " avec " + otherName + ".");
+         this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.BETRAYAL, "💔 " + breaker.getName() + " rompt son " + t.getType().getLabel().toLowerCase(Locale.ROOT) + " avec " + otherName + ".",
+            breaker.getId(), other != null ? other.getId() : null);
+         if (actor != null) {
+            this.plugin.getAchievements().grant(actor.getUniqueId(), fr.esicraft.life.Achievement.TRAITOR);
+         }
       } else {
          ChatUtil.broadcast("&e👑 " + breaker.getName() + " libère son vassal &6" + otherName + "&e : la vassalité prend fin.");
-         this.plugin.getSeasonManager().addHistory("👑 " + breaker.getName() + " libère son vassal " + otherName + ".");
+         this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.TREATY, "👑 " + breaker.getName() + " libère son vassal " + otherName + ".", breaker.getId(),
+            other != null ? other.getId() : null);
       }
 
       return null;

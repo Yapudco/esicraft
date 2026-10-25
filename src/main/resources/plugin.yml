@@ -86,6 +86,26 @@ commands:
     description: Repasser le jeu en français / switch the game back to French
     aliases: [fr, french]
     usage: /francais
+  journal:
+    description: Journal de guerre (derniers grands faits du serveur)
+    aliases: [chronique, gazette]
+    usage: /journal
+  succes:
+    description: Voir ses succès (ou ceux d'un joueur)
+    aliases: [achievements, hautsfaits]
+    usage: /succes [joueur]
+  climat:
+    description: Saison naturelle en cours et ses effets
+    aliases: [nature, meteo]
+    usage: /climat
+  aide:
+    description: Appeler ses alliés à l'aide pendant une attaque
+    aliases: [sos, renfort]
+    usage: /aide
+  deguisement:
+    description: Se déguiser en membre d'une autre guilde
+    aliases: [masque, disguise]
+    usage: /deguisement <guilde|off>
   evenement:
     description: Administration des événements serveur
     permission: esicraft.admin

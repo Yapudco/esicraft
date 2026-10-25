@@ -313,6 +313,7 @@ public class RaidManager implements Listener {
                      }
 
                      ChatUtil.broadcast("&4&l⚔️ UNE HORDE DE MONSTRES A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
+                     this.onRaidLaunched(attackerGuild, targetGuild, buyer, fr.esicraft.util.ChatUtil.color(raidType.getDisplayName()));
                      String details = "&7Type d'invasion : " + raidType.getDisplayName() + " &7par &e" + attackerName;
                      if (explosiveBreachers) {
                         details = details + " &c&l[SAPEURS EXPLOSIFS]";
@@ -541,6 +542,7 @@ public class RaidManager implements Listener {
                         }
 
                         ChatUtil.broadcast("&4&l⚔️ UNE HORDE PERSONNALISÉE SUR-MESURE A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
+                        this.onRaidLaunched(attackerGuild, targetGuild, buyer, "horde personnalisée");
                         String details = "&7Commanditaire : &e" + attackerName + " &7| Total : &c" + totalUnits + " monstres d'élite";
                         if (explosiveBreachers) {
                            details = details + " &c&l[SAPEURS EXPLOSIFS]";
@@ -579,6 +581,23 @@ public class RaidManager implements Listener {
 
          return false;
       }
+   }
+
+   /** Journal de guerre, rivalités et succès au lancement d'une horde. */
+   private void onRaidLaunched(Guild attackerGuild, Guild targetGuild, Player buyer, String hordeName) {
+      String attacker = attackerGuild != null ? attackerGuild.getName() : "L'administration";
+      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.RAID, attacker + " lance une horde (" + hordeName.replaceAll("§.", "") + ") sur " + targetGuild.getName() + ".",
+         attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId());
+      this.plugin.getChronicle().raid(attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId(), "launched");
+      if (buyer != null) {
+         this.plugin.getAchievements().grant(buyer.getUniqueId(), fr.esicraft.life.Achievement.RAIDER);
+         this.plugin.getAchievements().addStat(buyer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_RAIDS, 1L);
+      }
+   }
+
+   /** Raids en cours (lecture seule), pour le site web. */
+   public java.util.Collection<ActiveRaid> getActiveRaids() {
+      return java.util.List.copyOf(this.activeRaids.values());
    }
 
    private void notifyDefenders(Guild targetGuild) {
@@ -832,6 +851,16 @@ public class RaidManager implements Listener {
             this.plugin.getDataManager().saveGuild(targetGuild);
             if (defended) {
                this.plugin.getSeasonManager().recordRepelled(targetGuild);
+               this.plugin.getChronicle().raid(raid.getAttackerGuildId(), targetGuild.getId(), "repelled");
+               this.plugin.getHelpCalls().onRepelled(targetGuild);
+               for (UUID memberUuid : targetGuild.getMembers().keySet()) {
+                  Player defender = Bukkit.getPlayer(memberUuid);
+                  if (defender != null && targetGuild.isClaimed(ChunkKey.from(defender.getLocation().getChunk()))) {
+                     this.plugin.getAchievements().grant(memberUuid, fr.esicraft.life.Achievement.DEFENDER);
+                     this.plugin.getAchievements().addStat(memberUuid, fr.esicraft.life.AchievementManager.STAT_DEFENSES, 1L);
+                  }
+               }
+
                ChatUtil.broadcast("&a&l\ud83d\udee1️ La guilde &e" + targetGuild.getName() + " &aa repoussé avec succès l'invasion de monstres !");
             }
 

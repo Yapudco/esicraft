@@ -309,6 +309,8 @@ public class GUIListener implements Listener {
                            cost *= 0.5;
                         }
 
+                        cost *= this.plugin.getSynergy().trapCostMultiplier(guild);
+
                         PlayerData pData = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
                         boolean paid = false;
                         if (guild.withdrawBank(cost)) {

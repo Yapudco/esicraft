@@ -33,6 +33,13 @@ public class PlayerKillEconomyListener implements Listener {
          Guild victimGuild = this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId());
          Guild killerGuild = this.plugin.getGuildManager().getGuildByPlayer(killer.getUniqueId());
          if (victimGuild == null || killerGuild == null || !victimGuild.getId().equals(killerGuild.getId())) {
+            this.plugin.getAchievements().addStat(killer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_KILLS, 1L);
+            this.plugin.getAchievements().addStat(victim.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_DEATHS, 1L);
+            if (victimGuild != null && killerGuild != null) {
+               this.plugin.getAchievements().grant(killer.getUniqueId(), fr.esicraft.life.Achievement.DUELIST);
+               this.plugin.getChronicle().pvpKill(killerGuild.getId(), victimGuild.getId());
+            }
+
             UUID u1 = killer.getUniqueId();
             UUID u2 = victim.getUniqueId();
             String pairKey = u1.compareTo(u2) < 0 ? u1 + ":" + u2 : u2 + ":" + u1;

@@ -266,3 +266,18 @@ web:
   rate-limit:                  # Anti-flood par adresse IP (au-delà : réponse 429)
     requests: 60
     window-seconds: 10
+
+# Vie du serveur : saisons naturelles, déguisement, appel à l'aide
+life:
+  nature:
+    enabled: true
+    # Durée de chaque saison (printemps, été, automne, hiver), en jours réels
+    season-days: 14
+  disguise:
+    enabled: true
+    cost: 750
+    duration-seconds: 300
+    cooldown-minutes: 30
+  help:
+    # Pièces données à chaque allié venu en renfort si la horde est repoussée (6 alliés max)
+    reward: 250

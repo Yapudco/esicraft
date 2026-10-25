@@ -311,6 +311,7 @@ public class EventManager implements Listener {
       }
 
       ChatUtil.broadcast("&4&l🌑 LA LUNE DE SANG SE LÈVE ! &cPendant 10 minutes, les monstres sont plus nombreux, mais toutes les &6primes de chasse sont doublées&c !");
+      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "La Lune de Sang se lève : primes de chasse doublées pendant 10 minutes.");
       this.runTicker(100, () -> this.bar.setProgress(Math.max(0.0, Math.min(1.0, (double)(this.endsAt - System.currentTimeMillis()) / 600000.0))));
       return true;
    }
@@ -338,6 +339,7 @@ public class EventManager implements Listener {
       this.endsAt = System.currentTimeMillis() + 3 * 60000L;
       this.createBar("&6&l☄ PLUIE DE MÉTÉORITES &e— Cherchez les cratères !", BarColor.YELLOW);
       ChatUtil.broadcast("&6&l☄ UNE PLUIE DE MÉTÉORITES S'ABAT SUR LE MONDE ! &eDes blocs de minerai rares tombent près des joueurs, hors des territoires de guilde. Soyez les premiers !");
+      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "Une pluie de météorites s'abat sur le monde.");
       this.runTicker(300, () -> {
          this.bar.setProgress(Math.max(0.0, Math.min(1.0, (double)(this.endsAt - System.currentTimeMillis()) / 180000.0)));
          List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -412,6 +414,7 @@ public class EventManager implements Listener {
       this.endsAt = System.currentTimeMillis() + 5 * 60000L;
       this.createBar("&5&l🧙 MARCHÉ NOIR &d— Un marchand rôde près de " + rough(loc), BarColor.PURPLE);
       ChatUtil.broadcast("&5&l🧙 UN MARCHAND DU MARCHÉ NOIR EST APPARU près de &d" + rough(loc) + " &5! &7Il échange des objets rares contre des &bdiamants&7 — pendant 5 minutes seulement.");
+      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "Le Marchand du Marché Noir est apparu pour 5 minutes.");
       this.runTicker(100, () -> this.bar.setProgress(Math.max(0.0, Math.min(1.0, (double)(this.endsAt - System.currentTimeMillis()) / 300000.0))));
       return true;
    }
@@ -476,6 +479,7 @@ public class EventManager implements Listener {
       this.endsAt = System.currentTimeMillis() + 15 * 60000L;
       this.createBar("&4&l☠ SEIGNEUR DES CENDRES &c— " + rough(loc), BarColor.RED);
       ChatUtil.broadcast("&4&l☠ LE SEIGNEUR DES CENDRES S'EST ÉVEILLÉ près de &c" + rough(loc) + " &4! &7Alliez-vous pour le terrasser en 15 minutes : &6" + String.format("%.0f", BOSS_COIN_POOL) + " pièces &7à se partager selon les dégâts infligés !");
+      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "Le Seigneur des Cendres s'est éveillé : 15 minutes pour le terrasser.");
       this.runTicker(20, () -> {
          if (this.boss == null || !this.boss.isValid()) {
             return;
@@ -543,7 +547,8 @@ public class EventManager implements Listener {
          event.getDrops().add(new ItemStack(Material.NETHER_STAR, 1));
          event.getDrops().add(new ItemStack(Material.DIAMOND, 8));
          ChatUtil.broadcast("&7Le plus grand pourfendeur, &e" + topName + "&7, voit tomber une &fÉtoile du Nether &7et &b8 diamants&7 !");
-         this.plugin.getSeasonManager().addHistory("☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : " + topName + ").");
+         this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.EVENT, "☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : " + topName + ").", null, null);
+         this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.SLAYER);
       }
 
       Bukkit.getScheduler().runTask(this.plugin, this::stop);

@@ -33,14 +33,17 @@ public class ChatFormatListener implements Listener, ChatRenderer {
    public Component render(Player source, Component sourceDisplayName, Component message, Audience viewer) {
       Guild guild = this.plugin.getGuildManager().getGuildByPlayer(source.getUniqueId());
       StringBuilder prefixBuilder = new StringBuilder();
-      if (guild != null) {
+      fr.esicraft.life.DisguiseManager.Disguise disguise = this.plugin.getDisguiseManager().get(source.getUniqueId());
+      if (disguise != null) {
+         prefixBuilder.append("&8[&6").append(disguise.tag()).append("&8] ");
+      } else if (guild != null) {
          prefixBuilder.append(this.plugin.getSeasonManager().isChampion(guild.getId()) ? "&6👑 " : "").append("&8[&6").append(guild.getTag()).append("&8] ");
       } else {
          prefixBuilder.append("&8[&7Sans Guilde&8] ");
       }
 
       AgeType age = this.plugin.getAgeManager().getPlayerAge(source);
-      if (age == AgeType.SUPREMACY) {
+      if (age == AgeType.SUPREMACY && disguise == null) {
          PlayerData data = this.plugin.getDataManager().getPlayerData(source.getUniqueId());
          long sessionDurationMs = data != null ? System.currentTimeMillis() - data.getSessionLoginTime() : 0L;
          if (sessionDurationMs > 3600000L) {

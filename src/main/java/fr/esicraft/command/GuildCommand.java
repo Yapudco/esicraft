@@ -417,6 +417,10 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                      + " pièces&8)"
                );
                ChatUtil.sendRaw(player, "&7Banque de Guilde : &a" + String.format("%.2f", guild.getBankBalance()) + " pièces");
+               for (String line : this.plugin.getSynergy().describe(guild)) {
+                  ChatUtil.sendRaw(player, line);
+               }
+
                ChatUtil.sendRaw(
                   player,
                   "&7Nexus : " + (guild.hasNexus() ? "&a" + guild.getNexus().getCurrentHealth() + "/" + guild.getNexus().getMaxHealth() + " PV" : "&cNon posé")

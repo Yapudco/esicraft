@@ -81,6 +81,40 @@ final class HtmlPages {
       .mut{color:var(--mut)}.money{color:var(--acc);font-weight:700}
       .two{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:22px}@media (max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
       footer{color:var(--mut);font-size:.8rem;padding:26px 0 34px;text-align:center}
+      [hidden]{display:none!important}
+      .s{color:var(--mut);font-size:.8rem}
+      .chip.bad{color:#f87171;border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.1)}
+      .chip.rare{color:#c084fc;border-color:rgba(192,132,252,.45);background:rgba(192,132,252,.12)}
+      a.chip:hover{color:var(--tx)}
+      .row.alert{margin-top:14px;border-color:rgba(248,113,113,.5);background:linear-gradient(90deg,rgba(248,113,113,.14),var(--card))}
+      .card.raid{margin-bottom:12px;border-color:rgba(248,113,113,.4)}.card.raid .bar i{background:linear-gradient(90deg,#f87171,var(--acc))}
+      .card.nature{margin-top:14px}.big{font-size:1.9rem;line-height:1}
+      .chart{width:100%;height:auto;display:block;margin-top:8px}.chart text{fill:var(--mut);font-size:11px}.chart .gl{stroke:var(--line)}
+      .chart .lbl{fill:var(--tx);font-weight:700;font-size:12px}.chart .num{fill:#fff;font-weight:800;font-size:11px}.frise{min-width:560px}
+      .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+      .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
+      .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
+      .net a:hover circle{stroke:var(--acc)}
+      .scroll{overflow-x:auto}.heat{border-collapse:separate;border-spacing:4px;width:100%}.heat th,.heat td{padding:7px 8px;text-align:center;font-size:.8rem;border-radius:8px;white-space:nowrap}
+      .heat th{color:var(--mut);font-weight:700}
+      .filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 16px}.fb{cursor:pointer;font:inherit;font-size:.82rem;padding:6px 12px}.fb.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+      .day{font-weight:700;color:var(--tx);margin:16px 0 8px -22px;text-transform:capitalize;font-size:.9rem}
+      .ev[data-k=RAID]:before,.ev[data-k=CONQUEST]:before,.ev[data-k=BETRAYAL]:before{background:#f87171}
+      .ev[data-k=DEFENSE]:before,.ev[data-k=HELP]:before{background:var(--ok)}.ev[data-k=TREATY]:before{background:#60a5fa}
+      .ev[data-k=ACHIEVEMENT]:before{background:#c084fc}.ev[data-k=NATURE]:before{background:#a3e635}
+      .ev .chips{margin-top:6px}
+      .achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px}
+      .ach{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+      .ach .ic{flex:none;font-size:1.35rem;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--card2)}
+      .ach.lock{opacity:.5}.ach.lock .ic{filter:grayscale(1)}.ach .bar{margin:8px 0 4px}
+      .card.trophy{display:block;transition:transform .2s,border-color .2s}.card.trophy:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--acc) 40%,var(--line))}
+      .search{width:100%;margin:16px 0 4px;padding:14px 18px;border-radius:18px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;font-size:1rem;box-shadow:var(--shadow)}
+      .search:focus{outline:2px solid color-mix(in srgb,var(--acc) 60%,transparent);outline-offset:2px}
+      .guide{display:grid;gap:12px;margin-top:14px}.gs h3{margin:0 0 8px;font-size:1.05rem}.gs p,.gs li{color:var(--mut)}.gs b{color:var(--tx)}.gs p{margin:6px 0}.gs ul,.gs ol{margin:6px 0;padding-left:20px}
+      .cmd{width:100%;border-collapse:collapse}.cmd td{padding:7px 4px;border-bottom:1px solid var(--line);font-size:.9rem}.cmd td:first-child{font-weight:700;white-space:nowrap;color:var(--acc);padding-right:14px}
+      #stamp{transition:color .3s}#stamp.flash{color:var(--ok)}
+      .nl.raidl{color:#f87171}
+      @media (max-width:860px){nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}.nl{flex:none}.brand{flex:none}}
       @media (max-width:560px){.hero{padding:24px 20px;border-radius:24px}.score{min-width:64px}.row{padding:12px;gap:10px}nav{flex-wrap:nowrap;gap:2px}.brand .bn{display:none}.nl{padding:7px 11px;font-size:.88rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:14px}.stat .n{font-size:1.25rem}.stat .i{width:32px;height:32px;margin-bottom:8px}.rank{width:24px}}
       """;
 
@@ -115,16 +149,16 @@ final class HtmlPages {
       return s == null ? "" : s.replaceAll("[&§]#[0-9a-fA-F]{6}", "").replaceAll("[&§][0-9a-fk-orxA-FK-ORX]", "");
    }
 
-   private static String money(double v) {
+   static String money(double v) {
       return String.format(Locale.FRANCE, "%,.0f", v).replace(' ', ' ').replace(' ', ' ');
    }
 
    /** Teinte stable dérivée d'un texte, pour colorer les avatars. */
-   private static int hue(String s) {
+   static int hue(String s) {
       return Math.floorMod(s == null ? 0 : s.hashCode() * 31 + 7, 360);
    }
 
-   private static String initials(String s, boolean two) {
+   static String initials(String s, boolean two) {
       String p = plain(s).trim();
       if (p.isEmpty()) {
          return "?";
@@ -140,15 +174,15 @@ final class HtmlPages {
       return esc(first);
    }
 
-   private static String avatar(String label, String seed, String size) {
+   static String avatar(String label, String seed, String size) {
       return avatar(label, seed, size, false);
    }
 
-   private static String avatar(String label, String seed, String size, boolean two) {
+   static String avatar(String label, String seed, String size, boolean two) {
       return "<span class=\"av" + (size.isEmpty() ? "" : " " + size) + "\" style=\"--h:" + hue(seed) + "\" aria-hidden=\"true\">" + initials(label, two) + "</span>";
    }
 
-   private static String medal(int rank) {
+   static String medal(int rank) {
       return switch (rank) {
          case 1 -> "<span class=\"rank m1\">🥇</span>";
          case 2 -> "<span class=\"rank m2\">🥈</span>";
@@ -157,25 +191,34 @@ final class HtmlPages {
       };
    }
 
-   private static String stat(String icon, String n, String label) {
+   static String stat(String icon, String n, String label) {
       return "<div class=\"card stat\"><div class=\"i\">" + icon + "</div><div class=\"n\">" + esc(n) + "</div><div class=\"l\">" + esc(label) + "</div></div>";
    }
 
-   private static String empty(String text) {
+   static String empty(String text) {
       return "<div class=\"empty\">" + esc(text) + "</div>";
    }
 
    // ------------------------------------------------------------------ gabarit
 
    static String page(String serverName, String active, String title, String body, WebSnapshot snap) {
+      return page(serverName, active, title, body, snap, 15, false);
+   }
+
+   /** {@code live} : secondes entre deux rafraîchissements automatiques (0 = aucun). */
+   static String page(String serverName, String active, String title, String body, WebSnapshot snap, int live, boolean raidActive) {
       String time = snap.generatedAt() == 0L ? "en cours de chargement…" : "mises à jour à " + TIME.format(Instant.ofEpochMilli(snap.generatedAt()));
       return "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
          + "<meta name=\"color-scheme\" content=\"dark light\"><meta name=\"description\" content=\"Guildes, joueurs et saison du serveur " + esc(serverName) + "\">"
-         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style></head><body>"
+         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style><script src=\"/assets/app.js\" defer></script></head><body data-live=\"" + live + "\">"
          + "<header><div class=\"w\"><nav><a class=\"brand\" href=\"/\"><span class=\"logo\">" + initials(serverName, false) + "</span><span class=\"bn\">" + esc(serverName) + "</span></a>"
          + navLink("/", "Accueil", "home", active) + navLink("/guildes", "Guildes", "guildes", active) + navLink("/joueurs", "Joueurs", "joueurs", active)
+         + (raidActive ? "<a class=\"nl raidl" + ("raids".equals(active) ? " on" : "") + "\" href=\"/raids\">⚔ Raids</a>" : "")
+         + navLink("/journal", "Journal", "journal", active) + navLink("/diplomatie", "Diplomatie", "diplomatie", active) + navLink("/musee", "Musée", "musee", active)
+         + navLink("/ages", "Âges", "ages", active) + navLink("/guide", "Guide", "guide", active)
          + "</nav></div></header><main class=\"w\">" + body
-         + "<footer>Données " + esc(time) + " · <a class=\"money\" href=\"/api/stats.json\">API JSON</a></footer></main></body></html>";
+         + "<footer><span id=\"stamp\">Données " + esc(time) + "</span>" + (live > 0 ? " · mise à jour automatique" : "")
+         + " · <a class=\"money\" href=\"/api/stats.json\">API JSON</a></footer></main></body></html>";
    }
 
    private static String navLink(String href, String label, String key, String active) {
@@ -219,7 +262,7 @@ final class HtmlPages {
 
       StringBuilder b = new StringBuilder("<div class=\"people\">");
       for (WebSnapshot.OnlineView p : s.online()) {
-         b.append(p.guildId() != null ? "<a class=\"person row\" href=\"/guilde/" + esc(p.guildId()) + "\">" : "<div class=\"person row\">")
+         b.append("<a class=\"person row\" href=\"/joueur/" + esc(p.name().toLowerCase(Locale.ROOT)) + "\">")
             .append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(p.name())).append("</div><div class=\"s\">")
             .append(esc(p.race())).append(" · ").append(p.guildName() != null ? esc(p.guildName()) : "sans guilde").append("</div></div>");
          if (p.coins() != null) {
@@ -228,13 +271,13 @@ final class HtmlPages {
             b.append("<span class=\"on-dot\"></span>");
          }
 
-         b.append(p.guildId() != null ? "</a>" : "</div>");
+         b.append("</a>");
       }
 
       return b.append("</div>").toString();
    }
 
-   private static String timeline(List<String> history) {
+   static String timeline(List<String> history) {
       if (history.isEmpty()) {
          return empty("Rien à signaler pour le moment.");
       }
@@ -253,11 +296,11 @@ final class HtmlPages {
 
    // ------------------------------------------------------------------ pages
 
-   static String home(String serverName, WebSnapshot s) {
+   static String home(String serverName, WebSnapshot s, WebExtra x) {
       StringBuilder b = new StringBuilder("<section class=\"hero\"><span class=\"live\"><span class=\"dot\"></span>")
          .append(s.onlineCount()).append(s.onlineCount() > 1 ? " joueurs" : " joueur").append(" en ligne</span><h1>")
          .append(esc(serverName)).append("</h1><p>Saison ").append(esc(s.season())).append(" · ").append(s.daysLeft()).append(" jours restants")
-         .append(s.event() != null ? " · " + esc(plain(s.event())) : "").append("</p></section>");
+         .append(s.event() != null ? " · " + esc(plain(s.event())) : "").append("</p></section>").append(ExtraPages.homeBanner(x)).append(ExtraPages.natureCard(x));
       b.append("<div class=\"grid\" style=\"margin-top:16px\">")
          .append(stat("🟢", s.onlineCount() + " / " + s.maxPlayers(), "Joueurs en ligne"))
          .append(stat("🏰", String.valueOf(s.guilds().size()), "Guildes"))
@@ -265,18 +308,18 @@ final class HtmlPages {
          .append(stat("🏆", s.guilds().isEmpty() ? "-" : s.guilds().get(0).name(), "Guilde en tête"))
          .append("</div>");
       b.append("<div class=\"two\"><div><h2>🏆 Top guildes <small><a href=\"/guildes\">tout voir →</a></small></h2>")
-         .append(guildRows(s.guilds().stream().limit(5).toList(), false)).append("</div><div><h2>📜 Histoire récente</h2>")
-         .append(timeline(s.history())).append("</div></div>");
+         .append(guildRows(s.guilds().stream().limit(5).toList(), false)).append("<p><a class=\"nl\" href=\"/evolution\">📈 Courbes d'évolution →</a></p></div><div><h2>📰 Journal de guerre <small><a href=\"/journal\">tout voir →</a></small></h2>")
+         .append(x.journal().isEmpty() ? timeline(s.history()) : ExtraPages.journalList(s, x.journal().stream().limit(8).toList(), s.generatedAt(), false)).append("</div></div>");
       b.append("<h2>🟢 En ligne</h2>").append(onlineGrid(s));
       return b.toString();
    }
 
    static String guilds(WebSnapshot s) {
       return "<section class=\"hero\"><h1>Guildes</h1><p>Classement de la saison " + esc(s.season()) + " : territoire, Âge, richesse, raids repoussés et conquêtes.</p></section>"
-         + "<h2>🏰 Classement <small>" + s.guilds().size() + " guilde" + (s.guilds().size() > 1 ? "s" : "") + "</small></h2>" + guildRows(s.guilds(), true);
+         + "<h2>🏰 Classement <small>" + s.guilds().size() + " guilde" + (s.guilds().size() > 1 ? "s" : "") + " · <a href=\"/evolution\">📈 courbes</a> · <a href=\"/diplomatie\">🕸 diplomatie</a></small></h2>" + guildRows(s.guilds(), true);
    }
 
-   static String players(WebSnapshot s) {
+   static String players(WebSnapshot s, WebExtra x) {
       StringBuilder b = new StringBuilder("<section class=\"hero\"><span class=\"live\"><span class=\"dot\"></span>")
          .append(s.onlineCount()).append(" / ").append(s.maxPlayers()).append(" connectés</span><h1>Joueurs</h1><p>Qui joue en ce moment, et qui a le plus de pièces.</p></section>");
       b.append("<h2>🟢 En ligne</h2>").append(onlineGrid(s));
@@ -286,15 +329,15 @@ final class HtmlPages {
          int rank = 1;
          for (WebSnapshot.RichView r : s.rich()) {
             int pct = (int)Math.max(3L, Math.min(100L, Math.round(r.coins() * 100.0 / top)));
-            b.append("<div class=\"row\">").append(medal(rank++)).append(avatar(r.name(), r.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
+            b.append("<a class=\"row\" href=\"/joueur/").append(esc(r.name().toLowerCase(Locale.ROOT))).append("\">").append(medal(rank++)).append(avatar(r.name(), r.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
                .append(esc(r.name())).append("</div><div class=\"bar\"><i style=\"width:").append(pct).append("%\"></i></div></div><div class=\"score\"><b class=\"money\">")
-               .append(money(r.coins())).append("</b><span class=\"mut\">pièces</span></div></div>");
+               .append(money(r.coins())).append("</b><span class=\"mut\">pièces</span></div></a>");
          }
 
          b.append("</div>");
       }
 
-      return b.toString();
+      return b.append(ExtraPages.directory(x)).toString();
    }
 
    static String guild(WebSnapshot.GuildView g) {
@@ -331,12 +374,12 @@ final class HtmlPages {
 
       b.append("<h2>👥 Membres <small>").append(g.members().size()).append("</small></h2><div class=\"people\">");
       for (WebSnapshot.MemberView m : g.members()) {
-         b.append("<div class=\"person\">").append(avatar(m.name(), m.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(m.name()))
+         b.append("<a class=\"person row\" href=\"/joueur/").append(esc(m.name().toLowerCase(Locale.ROOT))).append("\">").append(avatar(m.name(), m.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(m.name()))
             .append("</div><div class=\"s\">").append(esc(m.role())).append(m.race() != null ? " · " + esc(m.race()) : "").append("</div></div>")
-            .append(m.online() ? "<span class=\"on-dot\" title=\"En ligne\"></span>" : "<span class=\"off-dot\" title=\"Hors ligne\"></span>").append("</div>");
+            .append(m.online() ? "<span class=\"on-dot\" title=\"En ligne\"></span>" : "<span class=\"off-dot\" title=\"Hors ligne\"></span>").append("</a>");
       }
 
-      return b.append("</div><p style=\"margin-top:26px\"><a class=\"nl\" href=\"/guildes\">← Toutes les guildes</a></p>").toString();
+      return b.append("</div>").toString();
    }
 
    static String notFound() {
