@@ -242,3 +242,13 @@ rail:
   max-stations-per-guild: 6
   min-age-level: 2             # Âge minimal de la guilde pour créer une gare
   search-max-rails: 30000      # Plafond de rails explorés par recherche
+
+# Traités entre guildes (/traite)
+treaties:
+  enabled: true
+  proposal-minutes: 10         # Durée de validité d'une proposition
+  pact-days: 7                 # Durée d'un pacte de non-agression
+  vassal-tribute-percent: 5.0  # % de la banque du vassal versé chaque jour au suzerain
+  break-indemnity: 500.0       # Indemnité versée à l'ex-partenaire en cas de rupture (plafonnée à la banque)
+  break-grace-minutes: 30      # Préavis avant que le traître puisse attaquer sa victime
+  protect-allies-pvp: true     # Pas de dégâts entre joueurs alliés / suzerain-vassal

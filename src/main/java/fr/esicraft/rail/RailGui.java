@@ -191,11 +191,12 @@ public final class RailGui {
          Guild other = others.get(from + i);
          holder.guildSlots.add(other);
          Relation r = plugin.getRailManager().getRelation(guild.getId(), other.getId());
+         boolean locked = plugin.getRailManager().isTreatyLocked(guild.getId(), other.getId());
          inv.setItem(i, new ItemBuilder(r.getIcon()).name("&f" + other.getName()).lore(
             "&7Relation : " + r.getLabel(),
             "&8" + r.getDescription(),
             "",
-            "&eClic pour changer (Normale → Alliée → Bannie)").build());
+            locked ? "&d🔒 Imposée par un traité (/traite)" : "&eClic pour changer (Normale → Alliée → Bannie)").build());
       }
 
       int pages = Math.max(1, (others.size() + PAGE_SIZE - 1) / PAGE_SIZE);

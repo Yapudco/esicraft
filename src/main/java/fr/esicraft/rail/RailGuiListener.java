@@ -101,6 +101,11 @@ public class RailGuiListener implements Listener {
             RailGui.openRelations(this.plugin, player, guild, holder.page + 1);
          } else if (slot >= 0 && slot < holder.guildSlots.size()) {
             Guild other = holder.guildSlots.get(slot);
+            if (rails.isTreatyLocked(guild.getId(), other.getId())) {
+               ChatUtil.sendMessage(player, "&c❌ Un traité impose le passage gratuit à &6" + other.getName() + "&c : rompez-le pour changer la relation.");
+               return;
+            }
+
             Relation next = rails.getRelation(guild.getId(), other.getId()).next();
             rails.setRelation(guild.getId(), other.getId(), next);
             ChatUtil.playSound(player, Sound.UI_BUTTON_CLICK, 0.6F, 1.0F);

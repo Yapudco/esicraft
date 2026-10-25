@@ -193,9 +193,25 @@ public class RailManager {
          "INSERT INTO rail_policy (guild_id, toll) VALUES (?, ?) ON CONFLICT(guild_id) DO UPDATE SET toll = excluded.toll;", guildId, clamped));
    }
 
+   public void invalidateCache() {
+      this.cache.clear();
+   }
+
+   /** Vrai si un traité (alliance / vassalité) impose le passage gratuit : la relation manuelle est alors verrouillée. */
+   public boolean isTreatyLocked(String ownerGuildId, String otherGuildId) {
+      return this.plugin.getTreatyManager() != null && this.plugin.getTreatyManager().areFriends(ownerGuildId, otherGuildId);
+   }
+
    public Relation getRelation(String ownerGuildId, String otherGuildId) {
       if (otherGuildId == null) {
          return Relation.NORMAL;
+      }
+
+      if (this.plugin.getTreatyManager() != null) {
+         Relation forced = this.plugin.getTreatyManager().railOverride(ownerGuildId, otherGuildId);
+         if (forced != null) {
+            return forced;
+         }
       }
 
       Map<String, Relation> map = this.relations.get(ownerGuildId);

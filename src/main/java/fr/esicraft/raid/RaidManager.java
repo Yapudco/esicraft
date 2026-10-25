@@ -158,6 +158,8 @@ public class RaidManager implements Listener {
             }
 
             return false;
+         } else if (this.plugin.getTreatyManager().blocksRaid(attackerGuild, targetGuild, buyer)) {
+            return false;
          } else if (this.isGuildUnderRaid(targetGuild.getId())) {
             if (buyer != null) {
                ChatUtil.sendMessage(buyer, "&cUne horde de monstres attaque déjà le Nexus de cette guilde !");
@@ -402,7 +404,9 @@ public class RaidManager implements Listener {
                }
 
                return false;
-            } else if (this.isGuildUnderRaid(targetGuild.getId())) {
+            } else if (this.plugin.getTreatyManager().blocksRaid(attackerGuild, targetGuild, buyer)) {
+            return false;
+         } else if (this.isGuildUnderRaid(targetGuild.getId())) {
                if (buyer != null) {
                   ChatUtil.sendMessage(buyer, "&cUne horde de monstres attaque déjà le Nexus de cette guilde !");
                }
