@@ -38,6 +38,11 @@ import fr.esicraft.guild.listener.SpecializationRulesListener;
 import fr.esicraft.race.listener.RaceCombatListener;
 import fr.esicraft.race.listener.RaceInteractionListener;
 import fr.esicraft.raid.RaidManager;
+import fr.esicraft.rail.RailGuiListener;
+import fr.esicraft.rail.RailListener;
+import fr.esicraft.rail.RailManager;
+import fr.esicraft.command.RailCommand;
+import fr.esicraft.command.StationCommand;
 import fr.esicraft.fun.ContractListener;
 import fr.esicraft.fun.ContractManager;
 import fr.esicraft.fun.EventManager;
@@ -57,6 +62,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private SeasonManager seasonManager;
    private EventManager eventManager;
    private HudManager hudManager;
+   private RailManager railManager;
    private RaceManager raceManager;
    private GuildManager guildManager;
    private NexusManager nexusManager;
@@ -85,9 +91,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.seasonManager = new SeasonManager(this);
       this.eventManager = new EventManager(this);
       this.hudManager = new HudManager(this);
+      this.railManager = new RailManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       this.seasonManager.init();
+      this.railManager.load();
       this.eventManager.start();
       this.hudManager.start();
       this.nexusManager.removeAllHolograms();
@@ -101,6 +109,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.specializationRules, this);
       pm.registerEvents(new ContractListener(this), this);
       pm.registerEvents(this.eventManager, this);
+      pm.registerEvents(new RailListener(this), this);
+      pm.registerEvents(new RailGuiListener(this), this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
       pm.registerEvents(new GUIListener(this), this);
@@ -169,6 +179,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       SeasonCommand seasonCommand = new SeasonCommand(this);
       Objects.requireNonNull(this.getCommand("classement")).setExecutor(seasonCommand);
       Objects.requireNonNull(this.getCommand("histoire")).setExecutor(seasonCommand);
+      Objects.requireNonNull(this.getCommand("station")).setExecutor(new StationCommand(this));
+      Objects.requireNonNull(this.getCommand("rail")).setExecutor(new RailCommand(this));
       FunCommand funCommand = new FunCommand(this);
       Objects.requireNonNull(this.getCommand("hud")).setExecutor(funCommand);
       Objects.requireNonNull(this.getCommand("evenement")).setExecutor(funCommand);
@@ -205,6 +217,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public EventManager getEventManager() {
       return this.eventManager;
+   }
+
+   public RailManager getRailManager() {
+      return this.railManager;
    }
 
    public HudManager getHudManager() {

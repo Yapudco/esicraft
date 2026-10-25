@@ -177,6 +177,7 @@ public class DataManager {
       this.plugin.getNexusManager().removeAllHolograms();
       this.plugin.getGuildManager().clearAll();
       this.plugin.getMarketManager().clearAll();
+      this.plugin.getRailManager().clearAll();
       this.plugin.getAntiFarmManager().resetStats();
       this.storage.resetAllGameData();
    }

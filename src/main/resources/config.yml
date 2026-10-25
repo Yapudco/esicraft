@@ -231,3 +231,14 @@ events:
   enabled: true
   min-interval-minutes: 45
   max-interval-minutes: 90
+
+# Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
+rail:
+  enabled: true
+  base-fare: 1.0              # Tarif de base d'un trajet (versé à la guilde de la gare d'arrivée)
+  default-toll: 2.0           # Péage par défaut d'une guilde dont le territoire est traversé
+  max-toll: 500.0
+  station-creation-cost: 500.0 # Prélevé sur la banque de guilde
+  max-stations-per-guild: 6
+  min-age-level: 2             # Âge minimal de la guilde pour créer une gare
+  search-max-rails: 30000      # Plafond de rails explorés par recherche
