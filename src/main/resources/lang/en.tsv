@@ -1472,3 +1472,269 @@ Sauveur	Savior
  a répondu à l'appel de 	 answered the call of 
  commence.	 begins.
  entre dans l'	 enters the 
+# Site web (pages publiques)
+Accueil	Home
+Guildes	Guilds
+Joueurs	Players
+Journal de guerre	War log
+Journal	Log
+Diplomatie	Diplomacy
+Musée des trophées	Trophy museum
+Musée	Museum
+Raids en direct	Live raids
+Courbes d'évolution	Growth curves
+Frise des Âges	Ages timeline
+Réseau diplomatique	Diplomatic network
+Guide du joueur	Player guide
+Introuvable	Not found
+Cette page n'existe pas (ou plus).	This page doesn't exist (anymore).
+Retour à l'accueil	Back to home
+maintenant	now
+Recentrer	Re-center
+Tout afficher	Show all
+Tout masquer	Hide all
+Toutes les guildes	All guilds
+Molette ou boutons pour zoomer, glisser pour déplacer. Cliquez un type pour le masquer ou l'afficher.	Mouse wheel or buttons to zoom, drag to pan. Click a type to hide or show it.
+Abscisse : le temps réel (les écarts sont proportionnels). Ordonnée : l'Âge atteint. Chaque marche est un passage d'Âge ; le gros point est l'Âge actuel. Survolez un point pour sa date et le délai depuis l'Âge précédent.	X axis: real time (gaps are proportional). Y axis: the Age reached. Each step is an Age change; the big dot is the current Age. Hover a dot for its date and the delay since the previous Age.
+Pour atteindre l'Âge	To reach Age
+), la guilde doit déposer (	), the guild must deposit (
+Les quantités augmentent avec la taille de la guilde (	Quantities grow with guild size (
+Cette guilde a atteint le dernier Âge.	This guild has reached the final Age.
+Aucun passage d'Âge enregistré pour le moment.	No Age change recorded yet.
+Âge maximal	Max Age
+après l'Âge	after Age
+Âge Rustique	Rustic Age
+Âge de la Métallurgie	Age of Metallurgy
+Âge de l'Alchimie	Age of Alchemy
+Âge de Guerre Totale	Age of Total War
+Âge Mythique & Apex	Mythic & Apex Age
+Âge de Suprématie	Age of Supremacy
+Prérequis du prochain Âge	Requirements for the next Age
+Réputation	Reputation
+honneur	honor
+Les plus honorables	Most honorable
+Derniers débloqués	Latest unlocked
+Spécialisations	Specializations
+Carte des rivalités	Rivalry map
+Saisons naturelles	Natural seasons
+Vie du serveur	Server life
+Tous les succès	All achievements
+Galerie des guildes	Guild gallery
+Succès rares obtenus	Rare achievements earned
+Le Nexus et ses pièges	The Nexus and its traps
+Les plus riches	The richest
+Tous les joueurs	All players
+Derniers combats	Latest battles
+Traités en vigueur	Treaties in force
+Dans le journal	In the log
+Bien démarrer	Getting started
+Diversité des métiers	Profession diversity
+Vassalité (flèche : vassal → suzerain)	Vassalage (arrow: vassal → overlord)
+Rivalité (épaisseur = intensité)	Rivalry (thickness = intensity)
+Rivalités	Rivalries
+Rivalité	Rivalry
+Rustique	Rustic
+Métallurgie	Metallurgy
+Alchimie	Alchemy
+Guerre Totale	Total War
+Mythique	Mythic
+Arcaniste	Arcanist
+Forgeron	Blacksmith
+Ingénieur	Engineer
+Nain	Dwarf
+Rôdeur	Ranger
+Sylvain	Sylvan
+Chef	Leader
+Argent	Money
+Traités	Treaties
+Succès	Achievements
+Membres	Members
+Métier	Profession
+Pièces	Coins
+Sans guilde	No guild
+Sans métier	No profession
+sans guilde	no guild
+en ligne	online
+En ligne	Online
+Saison	Season
+Données	Data
+Conquêtes	Conquests
+Trahisons	Betrayals
+courbes	curves
+Évolution	Growth
+Défenses	Defenses
+Territoire	Territory
+Contrats	Contracts
+Déguisement	Disguise
+Événements	Events
+Commandes	Commands
+Classement	Ranking
+Trophées	Trophies
+Top guildes	Top guilds
+Renforts	Reinforcements
+joueur tué	player killed
+joueurs tués	players killed
+succès rare	rare achievement
+à l'instant	just now
+· encore	· still
+· puis	· then
+sur place	on site
+tout voir →	see all →
+en cours de chargement…	loading…
+mises à jour à	updated at
+· mise à jour automatique	· automatic updates
+(750 pièces, 5 minutes, une fois toutes les 30 minutes) : vous apparaissez sous le nom d'un membre de cette guilde,	(750 coins, 5 minutes, once every 30 minutes): you appear under the name of a member of that guild,
+(alliance + 5 % de la banque du vassal chaque jour au suzerain). Rompre un traité est une trahison : indemnité (500 pièces max) et 30 minutes sans pouvoir attaquer.	(alliance + 5% of the vassal's bank each day to the overlord). Breaking a treaty is a betrayal: compensation (500 coins max) and 30 minutes without being able to attack.
+(armures en diamant, villageois, TNT pour tous) · 5 Mythique (Netherite pour tous, terres illimitées) · 6 Suprématie (œuf de dragon et titre).	(diamond armor, villagers, TNT for everyone) · 5 Mythic (Netherite for everyone, unlimited land) · 6 Supremacy (dragon egg and title).
+(pas de raid, trains gratuits, pas de dégâts entre alliés),	(no raids, free trains, no damage between allies),
+) : chaque jour, trois objectifs réservés chacun à un métier (un Nain mine, un Forgeron fond…).	): each day, three goals each reserved for one profession (a Dwarf mines, a Blacksmith smelts…).
+) ou fondez la vôtre :	) or found your own:
+) puis posez le Nexus (	) then place the Nexus (
+), Hôtel des Ventes (	), Auction House (
+), dans l'heure qui suit la création.	), within the hour after creation.
+), événements. Tuer un joueur d'une autre guilde rapporte 100 pièces + 1 % de sa fortune.	), events. Killing a player from another guild earns 100 coins + 1% of their fortune.
+, +400 pièces pour les trois), Hôtel des Ventes	, +400 coins for all three), Auction House
+, payés par la banque, consommés à la fin de la prochaine horde) :	, paid by the bank, consumed at the end of the next horde):
+. 1 Rustique · 2 Métallurgie (Nether) · 3 Alchimie (End) · 4 Guerre Totale	. 1 Rustic · 2 Metallurgy (Nether) · 3 Alchemy (End) · 4 Total War
+. Tapez un mot pour filtrer : « Nexus », « traité », « train »…	. Type a word to filter: “Nexus”, “treaty”, “train”…
+3 métiers : primes de monstres +10 %	3 professions: monster bounties +10%
+4 métiers : terres -10 %	4 professions: land -10%
+5 métiers : pièges -15 %	5 professions: traps -15%
+6 métiers : contrats de guilde ×1,5	6 professions: guild contracts ×1.5
+: +20 % d'expérience.	: +20% experience.
+: Légion Guerrière (combat), Industrie Souterraine (minage), Enclave Champêtre (nature),	: Warrior Legion (combat), Underground Industry (mining), Pastoral Enclave (nature),
+: banque, dons, défense.	: bank, donations, defense.
+: choisissez votre métier. Sans métier, impossible de casser un bloc.	: choose your profession. Without one, you can't break a block.
+: cultures deux fois plus lentes, primes de monstres +25 %.	: crops twice as slow, monster bounties +25%.
+: cultures plus rapides (+50 %).	: faster crops (+50%).
+: nouvelles terres 10 % moins chères	: new land 10% cheaper
+: pièges du Nexus 15 % moins chers	: Nexus traps 15% cheaper
+: primes de monstres +10 %	: monster bounties +10%
+: récompenses des contrats de guilde ×1,5	: guild contract rewards ×1.5
+: territoire, Âge, richesse, raids repoussés et conquêtes.	: territory, Age, wealth, repelled raids and conquests.
+: une chance sur deux d'une récolte bonus.	: a 50% chance of a bonus harvest.
+: vos alliés (alliance ou vassalité) sont prévenus. Ceux qui viennent sur vos terres avant la fin de la horde	: your allies (alliance or vassalage) are notified. Those who come to your land before the horde ends
+Alliances, pactes, vassalités et rivalités entre les guildes. Les rivalités comptent les raids lancés et les joueurs tués.	Alliances, pacts, vassalages and rivalries between guilds. Rivalries count raids launched and players killed.
+Appel à l'aide	Call for help
+Après le premier choix, on ne peut en changer qu'à l'arrivée d'un nouveau joueur.	After the first choice, it can only be changed when a new player joins.
+Aucun raid ni duel entre guildes pour l'instant.	No raids or duels between guilds yet.
+Aucun traité ni rivalité pour le moment : le réseau se dessinera au fil des alliances et des raids.	No treaty or rivalry yet: the network will take shape as alliances and raids happen.
+Aucun traité signé.	No treaty signed.
+Aucun trophée pour l'instant : Âges avancés, conquêtes, hordes repoussées et titres de champion apparaîtront ici.	No trophies yet: advanced Ages, conquests, repelled hordes and champion titles will appear here.
+Aucune guilde pour le moment.	No guild yet.
+Aucune horde n'attaque pour le moment. Les derniers raids sont dans le journal de guerre.	No horde is attacking right now. The latest raids are in the war log.
+Aucune section ne correspond à cette recherche.	No section matches this search.
+Brasier (250), Toile (200), Foudre (350), Brume toxique (300), Golem gardien (500).	Brazier (250), Web (200), Lightning (350), Toxic Mist (300), Guardian Golem (500).
+Champion de saison	Season champion
+Choisies par le chef dans	Chosen by the leader in
+Chunks revendiqués	Claimed chunks
+Classement de la saison	Season ranking
+Construire une gare : Âge 2, 500 pièces, 6 gares par guilde.	Build a station: Age 2, 500 coins, 6 stations per guild.
+Contrat de guilde	Guild contract
+Contrats accomplis	Contracts completed
+Contrats du jour et de guilde	Daily and guild contracts
+Couronne de la dernière saison	Crown of the last season
+Donnez des ressources dans	Give resources in
+Défaites en duel	Duel defeats
+Gagnez des pièces : monstres, contrats du jour (	Earn coins: monsters, daily contracts (
+Guilde complète	Complete guild
+Guilde en tête	Leading guild
+Guilde, terres, Nexus, banque	Guild, land, Nexus, bank
+Hordes lancées	Hordes launched
+Hordes repoussées	Hordes repelled
+Hôtel des Ventes et raids	Auction House and raids
+Infliger des dégâts (ou frapper le Nexus) vous démasque, et la guilde est prévenue.	Dealing damage (or hitting the Nexus) unmasks you, and the guild is warned.
+Joueurs en ligne	Players online
+Joueurs vaincus	Players defeated
+La cible est ensuite protégée 30 minutes (2 minutes pour une guilde en hégémonie, trop riche).	The target is then protected for 30 minutes (2 minutes for a guild in hegemony, too rich).
+La course aux Âges sur un vrai axe de temps : à quel moment chaque guilde a franchi chaque Âge, et ce qu'il lui manque pour le suivant.	The race through the Ages on a real time axis: when each guild passed each Age, and what it still lacks for the next one.
+Le cœur de la guilde : s'il est détruit, la guilde perd ses terres et sa banque. Pas d'eau, de lave ni d'obsidienne à moins de 16 blocs.	The heart of the guild: if destroyed, the guild loses its land and bank. No water, lava or obsidian within 16 blocks.
+Le monde change de saison toutes les deux semaines (	The world changes season every two weeks (
+Le score de saison des meilleures guildes, relevé chaque heure (90 jours d'historique).	The season score of the top guilds, recorded every hour (90 days of history).
+Les chunks revendiqués doivent se toucher. Prix : 100 pièces puis +25 par chunk. Maximum : 16 (Âge 1), 32, 64, 128, puis illimité à l'Âge 5.	Claimed chunks must touch. Price: 100 coins then +25 per chunk. Maximum: 16 (Age 1), 32, 64, 128, then unlimited at Age 5.
+Les exclusivités disparaissent avec les Âges. Changer de métier : 3 fois gratuitement après le premier choix, puis 10 000 pièces, 24 h d'attente.	Exclusives disappear with the Ages. Changing profession: 3 times for free after the first choice, then 10,000 coins and a 24 h wait.
+Les exploits des guildes et les succès des joueurs. Un succès obtenu par moins de 10 % des joueurs est rare.	Guild feats and player achievements. An achievement earned by fewer than 10% of players is rare.
+Les membres donnent des ressources dans	Members give resources in
+Les quantités augmentent avec le nombre maximal de membres atteint pendant l'Âge.	Quantities grow with the maximum number of members reached during the Age.
+Les six métiers réunis	All six professions together
+Monstres éliminés	Monsters slain
+Nexus détruit(s) cette saison	Nexus destroyed this season
+Obtenus par ses membres	Earned by its members
+Pas encore assez de données : un point est enregistré chaque heure.	Not enough data yet: one point is recorded every hour.
+Pendant une attaque, tapez	During an attack, type
+Pensez à faire des réserves avant l'hiver.	Remember to stock up before winter.
+Personne n'a encore débloqué de succès.	Nobody has unlocked an achievement yet.
+Personne n'est connecté pour le moment.	Nobody is online right now.
+Plus une guilde réunit de métiers différents, plus elle est forte :	The more different professions a guild brings together, the stronger it is:
+Primes de monstres (de 1,50 à 750 pièces), 3 contrats par jour (	Monster bounties (from 1.50 to 750 coins), 3 contracts per day (
+Prix : 1 pièce pour la gare d'arrivée + les péages des guildes traversées.	Price: 1 coin for the arrival station + the tolls of the guilds crossed.
+Près d'une gare (panneau	Near a station (sign
+Qui joue en ce moment, et qui a le plus de pièces.	Who is playing right now, and who has the most coins.
+Raids repoussés	Raids repelled
+Rejoignez une guilde (	Join a guild (
+Renforts envoyés	Reinforcements sent
+Revendiquez un terrain (	Claim a plot of land (
+Rien à signaler pour le moment.	Nothing to report for now.
+Saison et mémorial	Season and memorial
+Saison naturelle	Natural season
+Saisons vécues	Seasons lived
+Score de saison	Season score
+Seuls les membres du bon métier les font avancer : 200 pièces par objectif et 750 de plus pour les trois, versées à la banque de guilde.	Only members of the right profession advance them: 200 coins per goal and 750 more for all three, paid into the guild bank.
+Si le Nexus tombe : territoire et banque passent au vainqueur, les vaincus choisissent de le rejoindre ou de partir.	If the Nexus falls: land and bank go to the winner, and the defeated choose to join them or leave.
+Suivre en direct →	Follow live →
+Syndicat Marchand (commerce), Conclave Arcanique (magie), Rôdeur Solitaire (seul). Chacune donne des bonus et impose une composition de métiers.	Merchant Syndicate (trade), Arcane Conclave (magic), Lone Ranger (solo). Each gives bonuses and imposes a profession mix.
+Tableau de bord, livre, anglais	Dashboard, book, English
+Tout ce qui fait l'histoire du serveur : raids, conquêtes, traités, trahisons, Âges, événements.	Everything that makes the server's history: raids, conquests, treaties, betrayals, Ages, events.
+Toutes les règles d'	All the rules of 
+Un défenseur doit être connecté et sur ses terres.	A defender must be online and on their land.
+Un événement tous les 1 à 2 jours : Lune de sang, pluie de météorites, marché noir, boss mondial.	An event every 1 to 2 days: Blood Moon, meteor shower, black market, world boss.
+Une pomme dorée jetée dessus le soigne (+500 PV, +2 500 si enchantée, 30 s entre deux soins).	A golden apple thrown on it heals it (+500 HP, +2,500 if enchanted, 30 s between heals).
+Votre niveau s'affiche dans	Your level is shown in
+Voyages en train	Train trips
+avec son étiquette, et votre nom au-dessus de la tête est masqué. Ses pièges et son golem vous ignorent, mais ses protections de territoire restent actives.	with its tag, and your name above your head is hidden. Its traps and golem ignore you, but its land protections stay active.
+chacun si elle est repoussée (6 alliés au plus). Un appel toutes les 10 minutes.	each if it is repelled (6 allies at most). One call every 10 minutes.
+chunks revendiqués	claimed chunks
+de non-agression (7 jours),	non-aggression (7 days),
+donne le livre en jeu,	gives the in-game book,
+désigne la guilde championne (5 000 pièces + 500 par membre).	names the champion guild (5,000 coins + 500 per member).
+et sur la fiche de guilde.	and on the guild page.
+hordes repoussées cette saison	hordes repelled this season
+jours restants	days left
+le tableau de bord,	the dashboard,
+liste vos succès (les plus rares sont exposés au musée du site).	lists your achievements (the rarest are shown in the site museum).
+membre(s) comptés).	member(s) counted).
+passe le jeu en anglais.	switches the game to English.
+pour faire progresser votre guilde.	to advance your guild.
+pour l'enlever.	to remove it.
+raids en cours	raids in progress
+raid en cours	raid in progress
+raids · joueurs tués	raids · players killed
+règle le péage et les relations (normale, alliée, bannie).	sets the toll and relations (normal, allied, banned).
+résume les derniers grands faits,	summarizes the latest major events,
+sous les assauts d'une horde	under a horde's assault
+téléporte vers une autre gare reliée par des rails continus.	teleports to another station linked by continuous rails.
+Âge 6 atteint : œuf de dragon et bloc de Netherite	Age 6 reached: dragon egg and Netherite block
+← Tous les joueurs	← All players
+← Toutes les guildes	← All guilds
+(archer) : flèches empoisonnées, +25 % à distance, rapide en forêt ; lent avec un plastron lourd.	(archer): poisoned arrows, +25% at range, fast in forests; slow with heavy chestplates.
+(fermier) : régénération pour lui et sa guilde à 4 blocs, récolte d'un clic droit ; -20 % de dégâts au corps à corps.	(farmer): regeneration for them and their guild within 4 blocks, right-click harvest; -20% melee damage.
+(mage) : enchantements et potions, +30 % d'XP ; +15 % de dégâts subis au corps à corps.	(mage): enchantments and potions, +30% XP; +15% melee damage taken.
+(mineur) : Hâte II et vision nocturne sous la couche 0, 15 % de minerais doublés ; lent en plein soleil, pas d'armes ni d'armures en métal.	(miner): Haste II and night vision below layer 0, 15% ore doubled; slow in full sun, no metal weapons or armor.
+, le crâne de Wither : choisissez une horde (ou composez-la, 60 monstres max) et une cible ; la banque de guilde paie.	, the Wither skull: choose a horde (or build one, 60 monsters max) and a target; the guild bank pays.
+métiers	professions
+métier	profession
+: invitations, terres, Nexus, pièges, raids, traités, gares ;	: invitations, land, Nexus, traps, raids, treaties, stations;
+: redstone, pistons et TNT, -40 % de dégâts d'explosion ; -20 % au corps à corps.	: redstone, pistons and TNT, -40% explosion damage; -20% in melee.
+: seul à forger armes, armures et enclumes au début ; résistance au feu, 35 % de lingots doublés ; a faim plus vite.	: the only one able to forge weapons, armor and anvils at the start; fire resistance, 35% ingots doubled; gets hungry faster.
+: tout ;	: everything;
+Chez une autre guilde : impossible de casser, poser, ouvrir les coffres ; TNT, perles, pistons, lave et eau venues de l'extérieur sont bloqués. Pas de seau de lave à moins de 5 blocs d'un joueur ennemi.	On another guild's land: you can't break, place or open chests; TNT, pearls, pistons, lava and water from outside are blocked. No lava bucket within 5 blocks of an enemy player.
+Les hordes qui assiègent un Nexus en ce moment. La page se met à jour toute seule ; aucune position n'est publiée.	Hordes currently besieging a Nexus. The page updates by itself; no position is published.
+Forteresse	Fortress
+Banque	Bank
+Les raids	The raids
+Les métiers	The professions
+Le train	The train
+diplomatie	diplomacy
+Pièges (	Traps (
+Aucun raid	No raid
+Chaque mois,	Every month,

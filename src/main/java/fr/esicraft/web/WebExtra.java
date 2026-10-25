@@ -8,7 +8,7 @@ import java.util.Map;
 record WebExtra(List<JournalView> journal, List<RaidView> raids, List<EdgeView> edges, Map<String, List<Chronicle.Point>> curves,
                 List<Chronicle.AgeMark> ages, List<AchievementView> achievements, List<UnlockView> recentUnlocks,
                 Map<String, List<TrophyView>> trophies, List<ProfileView> profiles, NatureView nature, Map<String, Integer> diversity,
-                int knownPlayers) {
+                int knownPlayers, Map<String, AgeProgress> ageProgress) {
 
    record JournalView(long ts, String icon, String kind, String text, String guildA, String guildB) {
    }
@@ -32,14 +32,21 @@ record WebExtra(List<JournalView> journal, List<RaidView> raids, List<EdgeView> 
    }
 
    record ProfileView(String key, String name, String race, String guildId, String guildName, String role, String age, Double coins,
-                      boolean online, List<String> achievements, Map<String, Long> stats) {
+                      boolean online, List<String> achievements, Map<String, Long> stats, int reputation) {
+   }
+
+   /** Prérequis du prochain Âge d'une guilde : objets à déposer (déposé / requis). */
+   record ReqView(String item, int donated, int required) {
+   }
+
+   record AgeProgress(int nextLevel, String nextName, List<ReqView> reqs, int members) {
    }
 
    record NatureView(String icon, String label, long daysLeft, List<String> effects, String next) {
    }
 
    static WebExtra empty() {
-      return new WebExtra(List.of(), List.of(), List.of(), Map.of(), List.of(), List.of(), List.of(), Map.of(), List.of(), null, Map.of(), 1);
+      return new WebExtra(List.of(), List.of(), List.of(), Map.of(), List.of(), List.of(), List.of(), Map.of(), List.of(), null, Map.of(), 1, Map.of());
    }
 
    ProfileView profile(String key) {

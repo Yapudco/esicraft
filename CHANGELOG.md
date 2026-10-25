@@ -4,6 +4,20 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Nouvelles mécaniques
+- **Banque de guilde** (`/banque`) : prêts entre guildes liées par un traité (10 % d'intérêts, 5 jours), remboursement, pardon, **coffre commun**. Une dette impayée bloque les revendications et fait saisir un chunk par jour (jamais celui du Nexus).
+- **Réputation** (`/merci <joueur>`) : un point d'honneur, une fois par jour et par personne, affiché dans le tab, sur le profil et au classement du site.
+- **Parrainage** (`/parrain`) : un joueur avancé guide une recrue et gagne des pièces à son premier métier et à son premier territoire.
+- **Rançon** (`/rancon`) : un coup fatal d'un joueur d'une autre guilde capture au lieu de tuer ; le ravisseur fixe un prix, libère ou exécute.
+- **Revanche** : la guilde qui perd un raid a 24 h de hordes à -50 % contre le vainqueur.
+- **Rattrapage** : jusqu'à +25 % sur les primes de monstres pour les guildes sous la médiane de la saison.
+
+### Site web
+- **Logo** du serveur dans l'en-tête et comme icône d'onglet.
+- **Version anglaise** : bouton EN / FR ou `?lang=en`, avec le dictionnaire de `/english` (noms de guildes et de joueurs conservés, dates traduites).
+- **Frise des Âges** refaite : vrai axe de temps proportionnel (une courbe en escalier par guilde), guildes masquables une à une (Tout masquer / Tout afficher), et menu déroulant par guilde avec les **prérequis du prochain Âge** déposés ou non.
+- **Réputation** sur les profils, l'annuaire et un classement « Les plus honorables ».
+
 ### Site : frise des Âges
 - Refonte lisible : une colonne par Âge (1 à 6, avec son nom), une ligne par guilde. Chaque Âge atteint affiche sa date, les Âges non atteints restent vides, l'Âge actuel est cerclé et ★ marque la première guilde à franchir chaque Âge.
 - Avant, les points étaient placés sur une échelle de temps continue : ils se chevauchaient et rien n'indiquait ce que chaque nombre représentait. Le survol donne le délai depuis l'Âge précédent.

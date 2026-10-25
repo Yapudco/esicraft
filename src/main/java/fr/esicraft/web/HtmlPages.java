@@ -95,6 +95,11 @@ final class HtmlPages {
       .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
       .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
       .net a:hover circle{stroke:var(--acc)}
+      .logoimg{width:36px;height:36px;border-radius:10px;image-rendering:pixelated;display:block}.nl.lang{margin-left:auto;font-weight:800;border:1px solid var(--line)}
+      .gk:not(.on){opacity:.4;text-decoration:line-through}.fdl{display:grid;gap:10px}
+      .fd summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none}.fd summary::-webkit-details-marker{display:none}.fd summary::before{content:'▸';color:var(--mut)}.fd[open] summary::before{content:'▾'}
+      .fdb{margin-top:10px}.reqs{display:grid;gap:6px;margin-top:8px}.req{display:grid;grid-template-columns:22px 1fr auto;gap:2px 10px;align-items:center;font-size:.88rem}
+      .req .bar{grid-column:1/-1;margin:0}.req.ok .ck{color:var(--ok)}.req.ko .ck{color:#f87171}.req .rv{font-variant-numeric:tabular-nums;color:var(--mut)}
       .net{touch-action:none;cursor:grab;overflow:hidden}.net .node,.net .edge{transition:opacity .2s}
       .nettools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-bottom:8px}.zb{display:inline-flex;gap:6px}
       .nsel{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font:inherit;font-size:.85rem}
@@ -214,13 +219,13 @@ final class HtmlPages {
       String time = snap.generatedAt() == 0L ? "en cours de chargement…" : "mises à jour à " + TIME.format(Instant.ofEpochMilli(snap.generatedAt()));
       return "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
          + "<meta name=\"color-scheme\" content=\"dark light\"><meta name=\"description\" content=\"Guildes, joueurs et saison du serveur " + esc(serverName) + "\">"
-         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style><script src=\"/assets/app.js\" defer></script></head><body data-live=\"" + live + "\">"
-         + "<header><div class=\"w\"><nav><a class=\"brand\" href=\"/\"><span class=\"logo\">" + initials(serverName, false) + "</span><span class=\"bn\">" + esc(serverName) + "</span></a>"
+         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style><link rel=\"icon\" type=\"image/png\" href=\"/assets/logo.png\"><script src=\"/assets/app.js\" defer></script></head><body data-live=\"" + live + "\">"
+         + "<header><div class=\"w\"><nav><a class=\"brand\" href=\"/\"><img class=\"logoimg\" src=\"/assets/logo.png\" alt=\"\" width=\"36\" height=\"36\"><span class=\"bn\">" + esc(serverName) + "</span></a>"
          + navLink("/", "Accueil", "home", active) + navLink("/guildes", "Guildes", "guildes", active) + navLink("/joueurs", "Joueurs", "joueurs", active)
          + (raidActive ? "<a class=\"nl raidl" + ("raids".equals(active) ? " on" : "") + "\" href=\"/raids\">⚔ Raids</a>" : "")
          + navLink("/journal", "Journal", "journal", active) + navLink("/diplomatie", "Diplomatie", "diplomatie", active) + navLink("/musee", "Musée", "musee", active)
          + navLink("/ages", "Âges", "ages", active) + navLink("/guide", "Guide", "guide", active)
-         + "</nav></div></header><main class=\"w\">" + body
+         + "<!--LANG--></nav></div></header><main class=\"w\">" + body
          + "<footer><span id=\"stamp\">Données " + esc(time) + "</span>" + (live > 0 ? " · mise à jour automatique" : "")
          + " · <a class=\"money\" href=\"/api/stats.json\">API JSON</a></footer></main></body></html>";
    }
@@ -315,6 +320,20 @@ final class HtmlPages {
          .append(guildRows(s.guilds().stream().limit(5).toList(), false)).append("<p><a class=\"nl\" href=\"/evolution\">📈 Courbes d'évolution →</a></p></div><div><h2>📰 Journal de guerre <small><a href=\"/journal\">tout voir →</a></small></h2>")
          .append(x.journal().isEmpty() ? timeline(s.history()) : ExtraPages.journalList(s, x.journal().stream().limit(8).toList(), s.generatedAt(), false)).append("</div></div>");
       b.append("<h2>🟢 En ligne</h2>").append(onlineGrid(s));
+      List<WebExtra.ProfileView> honorable = x.profiles().stream().filter(p -> p.reputation() > 0).sorted((a, c) -> Integer.compare(c.reputation(), a.reputation())).limit(10).toList();
+      if (!honorable.isEmpty()) {
+         int topRep = honorable.get(0).reputation();
+         b.append("<h2>❤ Les plus honorables <small>/merci &lt;joueur&gt;</small></h2><div class=\"list\">");
+         int hr = 1;
+         for (WebExtra.ProfileView p : honorable) {
+            b.append("<a class=\"row\" href=\"").append(ExtraPages.profileLink(p.name())).append("\">").append(medal(hr++)).append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
+               .append(esc(p.name())).append("</div><div class=\"bar\"><i style=\"width:").append(Math.max(3, p.reputation() * 100 / topRep)).append("%\"></i></div></div><div class=\"score\"><b>")
+               .append(p.reputation()).append("</b><span class=\"mut\">honneur</span></div></a>");
+         }
+
+         b.append("</div>");
+      }
+
       return b.toString();
    }
 
