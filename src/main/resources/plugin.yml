@@ -30,8 +30,8 @@ commands:
     aliases: [hdv, market, marche]
     usage: /ah [sell <prix>|menu]
   money:
-    description: Administration économique des joueurs et équilibrage anti-farm
-    permission: esicraft.admin
+    description: Voir son solde (sous-commandes réservées aux administrateurs)
+    aliases: [solde]
     usage: /money <get|set|give|take|rectify|top> <joueur|valeur> [montant]
   baltop:
     description: Voir le classement des joueurs les plus riches du serveur

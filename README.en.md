@@ -1,382 +1,372 @@
-# ⚔️ OFFICIAL PLAYER GUIDE — ESICRAFT SERVER
+# ⚔️ Esicraft — Player Guide
 
-🇫🇷 [Version française](README.md)
+🇫🇷 [Version française](README.md) · 📝 [Changelog (in French)](CHANGELOG.md)
 
-Welcome to **Esicraft**, a strategic hardcore survival server built around guilds, professions, a dynamic economy and territorial wars!
-
-This guide covers every feature, mechanic, profession and command on the server so you can build your empire and crush your rivals.
+**Esicraft** is a strategy-focused survival Minecraft server for a group of friends. Each player picks a **profession**, joins a **guild**, claims **land** and protects the **Nexus**, the heart of their base. Guilds progress together through **6 Ages**, trade, sign **treaties**… or send **monster hordes** to destroy each other's Nexus.
 
 > [!NOTE]
-> The in-game interface is in French. This guide gives English names, with the in-game French name in parentheses where it helps (e.g. *Nain*, *Âge*, `/traite`). Commands are typed exactly as written.
+> The game itself is in French. This guide gives the French in-game name in *italics* where it helps you find things in menus. Commands are typed exactly as written.
 
 ---
 
-## 📑 Table of Contents
-1. [🎭 The 6 Professions (Races)](#-1-the-6-professions-races)
-2. [🏛️ Guilds & Territories](#️-2-guilds--territories)
-3. [🌟 The 5 Guild Specializations](#-3-the-5-guild-specializations)
-4. [💎 The Base Core: the Nexus & Traps](#-4-the-base-core-the-nexus--traps)
-5. [⚔️ Black Hordes & Siege Raids](#️-5-black-hordes--siege-raids)
-6. [💰 Economy, Auction House & PvP Bounty](#-6-economy-auction-house--pvp-bounty)
-7. [⏳ Technological Ages](#-7-technological-ages)
-8. [🎉 Contracts, Events, Seasons, Railways, Treaties & Website](#-8-contracts-events-seasons-railways-treaties--website)
-9. [📋 Full Command List](#-9-full-command-list)
+## 📑 Contents
+
+1. [Getting started in 5 steps](#-1-getting-started-in-5-steps)
+2. [Professions](#-2-professions)
+3. [Guilds and their land](#️-3-guilds-and-their-land)
+4. [Guild specializations](#-4-guild-specializations)
+5. [The Nexus and its traps](#-5-the-nexus-and-its-traps)
+6. [Raids (monster hordes)](#️-6-raids-monster-hordes)
+7. [Ages](#-7-ages)
+8. [Money](#-8-money)
+9. [Diplomacy and travel](#-9-diplomacy-and-travel)
+10. [Server life](#-10-server-life)
+11. [All commands](#-11-all-commands)
+12. [For administrators](#️-12-for-administrators)
 
 ---
 
-## 🎭 1. The 6 Professions (Races)
+## 🚀 1. Getting started in 5 steps
 
-> [!IMPORTANT]
-> **Profession required**: a player who has not chosen a profession yet (`/race`) **cannot break any block**. Picking a race is mandatory as soon as you arrive if you want to mine, harvest and build.
-
-As soon as you join, choose your profession with `/race`. Each profession has exclusive crafting rights, unique bonuses and balanced drawbacks:
-
-| Profession | Role | Exclusive Crafts & Uses | Passive & Active Bonuses | Restrictions & Drawbacks |
-| :--- | :--- | :--- | :--- | :--- |
-| **⛏ Miner (Dwarf / *Nain*)** | Mining & geology | • Iron pickaxe (Age 1)<br>• Diamond pickaxe & shovel (Age 2)<br>• Netherite pickaxe & shovel (Ages 3-4) | • Permanent **Haste II** and **Night Vision** below $Y \le 0$<br>• **+15% chance to double** every ore mined | • **Slowness I** in open air and full sunlight ($Y > 60$)<br>• Cannot craft metal weapons or armor |
-| **🌿 Sylvan (Elf / *Sylvain*)** | Farming, breeding & nature | • Iron hoe (Age 1), diamond (Age 2), Netherite (Ages 3-4)<br>• Bone meal use (Ages 1-2)<br>• Animal breeding (Ages 1-2)<br>• Crafted golden apples | • Permanent **Regeneration I aura** for themselves and guild allies within 4 blocks<br>• **Instant right-click harvest** of mature crops (with automatic replanting) | • **-20% melee damage** dealt |
-| **🔨 Blacksmith (*Forgeron*)** | Heavy forging, armor & metal | • Full iron armor, swords & shields (Age 1)<br>• Diamond armor, sword & axe (Age 2)<br>• Netherite armor, sword & axe (Ages 3-4)<br>• Anvils, grindstones & blast furnaces | • Permanent **Fire Resistance**<br>• **+35% chance to double** an ingot taken from a furnace/blast furnace<br>• **-50% XP cost** at the anvil | • **+25% hunger drain** during physical effort |
-| **🏹 Ranger (*Rôdeur*)** | Ranged hunting & exploration | • **Only profession able to use and craft Bows and Crossbows** up to and including Age 3 (unlocked for everyone at Age 4)<br>• Crafted arrows and spectral arrows | • **Every arrow shot becomes a Poison arrow (Poison I)**<br>• **+25% ranged damage** on all projectiles<br>• Permanent **Speed I** in natural biomes (plains, forests, jungles, taigas) | • **Slowness I** while wearing a heavy chestplate (diamond or Netherite) |
-| **🧪 Arcanist (*Arcaniste*)** | Magic, alchemy & enchanting | • **Only profession able to enchant items** (enchanting table & enchanted books on an anvil)<br>• **Only profession able to use and throw Splash Potions**<br>• Exclusive use and crafting of Brewing Stands up to Age 3 (Alchemy)<br>• Crafted golden apples | • **+30% XP** from every source<br>• **+25% duration** on potions drunk<br>• **-20% magic damage taken** (harming potions, poison, wither, dragon's breath) | • **+15% physical damage taken** in close combat (melee fragility) |
-| **⚙ Engineer (*Ingénieur*)** | Automation, redstone & machines | • Pistons, sticky pistons, hoppers, observers, repeaters, comparators, dispensers, droppers & **TNT** (Ages 1-3) | • **-40% explosion damage taken** (TNT, creepers, beds)<br>• Exclusive mastery of TNT and automation | • **-20% melee damage** dealt |
+1. **Pick your profession** with `/race`. Until you do, you can't break any block.
+2. **Join a guild** (accept an invitation with `/guild join <name>`) or **create your own** with `/guild create <name> <tag>` (costs 500 coins).
+3. **Claim your first piece of land** with `/guild claim`, then **place the Nexus** with `/guild nexus place`.
+4. **Earn money**: kill monsters, complete your daily contracts (`/contrat`), sell at the Auction House (`/ah`).
+5. **Level up your guild** by donating resources in `/age` to unlock new gear and dimensions.
 
 > [!TIP]
-> **Profession commands**:
-> * `/race`: opens the profession selection / retraining menu (first choice free + 3 free retrainings, then 10,000 coins, with a 24 h delay between two changes).
-> * `/race show [player]`: opens the **interactive Profession Directory** showing the head, profession, guild, technological Age, balance and stats of every online player.
+> Type `/guide` to get the rule book in game, and `/hud` to show or hide the dashboard on the right of your screen.
 
 ---
 
-## 🏛️ 2. Guilds & Territories
+## 🎭 2. Professions
 
-Found a guild with your allies to claim land and build your fortress.
+Each profession has **items only it can craft**, some **strengths** and one **weakness**. These exclusives fade over the Ages: gear reserved for one profession becomes available to everyone later.
 
-### 👑 Guild Hierarchy
-* **Guild Leader (`LEADER`)**: full control over the guild, appoints officers (`/guild promote`), transfers leadership (`/guild transfer`) or disbands the guild (`/guild disband`).
-* **Officer (`OFFICER`)**: can claim/unclaim territory, place the Nexus, buy traps and **hire / launch mercenary hordes**.
-* **Member / Recruit (`MEMBER`)**: takes part in bank deposits, Age donations and collective defense.
-* **Member limit**: **10 players maximum** per guild (`guilds.max-members-default`). A player can only belong to **one guild**; invitations expire after **5 minutes**.
-* **Composition**: specialization constraints (forbidden/limited professions, Legion: at least 50% Rangers/Blacksmiths) are checked **every time someone joins** (invitation, allegiance after an annexation) and on every profession change.
-* **Disbanding**: `/guild disband` is refused during a raid or within **10 minutes** of an attack on the Nexus (you can't dodge the War Treasury).
+| Profession | Specialty | Strengths | Weakness |
+| :--- | :--- | :--- | :--- |
+| ⛏ **Dwarf** (*Nain*, miner) | Pickaxes and shovels | Haste II and Night Vision below layer 0 · 15% chance to double an ore | Slowness I in full sunlight (above layer 60) · can't craft metal weapons or armor |
+| 🌿 **Sylvan** (*Sylvain*, farmer) | Hoes, bone meal, breeding, golden apples | Regeneration I for themselves and guildmates within 4 blocks · right-click harvest with automatic replanting | -20% melee damage |
+| 🔨 **Blacksmith** (*Forgeron*) | Armor, swords, axes, shields, anvils, grindstones, blast furnaces | Permanent Fire Resistance · 35% chance to double an ingot from a furnace · anvil costs half the XP | Gets hungry 25% faster |
+| 🏹 **Ranger** (*Rôdeur*, archer) | Bows, crossbows and arrows (until Age 3) | Arrows poison their target · +25% ranged damage · Speed I in plains, forests, jungles and taigas | Slowness I when wearing a diamond or Netherite chestplate |
+| 🧪 **Arcanist** (*Arcaniste*, mage) | Enchanting, splash potions, brewing stands (until Age 3) | +30% XP · potions last 25% longer · -20% magic damage taken | +15% melee damage taken |
+| ⚙ **Engineer** (*Ingénieur*) | Redstone, pistons, hoppers, dispensers and **TNT** (until Age 3) | -40% explosion damage taken | -20% melee damage |
 
-### 🗺️ Territorial Expansion & Claims
-* **Contiguity required**: the first chunk is free. Every following chunk **must be adjacent** to land your guild already owns. Conversely, `/guild unclaim` is refused if it **splits the territory into several pieces** or targets the Nexus chunk.
-* **Capacity unlocked by Age**:
-  * **Age 1 (Rustic)**: **16 chunks max**
-  * **Age 2 (Metallurgy)**: **32 chunks max**
-  * **Age 3 (Alchemy)**: **64 chunks max**
-  * **Age 4 (Total War)**: **128 chunks max**
-  * **Age 5 (Mythic & Apex)**: **Unlimited**
-* **Gentle progressive pricing**:
-  * Each new chunk costs $\text{Price} = 100 + (N \times 25\text{ coins})$ where $N$ is the number of chunks already claimed (e.g. 100 coins, then 125, 150, 175, 200...).
-  * The price is **taken directly from the Guild Bank**.
+<details>
+<summary><b>Which tools and armor for which profession, Age by Age?</b></summary>
 
-### 🧱 Protection & Security in Enemy Territory
-* **Full block protection**: you cannot break or place blocks on another guild's territory.
-* **Container protection**: only guild members can open the chests, barrels, shulkers, furnaces and hoppers inside their claims.
-* **Combat restrictions in enemy land**:
-  * ❌ **No TNT placement**.
-  * ❌ **No TNT minecarts** (placement, dispenser launch, entering on rails and explosion are blocked).
-  * ❌ **No Ender Pearls** (throwing and teleporting into an enemy claim are blocked).
-  * ❌ **No End Crystals** (placement and explosion are blocked).
-  * ❌ **Chorus Fruit** (teleporting into an enemy claim), **pistons**, **lava / water / fire** coming from outside, **Wither / Enderman / Ravager** block destruction and **projectiles** hitting animals, item frames and armor stands: all blocked inside claims (except during a raid on that guild).
-  * ⚠️ **Vulnerable territory**: after its Nexus is destroyed without an annexation, a guild's territory loses its block/explosion protection for **30 minutes**.
+| Profession | Age 1 | Age 2 | Ages 3-4 |
+| :--- | :--- | :--- | :--- |
+| Dwarf | Iron pickaxe | Diamond pickaxe and shovel | Netherite pickaxe and shovel |
+| Blacksmith | Iron armor, sword and shield | Diamond armor, sword and axe | Netherite armor, sword and axe |
+| Sylvan | Iron hoe | Diamond hoe | Netherite hoe |
+
+From Age 5, Netherite is available to everyone.
+</details>
+
+**Changing profession**: `/race` opens the menu. Your first choice and the next 3 changes are free; after that each change costs 10,000 coins. You must wait 24 h between two changes.
+
+`/race show` lists online players (profession, guild, Age, money).
 
 ---
 
-## 🌟 3. The 5 Guild Specializations
+## 🏛️ 3. Guilds and their land
 
-Pick your guild's collective specialization from the `/guild spec` menu:
+### Roles
 
-1. ⚔️ **Warrior Legion (PvP / Conquest)**:
-   * **Bonuses**: permanent **Strength I** and **Resistance I** inside claims, **-30% on ALL mercenary hordes**, **+30% attack damage** against monsters and enemy hordes.
-   * **Constraints**: max 1 Dwarf (Miner) and 1 Sylvan (Farmer), ore and crop yields reduced by 25% inside claims.
-2. ⛏️ **Underground Industry (Mining / Production)**:
-   * **Bonuses**: permanent **Haste II** inside claims below $Y \le 30$, **raw ore drops ×1.5**, Nexus traps and Golems **-50%**.
-   * **Constraints**: max 1 Ranger (ranged fighter), weak to magic attacks (+20% damage taken), **level II potions forbidden**.
-3. 🌾 **Rural Enclave (Resources & Health)**:
-   * **Bonuses**: **+2 hearts of base max health (+4.0 HP for every member)**, permanent **Regeneration I** and **Saturation** inside claims, **double crop harvests**, **double animal loot**, **double yield on wood and natural stone** (Andesite, Diorite, Granite, Blackstone, Calcite), faster animal breeding (×3).
-   * **Constraints**: no Netherite armor (removed automatically), no Engineer (no TNT), max 1 Blacksmith.
-4. 💰 **Merchant Syndicate (Trade & Economy)**:
-   * **Bonuses**: **exclusive right to trade with Villagers and Wandering Traders during Ages 1 to 3** (other guilds unlock villager trading at Age 4!), **+20% bounties** on monster kills, **10% of every monster bounty goes to the guild bank** (taken from the player's share), and **0% tax** at the Auction House.
-   * **Constraints**: **no Arcanist allowed in the guild**, **mercenary hordes cost 30% more**, no passive combat effects, Nexus max HP reduced by 20%.
-5. 🔮 **Arcane Conclave (Magic & Runes)**:
-   * **Bonuses**: **+25% max HP on the Guild Core (Nexus)**, **-50% XP cost for enchanting and anvil repairs**, **potions drunk or thrown are automatically one tier higher** (+1 effect level), **overpowered enchantments unlocked (level IV becomes V, level V becomes VI)**, the Nexus automatically fires a **magic energy beam** at the nearest attacker (1 heart = 2.0 HP of damage every 2 seconds), **50% less magic damage** taken.
-   * **Constraints**: **-2 hearts of base max health (-4.0 HP for every member)**, claims cost 50% more, max 1 Blacksmith and 1 Dwarf, **boosted level VI / V enchantments are lost immediately if the guild changes specialization**.
+| Role | What they can do |
+| :--- | :--- |
+| 👑 **Leader** | Everything, plus: appoint officers, hand over the guild (`/guild transfer`), disband it (`/guild disband`) |
+| 🛡 **Officer** | Invite, kick, claim land, place the Nexus, buy traps, launch raids, sign treaties, manage stations |
+| 🙂 **Member** | Deposit money in the bank, donate resources for the Age, defend |
+
+- **10 players maximum** per guild, and you can only be in **one guild**.
+- Invitations expire after **5 minutes**.
+- You can't disband your guild during a raid, or within 10 minutes of an attack on the Nexus.
+
+### Claiming land
+
+Land is counted in **chunks** (16 × 16 block squares). With `/guild claim`, an officer claims the chunk they're standing in.
+
+- **All chunks must touch each other.** Only the first one can go anywhere. You also can't give up a chunk (`/guild unclaim`) if that would split the territory in two, or if it holds the Nexus.
+- **Price**: paid from the guild bank. The first chunk costs 100 coins, then each new chunk costs 25 more than the previous one (100, 125, 150, 175…).
+- **Maximum size by Age**:
+
+| Age | 1 | 2 | 3 | 4 | 5 and 6 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Max chunks | 16 | 32 | 64 | 128 | unlimited |
+
+`/guild claim show` displays your territory borders.
+
+### What's protected on a guild's land
+
+On another guild's land you **can't break or place blocks**, or open its chests, furnaces, barrels, shulkers or hoppers.
+
+Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **Chorus Fruit** to teleport in, **End Crystals**, **pistons**, **lava, water and fire** coming from outside, block destruction by Withers, Endermen and Ravagers, and **projectiles** hitting animals, item frames and armor stands.
+
+These protections only drop during a raid against that guild, and for **30 minutes** after its Nexus is destroyed if there's no annexation.
+
+---
+
+## 🌟 4. Guild specializations
+
+The leader picks a specialization in `/guild spec`. It gives bonuses to the whole guild but imposes rules on its makeup, checked whenever a player joins and whenever someone changes profession.
+
+| Specialization | Bonuses | Constraints |
+| :--- | :--- | :--- |
+| ⚔️ **Warrior Legion** (*Légion Guerrière*, combat) | Strength I and Resistance I on your land · raids 30% cheaper · +30% damage against monsters | At least 50% Rangers and Blacksmiths · max 1 Dwarf and 1 Sylvan · -25% ores and crops on your land |
+| ⛏️ **Underground Industry** (*Industrie Souterraine*, mining) | Haste II on your land below layer 30 · raw ores ×1.5 · Nexus traps 50% cheaper | Max 1 Ranger · level II potions forbidden · +20% magic damage taken |
+| 🌾 **Rural Enclave** (*Enclave Champêtre*, nature) | +2 hearts of health · Regeneration I and Saturation on your land · crops, animal loot, wood and stone ×2 · animals breed 3× faster | No Engineer · max 1 Blacksmith · Netherite armor forbidden |
+| 💰 **Merchant Syndicate** (*Syndicat Marchand*, trade) | Only guild allowed to trade with villagers before Age 4 · +20% on monster bounties (10% of which goes to the bank) · no Auction House tax | No Arcanist · raids 30% more expensive · no combat bonuses · Nexus -20% health |
+| 🔮 **Arcane Conclave** (*Conclave Arcanique*, magic) | Nexus +25% health · enchanting and anvil cost half the XP · potions one level higher · boosted enchantments (IV becomes V, V becomes VI) · the Nexus fires a beam at the nearest attacker (1 heart every 2 s) · -50% magic damage | -2 hearts of health · land 50% more expensive · max 1 Blacksmith and 1 Dwarf · boosted enchantments are lost if you change specialization |
+| 🏹 **Lone Ranger** (*Rôdeur Solitaire*, solo) | Permanent Speed I · Netherite armor and enchanting from Age 3 | A single member, a Ranger who has never been in another guild · no chests on their land · Nexus capped at 2,500 HP |
 
 > [!IMPORTANT]
-> **Specialization change rule**: the first choice is immediate. After that, a guild can only change specialization **when a NEW player** (who has never belonged to the guild before) joins! This rewards active recruiting and prevents permanent opportunistic switching.
+> The first choice is immediate. After that, a guild can only change specialization **when a new player** (who has never been in the guild) joins.
 
 ---
 
-## 💎 4. The Base Core: the Nexus & Traps
+## 💎 5. The Nexus and its traps
 
-Every guild has a **Nexus** (base core) that it must place inside its territory with `/guild nexus place`.
+The **Nexus** is the heart of your guild. You place it on your land with `/guild nexus place` (only once: you can't place it again to reset its health to 100%). **If it's destroyed, your guild loses everything** (see [raids](#️-6-raids-monster-hordes)).
 
-### 🛡️ Nexus Safety Perimeter (16 blocks)
-* **Placement check**: the server scans the whole **16-block radius** around the Nexus before allowing it. Any **water**, **lava** or **obsidian** in that area **blocks the placement**.
-* **No fluids at all (lava & water)**: you cannot place water or lava, empty a bucket, dispense a fluid or let one flow within **16 blocks of the Nexus**.
-* **No obsidian**: placing obsidian or crying obsidian is strictly blocked within the **16-block radius**, to keep sieges fast and dynamic.
+**16-block safety zone** around the Nexus: no water, lava or obsidian (crying obsidian included). The Nexus can't be placed if there's already some, and none can be added later. This prevents moats and unbreakable walls.
 
-### 💖 Healing the Nexus
-* By throwing a **Golden Apple** onto the Nexus's central block (or right-clicking it), **guild members** instantly restore **+500 HP** (**+2,500 HP** for an Enchanted Golden Apple), except during an active raid.
-* **30-second cooldown** between two heals (`guilds.nexus.heal-cooldown-seconds`).
-* A Nexus **cannot be placed again** while the guild already has one (no free reset to 100% HP).
-* **Purchased traps are saved** and survive restarts. The **Guardian Golem** now attacks intruders; traps and the arcane beam only target non-members **standing inside the claim**.
+**Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid.
 
-### 💣 The 5 Defensive Traps (`/nexus traps`)
-* 🔥 **Infernal Blaze (250 coins)**: sets enemies within 8 blocks on fire with continuous burns.
-* 🕸️ **Binding Web (200 coins)**: gives Slowness III and Blindness to attackers approaching the Nexus.
-* ⚡ **Retaliation Lightning (350 coins)**: violently strikes anyone who hits the Nexus (+15 damage).
-* 🧪 **Toxic Mist (300 coins)**: releases a poison cloud (Poison II) that chokes raiders and attacking monsters.
-* 🤖 **Guardian Automaton (500 coins)**: summons a loyal armored iron golem that fiercely defends the Nexus.
-* *Note: traps are paid from the Guild Bank first, stay armed for the next horde, and are 50% cheaper for the Underground Industry.*
+### Traps (`/nexus traps`)
 
----
+Paid from the guild bank, they stay active (even after a restart) and only target intruders standing on your land.
 
-## ⚔️ 5. Black Hordes & Siege Raids
-
-Hire armies of mercenary monsters to besiege and destroy a rival guild's Nexus!
-
-### 🎯 Access & Funding
-* **Access**: open the Auction House with `/ah` and click the **Wither Skull** (slot 49).
-* **Required rank**: only **Officers** and the **Leader** can set up and launch hordes.
-* **Funding**: the cost is **100% paid from the Guild Bank** (`/guild bank`).
-* **Defender present**: a horde can only be launched if at least one member of the target guild is online **inside their own claims**.
-
-### 📦 Horde Types
-1. **Preset contracts**: armored zombies, incendiary skeletons, venomous spiders, Pillager Siege (1 Ravager in 6 and 1 Vindicator in 3, the rest Pillagers)...
-2. **Custom Horde Builder**: build your own army unit by unit from 8 monster classes (up to **60 monsters**, `raids.max-custom-horde-units`, depending on your guild bank funds).
-
-### 💥 Special Invasion Options
-* 💣 **Explosive Sappers**: monsters blocked by trenches or walls explode to open a breach and **instantly evaporate every water and lava source within 5 blocks**.
-* 🔥 **Fireproofing (Lava & Fire Resistance)**: your monsters get permanent fire resistance and cross enemy lava moats without taking damage.
-
-### ⭐ Economic Hegemony (Bounty on Wealthy Guilds)
-To prevent crushing financial monopolies and keep faction wars alive:
-* **Hegemony status triggers automatically** if the target guild meets at least one of these conditions:
-  1. **At least 50% of its members** are in the server's **Top 5 richest players** (`/baltop`).
-  2. **Its Guild Bank holds more than 30%** of the server's total money supply.
-* **Devastating effects against a Hegemonic guild**:
-  * 📉 **Horde cost halved (-50%!)**: every horde (preset or custom) launched against this guild costs **half price**.
-  * ⏱ **Raid cooldown reduced to 2 minutes**: the post-raid immunity of this guild lasts **only 2 minutes** instead of 30.
-  * 🛡 **Badge in the target picker**: guilds with this status show a gold star `⭐ HÉGÉMONIE ÉCONOMIQUE` in the raid menu.
-
-### 🏴 Territory Annexation & War Treasury
-* If a guild's Nexus is destroyed during a raid:
-  * 🗺️ **Territory transfer**: the defeated guild's land is **instantly annexed** by the winning guild, **up to the claim cap of its Age** (extra chunks go back to the wild).
-  * 💰 **Guild Bank merge (War Treasury)**: the defeated guild's entire treasury is **automatically transferred into the winner's bank**.
-  * 🤝 **Allegiance choice for the defeated**:
-    * `/guild annex join`: join the winning guild as a member.
-    * `/guild annex decline`: refuse and become a free player with no guild.
-
----
-
-## 💰 6. Economy, Auction House & PvP Bounty
-
-### 🪙 Earning Coins & Hunting Bounties
-Every monster killed pays a bounty straight to your account, based on how dangerous it is:
-
-| Category | Monsters | Bounty per Kill |
+| Trap | Price | Effect |
 | :--- | :--- | :--- |
-| 🐉 **Legendary Bosses** | • **Ender Dragon**<br>• **Warden**<br>• **Wither**<br>• **Elder Guardian** | **750.00 coins**<br>**500.00 coins**<br>**350.00 coins**<br>**150.00 coins** |
-| 👺 **Mini-Bosses & Sieges** | • **Ravager**<br>• **Evoker**<br>• **Piglin Brute** | **75.00 coins**<br>**40.00 coins**<br>**25.00 coins** |
-| 🔥 **Nether & End (Dangerous)** | • **Ghast** & **Shulker**<br>• **Wither Skeleton** & **Guardian**<br>• **Blaze** 🔥 & **Hoglin / Zoglin** | **20.00 coins**<br>**15.00 coins**<br>**12.00 coins** |
-| 🏹 **Overworld Elite** | • **Vindicator**<br>• **Witch**<br>• **Enderman**<br>• **Pillager** | **15.00 coins**<br>**12.00 coins**<br>**10.00 coins**<br>**8.00 coins** |
-| 🧟 **Common Monsters** | • **Creeper** & **Phantom**<br>• **Piglin** & **Zombified Piglin**<br>• **Spiders (Normal / Cave)**<br>• **Skeletons & Strays**<br>• **Zombies (Drowned, Husks, Villagers)** | **5.00 coins**<br>**4.00 coins**<br>**3.00 - 3.50 coins**<br>**3.00 coins**<br>**2.50 coins** |
-| 🐛 **Small Monsters** | • **Slimes & Magma Cubes**<br>• **Vex**<br>• **Silverfish & Endermites** | **2.00 coins**<br>**2.50 coins**<br>**1.50 coins** |
-
-*Note: members of a **Merchant Syndicate** guild get a passive **+20% bonus** on every monster bounty. Repetitive mob farms are detected and pay less (anti-farm).*
-
-1. **Auction House (`/ah`)**: sell your resources and crafted gear with `/ah sell <price>`.
-2. **Nexus defense**: killing the monsters of an attacking horde yields valuable loot.
-
-### ⚔️ PvP Kill Bounty (Outside Your Guild)
-When you kill an enemy player:
-* **The winner (killer)** receives exactly what the victim loses: **100 coins + 1% of the victim's fortune**.
-* **The victim** loses:
-  * **If they have more than 100 coins**: **100 coins + 1% of their fortune**.
-  * **If they have 100 coins or less**: **all of their money** (balance drops to `0.00`).
-* No bounty if the same pair of players fought less than 2 minutes ago (anti-farm).
-* *(Inactive between members of the same guild, and between allied guilds, to protect allies.)*
+| 🔥 Infernal Blaze | 250 | Sets enemies within 8 blocks on fire |
+| 🕸️ Binding Web | 200 | Slowness III and Blindness for anyone approaching |
+| ⚡ Retaliation Lightning | 350 | Strikes anyone who hits the Nexus |
+| 🧪 Toxic Mist | 300 | Poison II cloud |
+| 🤖 Guardian Automaton | 500 | An iron golem defends the Nexus |
 
 ---
 
-## ⏳ 7. Technological Ages
+## ⚔️ 6. Raids (monster hordes)
 
-The server progresses through **6 major technological Ages**. To move your guild to the next Age and unlock higher technologies and dimensions, members must pool their efforts and donate **ores and farm produce** through `/age`. Quotas scale with the **peak member count** reached during the current Age.
+A raid means **paying for an army of monsters** to attack another guild's Nexus.
 
-> [!CAUTION]
-> **Dimension & villager trading restrictions by Age**:
-> * 🔥 **Nether**: access to the Nether (portals, lighting and teleports) is **strictly blocked until Age 2 (Metallurgy)**.
-> * 🌌 **The End**: access to the End (portals, eyes of ender and teleports) is **strictly blocked until Age 3 (Alchemy)**.
-> * 🛡️ **Villager trading**: trading with villagers and wandering traders is **reserved for the Merchant Syndicate during Ages 1 to 3**, then **opened to every guild from Age 4 (Total War)**.
+### Launching a raid
 
-1. **Rustic Age (Age 1 — Start)**:
-   * *Technologies*: wood and stone tools only (16 claims max). **Nether & End locked**. Iron tools reserved for specialists (Dwarf, Blacksmith, Sylvan).
-2. **Age of Metallurgy (Age 2)**:
-   * *Unlocks*: **Nether access** 🔥, iron tools for everyone, shields, and expansion to **32 claims max**. **Diamond crafts are reserved for specialized professions** (Dwarf: pickaxe/shovel, Blacksmith: armor/sword/axe, Sylvan: hoe).
-   * *Required (quotas reduced by 50%)*:
-     * ⛏ **750 Copper Ingots** | 🐮 **256 Leather** | 750 Raw Iron | 1,000 Oak Logs
-     * 🌾 **1,500 Wheat** | 🥕 **750 Carrots** *(food & market gardening)*
-3. **Age of Alchemy (Age 3)**:
-   * *Unlocks*: **End access** 🌌, **diamond for everyone**, full iron armor for everyone, and expansion to **64 claims max**. **Netherite crafts become available only to specialized professions** (Dwarf: pickaxe/shovel, Blacksmith: armor/sword/axe, Sylvan: hoe).
-   * *Required*:
-     * ⛏ 3,000 Iron Ingots | 1,000 Gold Ingots | 500 Nether Wart
-     * 🥔 **5,000 Potatoes** | 🎋 **5,000 Sugar Cane** | 🪶 **3,000 Feathers** | 🎃 **800 Pumpkins**
-4. **Age of Total War (Age 4)**:
-   * *Unlocks*: **villager trading for everyone**, **TNT and offensive machinery (TNT cannons, breaches, pistons, dispensers, advanced redstone) for everyone**, brewing stands and tier II potions for everyone, bows and crossbows for everyone, and expansion to **128 claims max**.
-   * *Required*:
-     * ⛏ **500 Diamonds** | **1,500 Obsidian** | **500 Ender Pearls** | 🪽 **1 pair of Elytra**
-     * ✨ **2,500 Golden Carrots** | 🌾 **800 Hay Bales** | 🍯 **500 Honey Bottles**
-     * 🔴 **3,500 Redstone Dust** | ⚙ **250 Repeaters** | 🧱 **200 Pistons**
-     * 💣 **1,000 Gunpowder** | 🧨 **100 TNT**
-   * *🌟 **Warfare bonuses for players who reached Age 4**:*
-     * ⚡ **War mobility**: permanent **Speed I**.
-     * ⚔ **Combativeness**: **+10% damage dealt** (melee and ranged) and **+25% extra XP**.
-     * 🛡 **Trench plating**: **-20% explosion damage taken** (TNT and creepers).
-5. **Mythic & Apex Age (Age 5)**:
-   * *Unlocks*: **Netherite for everyone**, beacons and **unlimited territory**.
-   * *Required*:
-     * ⛏ 150 Netherite Scrap | 5 Nether Stars
-     * 🍏 **5 Enchanted Golden Apples** | 🌸 **1,000 Chorus Fruit**
-     * 🌌 **64 Shulker Shells** | 🪐 **2,500 End Stone** | 🟣 **500 Purpur Blocks**
-     * 🔴 **500 Redstone Blocks** | 🎛 **200 Comparators** | 👁 **200 Observers**
-   * *🌟 **Apex blessings for players who reached Age 5**:*
-     * 👑 **Permanent Sovereign Aura**: constant **Haste I**, **Speed I** and **Resistance I**.
-     * ⚔ **Martial power & knowledge**: **+15% raw damage dealt** in combat and **+50% extra XP** from every source.
-     * 🏛 **Limitless empire**: **100% unlimited** chunk claims and **full access to every Netherite craft** for all guild members.
-6. 👑 **Age of Supremacy (Age 6 — The Ultimate, Sacred Age)**:
-   * *Description*: the ultimate, divine peak of civilization on the server, demanding the rarest relics and masterpieces in the universe.
-   * *Required*:
-     * 🎶 **Every Music Disc**: 13, Cat, Blocks, Chirp, Far, Mall, Mellohi, Stal, Strad, Ward, 11, Wait, Otherside, 5, Pigstep, Relic.
-     * 💀 **Every Mob Head**: Wither Skeleton Skull, Zombie Head, Skeleton Skull, Ender Dragon Head, Creeper Head, Piglin Head.
-     * 📯 **Every Goat Horn (8 horns)**.
-     * ⭐ **64 Nether Stars**.
-     * 🌾 **1 Netherite Hoe**, enchanted with **Mending + Unbreaking III + Fortune III**.
-     * 🛡 **Every Smithing Template**: Coast, Dune, Eye, Host, Raiser, Rib, Sentry, Shaper, Silence, Snout, Spire, Tide, Vex, Ward, Wayfinder, Wild, Netherite Upgrade.
-     * 🏺 **Every Pottery Sherd (20)**: Angler, Archer, Arms Up, Blade, Brewer, Burn, Danger, Explorer, Friend, Heart, Heartbreak, Howl, Miner, Mourner, Plenty, Prize, Sheaf, Shelter, Skull, Snort.
-     * 🥚 **The Ender Dragon Egg** (`1 Dragon Egg`).
-     * 🌿 **A Dead Bush** (`1 Dead Bush`).
-   * *🌟 **Supreme rewards & titles for conquering Age 6**:*
-     * 🥚 **Ancestral relic**: **1× Ender Dragon Egg** for every member.
-     * 💎 **Treasure**: **1× Block of Netherite** for every member.
-     * 💬 **Dynamic chat title based on play time**:
-       * If your current session lasts **less than 1 hour**: glory prefix **`[Giga Tchad]`** in chat!
-       * If your current session lasts **more than 1 hour**: prestige prefix **`[Gros Nerd]`** in chat!
+1. Open `/ah` and click the **Wither skull** (at the bottom of the menu).
+2. Pick a **ready-made horde** (armored zombies, incendiary skeletons, spiders, pillagers and ravagers) or **build your own** (up to 60 monsters).
+3. Pick the target guild. The price is paid from **your guild bank**.
+
+Options: **sappers** that blow up walls and dry out the water and lava around them, and **fireproofing** so your monsters can cross lava.
+
+### Conditions
+
+- Only **officers and the leader** can launch a raid.
+- **At least one defender must be online and on their own land**, otherwise the raid is refused.
+- After a raid, the target guild is **protected for 30 minutes**.
+- You can't attack a guild you have a **treaty** with (see [Diplomacy](#-9-diplomacy-and-travel)).
+
+### If the Nexus falls
+
+- The loser's **land** goes to the winner (within the limit of the winner's Age).
+- The loser's whole **bank** goes to the winner.
+- The loser's members choose: join the winner (`/guild annex join`) or leave (`/guild annex decline`).
+
+### ⭐ Guilds that get too rich become targets
+
+A guild gets **Economic Hegemony** status if at least half of its members are in the top 5 richest players (`/baltop`), or if its bank holds more than 30% of all the money on the server. Raids against it cost **half price** and its post-raid protection only lasts **2 minutes**. It's marked with a ⭐ in the target menu.
 
 ---
 
-## 🎉 8. Contracts, Events, Seasons, Railways, Treaties & Website
+## ⏳ 7. Ages
 
-### 📜 Daily Contracts (`/contrat`)
-Every day (reset at midnight, Paris time), each player with a profession gets **3 contracts**: one specific to their profession (Miner: ores, Sylvan: crops, Blacksmith: smelted ingots, Ranger: ranged kills, Arcanist: enchantments, Engineer: redstone components), a hunting contract and a mining/harvesting contract. Each contract pays coins, and **completing all 3 gives +400 coins**. Blocks placed by players, repetitive mob farms and redstone place/break loops don't count.
+Your guild starts at **Age 1** and can go up to **Age 6**. To reach the next Age, members **donate resources** in the `/age` menu. Each Age unlocks gear and raises how much land you can hold.
 
-### 🌍 Server Events (every 45 to 90 min, `events.*` in `config.yml`)
-* 🌑 **Blood Moon** (10 min): more monsters at night, **hunting bounties ×2**.
-* ☄ **Meteor Shower** (3 min): ore blocks (up to ancient debris) crash down near players, outside guild territories.
-* 🧙 **Black Market** (5 min): a wandering merchant appears (approximate coordinates announced) and trades rare items for diamonds — open to everyone, whatever their Age.
-* ☠ **World Boss** (15 min): the *Lord of Ashes* (800 HP). **3,000 coins** shared according to damage dealt; the top fighter wins a Nether Star and 8 diamonds.
-* Admins: `/evenement <lune|meteores|marchand|boss|stop|status>`.
+| Age | What it unlocks |
+| :--- | :--- |
+| 1. **Rustic** (start) | Wood and stone. Iron is reserved for specialized professions. Nether and End closed. |
+| 2. **Metallurgy** | **The Nether**, iron tools and shields for everyone. Diamond is reserved for specialized professions. |
+| 3. **Alchemy** | **The End**, diamond tools and iron armor for everyone. Netherite is reserved for specialized professions. |
+| 4. **Total War** | For everyone: diamond armor, villager trading, TNT, redstone, pistons, brewing stands, bows and crossbows. **Player bonuses**: Speed I, +10% damage, +25% XP, -20% explosion damage. |
+| 5. **Mythic** | Netherite and beacons for everyone, unlimited land. **Player bonuses**: Haste I, Speed I, Resistance I, +15% damage, +50% XP. |
+| 6. **Supremacy** | The ultimate Age. **Reward**: a dragon egg and a block of Netherite for every member, plus a chat title: **[Giga Tchad]** if your session is under an hour, **[Gros Nerd]** beyond that. |
 
-### 🏆 Season & Memorial
-* `/classement`: monthly guild ranking (territory, Age, wealth, members, raids repelled, conquests). The champion receives **5,000 coins** in its bank, **500 per member** and the 👑 crown in chat.
-* `/histoire`: the last 10 notable events (conquests, repelled raids, bosses, champions, treaties).
+> [!NOTE]
+> The amounts below are for a **one-player guild**. They grow with the number of members (×1.3 with 2 players, ×2.2 with 5, ×4.7 with 10), based on the **highest member count** reached during the Age. The `/age` menu always shows the exact amounts for your guild.
 
-### 🚆 Inter-Guild Railway Network (`/station`, `/rail`)
-* **Travel (`/station`)**: within 8 blocks of a `[Gare]` sign, `/station` opens a menu of the stations reachable **through a continuous rail path**. The network is a **graph**: junctions, crossings and rails placed side by side are all connected (so a line can go "both left and right"). Crossed chunks are loaded on demand; the search is spread over several ticks (network limited to `rail.search-max-rails` rails).
-* **Fare**: station fee (`rail.base-fare`, 1 coin, paid to the guild owning the arrival station) + **a toll for every guild whose territory the trip crosses** (paid to its bank). Your own guild doesn't charge you; **allied** guilds travel for free.
-* **Cooperation & rivalry (`/rail`, officers)**: set your toll (0 to `rail.max-toll`) and, for each other guild, a **Normal / Allied (free) / Banned** relation. A banned guild can no longer cross your land: **the lines through it are cut** for them (the search goes around the area, or the station becomes unreachable).
-* **Build a station**: an officer places a sign with `[Gare]` on line 1 and the name on line 2, within 2 blocks of a rail (Age 2 minimum, `rail.station-creation-cost` from the guild bank, 6 stations max per guild, not inside another guild's territory). Breaking the sign removes the station (only officers of the owning guild).
+<details>
+<summary><b>Resources to donate for each Age</b></summary>
 
-### 📜 Guild Treaties (`/traite`)
-Only **officers** can act from this menu (every member can read it with `/traite liste`). A proposal is sent to the other guild (valid for `treaties.proposal-minutes`, 10 min), which accepts it (left click) or refuses it (right click).
-* **🤝 Alliance** (unlimited): no raids between the two guilds, **free rail travel** (relation locked in `/rail`) and **no damage between allied players** (`treaties.protect-allies-pvp`), including harmful splash and lingering potions.
-* **📜 Non-Aggression Pact** (`treaties.pact-days`, 7 days): no raids between the two guilds for the duration of the pact.
-* **👑 Vassalage**: the vassal pays `treaties.vassal-tribute-percent` (5%) of its bank to its overlord every day; same benefits as an alliance. A guild can only be the vassal of one other guild. The overlord can free its vassal at no cost.
-* **💔 Betrayal**: breaking an alliance, an ongoing pact or leaving your overlord costs an **indemnity** (`treaties.break-indemnity`, 500 coins max, capped at the bank balance) paid to the former partner and announced to the whole server, and you cannot attack that guild for `treaties.break-grace-minutes` (30 min).
-* Treaties are stored in the database (`treaties`, `treaty_grace` tables), written into the season memorial, and removed if a guild disappears. The "defender present" raid rule is unchanged.
+- **Age 2**: 750 copper ingots, 256 leather, 750 raw iron, 1,000 oak logs, 1,500 wheat, 750 carrots.
+- **Age 3**: 3,500 iron ingots, 1,500 gold ingots, 1,500 lapis lazuli, 1,000 quartz, 750 nether wart, 150 blaze rods, 150 magma cream, 15 ghast tears, 750 glowstone dust, 3,500 feathers, 6,000 potatoes, 6,000 sugar cane, 1,000 pumpkins, 2,500 melon slices, 1,500 beetroots.
+- **Age 4**: 500 diamonds, 150 iron blocks, 100 gold blocks, 1,000 obsidian, 200 crying obsidian, 500 ender pearls, 1 pair of elytra, 2,500 golden carrots, 150 golden apples, 1,200 hay bales, 800 honey bottles, 800 slimeballs, 6,000 redstone dust, 400 repeaters, 350 pistons, 200 sticky pistons, 150 dispensers, 2,500 gunpowder, 250 TNT, 750 firework rockets, 32 anvils.
+- **Age 5**: 16 netherite ingots, 5 nether stars, 4 beacons, 8 totems of undying, 16 echo shards, 16 sculk catalysts, 16 sculk shriekers and 64 sculk sensors, 64 shulker shells, 2,500 end stone, 1,200 purpur blocks, 2,500 chorus fruit and 1,000 popped chorus fruit, 1,000 redstone blocks, 400 comparators, 400 observers, 250 hoppers, 150 targets, 150 emerald blocks.
+- **Age 6** (fixed amounts): every music disc, every mob head, all 8 goat horns, 64 nether stars, a Netherite hoe enchanted with Mending + Unbreaking III + Fortune III, every smithing template, all 20 pottery sherds, the dragon egg and a dead bush.
 
-### 🌐 Public Website (`web.*` in `config.yml`)
-The plugin runs a **read-only website**, open to everyone: `http://<server-ip>/` (port `web.port`, **80** by default).
-* **Pages**: home (online players, season, event, top guilds, recent history), `/guildes` (ranking), `/guilde/<id>` (members, treaties, stats), `/joueurs` (online + richest players) and `/api/stats.json` (JSON).
-* **Design**: automatic dark/light theme, rounded cards, colored avatars, medals and score bars, history timeline, blurred sticky header, fully responsive (mobile included). No external resources and no scripts.
-* **Security**: HTTP server built into the JDK (no dependency), GET/HEAD only, escaped text, CSP / anti-iframe / no-referrer headers. Pages are **rendered once per snapshot** (every `web.refresh-seconds`) and served from memory, with a **per-IP request limit** (`web.rate-limit`, 429 response), a bounded queue and timeouts: a flood can neither fill the memory nor slow down the Minecraft server. **No coordinates** (Nexus, bases, claims) and no IP addresses are ever shown, and *vanished* players are hidden; Nexus HP is hidden by default (`web.show-nexus-health`), banks and balances are configurable (`web.show-guild-banks`, `web.show-balances`). Behind a reverse proxy every visitor shares the proxy's IP: raise `web.rate-limit.requests` in that case.
-* **Port 80 on Linux**: requires root or `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))`; otherwise set `web.port: 8080`. If the port can't be opened, the plugin keeps running normally and says so in the console. Remember to open the port on your router / firewall.
-
-### 📊 Dashboard (`/hud`)
-A sidebar shows your guild, your Age, Nexus HP, raid/immunity status, treaties, contracts, balance and the current event. `/hud` toggles it on or off (setting saved).
+</details>
 
 ---
 
-## 📋 9. Full Command List
+## 💰 8. Money
 
-### 🎭 Professions & Races
-* `/race`: open the profession selection menu.
-* `/race show [player]`: profession directory of online players.
-* `/guide`: get / open the official interactive guide book.
+### Earning coins
 
-### 🏛️ Guild Management
-* `/guild create <name> <tag>`: found a new guild.
-* `/guild invite <player>`: invite a player to the guild *(Officer/Leader)*.
-* `/guild join <name>`: accept a guild invitation.
-* `/guild leave`: leave your current guild.
-* `/guild kick <player>`: kick a player *(Officer/Leader)*.
-* `/guild promote <player>`: promote a player to Officer or demote them *(Leader)*.
-* `/guild demote <player>`: demote an officer to regular member *(Leader)*.
-* `/guild transfer <player>`: hand guild leadership to a member *(Leader)*.
-* `/guild disband`: disband the guild *(Leader)*.
-* `/guild info [name]`: show a guild's stats, claims, bank and status.
+- **Killing monsters**: every monster pays a bounty, from 1.50 coins (silverfish) to 750 coins (Ender Dragon). Repetitive mob farms pay less.
+- **Daily contracts** (`/contrat`): 3 missions a day, one of them tied to your profession. +400 coins if you complete all three.
+- **Auction House** (`/ah`): sell the item in your hand with `/ah sell <price>` (10 listings max). Click your own listing to take it back.
+- **Events** and the **world boss** (see [Server life](#-10-server-life)).
 
-### 🗺️ Territory & Defense
-* `/guild claim`: claim the current chunk for your guild *(Officer/Leader)*.
-* `/guild claim show`: toggle the highlight of your territory borders.
-* `/guild unclaim`: give up the current chunk *(Officer/Leader)*.
-* `/guild spec`: open the guild specialization menu.
-* `/guild nexus place`: place the guild Nexus *(Officer/Leader)*.
-* `/nexus traps`: buy and arm the Nexus's defensive traps.
-* `/guild annex <join|decline>`: accept or refuse to join the winning guild after a defeat.
+<details>
+<summary><b>Monster bounty table</b></summary>
 
-### 💰 Economy & Market
-* `/guild bank <amount>`: deposit money into the guild bank.
-* `/pay <player> <amount>`: instantly send coins to another player.
-* `/money`: check your personal balance. *(The `/money get|set|top|rectify…` subcommands are admin-only.)*
-* `/baltop`: show the server's richest players.
-* `/ah`: open the Auction House and the Black Horde market.
-* `/ah sell <price>`: list the item in your hand on the Auction House (**10 active listings max** per player, `market.max-listings-per-player`).
-* Inside `/ah`: **pagination** (◀ ▶ arrows), and **clicking your own listing cancels it** and gives the item back.
-* `/age`: open the Age progression menu and donate resources.
+| Category | Monsters and bounty |
+| :--- | :--- |
+| 🐉 Bosses | Ender Dragon 750 · Warden 500 · Wither 350 · Elder Guardian 150 |
+| 👺 Mini-bosses | Ravager 75 · Evoker 40 · Piglin Brute 25 |
+| 🔥 Nether and End | Ghast and Shulker 20 · Wither Skeleton and Guardian 15 · Blaze, Hoglin and Zoglin 12 |
+| 🏹 Elite | Vindicator 15 · Witch 12 · Enderman 10 · Pillager 8 |
+| 🧟 Common | Creeper and Phantom 5 · Piglin and Zombified Piglin 4 · Spiders 3 to 3.50 · Skeletons 3 · Zombies 2.50 |
+| 🐛 Small | Vex 2.50 · Slimes and Magma Cubes 2 · Silverfish and Endermites 1.50 |
 
-### 🎉 Gameplay & Diplomacy
-* `/traite [liste]`: guild treaties (alliance, pact, vassalage).
-* `/station`, `/rail`: travel between stations / manage your guild's tolls, relations and stations.
-* `/contrat`, `/classement`, `/histoire`, `/hud`: daily contracts, season ranking, memorial, dashboard.
+The Merchant Syndicate earns 20% more.
+</details>
 
-### 🌐 Navigation & Server
-* `/hub` (or `/lobby`): reconnect directly to the network's main Hub (shortcut for `/server hub`).
+### Killing a player
+
+When you kill a player from another guild, you **take 100 coins + 1% of their fortune** from them (or everything they have if they have 100 coins or less). No bounty if you already fought each other less than 2 minutes ago, or between members of the same guild.
+
+### Spending
+
+Guild bank (`/guild bank <amount>`) for land, traps and raids · transfers (`/pay`) · Auction House purchases · train trips · profession changes.
 
 ---
 
-## 🛡️ Integrity & Anti-Cheat (technical summary)
-* **Mining bonuses** (Dwarf, Industry, Enclave): computed **after** claim protection, never on a block **placed by a player** (stored in the chunk, persistent and tracked through pistons).
-* **Age quotas**: indexed on the **peak member count** of the current Age (kicking members before donating no longer lowers anything).
-* **Profession change**: 3 free retrainings then paid ones, with a **24 h delay** between two changes (`races.change-cooldown-hours`).
-* **Hordes**: cap of **60 monsters** for a custom horde (`raids.max-custom-horde-units`); the bank is only charged once the target is validated; orphaned raid mobs are removed on restart.
-* **Enchantments**: levels above the vanilla maximum are brought back to normal outside the Arcane Conclave (click, pickup, slot change, login).
-* **Brewing stand**: hopper feeding follows the same restriction as opening it by hand.
-* **Saving**: player account writes are serialized (no money lost between an Auction House sale and a disconnection).
+## 🤝 9. Diplomacy and travel
 
-## ✅ Recent Implementation Details
-* **Arcanist**: +15% melee damage taken (direct attacks only).
-* **Blacksmith**: anvils, grindstones and blast furnaces can only be **crafted** by Blacksmiths up to Age 3 (using them stays free: Arcanists need the anvil for their books).
-* **Rural Enclave**: faster animal breeding (parent cooldown and baby growth divided by 3); Netherite armor is removed automatically (equipping, login, periodic check).
-* **Underground Industry**: drinking or throwing a level II potion (`STRONG_*` or amplifier ≥ 1) is refused.
-* **Pillager Siege**: 1 Ravager in 6 and 1 Vindicator in 3, the rest Pillagers.
-* **Merchant Syndicate**: the 10% dividend is now **taken from** the player's bounty (they get 90%) and sent to the bank: no more money creation.
-* **Raid cooldowns**: stored in the database (`raid_cooldowns` table, schema v6) and kept after a restart.
-* **Active raids**: by design, a running raid doesn't survive a restart (its monsters are removed), but the post-raid immunity is kept.
-* **Performance**: the periodic save of players and guilds runs in **a single** SQLite transaction.
-* **Treaties**: new `fr.esicraft.treaty` package (manager, menus, allied PvP protection), wired into both raid entry points and `RailManager.getRelation`.
-* **HUD optimization**: the sidebar is no longer rebuilt every 2 s; it only updates when its content changes, and only outdated lines are removed (fewer scoreboard packets).
-* **Website**: new `fr.esicraft.web` package (`WebServer`, `WebSnapshot`, `HtmlPages`), started/stopped with the plugin.
-* **Security (25/10 audit)**: atomic treaty break (two officers clicking at the same time no longer pay two indemnities), cancelling a proposal is officer-only, allied protection extended to harmful splash and lingering potions.
+### Treaties (`/traite`)
+
+An officer proposes a treaty to another guild, which has 10 minutes to accept (left click) or refuse (right click) in its own `/traite` menu.
+
+| Treaty | Duration | Effects |
+| :--- | :--- | :--- |
+| 🤝 **Alliance** | Unlimited | No raids between you · free train travel on each other's land · you can't hurt each other (hits, arrows, potions) |
+| 📜 **Non-aggression pact** | 7 days | No raids between you |
+| 👑 **Vassalage** | Unlimited | Like an alliance, but the vassal pays 5% of its bank to its overlord every day |
+
+**Breaking a treaty is a betrayal**: your guild pays up to 500 coins of compensation to the other one, the whole server is told, and you can't attack them for 30 minutes. One exception: an overlord can free its vassal for free.
+
+### The train (`/station`, `/rail`)
+
+The rail network lets you **teleport from station to station**, as long as a **continuous rail line** connects them (junctions and crossings included).
+
+- **Travel**: near a station (a `[Gare]` sign), type `/station` and pick your destination.
+- **Price**: 1 coin for the guild owning the arrival station, plus the **toll** of every guild whose land you cross. Your own guild and its allies don't charge you.
+- **Managing your network** (`/rail`, officers): set your toll, and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
+- **Building a station**: an officer places a sign with `[Gare]` on line 1 and the station name on line 2, within 2 blocks of a rail. Requires Age 2, 500 coins from the bank, and no more than 6 stations per guild.
+
+---
+
+## 🎉 10. Server life
+
+### Events (every 45 to 90 minutes)
+
+| Event | Duration | What happens |
+| :--- | :--- | :--- |
+| 🌑 Blood Moon | 10 min | More monsters, bounties ×2 |
+| ☄ Meteor Shower | 3 min | Ore blocks fall from the sky near players |
+| 🧙 Black Market | 5 min | A merchant sells rare items for diamonds, to everyone |
+| ☠ World Boss | 15 min | The *Lord of Ashes*: 3,000 coins shared by damage dealt, bonus for the top fighter |
+
+### Seasons
+
+Every month, `/classement` ranks the guilds (land, Age, wealth, members, raids repelled, conquests). The champion guild wins **5,000 coins**, **500 per member** and a 👑 crown in chat. `/histoire` tells the latest big moments on the server.
+
+### The website
+
+The server has a public website: **`http://<server-address>/`**. It shows online players, the guild ranking, a page for each guild (members, treaties, stats) and the richest players. It shows **no coordinates**: nothing that helps find a base.
+
+---
+
+## 📋 11. All commands
+
+| Command | What it does |
+| :--- | :--- |
+| `/race` · `/race show` | Pick your profession · see online players |
+| `/guide` | In-game rule book |
+| `/guild create <name> <tag>` | Create a guild |
+| `/guild invite <player>` · `/guild join <name>` | Invite · accept an invitation |
+| `/guild leave` · `/guild kick <player>` | Leave · kick |
+| `/guild promote <player>` · `/guild demote <player>` | Appoint or remove an officer (leader) |
+| `/guild transfer <player>` · `/guild disband` | Hand over the guild · disband it (leader) |
+| `/guild info [name]` | Guild details |
+| `/guild claim` · `/guild unclaim` · `/guild claim show` | Claim · give up a chunk · show borders |
+| `/guild spec` | Pick the specialization |
+| `/guild nexus place` · `/nexus traps` | Place the Nexus · buy traps |
+| `/guild annex <join\|decline>` | After a defeat: join the winner or leave |
+| `/guild bank <amount>` | Deposit into the guild bank |
+| `/age` | Age progression and donations |
+| `/money` · `/baltop` · `/pay <player> <amount>` | Your money · richest players · send coins |
+| `/ah` · `/ah sell <price>` | Auction House and raids · sell the item in your hand |
+| `/contrat` | Daily contracts |
+| `/traite` · `/traite liste` | Guild treaties |
+| `/station` · `/rail` | Take the train · manage your network (officers) |
+| `/classement` · `/histoire` | Season ranking · big moments |
+| `/hud` | Show or hide the dashboard |
+| `/hub` | Go back to the hub |
+
+---
+
+## 🛠️ 12. For administrators
+
+<details>
+<summary><b>Installation, configuration and admin commands</b></summary>
+
+### Installation
+
+- **Server**: Paper 1.20.4, Java 17 or newer.
+- **Build**: `.\mvnw.cmd package` on Windows, `./mvnw package` on Linux/macOS. The plugin is created in `target/`. Every change pushed to GitHub is also built automatically (GitHub Actions).
+- **Install**: copy the `.jar` into the server's `plugins/` folder and restart. Data is stored in an SQLite database in the plugin folder.
+
+### Main settings (`config.yml`)
+
+| Section | Contents |
+| :--- | :--- |
+| `guilds` | Creation and land prices, max members, Nexus health and healing |
+| `ages` | Resources required for each Age |
+| `raids` | Post-raid protection, max size of custom hordes |
+| `races` | Delay between two profession changes |
+| `market` | Auction House tax and max listings |
+| `events` | Event frequency |
+| `rail` | Trip and station prices, max toll, minimum Age |
+| `treaties` | Pact duration, tribute, compensation, grace period, ally protection |
+| `web` | Website: port, displayed name, visible information, anti-flood |
+
+### The website
+
+- Enabled by default on **port 80** (`web.port`). On Linux this port needs root or `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))`; otherwise use 8080. If the port is refused, the plugin still starts and says so in the console.
+- Remember to **open the port** on your router and firewall.
+- Read-only, with no coordinates. Nexus HP is hidden by default (`web.show-nexus-health`). Banks and balances can be hidden (`web.show-guild-banks`, `web.show-balances`). Vanished players don't appear.
+- Anti-flood: 60 requests per 10 seconds per IP address (`web.rate-limit`). Behind a reverse proxy, raise this limit.
+- JSON data: `/api/stats.json`.
+
+### Admin commands (permission `esicraft.admin`, operators by default)
+
+| Command | Use |
+| :--- | :--- |
+| `/esicraftadmin setage\|spawnraid\|givecoins\|forcenexus` | Change a guild's Age, launch a raid, give coins, force a Nexus |
+| `/money get\|set\|give\|take\|rectify\|top` | Manage player money |
+| `/evenement <lune\|meteores\|marchand\|boss\|stop\|status>` | Start or stop an event |
+| `/pvp [on\|off\|toggle]` | Turn raids and Nexus destruction on or off |
+| `/game reset` | Reset the whole game |
+| `/race set <player> <race>` | Change a player's profession |
+
+### Built-in anti-cheat
+
+- Mining bonuses never apply to a block placed by a player, or on another guild's land.
+- Age requirements are based on the highest member count reached: kicking players before donating doesn't help.
+- Enchantments above their normal maximum are removed outside the Arcane Conclave.
+- Horde size is capped, the bank is only charged once the target is confirmed, and raid monsters are removed on restart.
+- Money writes are serialized (nothing lost between a sale and a disconnection).
+
+</details>

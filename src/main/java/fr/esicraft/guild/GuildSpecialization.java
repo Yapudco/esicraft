@@ -44,7 +44,7 @@ public enum GuildSpecialization {
       "&e\ud83d\udcb0 Syndicat Marchand",
       Material.GOLD_BLOCK,
       "&7Monopole économique & commerce.",
-      List.of("&a+ Commerce exclusif Villageois", "&a+ Primes monstres +20% (+10% clan)", "&a+ Ventes HV bonifiées (+25%)", "&a+ Dividendes de guilde"),
+      List.of("&a+ Commerce exclusif Villageois", "&a+ Primes monstres +20% (+10% clan)", "&a+ Aucune taxe à l'Hôtel des Ventes", "&a+ Dividendes de guilde"),
       List.of("&c- 0 Arcaniste autorisé", "&c- Hordes mercenaires à +30%", "&c- Aucun bonus de combat", "&c- Nexus : -20% PV max")
    ),
    ARCANE_CONCLAVE(
@@ -56,7 +56,7 @@ public enum GuildSpecialization {
          "&a+ Enchantements & enclumes : -50% XP",
          "&a+ Potions améliorées (+1 tier)",
          "&a+ Enchants surpuissants (IV➔V, V➔VI)",
-         "&a+ Rayon magique de Nexus (1 cœur/s)",
+         "&a+ Rayon magique de Nexus (1 cœur / 2 s)",
          "&a+ -50% dégâts magiques subis"
       ),
       List.of("&c- Santé max : -2 cœurs (-4 PV)", "&c- Coût des claims : +50%", "&c- Max 1 Forgeron et 1 Nain", "&c- Perte des enchants V-VI si quit")
