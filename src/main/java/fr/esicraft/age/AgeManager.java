@@ -41,6 +41,8 @@ public class AgeManager {
                   Material mat = Material.matchMaterial(matName);
                   if (mat != null) {
                      reqs.put(mat, reqSec.getInt(matName));
+                  } else {
+                     this.plugin.getLogger().warning("[Âges] Objet inconnu dans config.yml (ages." + key + ") : " + matName + " - ignoré.");
                   }
                }
             }
