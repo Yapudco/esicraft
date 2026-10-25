@@ -180,7 +180,17 @@ public class RailManager {
 
    // ------------------------------------------------------------------ péages et relations
 
+   /** Seul le Syndicat Marchand peut prélever un péage. */
+   public boolean canTax(Guild guild) {
+      return guild != null && guild.getSpecialization() == fr.esicraft.guild.GuildSpecialization.MERCHANT_SYNDICATE;
+   }
+
+   /** Péage réellement appliqué : 0 pour toute guilde qui n'est pas un Syndicat Marchand. */
    public double getToll(String guildId) {
+      if (!this.canTax(this.plugin.getGuildManager().getGuildById(guildId))) {
+         return 0.0;
+      }
+
       Double t = this.tolls.get(guildId);
       return t != null ? t : this.plugin.getConfig().getDouble("rail.default-toll", 2.0);
    }

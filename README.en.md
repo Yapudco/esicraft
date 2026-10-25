@@ -283,7 +283,7 @@ The rail network lets you **teleport from station to station**, as long as a **c
 
 - **Travel**: near a station (a `[Gare]` sign), type `/station` and pick your destination.
 - **Price**: 1 coin for the guild owning the arrival station, plus the **toll** of every guild whose land you cross. Your own guild and its allies don't charge you.
-- **Managing your network** (`/rail`, officers): set your toll, and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
+- **Managing your network** (`/rail`, officers): set your toll (**Merchant Syndicate guilds only**; other guilds never charge), and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
 - **Building a station**: an officer places a sign with `[Gare]` on line 1 and the station name on line 2, within 2 blocks of a rail. Requires Age 2, 500 coins from the bank, and no more than 6 stations per guild.
 
 ---

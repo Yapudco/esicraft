@@ -67,6 +67,12 @@ public class RailGuiListener implements Listener {
 
       RailManager rails = this.plugin.getRailManager();
       if (holder.kind == RailGui.Kind.MAIN) {
+         if ((slot == 10 || slot == 11 || slot == 15 || slot == 16) && !rails.canTax(guild)) {
+            ChatUtil.sendMessage(player, "&c❌ Seul un &6Syndicat Marchand &cpeut prélever un péage sur le rail.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            return;
+         }
+
          double delta = switch (slot) {
             case 10 -> -10.0;
             case 11 -> -1.0;

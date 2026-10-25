@@ -144,7 +144,8 @@ public final class RailGui {
          "&7Prélevé sur chaque voyageur (hors alliés)",
          "&7dont la ligne traverse vos territoires.",
          "&7Versé directement à la banque de guilde.",
-         "&8Maximum : " + String.format(Locale.ROOT, "%.0f", plugin.getConfig().getDouble("rail.max-toll", 500.0))).build());
+         plugin.getRailManager().canTax(guild) ? "&8Maximum : " + String.format(Locale.ROOT, "%.0f", plugin.getConfig().getDouble("rail.max-toll", 500.0))
+            : "&cRéservé aux guildes Syndicat Marchand.").build());
       inv.setItem(15, new ItemBuilder(Material.LIME_CONCRETE).name("&a+1").build());
       inv.setItem(16, new ItemBuilder(Material.GREEN_CONCRETE).name("&2+10").build());
       inv.setItem(31, new ItemBuilder(Material.WRITABLE_BOOK).name("&b&lRelations entre guildes").lore(

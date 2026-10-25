@@ -4,6 +4,9 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Rail
+- Seules les guildes **Syndicat Marchand** peuvent prélever un péage sur le rail. Les autres guildes ne font plus payer (avant, toutes appliquaient 2 pièces par défaut) et ne peuvent plus modifier le montant dans `/rail`.
+
 ### Pacte de non-agression
 - Frapper un joueur de la guilde sous pacte (coup, flèche) ou son Nexus rompt désormais le pacte automatiquement : trahison (indemnité, préavis de 30 minutes, annonce, succès) et **rivalité** déclarée entre les deux guildes.
 

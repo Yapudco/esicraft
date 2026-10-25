@@ -280,7 +280,7 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 
 - **Voyager** : près d'une gare (panneau `[Gare]`), tape `/station` et choisis ta destination.
 - **Prix** : 1 pièce pour la guilde de la gare d'arrivée, plus le **péage** de chaque guilde dont tu traverses les terres. Ta propre guilde et ses alliés ne font pas payer.
-- **Gérer son réseau** (`/rail`, officiers) : fixer son péage, et pour chaque autre guilde choisir **Normale**, **Alliée** (gratuit) ou **Bannie** (les lignes qui passent chez vous lui sont coupées).
+- **Gérer son réseau** (`/rail`, officiers) : fixer son péage (**réservé aux guildes Syndicat Marchand** ; les autres guildes ne font jamais payer), et pour chaque autre guilde choisir **Normale**, **Alliée** (gratuit) ou **Bannie** (les lignes qui passent chez vous lui sont coupées).
 - **Construire une gare** : un officier pose un panneau avec `[Gare]` sur la 1re ligne et le nom de la gare sur la 2e, à moins de 2 blocs d'un rail. Il faut être à l'Âge 2, payer 500 pièces avec la banque, et pas plus de 6 gares par guilde.
 
 ---
