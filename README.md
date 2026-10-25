@@ -276,7 +276,7 @@ Un officier propose un traité à une autre guilde, qui a 10 minutes pour accept
 
 **Apaiser une rivalité** : elle s'estompe seule avec le temps (le poids des raids, trahisons et morts est divisé par deux tous les 7 jours, réglable dans `rivalry.half-life-days`) et **disparaît dès que les deux guildes signent un traité** (alliance, pacte ou vassalité).
 
-**Agression sous pacte** : si un joueur frappe un membre de la guilde sous pacte avec lui (coup, flèche) ou attaque son Nexus, le pacte est rompu automatiquement. C'est une trahison (indemnité, préavis de 30 minutes, annonce au serveur) et une **rivalité** s'ouvre entre les deux guildes (visible sur le site, page diplomatie).
+**Agression sous traité** : si un joueur attaque le Nexus d'une guilde liée par un traité (pacte, alliance ou vassalité, y compris le suzerain contre son vassal), ou frappe un membre d'une guilde sous pacte (coup, flèche), le traité est rompu automatiquement. C'est une trahison (indemnité, préavis de 30 minutes, annonce au serveur) et une **rivalité** s'ouvre entre les deux guildes (visible sur le site, page diplomatie).
 
 ### Le train (`/station`, `/rail`)
 
