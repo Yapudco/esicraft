@@ -1320,3 +1320,22 @@ Observateurs	Observers
 Obsidienne	Obsidian
 Inconnu	Unknown
 Inconnue	Unknown
+&7Tarif de base : &6	&7Base fare: &6
+ pièce(s)	 coin(s)
+&8Maximum : 	&8Maximum: 
+&8Coût : 	&8Cost: 
+ pièces (banque)	 coins (bank)
+&6🚆 Péage perçu : &e+	&6🚆 Toll collected: &e+
+ pièces &7(passage de 	 coins &7(passage of 
+&7Expire dans : &e	&7Expires in: &e
+&7En attente de réponse.	&7Waiting for a reply.
+&cClic : annuler	&cClick: cancel
+ devient votre vassal.	 becomes your vassal.
+&7Tribut : &e	&7Tribute: &e
+% &7de sa banque / jour	% &7of its bank / day
+&c❌ Vous avez rompu un traité avec &6	&c❌ You broke a treaty with &6
+&c : préavis de &e	&c : notice of &e
+ &cavant de pouvoir l'attaquer.	 &cbefore you can attack them.
+ &d! Ouvrez &e/traite &dpour répondre (&7	 &d! Open &e/traite &dto reply (&7
+📜 PACTE DE NON-AGRESSION entre &6	📜 NON-AGGRESSION PACT between &6
+ jours) !	 days)!

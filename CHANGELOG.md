@@ -4,6 +4,11 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (nuit)
 
+### Commande `/english`
+- Traduit le jeu en anglais pour le joueur seul (messages, barre d'action, titres, menus, tableau de bord, livre `/guide`) ; `/francais` pour revenir. Choix mémorisé en base.
+- Fonctionne avec un dictionnaire FR→EN (`lang/en.tsv`, ~1 300 fragments) : les parties dynamiques (noms, nombres) restent telles quelles.
+- Pas encore traduits : barre de boss des événements, tchat, site web.
+
 ### Compatibilité Paper 26.2
 - Le plugin cible maintenant Paper 26.2 et Java 25 (il visait Paper 1.20.4 / Java 17 et ne pouvait pas fonctionner sur un serveur 26.2).
 - Constantes d'API renommées (effets de potion, attributs, particules, enchantements, wagonnet TNT).
