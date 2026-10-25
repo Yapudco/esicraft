@@ -275,6 +275,8 @@ An officer proposes a treaty to another guild, which has 10 minutes to accept (l
 
 **Breaking a treaty is a betrayal**: your guild pays up to 500 coins of compensation to the other one, the whole server is told, and you can't attack them for 30 minutes. One exception: an overlord can free its vassal for free.
 
+**Easing a rivalry**: it fades on its own over time (the weight of raids, betrayals and kills is halved every 7 days, adjustable via `rivalry.half-life-days`) and **vanishes as soon as the two guilds sign a treaty** (alliance, pact or vassalage).
+
 **Aggression under a pact**: if a player hits a member of the guild you have a pact with (melee, arrow) or attacks their Nexus, the pact is broken automatically. It counts as a betrayal (compensation, 30-minute notice, server announcement) and a **rivalry** opens between the two guilds (shown on the website, diplomacy page).
 
 ### The train (`/station`, `/rail`)
