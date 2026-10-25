@@ -437,7 +437,7 @@ public class NexusManager {
          }
 
          Guild other = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
-         if (other != null && this.plugin.getTreatyManager().areFriends(guild.getId(), other.getId())) {
+         if (other != null && this.plugin.getTreatyManager().between(guild.getId(), other.getId()) != null) {
             return false;
          }
 

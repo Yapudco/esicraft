@@ -4,6 +4,9 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Nexus
+- Le golem gardien et les pièges du Nexus (flammes, toile, poison, rayon du Conclave) épargnent désormais aussi les joueurs d'une guilde liée par un pacte de non-agression (comme pour l'alliance et la vassalité). Frapper le Nexus rompt le pacte avant que les défenses ne réagissent.
+
 ### Rivalités
 - Une rivalité s'estompe avec le temps : raids, trahisons et morts perdent la moitié de leur poids tous les 7 jours (`rivalry.half-life-days`).
 - Signer un traité (alliance, pacte, vassalité) efface la rivalité passée entre les deux guildes.
