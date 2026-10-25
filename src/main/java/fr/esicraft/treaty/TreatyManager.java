@@ -404,7 +404,7 @@ public class TreatyManager {
    }
 
    /**
-    * Agression d'un joueur ou du Nexus d'une guilde liée par un pacte de non-agression : le pacte est rompu
+    * Agression d'un joueur ou du Nexus d'une guilde liée par un traité (pacte, alliance, vassalité, suzerain compris) : le traité est rompu
     * automatiquement (trahison : indemnité et préavis) et une rivalité s'ouvre entre les deux guildes.
     */
    public void onAggression(Guild aggressor, Guild victim, Player actor) {
@@ -413,7 +413,7 @@ public class TreatyManager {
       }
 
       Treaty t = this.between(aggressor.getId(), victim.getId());
-      if (t != null && t.getType() == TreatyType.PACT) {
+      if (t != null) {
          this.doBreak(t, aggressor, actor, true);
       }
    }
@@ -426,7 +426,7 @@ public class TreatyManager {
       }
 
       Guild other = this.plugin.getGuildManager().getGuildById(t.other(breaker.getId()));
-      boolean betrayal = this.isBetrayal(t, breaker);
+      boolean betrayal = aggression || this.isBetrayal(t, breaker);
       double paid = 0.0;
       this.unindex(t);
       if (other != null && betrayal) {

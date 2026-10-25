@@ -4,6 +4,9 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Correctif traités
+- Frapper le Nexus d'une guilde liée par une alliance ou une vassalité (vassal comme suzerain) rompt désormais le traité automatiquement : trahison et rivalité, comme pour un pacte. Avant, seul le pacte était rompu et les deux guildes restaient liées tout en se frappant.
+
 ### Site : réseau diplomatique
 - Zoom et dézoom du graphe (molette, boutons + / − / Recentrer), déplacement en glissant.
 - Mise en avant d'une guilde : le sélecteur atténue fortement les liaisons qui ne la concernent pas.
