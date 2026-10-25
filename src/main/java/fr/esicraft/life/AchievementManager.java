@@ -145,6 +145,22 @@ public class AchievementManager {
       }
    }
 
+   public record Unlock(UUID uuid, Achievement achievement, long ts) {
+   }
+
+   /** Derniers succès débloqués, tous joueurs confondus (pour le site web). */
+   public java.util.List<Unlock> recentUnlocks(int limit) {
+      java.util.List<Unlock> list = new java.util.ArrayList<>();
+      for (Map.Entry<UUID, Map<Achievement, Long>> e : this.unlocked.entrySet()) {
+         for (Map.Entry<Achievement, Long> a : e.getValue().entrySet()) {
+            list.add(new Unlock(e.getKey(), a.getKey(), a.getValue()));
+         }
+      }
+
+      list.sort((x, y) -> Long.compare(y.ts(), x.ts()));
+      return list.size() > limit ? new java.util.ArrayList<>(list.subList(0, limit)) : list;
+   }
+
    // ------------------------------------------------------------------ statistiques
 
    public long stat(UUID uuid, String key) {

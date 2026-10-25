@@ -39,6 +39,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class WebServer {
    private static final String HTML = "text/html; charset=utf-8";
    private static final String JSON = "application/json; charset=utf-8";
+   private static final String JS = "text/javascript; charset=utf-8";
    private static final int MAX_PATH = 128;
 
    private record Page(int status, String type, byte[] body) {
@@ -72,7 +73,7 @@ public class WebServer {
       setIfAbsent("sun.net.httpserver.maxReqTime", "10");
       setIfAbsent("sun.net.httpserver.maxRspTime", "30");
       setIfAbsent("sun.net.httpserver.maxReqHeaders", "64");
-      this.render(WebSnapshot.empty());
+      this.render(WebSnapshot.empty(), WebExtra.empty());
 
       try {
          this.server = HttpServer.create(new InetSocketAddress(bind, port), 64);
@@ -167,6 +168,7 @@ public class WebServer {
       }
 
       List<WebSnapshot.OnlineView> online = new ArrayList<>();
+      java.util.Set<String> visibleNames = new java.util.HashSet<>();
       for (Player p : Bukkit.getOnlinePlayers()) {
          if (isVanished(p)) {
             continue;
@@ -174,7 +176,16 @@ public class WebServer {
 
          Guild g = this.plugin.getGuildManager().getGuildByPlayer(p.getUniqueId());
          PlayerData pd = this.plugin.getDataManager().getPlayerData(p.getUniqueId());
-         online.add(new WebSnapshot.OnlineView(p.getName(), pd != null && pd.getRace() != null ? HtmlPages.plain(pd.getRace().getDisplayName()) : "Sans métier",
+         String shownName = p.getName();
+         var disguise = this.plugin.getDisguiseManager().get(p.getUniqueId());
+         if (disguise != null) {
+            // Un espion apparaît sur le site sous son faux nom et dans la guilde qu'il imite.
+            shownName = disguise.fakeName();
+            g = this.plugin.getGuildManager().getGuildById(disguise.guildId());
+         }
+
+         visibleNames.add(shownName.toLowerCase(java.util.Locale.ROOT));
+         online.add(new WebSnapshot.OnlineView(shownName, pd != null && pd.getRace() != null ? HtmlPages.plain(pd.getRace().getDisplayName()) : "Sans métier",
             g != null ? g.getId() : null, g != null ? HtmlPages.plain(g.getName()) : null, HtmlPages.plain(this.plugin.getAgeManager().getPlayerAge(p).getDisplayName()),
             showCoins && pd != null ? pd.getCoins() : null));
       }
@@ -184,6 +195,7 @@ public class WebServer {
       int max = Bukkit.getMaxPlayers();
       String seasonName = fr.esicraft.fun.SeasonManager.currentSeason();
       long daysLeft = fr.esicraft.fun.SeasonManager.daysLeft();
+      ExtraCapture extra = this.captureExtra(guilds, showNexus);
       Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
          try {
             List<WebSnapshot.RichView> rich = new ArrayList<>();
@@ -194,7 +206,8 @@ public class WebServer {
             }
 
             List<String> history = new ArrayList<>(this.plugin.getSeasonManager().getHistory(12));
-            this.render(new WebSnapshot(System.currentTimeMillis(), seasonName, daysLeft, event, online.size(), max, guilds, online, rich, history));
+            WebSnapshot snap = new WebSnapshot(System.currentTimeMillis(), seasonName, daysLeft, event, online.size(), max, guilds, online, rich, history);
+            this.render(snap, this.finishExtra(extra, snap, showCoins, visibleNames));
          } catch (RuntimeException e) {
             this.plugin.getLogger().log(Level.WARNING, "Site web : échec du rafraîchissement", e);
          }
@@ -202,19 +215,248 @@ public class WebServer {
       this.purgeHits();
    }
 
-   /** Rend toutes les pages une fois pour toutes ; les requêtes ne font ensuite qu'une recherche dans une table. */
-   private void render(WebSnapshot s) {
-      String name = HtmlPages.plain(this.plugin.getConfig().getString("web.server-name", "Esicraft"));
-      Map<String, Page> map = new HashMap<>();
-      map.put("/", html(200, HtmlPages.page(name, "home", "Accueil", HtmlPages.home(name, s), s)));
-      map.put("/guildes", html(200, HtmlPages.page(name, "guildes", "Guildes", HtmlPages.guilds(s), s)));
-      map.put("/joueurs", html(200, HtmlPages.page(name, "joueurs", "Joueurs", HtmlPages.players(s), s)));
-      map.put("/api/stats.json", new Page(200, JSON, HtmlPages.statsJson(s).getBytes(StandardCharsets.UTF_8)));
-      for (WebSnapshot.GuildView g : s.guilds()) {
-         map.put("/guilde/" + g.id(), html(200, HtmlPages.page(name, "guildes", g.name(), HtmlPages.guild(g), s)));
+   // ------------------------------------------------------------------ données supplémentaires
+
+   /** Ce qui doit être lu sur le thread principal (raids, traités, diversité, saison naturelle). */
+   private record ExtraCapture(List<WebExtra.RaidView> raids, List<WebExtra.EdgeView> treatyEdges, Map<String, Integer> diversity,
+                               Map<String, List<WebExtra.TrophyView>> trophies, Map<String, List<UUID>> members, WebExtra.NatureView nature) {
+   }
+
+   private ExtraCapture captureExtra(List<WebSnapshot.GuildView> guildViews, boolean showNexus) {
+      List<WebExtra.RaidView> raids = new ArrayList<>();
+      for (fr.esicraft.raid.ActiveRaid r : this.plugin.getRaidManager().getActiveRaids()) {
+         Guild t = this.plugin.getGuildManager().getGuildById(r.getTargetGuildId());
+         if (t == null) {
+            continue;
+         }
+
+         int defenders = 0;
+         for (UUID m : t.getMembers().keySet()) {
+            Player p = Bukkit.getPlayer(m);
+            if (p != null && !isVanished(p) && t.isClaimed(fr.esicraft.util.ChunkKey.from(p.getLocation().getChunk()))) {
+               defenders++;
+            }
+         }
+
+         int alive = r.getAliveMobUuids().size();
+         raids.add(new WebExtra.RaidView(t.getId(), HtmlPages.plain(t.getName()), HtmlPages.plain(r.getAttackerGuildName()), HtmlPages.plain(r.getRaidDisplayName()),
+            alive, Math.max(alive, r.getTotalMobs()), r.getStartTime(), defenders,
+            showNexus && t.hasNexus() ? (int)Math.round(t.getNexus().getHealthPercentage()) : null));
       }
 
-      this.notFound = html(404, HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s));
+      List<WebExtra.EdgeView> edges = new ArrayList<>();
+      java.util.Set<String> seen = new java.util.HashSet<>();
+      Map<String, Integer> diversity = new HashMap<>();
+      Map<String, List<WebExtra.TrophyView>> trophies = new HashMap<>();
+      Map<String, List<UUID>> members = new HashMap<>();
+      var season = this.plugin.getSeasonManager();
+      for (Guild g : this.plugin.getGuildManager().getAllGuilds()) {
+         for (Treaty t : this.plugin.getTreatyManager().treatiesOf(g.getId())) {
+            if (seen.add(t.getId())) {
+               edges.add(new WebExtra.EdgeView(t.getAId(), t.getBId(), t.getType().name(), 1, 0, 0));
+            }
+         }
+
+         int d = this.plugin.getSynergy().diversity(g);
+         diversity.put(g.getId(), d);
+         members.put(g.getId(), new ArrayList<>(g.getMembers().keySet()));
+         List<WebExtra.TrophyView> list = new ArrayList<>();
+         if (season.isChampion(g.getId())) {
+            list.add(new WebExtra.TrophyView("👑", "Champion de saison", "Couronne de la dernière saison"));
+         }
+
+         int age = g.getCurrentAge().getLevel();
+         if (age >= 6) {
+            list.add(new WebExtra.TrophyView("🐉", "Suprématie", "Âge 6 atteint : œuf de dragon et bloc de Netherite"));
+         } else if (age >= 4) {
+            list.add(new WebExtra.TrophyView("⚔", "Guerre Totale", "Âge " + age + " atteint"));
+         }
+
+         if (season.getConquests(g.getId()) > 0) {
+            list.add(new WebExtra.TrophyView("💥", "Conquérant", season.getConquests(g.getId()) + " Nexus détruit(s) cette saison"));
+         }
+
+         if (season.getRepelled(g.getId()) >= 3) {
+            list.add(new WebExtra.TrophyView("🛡", "Forteresse", season.getRepelled(g.getId()) + " hordes repoussées cette saison"));
+         }
+
+         if (d >= 6) {
+            list.add(new WebExtra.TrophyView("🧩", "Guilde complète", "Les six métiers réunis"));
+         }
+
+         trophies.put(g.getId(), list);
+      }
+
+      WebExtra.NatureView nature = null;
+      var ns = this.plugin.getNatureSeasons();
+      if (ns.isEnabled()) {
+         var now = ns.current();
+         nature = new WebExtra.NatureView(now.getIcon(), now.getLabel(), ns.remainingDays(), List.of(now.getEffects()), ns.next().display());
+      }
+
+      return new ExtraCapture(raids, edges, diversity, trophies, members, nature);
+   }
+
+   private static final java.util.regex.Pattern PLAYER_NAME = java.util.regex.Pattern.compile("[A-Za-z0-9_]{1,16}");
+
+   /** Lectures en base et assemblage (thread asynchrone). */
+   private WebExtra finishExtra(ExtraCapture c, WebSnapshot snap, boolean showCoins, java.util.Set<String> visibleNames) {
+      var chronicle = this.plugin.getChronicle();
+      var achievements = this.plugin.getAchievements();
+      achievements.refreshKnownPlayers();
+      List<WebExtra.JournalView> journal = new ArrayList<>();
+      for (var e : chronicle.recent(80)) {
+         journal.add(new WebExtra.JournalView(e.ts(), e.kind().getIcon(), e.kind().name(), e.text(), e.guildA(), e.guildB()));
+      }
+
+      // Rivalités : raids lancés et joueurs tués, dans les deux sens, regroupés par paire de guildes.
+      Map<String, int[]> pairs = new HashMap<>();
+      for (var r : chronicle.rivalries()) {
+         if (snap.guild(r.a()) == null || snap.guild(r.b()) == null) {
+            continue;
+         }
+
+         String key = r.a().compareTo(r.b()) < 0 ? r.a() + "|" + r.b() : r.b() + "|" + r.a();
+         int[] v = pairs.computeIfAbsent(key, k -> new int[2]);
+         v[0] += r.raids();
+         v[1] += r.kills();
+      }
+
+      List<WebExtra.EdgeView> edges = new ArrayList<>(c.treatyEdges());
+      for (var e : pairs.entrySet()) {
+         String[] ids = e.getKey().split("\\|", 2);
+         int raids = e.getValue()[0];
+         int kills = e.getValue()[1];
+         edges.add(new WebExtra.EdgeView(ids[0], ids[1], "RIVALRY", raids * 3 + kills, raids, kills));
+      }
+
+      Map<String, List<fr.esicraft.life.Chronicle.Point>> curves = new HashMap<>();
+      for (WebSnapshot.GuildView g : snap.guilds()) {
+         curves.put(g.id(), chronicle.history(g.id()));
+      }
+
+      List<fr.esicraft.life.Chronicle.AgeMark> ages = new ArrayList<>();
+      for (var m : chronicle.ageMarks()) {
+         if (snap.guild(m.guildId()) != null) {
+            ages.add(m);
+         }
+      }
+
+      // Profils : tous les joueurs connus (au plus 1 000).
+      Map<UUID, String> names = new HashMap<>();
+      List<WebExtra.ProfileView> profiles = new ArrayList<>();
+      for (Object[] r : this.plugin.getDataManager().getStorage().select(
+         "SELECT uuid, name, race, guild_id, guild_role, coins FROM players WHERE name IS NOT NULL ORDER BY name LIMIT 1000;", 6)) {
+         String name = (String)r[1];
+         if (name == null || !PLAYER_NAME.matcher(name).matches()) {
+            continue;
+         }
+
+         UUID uuid;
+         try {
+            uuid = UUID.fromString((String)r[0]);
+         } catch (IllegalArgumentException e) {
+            continue;
+         }
+
+         names.put(uuid, name);
+         String race = "Sans métier";
+         try {
+            race = HtmlPages.plain(fr.esicraft.race.Race.valueOf((String)r[2]).getDisplayName());
+         } catch (RuntimeException ignored) {
+         }
+
+         // Les données en mémoire (joueurs connectés) sont plus fraîches que la base.
+         PlayerData live = this.plugin.getDataManager().getPlayerData(uuid);
+         if (live != null && live.getRace() != null) {
+            race = HtmlPages.plain(live.getRace().getDisplayName());
+         }
+
+         Guild g = this.plugin.getGuildManager().getGuildByPlayer(uuid);
+         WebSnapshot.GuildView gv = g != null ? snap.guild(g.getId()) : null;
+         String role = null;
+         if (g != null && g.getMembers().get(uuid) != null) {
+            role = HtmlPages.plain(g.getMembers().get(uuid).getDisplayName());
+         }
+
+         Double coins = null;
+         if (showCoins) {
+            coins = live != null ? live.getCoins() : r[5] instanceof Number n ? n.doubleValue() : null;
+         }
+
+         List<String> owned = new ArrayList<>();
+         achievements.of(uuid).entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(e -> owned.add(e.getKey().name()));
+         profiles.add(new WebExtra.ProfileView(name.toLowerCase(java.util.Locale.ROOT), name, race, gv != null ? gv.id() : null, gv != null ? gv.name() : null, role,
+            gv != null ? gv.age() : HtmlPages.plain(fr.esicraft.age.AgeType.RUSTIC.getDisplayName()), coins, visibleNames.contains(name.toLowerCase(java.util.Locale.ROOT)),
+            owned, achievements.statsOf(uuid)));
+      }
+
+      List<WebExtra.AchievementView> catalog = new ArrayList<>();
+      for (fr.esicraft.life.Achievement a : fr.esicraft.life.Achievement.values()) {
+         catalog.add(new WebExtra.AchievementView(a.name(), a.getIcon(), a.getTitle(), a.getDescription(), achievements.holders(a), achievements.percent(a),
+            achievements.isRare(a)));
+      }
+
+      List<WebExtra.UnlockView> unlocks = new ArrayList<>();
+      for (var u : achievements.recentUnlocks(14)) {
+         String who = names.get(u.uuid());
+         if (who != null) {
+            unlocks.add(new WebExtra.UnlockView(u.ts(), who, u.achievement().getIcon(), u.achievement().getTitle(), achievements.isRare(u.achievement())));
+         }
+      }
+
+      Map<String, List<WebExtra.TrophyView>> trophies = new HashMap<>();
+      for (var e : c.trophies().entrySet()) {
+         List<WebExtra.TrophyView> list = new ArrayList<>(e.getValue());
+         int rare = 0;
+         for (UUID m : c.members().getOrDefault(e.getKey(), List.of())) {
+            for (var a : achievements.of(m).keySet()) {
+               if (achievements.isRare(a)) {
+                  rare++;
+               }
+            }
+         }
+
+         if (rare > 0) {
+            list.add(new WebExtra.TrophyView("🏅", rare + " succès rare" + (rare > 1 ? "s" : ""), "Obtenus par ses membres"));
+         }
+
+         trophies.put(e.getKey(), List.copyOf(list));
+      }
+
+      return new WebExtra(journal, c.raids(), edges, curves, ages, catalog, unlocks, trophies, profiles, c.nature(), c.diversity(), achievements.knownPlayers());
+   }
+
+   /** Rend toutes les pages une fois pour toutes ; les requêtes ne font ensuite qu'une recherche dans une table. */
+   private void render(WebSnapshot s, WebExtra x) {
+      String name = HtmlPages.plain(this.plugin.getConfig().getString("web.server-name", "Esicraft"));
+      Map<String, Page> map = new HashMap<>();
+      int live = (int)Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 15L));
+      boolean raid = !x.raids().isEmpty();
+      map.put("/", html(200, HtmlPages.page(name, "home", "Accueil", HtmlPages.home(name, s, x), s, live, raid)));
+      map.put("/guildes", html(200, HtmlPages.page(name, "guildes", "Guildes", HtmlPages.guilds(s), s, live, raid)));
+      map.put("/joueurs", html(200, HtmlPages.page(name, "joueurs", "Joueurs", HtmlPages.players(s, x), s, live, raid)));
+      map.put("/journal", html(200, HtmlPages.page(name, "journal", "Journal de guerre", ExtraPages.journal(s, x), s, live, raid)));
+      map.put("/raids", html(200, HtmlPages.page(name, "raids", "Raids en direct", ExtraPages.raids(s, x), s, live, raid)));
+      map.put("/diplomatie", html(200, HtmlPages.page(name, "diplomatie", "Réseau diplomatique", ExtraPages.diplomacy(s, x), s, live, raid)));
+      map.put("/musee", html(200, HtmlPages.page(name, "musee", "Musée des trophées", ExtraPages.museum(s, x), s, live, raid)));
+      map.put("/evolution", html(200, HtmlPages.page(name, "guildes", "Courbes d'évolution", ExtraPages.evolution(s, x), s, live, raid)));
+      map.put("/ages", html(200, HtmlPages.page(name, "ages", "Frise des Âges", ExtraPages.ages(s, x), s, live, raid)));
+      map.put("/guide", html(200, HtmlPages.page(name, "guide", "Guide du joueur", ExtraPages.guide(name), s, 0, raid)));
+      map.put("/api/stats.json", new Page(200, JSON, HtmlPages.statsJson(s).getBytes(StandardCharsets.UTF_8)));
+      map.put("/api/journal.json", new Page(200, JSON, ExtraPages.journalJson(x).getBytes(StandardCharsets.UTF_8)));
+      map.put("/api/raids.json", new Page(200, JSON, ExtraPages.raidsJson(x).getBytes(StandardCharsets.UTF_8)));
+      map.put("/assets/app.js", new Page(200, JS, ExtraPages.APP_JS.getBytes(StandardCharsets.UTF_8)));
+      for (WebSnapshot.GuildView g : s.guilds()) {
+         map.put("/guilde/" + g.id(), html(200, HtmlPages.page(name, "guildes", g.name(), HtmlPages.guild(g) + ExtraPages.guildExtra(s, g, x)
+            + "<p style=\"margin-top:26px\"><a class=\"nl\" href=\"/guildes\">← Toutes les guildes</a></p>", s, live, raid)));
+      }
+
+      for (WebExtra.ProfileView p : x.profiles()) {
+         map.put("/joueur/" + p.key(), html(200, HtmlPages.page(name, "joueurs", p.name(), ExtraPages.profile(s, p, x), s, live, raid)));
+      }
+
+      this.notFound = html(404, HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s, 0, raid));
       this.pages = Map.copyOf(map);
    }
 
@@ -274,6 +516,10 @@ public class WebServer {
             path = path.substring(0, path.length() - 1);
          }
 
+         if (path.startsWith("/joueur/")) {
+            path = path.toLowerCase(java.util.Locale.ROOT);
+         }
+
          Page page = this.pages.get(path);
          if (page != null && page.type().equals(JSON)) {
             ex.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
@@ -301,8 +547,8 @@ public class WebServer {
       h.set("Referrer-Policy", "no-referrer");
       h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
       h.set("Cross-Origin-Opener-Policy", "same-origin");
-      h.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-      h.set("Cache-Control", page.status() == 200 ? "public, max-age=10" : "no-store");
+      h.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
+      h.set("Cache-Control", page.status() != 200 ? "no-store" : page.type().equals(JS) ? "public, max-age=300" : "public, max-age=10");
       if (head) {
          ex.sendResponseHeaders(page.status(), -1);
          return;
