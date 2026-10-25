@@ -34,19 +34,28 @@ public final class BookUtil {
       return String.join("\n", lines);
    }
 
-   private static Component indexPage() {
+   private static final String[] INDEX_EN = {
+      "Getting started", "Jobs", "Guilds & land", "Specializations", "Nexus & traps", "Raids", "The Ages", "Money", "Treaties", "Trains", "Events", "Commands"
+   };
+
+   private static Component indexPage(boolean english) {
       Component page = ChatUtil.component("&4&l== ESICRAFT ==&r\n");
-      for (String[] entry : INDEX) {
+      for (int idx = 0; idx < INDEX.length; idx++) {
+         String[] entry = INDEX[idx];
          int target = Integer.parseInt(entry[2]);
-         Component line = ChatUtil.component(entry[1] + "› " + entry[0] + "\n")
+         Component line = ChatUtil.component(entry[1] + "› " + (english ? INDEX_EN[idx] : entry[0]) + "\n")
             .clickEvent(ClickEvent.changePage(target))
-            .hoverEvent(HoverEvent.showText(ChatUtil.component("&7Aller à la page " + target)));
+            .hoverEvent(HoverEvent.showText(ChatUtil.component((english ? "&7Go to page " : "&7Aller à la page ") + target)));
          page = page.append(line);
       }
       return page;
    }
 
-   private static List<String> pages() {
+   private static List<String> pages(boolean english) {
+      if (english) {
+         return pagesEn();
+      }
+
       List<String> pages = new ArrayList<>();
       // 2-3 : démarrage
       pages.add(p("&4&lDÉMARRER (1/2)&r", "&01. &1/race&0 : choisis", "&0ton métier. Sans", "&0métier, tu ne peux", "&0casser aucun bloc.", "&02. Rejoins une", "&0guilde (&1/guild join", "&1<nom>&0) ou crée la", "&0tienne : &1/guild", "&1create <nom> <tag>", "&0(500 pièces)."));
@@ -87,20 +96,59 @@ public final class BookUtil {
       pages.add(p("&4&lSAISONS & SITE&r", "&1/classement&0 : chaque", "&0mois, la meilleure", "&0guilde gagne 5000 +", "&0500 par membre et une", "&0couronne.", "&1/histoire&0 : grands", "&0moments.", "&1/hud&0 : tableau de bord.", "&0Site web public :", "&1http://<ip du serveur>", "&0classement, joueurs."));
       // 28-29 : commandes
       pages.add(p("&4&lCOMMANDES (1/2)&r", "&1/race &1/guild &1/age", "&1/guild claim", "&1/guild spec", "&1/guild bank <$>", "&1/guild nexus place", "&1/nexus traps", "&1/guild annex", "&1/ah &0(+ raids)", "&1/ah sell <prix>", "&1/contrat"));
-      pages.add(p("&4&lCOMMANDES (2/2)&r", "&1/traite &1/station", "&1/rail", "&1/money &1/baltop", "&1/pay <joueur> <$>", "&1/classement", "&1/histoire", "&1/hud", "&1/hub", "&1/guide"));
+      pages.add(p("&4&lCOMMANDES (2/2)&r", "&1/traite &1/station", "&1/rail", "&1/money &1/baltop", "&1/pay <joueur> <$>", "&1/classement", "&1/histoire", "&1/hud", "&1/hub", "&1/guide", "&1/english"));
       // 30 : conseils
       pages.add(p("&4&lCONSEILS&r", "&0• Un raid exige un", "&0  défenseur en ligne", "&0  chez la cible : reste", "&0  connecté pour te", "&0  défendre.", "&0• Soigne ton Nexus", "&0  avant une attaque.", "&0• Un traité protège", "&0  des raids.", "&0• Trop riche = cible.", "&2Bon jeu !"));
       return pages;
    }
 
+
+   private static List<String> pagesEn() {
+      List<String> pages = new ArrayList<>();
+      pages.add(p("&4&lGETTING STARTED (1/2)&r", "&01. &1/race&0 : pick", "&0your job. Without", "&0one you cannot break", "&0any block.", "&02. Join a guild", "&0(&1/guild join <name>&0)", "&0or create yours:", "&1/guild create", "&1<name> <tag>", "&0(500 coins)."));
+      pages.add(p("&4&lGETTING STARTED (2/2)&r", "&03. &1/guild claim&0,", "&0then &1/guild nexus", "&1place&0.", "&04. Earn coins:", "&0monsters, &1/contrat&0,", "&1/ah&0.", "&05. Donate resources", "&0in &1/age&0 to advance.", "&8/hud : dashboard", "&8/guide : this book"));
+      pages.add(p("&4&lJOBS (1/3)&r", "&8&lDwarf&0 (miner)", "&0Haste II + night vision", "&0below layer 0, 15%", "&0double ore.", "&c-&0 Slow in sunlight", "&2&lSylvan&0 (farmer)", "&0Regen I (self + guild", "&0within 4 blocks), right", "&0click harvest.", "&c-&0 -20% melee damage"));
+      pages.add(p("&4&lJOBS (2/3)&r", "&4&lBlacksmith", "&0Only one to forge", "&0weapons, armor, anvils.", "&0Fire resistant, 35%", "&0double ingots, anvil", "&0half price.", "&c-&0 Hunger +25%", "&3&lRanger&0 (archer)", "&0Poison arrows, +25%", "&0ranged, fast in", "&0forest/plains.", "&c-&0 Slow in diamond chest"));
+      pages.add(p("&4&lJOBS (3/3)&r", "&5&lArcanist&0 (mage)", "&0Enchanting and potions.", "&0+30% XP, potions +25%", "&0longer, -20% magic", "&0damage.", "&c-&0 +15% melee damage", "&1&lEngineer", "&0Redstone, pistons, TNT.", "&0-40% explosion damage.", "&c-&0 -20% melee damage"));
+      pages.add(p("&4&lCHANGING JOB&r", "&1/race&0 opens the menu.", "&0The first pick + 3", "&0changes are free,", "&0then 10,000 coins.", "&024 h between changes.", "&4Exclusivities&0: an item", "&0reserved to one job", "&0becomes free later", "&0(iron Age 2, diamond", "&0Age 3, Netherite Age 5)."));
+      pages.add(p("&4&lGUILDS&r", "&0Max 10 players, one", "&0guild each.", "&6Leader&0: everything,", "&0names officers, &1/guild", "&1transfer&0, &1disband&0.", "&6Officer&0: invites,", "&0kicks, claims, Nexus,", "&0traps, raids, treaties,", "&0stations.", "&6Member&0: bank, gifts,", "&0defence."));
+      pages.add(p("&4&lTERRITORY&r", "&1/guild claim&0 takes", "&0the chunk you stand in.", "&0• All chunks must", "&0touch each other", "&0• 100 coins, then +25", "&0per chunk", "&0• Max: 16 (Age 1), 32,", "&064, 128, then unlimited", "&0(Age 5)", "&1/guild unclaim", "&1/guild claim show"));
+      pages.add(p("&4&lPROTECTION&r", "&0On another clan's land:", "&0• no breaking/placing", "&0• chests, furnaces,", "&0  shulkers locked", "&0• TNT, pearls, pistons,", "&0  outside lava/water", "&0  forbidden", "&0Protections drop during", "&0a raid, and 30 min", "&0after the Nexus falls."));
+      pages.add(p("&4&lSPECIALIZATIONS&r", "&0Leader: &1/guild spec", "&c&lWarrior Legion", "&0Strength I + Resist. I,", "&0raids -30%.", "&0At least 50% Ranger/", "&0Blacksmith.", "&8&lUnderground Industry", "&0Haste II below Y=30,", "&0ores x1.5, traps -50%.", "&0Max 1 Ranger."));
+      pages.add(p("&4&lSPECIALIZATIONS&r", "&2&lPastoral Enclave", "&0+2 hearts, Regen I,", "&0harvests x2. No", "&0Engineer.", "&6&lMerchant Syndicate", "&0Villagers before Age 4,", "&0bounties +20%, no AH", "&0tax. No Arcanist.", "&0Nexus -20% health."));
+      pages.add(p("&4&lSPECIALIZATIONS&r", "&5&lArcane Conclave", "&0Nexus +25%, boosted", "&0enchants (IV becomes V),", "&0magic Nexus beam.", "&0Land +50% price.", "&3&lLone Ranger", "&0Alone, Speed I,", "&0Netherite from Age 3.", "&0No chests in claims.", "&8Changing spec: only when", "&8a new player arrives."));
+      pages.add(p("&4&lTHE NEXUS&r", "&0The guild's heart:", "&1/guild nexus place", "&0(only once).", "&4If it falls, you lose", "&4everything.", "&016-block zone: no water,", "&0lava or obsidian.", "&2Heal&0: throw a golden", "&0apple on it (+500 HP,", "&0+2500 if enchanted),", "&030 s between heals."));
+      pages.add(p("&4&lTRAPS&r &1/nexus traps", "&0Paid by the bank,", "&0used up at the end of", "&0the next raid.", "&0They target intruders,", "&0never your allies.", "&cBlaze&0 250: fire", "&7Web&0 200: slowness", "&eLightning&0 350: 4 hearts", "&2Fumes&0 300: poison", "&8Golem&0 500: guardian"));
+      pages.add(p("&4&lRAIDS (1/3)&r", "&0Pay for a monster", "&0horde to destroy a", "&0rival's Nexus.", "&01. &1/ah&0, Wither skull", "&02. Ready-made or custom", "&0horde (60 max)", "&03. Pick the target", "&0The bank pays.", "&0Options: sappers,", "&0fireproofing."));
+      pages.add(p("&4&lRAIDS (2/3)&r", "&0• Leader or officer", "&0• A defender must be", "&0  online on their land", "&0• Target protected 30", "&0  min after a raid", "&0• No raid against a", "&0  treaty partner", "&0• Disbanding blocked", "&0  10 min after a raid"));
+      pages.add(p("&4&lRAIDS (3/3)&r", "&0Nexus destroyed:", "&0• land annexed", "&0• bank transferred", "&0• the losers choose:", "&1/guild annex join&0 or", "&1decline", "&6&lHegemony&0: a guild", "&0too rich = raids -50%,", "&0protection of only", "&02 min."));
+      pages.add(p("&4&lTHE AGES (1/3)&r", "&1/age&0: members donate", "&0resources.", "&01 Rustic: start", "&02 Metallurgy: Nether,", "&0  iron for all", "&03 Alchemy: End,", "&0  diamond, iron armor", "&04 Total War:", "&0  diamond armor,", "&0  villagers, TNT"));
+      pages.add(p("&4&lTHE AGES (2/3)&r", "&04: player bonuses", "&0Speed I, +10% damage,", "&0+25% XP.", "&05 Mythic: Netherite", "&0and beacons for all,", "&0unlimited land,", "&0Haste, Resist., +50% XP.", "&06 Supremacy: dragon", "&0egg + Netherite block", "&0per member, chat title."));
+      pages.add(p("&4&lDONATIONS&r", "&0The amounts in the", "&1/age&0 menu depend on", "&0the number of members:", "&0x1.3 for 2 players,", "&0x2.2 for 5, x4.7 for 10.", "&0The maximum members", "&0during the Age count:", "&0kicking before donating", "&0is pointless.", "&0Age 6: fixed amounts."));
+      pages.add(p("&4&lEARNING COINS&r", "&0• Monsters: 1.5 to", "&0  750 (Ender Dragon)", "&0• &1/contrat&0: 3 a day,", "&0  +400 if all 3", "&0• &1/ah sell <price>", "&0  (10 listings max)", "&0• Events, world boss", "&8Repetitive farms pay", "&8less."));
+      pages.add(p("&4&lPVP & SPENDING&r", "&0Killing a player from", "&0another clan: 100 coins", "&0+ 1% of their wealth.", "&0No bounty within 2 min", "&0of a previous fight.", "&0Spend: bank", "&0(&1/guild bank&0), &1/pay", "&0trains, &1/ah&0, changing", "&0job.", "&1/money&0, &1/baltop"));
+      pages.add(p("&4&lTREATIES&r &1/traite", "&0Offer valid 10 min.", "&6Alliance&0: no raids,", "&0free trains, no damage", "&0between allies.", "&6Pact&0: 7 days, no raid.", "&6Vassalage&0: alliance +", "&05% of the bank per day", "&0to the suzerain.", "&4Breaking = betrayal:", "&0indemnity (500 max)."));
+      pages.add(p("&4&lTRAINS&r", "&0Sign &1[Gare]&0 (line 1)", "&0+ name (line 2) near a", "&0rail. Age 2, 500 coins,", "&06 stations max.", "&1/station&0 near a", "&0station: pick where to go.", "&0Continuous rails needed.", "&0Price: 1 coin + tolls", "&0of guilds crossed.", "&1/rail&0: toll, relations", "&0Normal/Allied/Banned."));
+      pages.add(p("&4&lEVENTS&r", "&0One every 1 to 2 days:", "&cBlood Moon&0: more", "&0monsters, bounties x2", "&7Meteors&0: ore falling", "&0from the sky", "&5Black Market&0: rare", "&0items for diamonds", "&4World Boss&0: Lord of", "&0Ashes, 3000 coins", "&0shared"));
+      pages.add(p("&4&lSEASONS & SITE&r", "&1/classement&0: each", "&0month, the best guild", "&0wins 5000 + 500 per", "&0member and a crown.", "&1/histoire&0: great", "&0moments.", "&1/hud&0: dashboard.", "&0Public website:", "&1http://<server ip>", "&0ranking, players."));
+      pages.add(p("&4&lCOMMANDS (1/2)&r", "&1/race &1/guild &1/age", "&1/guild claim", "&1/guild spec", "&1/guild bank <$>", "&1/guild nexus place", "&1/nexus traps", "&1/guild annex", "&1/ah &0(+ raids)", "&1/ah sell <price>", "&1/contrat"));
+      pages.add(p("&4&lCOMMANDS (2/2)&r", "&1/traite &1/station", "&1/rail", "&1/money &1/baltop", "&1/pay <player> <$>", "&1/classement", "&1/histoire", "&1/hud", "&1/hub", "&1/guide", "&1/english &1/francais"));
+      pages.add(p("&4&lTIPS&r", "&0• A raid needs a", "&0  defender online at the", "&0  target: stay connected", "&0  to defend yourself.", "&0• Heal your Nexus", "&0  before an attack.", "&0• A treaty protects", "&0  from raids.", "&0• Too rich = target.", "&2Have fun!"));
+      return pages;
+   }
+
    public static ItemStack createGuideBook() {
+      return createGuideBook(false);
+   }
+
+   public static ItemStack createGuideBook(boolean english) {
       ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
       BookMeta meta = (BookMeta)book.getItemMeta();
       if (meta != null) {
-         meta.title(ChatUtil.component("&4Guide Esicraft"));
+         meta.title(ChatUtil.component(english ? "&4Esicraft Guide" : "&4Guide Esicraft"));
          meta.author(ChatUtil.component("L'Ordre d'Esicraft"));
-         meta.addPages(new Component[]{indexPage()});
-         for (String page : pages()) {
+         meta.addPages(new Component[]{indexPage(english)});
+         for (String page : pages(english)) {
             meta.addPages(new Component[]{ChatUtil.component(page)});
          }
          book.setItemMeta(meta);

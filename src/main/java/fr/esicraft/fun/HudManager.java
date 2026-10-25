@@ -4,6 +4,7 @@ import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.data.PlayerData;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.Lang;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -162,7 +163,7 @@ public class HudManager {
       List<String> unique = new ArrayList<>();
       Set<String> seen = new HashSet<>();
       for (String line : raw) {
-         String colored = ChatUtil.color(line);
+         String colored = ChatUtil.color(Lang.tr(player, line));
          while (!seen.add(colored)) {
             colored += "§r";
          }

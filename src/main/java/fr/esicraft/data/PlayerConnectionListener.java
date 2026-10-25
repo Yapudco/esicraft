@@ -45,7 +45,7 @@ public class PlayerConnectionListener implements Listener {
       this.plugin.getRaceManager().applyRaceAttributes(player, data.getRace());
       this.plugin.getGuildManager().updatePlayerTab(player);
       if (!player.hasPlayedBefore()) {
-         player.getInventory().addItem(new ItemStack[]{BookUtil.createGuideBook()});
+         player.getInventory().addItem(new ItemStack[]{BookUtil.createGuideBook(fr.esicraft.util.Lang.isEnglish(player))});
          ChatUtil.sendMessage(player, "&6Un livre explicatif des règles &e\"Guide Esicraft\" &6a été ajouté à votre inventaire !");
          ChatUtil.sendMessage(player, "&7(Vous pourrez toujours en réclamer un nouveau avec &e/guide&7)");
       }

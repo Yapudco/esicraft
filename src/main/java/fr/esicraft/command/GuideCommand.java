@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public class GuideCommand implements CommandExecutor {
    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
       if (sender instanceof Player player) {
-         ItemStack book = BookUtil.createGuideBook();
+         ItemStack book = BookUtil.createGuideBook(fr.esicraft.util.Lang.isEnglish(player));
             player.getInventory().addItem(new ItemStack[]{book}).values().forEach(left -> player.getWorld().dropItemNaturally(player.getLocation(), left));
             player.openBook(book);
          ChatUtil.sendMessage(player, "&aUn exemplaire du &6Guide Esicraft &aa été ajouté à votre inventaire !");

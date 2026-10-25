@@ -3,6 +3,7 @@ package fr.esicraft.command;
 import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.race.Race;
 import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.Lang;
 import java.time.Duration;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
@@ -41,8 +42,8 @@ public class GameCommand implements CommandExecutor {
                p.setSaturation(20.0F);
                p.showTitle(
                   Title.title(
-                     ChatUtil.component("&4&lRESET GLOBAL !"),
-                     ChatUtil.component("&cEffets, guildes et monde réinitialisés"),
+                     ChatUtil.component(Lang.tr(p, "&4&lRESET GLOBAL !")),
+                     ChatUtil.component(Lang.tr(p, "&cEffets, guildes et monde réinitialisés")),
                      Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(1000L))
                   )
                );
