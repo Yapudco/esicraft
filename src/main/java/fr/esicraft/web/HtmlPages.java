@@ -90,7 +90,7 @@ final class HtmlPages {
       .card.raid{margin-bottom:12px;border-color:rgba(248,113,113,.4)}.card.raid .bar i{background:linear-gradient(90deg,#f87171,var(--acc))}
       .card.nature{margin-top:14px}.big{font-size:1.9rem;line-height:1}
       .chart{width:100%;height:auto;display:block;margin-top:8px}.chart text{fill:var(--mut);font-size:11px}.chart .gl{stroke:var(--line)}
-      .chart .lbl{fill:var(--tx);font-weight:700;font-size:12px}.chart .num{fill:#fff;font-weight:800;font-size:11px}.frise{min-width:560px}
+      .chart .lbl{fill:var(--tx);font-weight:700;font-size:12px}.chart .num{fill:#fff;font-weight:800;font-size:11px}.frise{min-width:700px}
       .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
       .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
       .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}

@@ -678,67 +678,102 @@ final class ExtraPages {
       return b.append(agesTimeline(s, x.ages(), null)).toString();
    }
 
+   private static final String[] AGE_SHORT = {"Rustique", "Métallurgie", "Alchimie", "Guerre Totale", "Mythique", "Suprématie"};
+
+   /**
+    * Frise des Âges : une colonne par Âge (1 à 6), une ligne par guilde. Chaque Âge atteint porte sa date ; les Âges non
+    * atteints restent vides. Le premier à franchir chaque Âge est marqué d'une étoile.
+    */
    static String agesTimeline(WebSnapshot s, List<Chronicle.AgeMark> marks, String onlyGuild) {
-      Map<String, List<Chronicle.AgeMark>> byGuild = new LinkedHashMap<>();
+      Map<String, Map<Integer, Long>> byGuild = new LinkedHashMap<>();
       for (WebSnapshot.GuildView g : s.guilds()) {
          if (onlyGuild == null || g.id().equals(onlyGuild)) {
-            byGuild.put(g.id(), new ArrayList<>());
+            byGuild.put(g.id(), new HashMap<>());
          }
       }
 
-      long min = Long.MAX_VALUE;
+      Map<Integer, Long> firstAt = new HashMap<>();
       for (Chronicle.AgeMark m : marks) {
-         List<Chronicle.AgeMark> list = byGuild.get(m.guildId());
-         if (list != null) {
-            list.add(m);
-            min = Math.min(min, m.ts());
+         Map<Integer, Long> reached = byGuild.get(m.guildId());
+         if (reached != null && m.age() >= 1 && m.age() <= 6) {
+            reached.merge(m.age(), m.ts(), Math::min);
+            firstAt.merge(m.age(), m.ts(), Math::min);
          }
       }
 
-      byGuild.values().removeIf(List::isEmpty);
+      byGuild.values().removeIf(Map::isEmpty);
       if (byGuild.isEmpty()) {
          return empty("Aucun passage d'Âge enregistré pour le moment.");
       }
 
-      long max = Math.max(s.generatedAt(), min + 3600000L);
       List<String> ids = new ArrayList<>(byGuild.keySet());
-      ids.sort((a, c) -> Integer.compare(s.guild(c).ageLevel(), s.guild(a).ageLevel()));
+      ids.sort((a, c) -> {
+         int byAge = Integer.compare(s.guild(c).ageLevel(), s.guild(a).ageLevel());
+         return byAge != 0 ? byAge : Long.compare(byGuild.get(a).values().stream().max(Long::compare).orElse(0L), byGuild.get(c).values().stream().max(Long::compare).orElse(0L));
+      });
       if (ids.size() > 14) {
          ids = ids.subList(0, 14);
       }
 
-      int w = 720;
-      int left = 130;
-      int right = 24;
-      int rowH = 40;
-      int top = 16;
-      int h = top + ids.size() * rowH + 26;
-      int pad = 16;
-      double pw = w - left - right - pad;
-      left += pad;
+      int w = 780;
+      int left = 150;
+      int right = 20;
+      int head = 52;
+      int rowH = 62;
+      int h = head + ids.size() * rowH + 8;
+      double colW = (w - left - right) / 6.0;
       StringBuilder svg = new StringBuilder("<div class=\"card scroll\"><svg class=\"chart frise\" viewBox=\"0 0 " + w + " " + h + "\" role=\"img\" aria-label=\"Frise des Âges\">");
+      for (int a = 1; a <= 6; a++) {
+         double cx = left + colW * (a - 0.5);
+         svg.append("<rect x=\"").append(fmt(left + colW * (a - 1) + 3)).append("\" y=\"4\" width=\"").append(fmt(colW - 6)).append("\" height=\"").append(h - 8)
+            .append("\" rx=\"10\" fill=\"var(--card2)\" fill-opacity=\"").append(a % 2 == 0 ? ".5" : ".25").append("\"/>")
+            .append("<text x=\"").append(fmt(cx)).append("\" y=\"24\" text-anchor=\"middle\" class=\"lbl\">Âge ").append(a).append("</text>")
+            .append("<text x=\"").append(fmt(cx)).append("\" y=\"40\" text-anchor=\"middle\">").append(AGE_SHORT[a - 1]).append("</text>");
+      }
+
       int row = 0;
       for (String id : ids) {
          WebSnapshot.GuildView g = s.guild(id);
-         double y = top + row++ * rowH + rowH / 2.0;
+         Map<Integer, Long> reached = byGuild.get(id);
+         double y = head + row++ * rowH + 22;
          String c = color(hue(id));
-         List<Chronicle.AgeMark> list = byGuild.get(id);
-         list.sort(Comparator.comparingLong(Chronicle.AgeMark::ts));
-         double x0 = left + pw * (list.get(0).ts() - min) / (double)(max - min);
-         svg.append("<a href=\"/guilde/").append(esc(id)).append("\"><text x=\"").append(left - pad - 10).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"end\" class=\"lbl\">")
+         svg.append("<a href=\"/guilde/").append(esc(id)).append("\"><text x=\"").append(left - 14).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"end\" class=\"lbl\">")
             .append(esc(g.name())).append("</text></a>");
-         svg.append("<line x1=\"").append(fmt(x0)).append("\" x2=\"").append(fmt(left + pw)).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y))
-            .append("\" stroke=\"").append(c).append("\" stroke-width=\"3\" stroke-opacity=\".45\" stroke-linecap=\"round\"/>");
-         for (Chronicle.AgeMark m : list) {
-            double mx = left + pw * (m.ts() - min) / (double)(max - min);
-            svg.append("<circle cx=\"").append(fmt(mx)).append("\" cy=\"").append(fmt(y)).append("\" r=\"11\" fill=\"").append(c).append("\" stroke=\"var(--bg)\" stroke-width=\"2\"><title>")
-               .append(esc(g.name())).append(" : Âge ").append(m.age()).append(" le ").append(DAY_TIME.format(Instant.ofEpochMilli(m.ts()))).append("</title></circle><text x=\"")
-               .append(fmt(mx)).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"middle\" class=\"num\">").append(m.age()).append("</text>");
+         int top = reached.keySet().stream().max(Integer::compare).orElse(1);
+         // Trait plein entre les Âges franchis, pointillé vers le suivant.
+         svg.append("<line x1=\"").append(fmt(left + colW * 0.5)).append("\" x2=\"").append(fmt(left + colW * (top - 0.5))).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y))
+            .append("\" stroke=\"").append(c).append("\" stroke-width=\"3\" stroke-opacity=\".6\"/>");
+         if (top < 6) {
+            svg.append("<line x1=\"").append(fmt(left + colW * (top - 0.5))).append("\" x2=\"").append(fmt(left + colW * (top + 0.5))).append("\" y1=\"").append(fmt(y)).append("\" y2=\"").append(fmt(y))
+               .append("\" stroke=\"").append(c).append("\" stroke-width=\"2\" stroke-opacity=\".35\" stroke-dasharray=\"3 5\"/>");
+         }
+
+         for (int a = 1; a <= 6; a++) {
+            double cx = left + colW * (a - 0.5);
+            Long ts = reached.get(a);
+            if (ts == null) {
+               svg.append("<circle cx=\"").append(fmt(cx)).append("\" cy=\"").append(fmt(y)).append("\" r=\"9\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"2\"><title>")
+                  .append(esc(g.name())).append(" : Âge ").append(a).append(" pas encore atteint</title></circle>");
+               continue;
+            }
+
+            boolean current = a == top;
+            boolean first = ts.equals(firstAt.get(a)) && byGuild.size() > 1;
+            Long prev = reached.get(a - 1);
+            String delay = prev == null ? "" : " (" + fr.esicraft.treaty.TreatyManager.formatDuration(ts - prev) + " après l'Âge " + (a - 1) + ")";
+            svg.append("<circle cx=\"").append(fmt(cx)).append("\" cy=\"").append(fmt(y)).append("\" r=\"").append(current ? 13 : 11).append("\" fill=\"").append(c)
+               .append("\" stroke=\"").append(current ? "var(--tx)" : "var(--bg)").append("\" stroke-width=\"2\"><title>").append(esc(g.name())).append(" : Âge ").append(a).append(" (")
+               .append(AGE_SHORT[a - 1]).append(") le ").append(DAY_TIME.format(Instant.ofEpochMilli(ts))).append(delay).append(first ? " — premier à l'atteindre" : "").append("</title></circle>")
+               .append("<text x=\"").append(fmt(cx)).append("\" y=\"").append(fmt(y + 4)).append("\" text-anchor=\"middle\" class=\"num\">").append(a).append("</text>")
+               .append("<text x=\"").append(fmt(cx)).append("\" y=\"").append(fmt(y + 27)).append("\" text-anchor=\"middle\">").append(DAY_TIME.format(Instant.ofEpochMilli(ts))).append("</text>");
+            if (first) {
+               svg.append("<text x=\"").append(fmt(cx + 20)).append("\" y=\"").append(fmt(y + 4)).append("\" class=\"lbl\" style=\"fill:#fbbf24\">★</text>");
+            }
          }
       }
 
-      svg.append("<text x=\"").append(left).append("\" y=\"").append(h - 6).append("\">").append(DAY.format(Instant.ofEpochMilli(min))).append("</text><text x=\"").append(w - right)
-         .append("\" y=\"").append(h - 6).append("\" text-anchor=\"end\">aujourd'hui</text></svg></div>");
+      svg.append("</svg></div><p class=\"mut\" style=\"font-size:.8rem;margin:8px 0 0\">Chaque ligne est une guilde, chaque colonne un Âge. Le disque plein porte la date du passage ; ")
+         .append("le disque cerclé est l'Âge actuel ; ★ marque la première guilde à l'avoir atteint ; un cercle vide n'est pas encore atteint. Survolez un disque pour le délai depuis l'Âge précédent.</p>");
       return svg.toString();
    }
 
