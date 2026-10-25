@@ -69,6 +69,28 @@ public class AlliedProtectionListener implements Listener {
       }
    }
 
+   /** Un coup réellement porté à un joueur d'une guilde sous pacte de non-agression rompt le pacte (trahison + rivalité). */
+   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+   public void onPactAggression(EntityDamageByEntityEvent event) {
+      if (!(event.getEntity() instanceof Player victim)) {
+         return;
+      }
+
+      Player attacker = null;
+      if (event.getDamager() instanceof Player p) {
+         attacker = p;
+      } else if (event.getDamager() instanceof Projectile proj && proj.getShooter() instanceof Player p) {
+         attacker = p;
+      }
+
+      if (attacker == null || attacker.equals(victim)) {
+         return;
+      }
+
+      this.plugin.getTreatyManager().onAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()),
+         this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId()), attacker);
+   }
+
    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
    public void onDamage(EntityDamageByEntityEvent event) {
       if (!(event.getEntity() instanceof Player victim) || !this.plugin.getConfig().getBoolean("treaties.protect-allies-pvp", true)) {

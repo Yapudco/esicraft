@@ -4,6 +4,9 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Pacte de non-agression
+- Frapper un joueur de la guilde sous pacte (coup, flèche) ou son Nexus rompt désormais le pacte automatiquement : trahison (indemnité, préavis de 30 minutes, annonce, succès) et **rivalité** déclarée entre les deux guildes.
+
 ### Correctifs
 - **Nexus** : l'hologramme des PV réapparaît après un redémarrage du serveur ou une reconnexion (il n'était recréé qu'au premier dégât ou soin).
 - **Nexus** : après un redémarrage, le Nexus est de nouveau retrouvé à sa position (l'index était vidé au démarrage).
