@@ -384,8 +384,40 @@ public class GuildClaimListener implements Listener {
       Block to = event.getToBlock();
       if (from.getX() >> 4 != to.getX() >> 4 || from.getZ() >> 4 != to.getZ() >> 4) {
          String toOwner = this.claimOwnerId(to);
-         if (toOwner != null && !toOwner.equals(this.claimOwnerId(from)) && !this.isRaided(toOwner)) {
+         if (toOwner != null && !toOwner.equals(this.claimOwnerId(from))) {
             event.setCancelled(true);
+         }
+      }
+   }
+
+   /** Pas de "lava cast" : un seau de lave ne se vide pas aux pieds d'un joueur d'un autre camp. */
+   private static final double LAVA_CAST_RADIUS = 5.0;
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onLavaCast(PlayerBucketEmptyEvent event) {
+      if (event.getBucket() == Material.LAVA_BUCKET) {
+         Player caster = event.getPlayer();
+         Block target = event.getBlockClicked().getRelative(event.getBlockFace());
+         Guild casterGuild = this.plugin.getGuildManager().getGuildByPlayer(caster.getUniqueId());
+         for (Player other : target.getWorld().getPlayers()) {
+            if (!other.equals(caster)
+               && other.getGameMode() != org.bukkit.GameMode.CREATIVE
+               && other.getGameMode() != org.bukkit.GameMode.SPECTATOR
+               && other.getLocation().distanceSquared(target.getLocation().add(0.5, 0.5, 0.5)) <= LAVA_CAST_RADIUS * LAVA_CAST_RADIUS) {
+               Guild otherGuild = this.plugin.getGuildManager().getGuildByPlayer(other.getUniqueId());
+               boolean friendly = casterGuild != null
+                  && otherGuild != null
+                  && (casterGuild.getId().equals(otherGuild.getId()) || this.plugin.getTreatyManager().areFriends(casterGuild.getId(), otherGuild.getId()));
+               if (!friendly) {
+                  event.setCancelled(true);
+                  ChatUtil.sendActionbar(caster, "&c❌ Impossible de verser de la lave à moins de 5 blocs d'un autre joueur !");
+                  ChatUtil.playSound(caster, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                  return;
+               }
+            }
          }
       }
    }
@@ -548,6 +580,17 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onBlockDispense(BlockDispenseEvent event) {
+      Material itemType = event.getItem().getType();
+      if ((itemType == Material.LAVA_BUCKET || itemType == Material.WATER_BUCKET)
+         && event.getBlock().getBlockData() instanceof org.bukkit.block.data.Directional directional) {
+         Block target = event.getBlock().getRelative(directional.getFacing());
+         String targetOwner = this.claimOwnerId(target);
+         if (targetOwner != null && !targetOwner.equals(this.claimOwnerId(event.getBlock()))) {
+            event.setCancelled(true);
+            return;
+         }
+      }
+
       if (event.getItem().getType() == Material.TNT_MINECART) {
          ChunkKey chunkKey = ChunkKey.from(event.getBlock().getLocation().getChunk());
          Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);

@@ -9,6 +9,11 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 - Constantes d'API renommées (effets de potion, attributs, particules, enchantements, wagonnet TNT).
 - Un objet de `config.yml` qui n'existe plus dans cette version est signalé dans la console au lieu d'être ignoré en silence.
 
+### Anti « lava cast » et inondations
+- Lave et eau ne passent plus d'un territoire à un autre, y compris pendant un raid (avant, l'exception de raid laissait inonder la cible).
+- Un distributeur ne peut plus verser un seau de lave ou d'eau sur le territoire d'une autre guilde.
+- Impossible de vider un seau de lave à moins de 5 blocs d'un joueur hors guilde et hors traité.
+
 ### Livre `/guide` réécrit
 - 30 pages alignées sur le jeu actuel : démarrage, 6 métiers, guildes et terres, 6 spécialisations, Nexus et pièges, raids, Âges, argent, traités, train, événements, saisons, site web, commandes.
 - Sommaire cliquable (clic = saut au chapitre) ; le livre s'ouvre directement et tombe au sol si l'inventaire est plein.
