@@ -7,6 +7,7 @@ import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildSpecialization;
 import fr.esicraft.race.Race;
 import fr.esicraft.util.ChatUtil;
+import fr.esicraft.util.ChunkKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -37,7 +38,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -52,6 +54,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class RaceInteractionListener implements Listener {
    private final EsicraftPlugin plugin;
+   private final fr.esicraft.util.PlacedBlockTracker placedTracker;
    private static final EnumSet<Material> BREEDING_FOODS = EnumSet.of(
       Material.WHEAT,
       Material.CARROT,
@@ -79,6 +82,7 @@ public class RaceInteractionListener implements Listener {
    );
 
    public RaceInteractionListener(EsicraftPlugin plugin) {
+      this.placedTracker = new fr.esicraft.util.PlacedBlockTracker(plugin);
       this.plugin = plugin;
    }
 
@@ -137,6 +141,13 @@ public class RaceInteractionListener implements Listener {
             && race == Race.SYLVAN
             && block.getBlockData() instanceof Ageable ageable
             && ageable.getAge() >= ageable.getMaximumAge()) {
+            Guild claimOwner = this.plugin.getGuildManager().getGuildByChunk(ChunkKey.from(block.getChunk()));
+            if (claimOwner != null && !claimOwner.isMember(player.getUniqueId()) && !player.hasPermission("esicraft.admin")) {
+               event.setCancelled(true);
+               ChatUtil.sendActionbar(player, "&c❌ Territoire protégé de la guilde &6" + claimOwner.getName());
+               return;
+            }
+
             Collection<ItemStack> drops = block.getDrops(player.getInventory().getItemInMainHand());
             Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
             boolean isDruidic = guild != null && guild.getSpecialization() == GuildSpecialization.DRUIDIC_ENCLAVE;
@@ -344,7 +355,7 @@ public class RaceInteractionListener implements Listener {
    public void onBlockPlace(BlockPlaceEvent event) {
       Block block = event.getBlock();
       if (this.isOre(block.getType()) || this.isDruidicBonusBlock(block)) {
-         block.setMetadata("placed_by_player", new FixedMetadataValue(this.plugin, true));
+         this.placedTracker.mark(block);
       }
    }
 
@@ -352,14 +363,90 @@ public class RaceInteractionListener implements Listener {
       priority = EventPriority.LOW,
       ignoreCancelled = true
    )
+   public void onBlockBreakRaceCheck(BlockBreakEvent event) {
+      Player player = event.getPlayer();
+      Race race = this.plugin.getRaceManager().getRace(player);
+      if (player.getGameMode() != GameMode.CREATIVE && (race == null || race == Race.NONE)) {
+         event.setCancelled(true);
+         ChatUtil.sendActionbar(player, "&c❌ Vous devez d'abord choisir un métier avec &e/race &cpour pouvoir miner et casser des blocs !");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.8F, 1.0F);
+      }
+   }
+
+   // Les bonus de drop sont calculés APRÈS les protections (claims en HIGH), sinon un bloc protégé
+   // (cancel tardif) laisserait quand même tomber les drops bonus.
+   // Alambic : l'alimentation automatique par entonnoir ne doit pas contourner la restriction (Arcaniste / Âge 3)
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onHopperToBrewingStand(org.bukkit.event.inventory.InventoryMoveItemEvent event) {
+      if (event.getDestination().getType() == InventoryType.BREWING && event.getDestination().getLocation() != null) {
+         Block stand = event.getDestination().getLocation().getBlock();
+         Guild owner = this.plugin.getGuildManager().getGuildByChunk(ChunkKey.from(stand.getChunk()));
+         boolean allowed = false;
+         if (owner != null) {
+            if (owner.getCurrentAge().getLevel() >= 3) {
+               allowed = true;
+            } else {
+               for (java.util.UUID memberUuid : owner.getMembers().keySet()) {
+                  if (this.plugin.getRaceManager().getRace(memberUuid) == Race.ARCANIST) {
+                     allowed = true;
+                     break;
+                  }
+               }
+            }
+         }
+
+         if (!allowed) {
+            event.setCancelled(true);
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.MONITOR,
+      ignoreCancelled = true
+   )
+   public void onPistonExtend(BlockPistonExtendEvent event) {
+      this.shiftPlacedMarks(event.getBlocks(), event.getDirection());
+   }
+
+   @EventHandler(
+      priority = EventPriority.MONITOR,
+      ignoreCancelled = true
+   )
+   public void onPistonRetract(BlockPistonRetractEvent event) {
+      this.shiftPlacedMarks(event.getBlocks(), event.getDirection());
+   }
+
+   /** Un piston déplace le bloc : la marque « posé par un joueur » doit le suivre. */
+   private void shiftPlacedMarks(List<Block> moved, org.bukkit.block.BlockFace direction) {
+      List<Block> destinations = new java.util.ArrayList<>();
+
+      for (Block b : moved) {
+         if (this.placedTracker.unmark(b)) {
+            destinations.add(b.getRelative(direction));
+         }
+      }
+
+      for (Block dest : destinations) {
+         this.placedTracker.mark(dest);
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGHEST,
+      ignoreCancelled = true
+   )
    public void onBlockBreak(BlockBreakEvent event) {
       Player player = event.getPlayer();
       Race race = this.plugin.getRaceManager().getRace(player);
       if (player.getGameMode() == GameMode.CREATIVE || race != null && race != Race.NONE) {
          Block block = event.getBlock();
-         boolean isPlayerPlaced = block.hasMetadata("placed_by_player");
+         boolean isPlayerPlaced = this.placedTracker.isPlaced(block);
          if (isPlayerPlaced) {
-            block.removeMetadata("placed_by_player", this.plugin);
+            this.placedTracker.unmark(block);
          }
 
          Material blockMat = block.getType();
@@ -427,10 +514,6 @@ public class RaceInteractionListener implements Listener {
                }
             }
          }
-      } else {
-         event.setCancelled(true);
-         ChatUtil.sendActionbar(player, "&c❌ Vous devez d'abord choisir un métier avec &e/race &cpour pouvoir miner et casser des blocs !");
-         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.8F, 1.0F);
       }
    }
 

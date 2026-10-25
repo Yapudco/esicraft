@@ -40,8 +40,37 @@ public class MarketManager {
       this.listings.clear();
    }
 
+   public long countListingsOf(UUID seller) {
+      return this.listings.values().stream().filter(l -> l.getSellerUuid().equals(seller)).count();
+   }
+
+   /** Clic sur une annonce : achat, ou annulation si c'est la sienne (l'objet est rendu au vendeur). */
+   public boolean buyOrCancelListing(Player player, String listingId) {
+      MarketListing listing = listingId != null ? this.listings.get(listingId) : null;
+      if (listing != null && listing.getSellerUuid().equals(player.getUniqueId())) {
+         if (player.getInventory().firstEmpty() == -1) {
+            ChatUtil.sendMessage(player, "&cVotre inventaire est plein : libérez de la place pour récupérer l'objet.");
+            return false;
+         } else if (this.listings.remove(listingId, listing)) {
+            this.plugin.getDataManager().deleteMarketListingSync(listingId);
+            player.getInventory().addItem(new ItemStack[]{listing.getItemStack()});
+            ChatUtil.sendMessage(player, "&aAnnonce annulée : l'objet a été rendu à votre inventaire.");
+            ChatUtil.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);
+            return true;
+         } else {
+            return false;
+         }
+      } else {
+         return this.buyListing(player, listingId);
+      }
+   }
+
    public boolean createListing(Player seller, ItemStack item, double price) {
-      if (seller != null && item != null && !item.getType().isAir() && !(price <= 0.0)) {
+      int maxListings = this.plugin.getConfig().getInt("market.max-listings-per-player", 10);
+      if (seller != null && this.countListingsOf(seller.getUniqueId()) >= (long)maxListings) {
+         ChatUtil.sendMessage(seller, "&c❌ Vous avez déjà &e" + maxListings + " &cannonces actives : annulez-en une (clic sur votre annonce dans /ah) avant d'en créer une autre.");
+         return false;
+      } else if (seller != null && item != null && !item.getType().isAir() && !(price <= 0.0) && !Double.isNaN(price) && !Double.isInfinite(price)) {
          String id;
          do {
             id = UUID.randomUUID().toString();

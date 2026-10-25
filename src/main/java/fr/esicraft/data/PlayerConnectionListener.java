@@ -41,6 +41,7 @@ public class PlayerConnectionListener implements Listener {
          data.setSessionLoginTime(System.currentTimeMillis());
       }
 
+      this.plugin.getGuildManager().reconcilePlayerGuild(player, data);
       this.plugin.getRaceManager().applyRaceAttributes(player, data.getRace());
       this.plugin.getGuildManager().updatePlayerTab(player);
       if (!player.hasPlayedBefore()) {
@@ -66,8 +67,8 @@ public class PlayerConnectionListener implements Listener {
       priority = EventPriority.MONITOR
    )
    public void onPlayerQuit(PlayerQuitEvent event) {
+      fr.esicraft.gui.CustomHordeGUI.clearAll(event.getPlayer().getUniqueId());
       this.plugin.getDataManager().unloadPlayer(event.getPlayer().getUniqueId());
-      this.plugin.getAntiFarmManager().resetPlayerStats(event.getPlayer().getUniqueId());
       this.plugin.getClaimVisualizerManager().stopVisualizer(event.getPlayer());
    }
 }

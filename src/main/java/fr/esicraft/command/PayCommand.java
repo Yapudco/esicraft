@@ -27,7 +27,7 @@ public class PayCommand implements CommandExecutor, TabCompleter {
             return true;
          } else {
             String targetName = args[0];
-            Player target = Bukkit.getPlayer(targetName);
+            Player target = Bukkit.getPlayerExact(targetName);
             if (target != null && target.isOnline()) {
                if (target.getUniqueId().equals(player.getUniqueId())) {
                   ChatUtil.sendMessage(player, "&cVous ne pouvez pas vous envoyer de l'argent à vous-même !");

@@ -106,7 +106,7 @@ public class GUIListener implements Listener {
                      if (targetSpec != null) {
                         Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
                         if (guild != null) {
-                           if (!guild.getLeaderUuid().equals(player.getUniqueId()) && !guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+                           if (!guild.getLeaderUuid().equals(player.getUniqueId()) && !guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                               ChatUtil.sendMessage(player, "&cSeuls les chefs et officiers peuvent modifier la spécialisation.");
                            } else {
                               this.plugin.getGuildManager().setSpecialization(guild, targetSpec, player);
@@ -145,16 +145,20 @@ public class GUIListener implements Listener {
                         }
                      }
                   }
-               } else if (holder instanceof MarketMainHolder) {
+               } else if (holder instanceof MarketMainHolder marketHolder) {
                   if (slot == 49) {
                      MercenaryHordeGUI.open(player, this.plugin);
+                  } else if (slot == 45 && event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ARROW) {
+                     MarketMainGUI.open(player, this.plugin, marketHolder.getPage() - 1);
+                  } else if (slot == 53 && event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ARROW) {
+                     MarketMainGUI.open(player, this.plugin, marketHolder.getPage() + 1);
                   } else {
                      ItemStack clicked = event.getCurrentItem();
                      if (clicked != null && clicked.hasItemMeta()) {
                         String listingId = (String)clicked.getItemMeta().getPersistentDataContainer().get(MarketMainGUI.LISTING_KEY, PersistentDataType.STRING);
                         if (listingId != null) {
-                           this.plugin.getMarketManager().buyListing(player, listingId);
-                           MarketMainGUI.open(player, this.plugin);
+                           this.plugin.getMarketManager().buyOrCancelListing(player, listingId);
+                           MarketMainGUI.open(player, this.plugin, marketHolder.getPage());
                         }
                      }
                   }
@@ -277,7 +281,7 @@ public class GUIListener implements Listener {
                         return;
                      }
 
-                     if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+                     if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                         ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent acheter des pièges de Nexus.");
                         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                         return;
@@ -307,8 +311,7 @@ public class GUIListener implements Listener {
 
                         PlayerData pData = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
                         boolean paid = false;
-                        if (guild.getBankBalance() >= cost) {
-                           guild.setBankBalance(guild.getBankBalance() - cost);
+                        if (guild.withdrawBank(cost)) {
                            paid = true;
                            ChatUtil.sendMessage(player, "&aCoût de &6" + String.format("%.2f", cost) + " pièces &adébité de la banque de guilde.");
                         } else {
@@ -331,10 +334,20 @@ public class GUIListener implements Listener {
                            nexus.addTrap(targetTrap);
                            if (targetTrap == NexusTrapType.GUARDIAN_GOLEM && nexus.getLocation() != null && nexus.getLocation().getWorld() != null) {
                               Location spawnLoc = nexus.getLocation().clone().add(1.0, 0.0, 1.0);
+                              String guardianTag = "esicraft_guardian_" + guild.getId();
+
+                              for (org.bukkit.entity.Entity old : spawnLoc.getWorld().getNearbyEntities(spawnLoc, 32.0, 32.0, 32.0)) {
+                                 if (old.getScoreboardTags().contains(guardianTag)) {
+                                    old.remove();
+                                 }
+                              }
+
                               spawnLoc.getWorld().spawn(spawnLoc, IronGolem.class, g -> {
                                  g.customName(ChatUtil.component("&6&l[Gardien : " + guild.getName() + "]"));
                                  g.setCustomNameVisible(true);
-                                 g.setPlayerCreated(true);
+                                 g.setPlayerCreated(false);
+                                 g.setRemoveWhenFarAway(false);
+                                 g.addScoreboardTag(guardianTag);
                               });
                            }
 

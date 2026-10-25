@@ -61,7 +61,7 @@ public class NexusCommand implements CommandExecutor {
                ChatUtil.sendMessage(player, "&cVotre guilde ne possède pas de Nexus actif. Posez-le avec &e/guild nexus place &cdans votre claim.");
                return true;
             }
-         } else if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+         } else if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
             ChatUtil.sendMessage(player, "&cSeuls les chefs et officiers peuvent poser le Nexus.");
             return true;
          } else {

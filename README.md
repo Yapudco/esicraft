@@ -49,9 +49,12 @@ Fondez une guilde avec vos alliés pour revendiquer des terres et bâtir votre f
 * **Chef de Guilde (`LEADER`)** : Contrôle absolu sur la guilde, nomination des officiers (`/guild promote`), transfert de leadership (`/guild transfer`) ou dissolution (`/guild disband`).
 * **Officier (`OFFICER`)** : Peut claim/unclaim des territoires, poser le Nexus, acheter des pièges et **recruter / lancer des hordes de mercenaires**.
 * **Membre / Recrue (`MEMBER`)** : Participe aux dépôts en banque, aux dons d'Âge et à la défense collective.
+* **Limite de membres** : **10 joueurs maximum** par guilde (`guilds.max-members-default`). Un joueur ne peut appartenir qu'à **une seule guilde** ; les invitations expirent au bout de **5 minutes**.
+* **Composition** : les contraintes de spécialisation (métiers interdits/limités, Légion : min. 50 % de Rôdeurs/Forgerons) sont vérifiées à **chaque arrivée** (invitation, allégeance après annexion) et à chaque changement de métier.
+* **Dissolution** : `/guild disband` est refusé pendant un raid ou dans les **10 minutes** qui suivent une attaque du Nexus (impossible d'esquiver le Trésor de Guerre).
 
 ### 🗺️ Expansion Territoriale & Claims
-* **Contiguïté Obligatoire** : Le premier chunk est libre. Tous les chunks suivants doivent **obligatoirement être collés (adjacents)** à un territoire déjà possédé par votre guilde.
+* **Contiguïté Obligatoire** : Le premier chunk est libre. Tous les chunks suivants doivent **obligatoirement être collés (adjacents)** à un territoire déjà possédé par votre guilde. À l'inverse, `/guild unclaim` est refusé s'il **coupe le territoire en plusieurs morceaux** ou s'il vise le chunk du Nexus.
 * **Capacité Débloquée par Âge** :
   * **Âge 1 (Rustique)** : **16 chunks max**
   * **Âge 2 (Métallurgie)** : **32 chunks max**
@@ -70,6 +73,8 @@ Fondez une guilde avec vos alliés pour revendiquer des terres et bâtir votre f
   * ❌ **Minecarts avec TNT interdits** (pose, tir via distributeur, pénétration sur rails et explosion bloqués).
   * ❌ **Utilisation d'Ender Pearls interdite** (lancement et téléportation vers un claim adverse bloqués).
   * ❌ **Cristaux de l'End interdits** (pose et explosion bloquées).
+  * ❌ **Fruit de Chorus** (téléportation vers un claim adverse bloquée), **pistons**, **lave / eau / feu** venant de l'extérieur, **Wither / Enderman / Ravageur** (destruction de blocs) et **projectiles** sur les animaux, cadres et armor stands : tous bloqués dans les claims (sauf pendant un raid sur la guilde).
+  * ⚠️ **Territoire vulnérable** : après la destruction de son Nexus sans annexion, le territoire d'une guilde perd sa protection des blocs/explosions pendant **30 minutes**.
 
 ---
 
@@ -108,7 +113,10 @@ Chaque guilde possède un **Nexus** (Cœur de base) qu'elle doit placer dans ses
 * **Interdiction de l'Obsidienne** : La pose d'obsidienne ou d'obsidienne pleureuse est strictement bloquée dans le **rayon de 16 blocs** pour préserver un gameplay fluide et dynamique lors des assauts.
 
 ### 💖 Soin du Nexus
-* En jetant une **Pomme Dorée** sur le bloc central du Nexus, vous lui rendez instantanément **+500 PV** (hors période de raid actif).
+* En jetant une **Pomme Dorée** sur le bloc central du Nexus (ou clic-droit dessus), les **membres de la guilde** lui rendent instantanément **+500 PV** (**+2 500 PV** pour une Pomme d'Or enchantée), hors période de raid actif.
+* **Délai de 30 secondes** entre deux soins (`guilds.nexus.heal-cooldown-seconds`).
+* Un Nexus **ne peut pas être reposé** tant que la guilde en possède un (pas de remise à 100 % de PV).
+* Les **pièges achetés sont sauvegardés** : ils survivent aux redémarrages. Le **Golem Gardien** attaque désormais les intrus ; les pièges et le rayon arcanique ne visent que les non-membres **présents dans le claim**.
 
 ### 💣 Les 5 Pièges de Défense (`/nexus traps`)
 * 🔥 **Brasier Infernal (250 pièces)** : Enflamme et inflige des brûlures continues aux ennemis à moins de 8 blocs.
@@ -149,7 +157,7 @@ Pour empêcher les monopoles financiers écrasants et dynamiser les guerres de f
 
 ### 🏴 Annexion de Territoires & Trésor de Guerre
 * Si le Nexus d'une guilde est détruit lors d'un raid :
-  * 🗺️ **Transfert Territorial** : Tous les territoires de la guilde vaincue sont **instantanément annexés** par la guilde victorieuse.
+  * 🗺️ **Transfert Territorial** : Les territoires de la guilde vaincue sont **instantanément annexés** par la guilde victorieuse, **dans la limite du plafond de claims de son Âge** (les chunks en trop redeviennent sauvages).
   * 💰 **Fusion des Banques de Guilde (Trésor de Guerre)** : L'intégralité de la trésorerie de la guilde vaincue est **automatiquement transférée et fusionnée dans la Banque de la guilde vainqueur**.
   * 🤝 **Choix d'Allégeance des Vaincus** :
     * `/guild annex join` : Rejoindre la guilde victorieuse en tant que membre.
@@ -281,11 +289,31 @@ Le serveur progresse à travers **6 Âges technologiques majeurs**. Pour faire f
 ### 💰 Économie & Marché
 * `/guild bank <montant>` : Déposer de l'argent dans la banque de guilde.
 * `/pay <joueur> <montant>` : Transférer instantanément des pièces à un autre joueur.
-* `/money` : Consulter son solde de pièces personnel.
+* `/money` : Consulter son solde de pièces personnel. *(Les sous-commandes `/money get|set|top|rectify…` restent réservées aux administrateurs.)*
 * `/baltop` : Afficher le classement des joueurs les plus riches du serveur.
 * `/ah` : Ouvrir l'Hôtel des Ventes et le marché des Hordes Noires.
-* `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes.
+* `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes (**10 annonces actives max** par joueur, `market.max-listings-per-player`).
+* Dans `/ah` : **pagination** (flèches ◀ ▶), et un **clic sur sa propre annonce l'annule** et rend l'objet.
 * `/age` : Ouvrir le menu de progression des Âges et déposer des ressources.
 
 ### 🌐 Navigation & Serveur
 * `/hub` (ou `/lobby`) : Se reconnecter directement au Hub principal du réseau (raccourci vers `/server hub`).
+
+---
+
+## 🛡️ Intégrité & Anti-Triche (résumé technique)
+* **Bonus de minage** (Nain, Industrie, Enclave) : calculés **après** les protections de claim, jamais sur un bloc **posé par un joueur** (mémorisé dans le chunk, persistant et suivi par les pistons).
+* **Quotas d'Âge** : indexés sur le **pic de membres** de l'Âge en cours (sortir ses membres avant de déposer ne réduit plus rien).
+* **Changement de métier** : 3 reconversions gratuites puis payantes, avec un **délai de 24 h** entre deux changements (`races.change-cooldown-hours`).
+* **Hordes** : plafond de **60 monstres** pour une horde sur-mesure (`raids.max-custom-horde-units`) ; la banque n'est débitée qu'une fois la cible validée ; les mobs de raid orphelins sont supprimés au redémarrage.
+* **Enchantements** : les niveaux au-delà du maximum vanilla sont ramenés à la normale hors Conclave Arcanique (clic, ramassage, changement de slot, connexion).
+* **Alambic** : l'alimentation par entonnoir est soumise à la même restriction que l'ouverture manuelle.
+* **Sauvegarde** : les écritures de comptes joueurs sont sérialisées (pas de perte d'argent entre une vente HDV et une déconnexion).
+
+## ⚠️ Fonctionnalités annoncées mais pas (encore) implémentées
+* Arcaniste : malus de +15 % de dégâts subis en mêlée.
+* Forgeron : exclusivité sur enclumes, meules et hauts-fourneaux.
+* Enclave Champêtre : reproduction animale x3 et interdiction des armures en Netherite.
+* Industrie Souterraine : interdiction des potions de niveau 2.
+* Siège de Pillards : Ravageurs et Vindicateurs dans la horde prédéfinie.
+* Persistance des cooldowns de raid et des raids actifs après redémarrage.

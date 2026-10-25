@@ -57,10 +57,13 @@ public class NexusListener implements Listener {
       if (guild != null) {
          Player player = event.getPlayer();
          if (player.getGameMode() == GameMode.CREATIVE && (player.hasPermission("esicraft.admin") || player.isOp())) {
-            this.plugin.getNexusManager().removeHologram(guild.getId());
-            guild.setNexus(null);
+            this.plugin.getNexusManager().removeNexus(guild);
+            // Nouveau délai de grâce d'1 h pour reposer un Nexus avant la dissolution automatique
+            guild.setCreatedAt(System.currentTimeMillis());
             this.plugin.getDataManager().saveGuild(guild);
-            ChatUtil.sendMessage(player, "&e[Admin] Nexus de la guilde &6" + guild.getName() + " &cretiré en mode créatif (hologramme supprimé).");
+            ChatUtil.sendMessage(
+               player, "&e[Admin] Nexus de la guilde &6" + guild.getName() + " &cretiré (désindexé, hologramme supprimé). La guilde dispose d'1 h pour en reposer un."
+            );
          } else {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c\ud83d\udee1️ Le Nexus est indestructible à la pioche ! Frappez-le avec une arme.");
@@ -197,7 +200,7 @@ public class NexusListener implements Listener {
                         } else {
                            ItemStack weapon = attacker.getInventory().getItemInMainHand();
                            int damage = this.getWeaponDamage(weapon.getType());
-                           this.plugin.getNexusManager().damageNexus(guild, damage, attacker.getName());
+                           this.plugin.getNexusManager().damageNexus(guild, damage, attacker.getName(), this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), attacker);
                            ChatUtil.sendActionbar(attacker, "&c⚔️ Vous avez infligé &e" + damage + " dégâts &cau Nexus ennemi !");
                         }
                      }

@@ -130,12 +130,16 @@ public class AgeDimensionListener implements Listener {
 
    @EventHandler
    public void onPlayerJoin(PlayerJoinEvent event) {
-      this.checkAndExpelIfUnderage(event.getPlayer());
+      Player joining = event.getPlayer();
+      // La position du joueur est réécrite pendant le chargement initial : on retente après quelques ticks.
+      Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.checkAndExpelIfUnderage(joining), 10L);
+      Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.checkAndExpelIfUnderage(joining), 60L);
    }
 
    @EventHandler
    public void onWorldChange(PlayerChangedWorldEvent event) {
-      this.checkAndExpelIfUnderage(event.getPlayer());
+      Player moved = event.getPlayer();
+      Bukkit.getScheduler().runTask(this.plugin, () -> this.checkAndExpelIfUnderage(moved));
    }
 
    private void checkAndExpelIfUnderage(Player player) {

@@ -90,7 +90,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+               if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                   ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent inviter des joueurs.");
                   return true;
                }
@@ -149,6 +149,10 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
 
                if (!guild.getLeaderUuid().equals(player.getUniqueId())) {
                   ChatUtil.sendMessage(player, "&cSeul le chef de guilde peut dissoudre la guilde.");
+                  return true;
+               }
+
+               if (!this.plugin.getGuildManager().canDisbandNow(guild, player)) {
                   return true;
                }
 
@@ -230,7 +234,24 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               this.plugin.getGuildManager().promoteOrDemotePlayer(guild, player, target, GuildRole.MEMBER);
+               GuildRole currentTargetRole = guild.getRole(target.getUniqueId());
+               if (currentTargetRole == null) {
+                  ChatUtil.sendMessage(player, "&cCe joueur ne fait pas partie de votre guilde.");
+                  return true;
+               }
+
+               GuildRole lowerRole = currentTargetRole == GuildRole.OFFICER ? GuildRole.MEMBER : GuildRole.RECRUIT;
+               if (currentTargetRole == GuildRole.LEADER) {
+                  ChatUtil.sendMessage(player, "&cLe chef ne peut pas être rétrogradé (utilisez &e/guild transfer&c).");
+                  return true;
+               }
+
+               if (currentTargetRole == GuildRole.RECRUIT) {
+                  ChatUtil.sendMessage(player, "&cCe joueur est déjà au rang le plus bas.");
+                  return true;
+               }
+
+               this.plugin.getGuildManager().promoteOrDemotePlayer(guild, player, target, lowerRole);
                break;
             }
             case "transfer":
@@ -267,7 +288,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+               if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                   ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent claim des territoires.");
                   return true;
                }
@@ -288,7 +309,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+               if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                   ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent unclaim.");
                   return true;
                }
@@ -314,7 +335,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                }
 
                if (args.length > 1 && args[1].equalsIgnoreCase("place")) {
-                  if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+                  if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
                      ChatUtil.sendMessage(player, "&cSeul le chef ou un officier peut poser le Nexus.");
                      return true;
                   }

@@ -90,6 +90,14 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public void onDisable() {
       this.getLogger().info("Arrêt de Esicraft-Plugin en cours...");
+      if (this.raidManager != null) {
+         try {
+            this.raidManager.stopAllRaids();
+         } catch (Exception var2) {
+            this.getLogger().warning("Impossible d'arrêter proprement les raids : " + var2.getMessage());
+         }
+      }
+
       if (this.nexusManager != null) {
          this.nexusManager.removeAllHolograms();
       }

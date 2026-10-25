@@ -97,7 +97,7 @@ public class RaceShowGUI {
          lore.add("");
          if (guild != null) {
             lore.add("&e\ud83c\udfdb Guilde : &6" + guild.getName() + " &7[" + guild.getTag() + "]");
-            lore.add("&e\ud83c\udf96 Rôle : &f" + guild.getRole(target.getUniqueId()).name());
+            lore.add("&e\ud83c\udf96 Rôle : &f" + (guild.getRole(target.getUniqueId()) != null ? guild.getRole(target.getUniqueId()).name() : "-"));
          } else {
             lore.add("&e\ud83c\udfdb Guilde : &7Aucune");
          }

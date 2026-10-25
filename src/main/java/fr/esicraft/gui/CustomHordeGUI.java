@@ -39,6 +39,13 @@ public class CustomHordeGUI {
       drafts.remove(uuid);
    }
 
+   /** Nettoyage complet à la déconnexion (évite la fuite mémoire). */
+   public static void clearAll(UUID uuid) {
+      drafts.remove(uuid);
+      breachersToggle.remove(uuid);
+      lavaResistanceToggle.remove(uuid);
+   }
+
    public static boolean isBreachersEnabled(UUID uuid) {
       return breachersToggle.getOrDefault(uuid, false);
    }
@@ -106,7 +113,7 @@ public class CustomHordeGUI {
       if (guild == null) {
          ChatUtil.sendMessage(player, "&c❌ Vous devez faire partie d'une guilde pour créer et lancer des hordes sur-mesure !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
-      } else if (!guild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+      } else if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
          ChatUtil.sendMessage(player, "&c❌ Seuls les Officiers et le Chef de guilde ont l'autorisation de créer et lancer des hordes !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
       } else {

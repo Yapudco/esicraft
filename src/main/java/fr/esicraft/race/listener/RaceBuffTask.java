@@ -53,7 +53,7 @@ public class RaceBuffTask extends BukkitRunnable {
             }
 
             player = (Player)var1.next();
-            if (player.isValid()) {
+            if (player.isValid() && player.getLocation().getWorld() != null) {
                Race race = this.plugin.getRaceManager().getRace(player);
                loc = player.getLocation();
                y = loc.getBlockY();

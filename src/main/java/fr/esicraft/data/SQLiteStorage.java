@@ -125,6 +125,11 @@ public class SQLiteStorage {
          currentVersion = 4;
       }
 
+      if (currentVersion < 5) {
+         this.applyMigration("ALTER TABLE guilds ADD COLUMN nexus_traps TEXT DEFAULT '';");
+         currentVersion = 5;
+      }
+
       try (PreparedStatement ps = this.connection
             .prepareStatement("INSERT INTO schema_version (version) VALUES (?) ON CONFLICT(version) DO UPDATE SET version = excluded.version;")) {
          ps.setInt(1, currentVersion);
@@ -222,7 +227,7 @@ public class SQLiteStorage {
 
    public synchronized void saveGuild(Guild guild) {
       if (guild != null && this.connection != null) {
-         String sql = "    INSERT INTO guilds (\n        id, name, tag, leader_uuid, specialization, bank_balance,\n        home_world, home_x, home_y, home_z, home_yaw, home_pitch,\n        nexus_world, nexus_x, nexus_y, nexus_z, nexus_health, nexus_max_health, vulnerable_until,\n        current_age, age_donations, created_at, can_change_spec, historical_members\n    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n    ON CONFLICT(id) DO UPDATE SET\n        name = excluded.name,\n        tag = excluded.tag,\n        leader_uuid = excluded.leader_uuid,\n        specialization = excluded.specialization,\n        bank_balance = excluded.bank_balance,\n        home_world = excluded.home_world,\n        home_x = excluded.home_x,\n        home_y = excluded.home_y,\n        home_z = excluded.home_z,\n        home_yaw = excluded.home_yaw,\n        home_pitch = excluded.home_pitch,\n        nexus_world = excluded.nexus_world,\n        nexus_x = excluded.nexus_x,\n        nexus_y = excluded.nexus_y,\n        nexus_z = excluded.nexus_z,\n        nexus_health = excluded.nexus_health,\n        nexus_max_health = excluded.nexus_max_health,\n        vulnerable_until = excluded.vulnerable_until,\n        current_age = excluded.current_age,\n        age_donations = excluded.age_donations,\n        created_at = excluded.created_at,\n        can_change_spec = excluded.can_change_spec,\n        historical_members = excluded.historical_members;\n";
+         String sql = "    INSERT INTO guilds (\n        id, name, tag, leader_uuid, specialization, bank_balance,\n        home_world, home_x, home_y, home_z, home_yaw, home_pitch,\n        nexus_world, nexus_x, nexus_y, nexus_z, nexus_health, nexus_max_health, vulnerable_until,\n        current_age, age_donations, created_at, can_change_spec, historical_members, nexus_traps\n    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n    ON CONFLICT(id) DO UPDATE SET\n        name = excluded.name,\n        tag = excluded.tag,\n        leader_uuid = excluded.leader_uuid,\n        specialization = excluded.specialization,\n        bank_balance = excluded.bank_balance,\n        home_world = excluded.home_world,\n        home_x = excluded.home_x,\n        home_y = excluded.home_y,\n        home_z = excluded.home_z,\n        home_yaw = excluded.home_yaw,\n        home_pitch = excluded.home_pitch,\n        nexus_world = excluded.nexus_world,\n        nexus_x = excluded.nexus_x,\n        nexus_y = excluded.nexus_y,\n        nexus_z = excluded.nexus_z,\n        nexus_health = excluded.nexus_health,\n        nexus_max_health = excluded.nexus_max_health,\n        vulnerable_until = excluded.vulnerable_until,\n        current_age = excluded.current_age,\n        age_donations = excluded.age_donations,\n        created_at = excluded.created_at,\n        can_change_spec = excluded.can_change_spec,\n        historical_members = excluded.historical_members,\n        nexus_traps = excluded.nexus_traps;\n";
          StringBuilder donationsSb = new StringBuilder();
 
          for (Entry<Material, Integer> entry : guild.getAgeDonations().entrySet()) {
@@ -282,6 +287,14 @@ public class SQLiteStorage {
             ps.setLong(22, guild.getCreatedAt());
             ps.setInt(23, guild.canChangeSpecialization() ? 1 : 0);
             ps.setString(24, histSb.toString());
+            StringBuilder trapsSb = new StringBuilder();
+            if (nexus != null) {
+               for (fr.esicraft.nexus.NexusTrapType trap : nexus.getActiveTraps()) {
+                  trapsSb.append(trap.name()).append(";");
+               }
+            }
+
+            ps.setString(25, trapsSb.toString());
             ps.executeUpdate();
             this.saveGuildMembers(guild);
             this.saveGuildClaims(guild);
@@ -457,6 +470,19 @@ public class SQLiteStorage {
                      int maxHealth = rs.getInt("nexus_max_health");
                      Nexus nexus = new Nexus(id, loc, maxHealth);
                      nexus.setCurrentHealth(rs.getInt("nexus_health"));
+
+                     try {
+                        String trapsStr = rs.getString("nexus_traps");
+                        if (trapsStr != null && !trapsStr.isEmpty()) {
+                           for (String trapName : trapsStr.split(";")) {
+                              if (!trapName.trim().isEmpty()) {
+                                 nexus.addTrap(fr.esicraft.nexus.NexusTrapType.valueOf(trapName.trim()));
+                              }
+                           }
+                        }
+                     } catch (Exception var40) {
+                     }
+
                      guild.setNexus(nexus);
                   }
                }

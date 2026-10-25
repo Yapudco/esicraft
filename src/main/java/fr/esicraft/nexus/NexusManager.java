@@ -123,6 +123,11 @@ public class NexusManager {
 
    public boolean placeNexus(Guild guild, Location location, Player player) {
       if (guild != null && location != null) {
+         if (guild.hasNexus()) {
+            ChatUtil.sendMessage(player, "&c❌ Votre guilde possède déjà un Nexus ! Il ne peut pas être reposé.");
+            return false;
+         }
+
          ChunkKey chunkKey = new ChunkKey(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
          if (!guild.isClaimed(chunkKey)) {
             ChatUtil.sendMessage(player, "&c❌ Le Nexus ne peut être posé que dans un chunk revendiqué (claim) par votre guilde !");
@@ -311,8 +316,16 @@ public class NexusManager {
    }
 
    public void damageNexus(Guild guild, int damage, String attackerName) {
+      Player exact = attackerName != null ? Bukkit.getPlayerExact(attackerName) : null;
+      Guild attackerGuild = exact != null ? this.plugin.getGuildManager().getGuildByPlayer(exact.getUniqueId()) : null;
+      this.damageNexus(guild, damage, attackerName, attackerGuild, exact);
+   }
+
+   /** attackerGuild / attackerPlayer sont résolus par l'appelant (jamais par recherche de nom ambiguë). */
+   public void damageNexus(Guild guild, int damage, String attackerName, Guild attackerGuild, Player attackerPlayer) {
       if (guild != null && guild.hasNexus()) {
          Nexus nexus = guild.getNexus();
+         this.lastNexusDamage.put(guild.getId(), System.currentTimeMillis());
          nexus.damage(damage);
          this.updateHologram(guild);
          Location loc = nexus.getLocation();
@@ -320,7 +333,6 @@ public class NexusManager {
             loc.getWorld().spawnParticle(Particle.CRIT, loc.clone().add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.1);
             loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_LAND, 1.0F, 0.6F);
             if (nexus.hasTrap(NexusTrapType.LIGHTNING_STRIKE)) {
-               Player attackerPlayer = Bukkit.getPlayer(attackerName);
                if (attackerPlayer != null && attackerPlayer.isOnline()) {
                   loc.getWorld().strikeLightningEffect(attackerPlayer.getLocation());
                   attackerPlayer.damage(15.0);
@@ -379,7 +391,7 @@ public class NexusManager {
          }
 
          if (!nexus.isAlive()) {
-            this.onNexusDestroyed(guild, attackerName);
+            this.onNexusDestroyed(guild, attackerName, attackerGuild);
          }
       }
    }
@@ -388,11 +400,18 @@ public class NexusManager {
       if (entity instanceof Monster) {
          return true;
       } else {
-         return entity instanceof Player player ? !guild.isMember(player.getUniqueId()) : false;
+         // Les joueurs non-membres ne sont visés que s'ils se trouvent dans le claim de la guilde (pas les simples passants)
+         return entity instanceof Player player
+            ? !guild.isMember(player.getUniqueId()) && guild.isClaimed(ChunkKey.from(player.getLocation().getChunk()))
+            : false;
       }
    }
 
    public void onNexusDestroyed(Guild guild, String killer) {
+      this.onNexusDestroyed(guild, killer, null);
+   }
+
+   public void onNexusDestroyed(Guild guild, String killer, Guild attackerGuild) {
       this.unindexGuildNexus(guild);
       Nexus nexus = guild.getNexus();
       if (nexus != null && nexus.getLocation() != null) {
@@ -406,14 +425,12 @@ public class NexusManager {
          loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.8F);
       }
 
-      Player killerPlayer = Bukkit.getPlayer(killer);
-      Guild victorGuild = null;
-      if (killerPlayer != null) {
-         victorGuild = this.plugin.getGuildManager().getGuildByPlayer(killerPlayer.getUniqueId());
-      }
-
+      Guild victorGuild = attackerGuild;
       if (victorGuild == null) {
-         victorGuild = this.plugin.getGuildManager().getGuildByName(killer);
+         Player killerPlayer = killer != null ? Bukkit.getPlayerExact(killer) : null;
+         if (killerPlayer != null) {
+            victorGuild = this.plugin.getGuildManager().getGuildByPlayer(killerPlayer.getUniqueId());
+         }
       }
 
       if (victorGuild != null && !victorGuild.getId().equals(guild.getId())) {
@@ -426,6 +443,35 @@ public class NexusManager {
       }
    }
 
+   private final Map<String, Long> lastNexusDamage = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /** Vrai si le Nexus a subi des dégâts dans la fenêtre donnée (anti « dissolution pour refuser le butin »). */
+   public boolean wasNexusRecentlyAttacked(Guild guild, long windowMs) {
+      Long last = guild != null ? this.lastNexusDamage.get(guild.getId()) : null;
+      return last != null && System.currentTimeMillis() - last < windowMs;
+   }
+
+   private final Map<String, Long> lastPlayerHeal = new java.util.concurrent.ConcurrentHashMap<>();
+
+   private boolean isHealReady(Guild guild) {
+      long cooldownMs = this.plugin.getConfig().getLong("guilds.nexus.heal-cooldown-seconds", 30L) * 1000L;
+      Long last = this.lastPlayerHeal.get(guild.getId());
+      return last == null || System.currentTimeMillis() - last >= cooldownMs;
+   }
+
+   private boolean isHealOnCooldown(Guild guild, Player player) {
+      long cooldownMs = this.plugin.getConfig().getLong("guilds.nexus.heal-cooldown-seconds", 30L) * 1000L;
+      Long last = this.lastPlayerHeal.get(guild.getId());
+      if (last != null && System.currentTimeMillis() - last < cooldownMs) {
+         long remaining = (cooldownMs - (System.currentTimeMillis() - last) + 999L) / 1000L;
+         ChatUtil.sendMessage(player, "&c❌ Le Nexus vient d'être soigné : réessayez dans &e" + remaining + "s&c.");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return true;
+      }
+
+      return false;
+   }
+
    public boolean healWithGoldenApple(Guild guild, Player player, ItemStack item) {
       if (guild != null && guild.hasNexus()) {
          Nexus nexus = guild.getNexus();
@@ -435,6 +481,8 @@ public class NexusManager {
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             }
 
+            return false;
+         } else if (player != null ? this.isHealOnCooldown(guild, player) : !this.isHealReady(guild)) {
             return false;
          } else if (nexus.getCurrentHealth() >= nexus.getMaxHealth()) {
             if (player != null) {
@@ -449,6 +497,8 @@ public class NexusManager {
             }
 
             nexus.heal(healAmount);
+            this.lastPlayerHeal.put(guild.getId(), System.currentTimeMillis());
+
             this.updateHologram(guild);
             this.plugin.getDataManager().saveGuild(guild);
             Location loc = nexus.getLocation();
@@ -569,6 +619,25 @@ public class NexusManager {
 
                               for (Entity entityx : nearbyEntities) {
                                  double distSq = entityx.getLocation().distanceSquared(loc);
+                                 if (entityx instanceof org.bukkit.entity.IronGolem golem && golem.getScoreboardTags().contains("esicraft_guardian_" + guildx.getId())) {
+                                    LivingEntity bestTarget = null;
+                                    double bestDist = 256.0;
+
+                                    for (Entity candidate : nearbyEntities) {
+                                       if (candidate instanceof LivingEntity candLiving && !candLiving.isDead() && NexusManager.this.isEnemy(guildx, candidate)) {
+                                          double cd = candidate.getLocation().distanceSquared(golem.getLocation());
+                                          if (cd < bestDist) {
+                                             bestDist = cd;
+                                             bestTarget = candLiving;
+                                          }
+                                       }
+                                    }
+
+                                    if (bestTarget != null) {
+                                       golem.setTarget(bestTarget);
+                                    }
+                                 }
+
                                  if (NexusManager.this.isEnemy(guildx, entityx)) {
                                     if (hasFlameTrap && distSq <= 64.0) {
                                        entityx.setFireTicks(100);
@@ -598,6 +667,7 @@ public class NexusManager {
                                  }
 
                                  if (!NexusManager.this.plugin.getRaidManager().isGuildUnderRaid(guildx.getId())
+                                    && NexusManager.this.isHealReady(guildx)
                                     && nexus.getCurrentHealth() < nexus.getMaxHealth()
                                     && distSq <= 4.0
                                     && entityx instanceof Item droppedItem

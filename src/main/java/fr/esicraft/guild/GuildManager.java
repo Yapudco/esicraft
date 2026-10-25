@@ -32,7 +32,8 @@ public class GuildManager {
    private final Map<String, Guild> guildsByName = new ConcurrentHashMap<>();
    private final Map<ChunkKey, Guild> chunkClaims = new ConcurrentHashMap<>();
    private final Map<UUID, String> playerGuildMap = new ConcurrentHashMap<>();
-   private final Map<UUID, Set<String>> pendingInvites = new ConcurrentHashMap<>();
+   private final Map<UUID, Map<String, Long>> pendingInvites = new ConcurrentHashMap<>();
+   private static final long INVITE_TTL_MS = 300000L;
    private static final Pattern GUILD_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_\\-]{3,24}$");
    private static final Pattern GUILD_TAG_PATTERN = Pattern.compile("^[a-zA-Z0-9àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ_\\-]{2,6}$");
    private final Map<UUID, String> pendingAnnexationChoices = new ConcurrentHashMap<>();
@@ -140,6 +141,22 @@ public class GuildManager {
       this.pendingInvites.clear();
    }
 
+   /** Vérifie qu'un joueur peut dissoudre sa guilde (pas en plein raid / attaque de Nexus). */
+   public boolean canDisbandNow(Guild guild, Player player) {
+      if (guild != null && guild.hasNexus()) {
+         if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getNexusManager().wasNexusRecentlyAttacked(guild, 600000L)) {
+            if (player != null) {
+               ChatUtil.sendMessage(player, "&c❌ Impossible de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            }
+
+            return false;
+         }
+      }
+
+      return true;
+   }
+
    public boolean disbandGuild(Guild guild) {
       if (guild == null) {
          return false;
@@ -178,6 +195,10 @@ public class GuildManager {
             return false;
          } else if (guild.getLeaderUuid().equals(uuid)) {
             if (guild.getMembers().size() <= 1) {
+               if (!this.canDisbandNow(guild, player)) {
+                  return false;
+               }
+
                this.disbandGuild(guild);
                ChatUtil.sendMessage(player, "&aVous avez quitté et dissous votre guilde.");
                return true;
@@ -275,6 +296,18 @@ public class GuildManager {
             guild.setLeaderUuid(newLeader.getUniqueId());
             guild.addMember(newLeader.getUniqueId(), GuildRole.LEADER);
             guild.addMember(leader.getUniqueId(), GuildRole.OFFICER);
+            PlayerData newLeaderData = this.plugin.getDataManager().getPlayerData(newLeader.getUniqueId());
+            if (newLeaderData != null) {
+               newLeaderData.setGuildRole(GuildRole.LEADER);
+               this.plugin.getDataManager().savePlayer(newLeaderData);
+            }
+
+            PlayerData oldLeaderData = this.plugin.getDataManager().getPlayerData(leader.getUniqueId());
+            if (oldLeaderData != null) {
+               oldLeaderData.setGuildRole(GuildRole.OFFICER);
+               this.plugin.getDataManager().savePlayer(oldLeaderData);
+            }
+
             this.plugin.getDataManager().saveGuild(guild);
             ChatUtil.broadcast(
                "&6&l[Guildes] &e" + leader.getName() + " &aa cédé le leadership de la guilde &6" + guild.getName() + " &aà &e" + newLeader.getName() + " &a!"
@@ -519,6 +552,38 @@ public class GuildManager {
       }
    }
 
+   /** Vrai si le territoire de la guilde reste d'un seul tenant (voisinage 8, comme la règle d'adjacence) sans ce chunk. */
+   private boolean remainsConnectedWithout(Guild guild, ChunkKey removed) {
+      Set<ChunkKey> remaining = new HashSet<>(guild.getClaimedChunks());
+      remaining.remove(removed);
+      if (remaining.size() <= 1) {
+         return true;
+      } else {
+         java.util.ArrayDeque<ChunkKey> queue = new java.util.ArrayDeque<>();
+         Set<ChunkKey> seen = new HashSet<>();
+         ChunkKey start = remaining.iterator().next();
+         queue.add(start);
+         seen.add(start);
+
+         while (!queue.isEmpty()) {
+            ChunkKey current = queue.poll();
+
+            for (int dx = -1; dx <= 1; dx++) {
+               for (int dz = -1; dz <= 1; dz++) {
+                  if (dx != 0 || dz != 0) {
+                     ChunkKey neighbor = new ChunkKey(current.getWorldName(), current.getX() + dx, current.getZ() + dz);
+                     if (remaining.contains(neighbor) && seen.add(neighbor)) {
+                        queue.add(neighbor);
+                     }
+                  }
+               }
+            }
+         }
+
+         return seen.size() == remaining.size();
+      }
+   }
+
    public boolean unclaimChunk(Guild guild, Player player) {
       if (guild != null && player != null) {
          Chunk chunk = player.getLocation().getChunk();
@@ -531,9 +596,15 @@ public class GuildManager {
                ChunkKey nexusChunk = ChunkKey.from(guild.getNexus().getLocation().getChunk());
                if (chunkKey.equals(nexusChunk)) {
                   ChatUtil.sendMessage(player, "&c❌ Impossible d'abandonner ce chunk : le Nexus de votre guilde y est implanté !");
-                  ChatUtil.sendMessage(player, "&7Déplacez d'abord votre Nexus vers un autre claim sécurisé avec &e/guild nexus place&7.");
+                  ChatUtil.sendMessage(player, "&7Un Nexus ne peut pas être déplacé : le chunk qui l'abrite ne peut pas être abandonné.");
                   return false;
                }
+            }
+
+            if (!this.remainsConnectedWithout(guild, chunkKey)) {
+               ChatUtil.sendMessage(player, "&c❌ Impossible d'abandonner ce chunk : il couperait votre territoire en plusieurs morceaux non contigus !");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               return false;
             }
 
             guild.removeClaim(chunkKey);
@@ -650,8 +721,16 @@ public class GuildManager {
                }
 
                return false;
+            } else if (!this.canJoinComposition(guild, target.getUniqueId())) {
+               if (sender != null) {
+                  ChatUtil.sendMessage(
+                     sender, "&c❌ L'arrivée de " + target.getName() + " (métier " + targetRace.getDisplayName() + ") est impossible : guilde pleine (" + this.getMaxMembers() + " max) ou contraintes de " + guild.getSpecialization().getDisplayName() + "&c !"
+                  );
+               }
+
+               return false;
             } else {
-               this.pendingInvites.computeIfAbsent(target.getUniqueId(), k -> new HashSet<>()).add(guild.getId());
+               this.pendingInvites.computeIfAbsent(target.getUniqueId(), k -> new ConcurrentHashMap<>()).put(guild.getId(), System.currentTimeMillis() + INVITE_TTL_MS);
                ChatUtil.sendMessage(
                   target,
                   "&aVous avez reçu une invitation à rejoindre la guilde &6"
@@ -672,14 +751,63 @@ public class GuildManager {
       this.invitePlayer(guild, target, null);
    }
 
+   public int getMaxMembers() {
+      return Math.max(1, this.plugin.getConfig().getInt("guilds.max-members-default", 10));
+   }
+
+   /** Vérifie que l'arrivée d'un joueur (de ce métier) respecte la spécialisation de la guilde. */
+   public boolean canJoinComposition(Guild guild, UUID joiningUuid) {
+      if (guild == null) {
+         return false;
+      } else if (!guild.isMember(joiningUuid) && guild.getMembers().size() >= this.getMaxMembers()) {
+         return false;
+      } else if (guild.getSpecialization() == GuildSpecialization.NONE) {
+         return true;
+      } else {
+         Map<Race, Integer> counts = new EnumMap<>(Race.class);
+
+         for (UUID memberUuid : guild.getMembers().keySet()) {
+            Race r = this.plugin.getRaceManager().getRace(memberUuid);
+            counts.merge(r, 1, Integer::sum);
+         }
+
+         if (!guild.isMember(joiningUuid)) {
+            counts.merge(this.plugin.getRaceManager().getRace(joiningUuid), 1, Integer::sum);
+         }
+
+         int total = guild.isMember(joiningUuid) ? guild.getMembers().size() : guild.getMembers().size() + 1;
+         return guild.getSpecialization().validateComposition(counts, total);
+      }
+   }
+
    public boolean hasInvite(Player player, Guild guild) {
-      Set<String> invites = this.pendingInvites.get(player.getUniqueId());
-      return invites != null && invites.contains(guild.getId());
+      Map<String, Long> invites = this.pendingInvites.get(player.getUniqueId());
+      if (invites == null) {
+         return false;
+      }
+
+      Long expiry = invites.get(guild.getId());
+      if (expiry == null) {
+         return false;
+      }
+
+      if (System.currentTimeMillis() > expiry) {
+         invites.remove(guild.getId());
+         return false;
+      }
+
+      return true;
    }
 
    public void acceptInvite(Player player, Guild guild) {
       if (guild != null) {
-         if (guild.getSpecialization() == GuildSpecialization.LONE_RANGER) {
+         if (this.getGuildByPlayer(player.getUniqueId()) != null) {
+            ChatUtil.sendMessage(player, "&c❌ Vous êtes déjà dans une guilde ! Quittez-la d'abord avec &e/guild leave&c.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         } else if (!this.hasInvite(player, guild)) {
+            ChatUtil.sendMessage(player, "&c❌ Cette invitation a expiré ou n'existe pas.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         } else if (guild.getSpecialization() == GuildSpecialization.LONE_RANGER) {
             ChatUtil.sendMessage(player, "&c❌ Cette guilde est sous la spécialisation Rôdeur Solitaire et ne peut accueillir aucun autre membre !");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          } else {
@@ -687,8 +815,11 @@ public class GuildManager {
             if (guild.getSpecialization() == GuildSpecialization.MERCHANT_SYNDICATE && playerRace == Race.ARCANIST) {
                ChatUtil.sendMessage(player, "&c❌ Vous êtes Arcaniste : le Syndicat Marchand interdit formellement les Arcanistes dans ses rangs !");
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            } else if (!this.canJoinComposition(guild, player.getUniqueId())) {
+               ChatUtil.sendMessage(player, "&c❌ Impossible de rejoindre : guilde pleine (" + this.getMaxMembers() + " membres max) ou métier incompatible avec " + guild.getSpecialization().getDisplayName() + "&c !");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             } else {
-               this.pendingInvites.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).remove(guild.getId());
+               this.pendingInvites.remove(player.getUniqueId());
                PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
                if (data != null) {
                   data.setGuildId(guild.getId());
@@ -715,13 +846,18 @@ public class GuildManager {
 
    public void registerAnnexation(Guild defeatedGuild, Guild victorGuild) {
       if (defeatedGuild != null && victorGuild != null) {
-         Set<ChunkKey> chunksToTransfer = new HashSet<>(defeatedGuild.getClaimedChunks());
+         Set<ChunkKey> chunksToTransfer = new HashSet<>();
+         int maxVictorClaims = this.getMaxClaims(victorGuild);
 
-         for (ChunkKey ck : chunksToTransfer) {
+         for (ChunkKey ck : new HashSet<>(defeatedGuild.getClaimedChunks())) {
             defeatedGuild.removeClaim(ck);
             this.chunkClaims.remove(ck);
-            victorGuild.addClaim(ck);
-            this.chunkClaims.put(ck, victorGuild);
+            // Le plafond de claims lié à l'Âge s'applique aussi aux annexions (les chunks en trop redeviennent sauvages)
+            if (maxVictorClaims == Integer.MAX_VALUE || victorGuild.getClaimedChunks().size() < maxVictorClaims) {
+               victorGuild.addClaim(ck);
+               this.chunkClaims.put(ck, victorGuild);
+               chunksToTransfer.add(ck);
+            }
          }
 
          double transferredBank = defeatedGuild.getBankBalance();
@@ -797,10 +933,16 @@ public class GuildManager {
          if (victorGuildId == null) {
             ChatUtil.sendMessage(player, "&cVous n'avez aucune offre d'annexion en attente.");
             return false;
+         } else if (this.getGuildByPlayer(player.getUniqueId()) != null) {
+            ChatUtil.sendMessage(player, "&cVous êtes déjà dans une guilde : l'offre d'annexion n'est plus valable.");
+            return false;
          } else {
             Guild victorGuild = this.getGuildById(victorGuildId);
             if (victorGuild == null) {
                ChatUtil.sendMessage(player, "&cLa guilde victorieuse n'existe plus.");
+               return false;
+            } else if (victorGuild.getSpecialization() == GuildSpecialization.LONE_RANGER || !this.canJoinComposition(victorGuild, player.getUniqueId())) {
+               ChatUtil.sendMessage(player, "&c❌ Votre métier ne respecte pas les contraintes de la guilde victorieuse : vous restez sans guilde.");
                return false;
             } else {
                PlayerData pData = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
@@ -843,6 +985,42 @@ public class GuildManager {
             ChatUtil.sendMessage(player, "&aVous avez refusé de rejoindre la guilde victorieuse. Vous êtes désormais libre et sans guilde.");
             ChatUtil.playSound(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
             return true;
+         }
+      }
+   }
+
+   /** À la connexion : aligne les données joueur sur l'état réel des guildes (expulsion/dissolution/annexion hors-ligne). */
+   public void reconcilePlayerGuild(Player player, PlayerData data) {
+      if (player != null && data != null) {
+         UUID uuid = player.getUniqueId();
+         String stored = data.getGuildId();
+         Guild actual = stored != null ? this.guildsById.get(stored) : null;
+         if (actual == null || !actual.isMember(uuid)) {
+            actual = null;
+
+            for (Guild candidate : this.guildsById.values()) {
+               if (candidate.isMember(uuid)) {
+                  actual = candidate;
+                  break;
+               }
+            }
+         }
+
+         if (actual == null) {
+            this.playerGuildMap.remove(uuid);
+            if (stored != null) {
+               data.setGuildId(null);
+               data.setGuildRole(null);
+               data.setHasJoinedGuildBefore(true);
+               this.plugin.getDataManager().savePlayer(data);
+            }
+         } else {
+            this.playerGuildMap.put(uuid, actual.getId());
+            if (!actual.getId().equals(stored)) {
+               data.setGuildId(actual.getId());
+               data.setGuildRole(actual.getRole(uuid));
+               this.plugin.getDataManager().savePlayer(data);
+            }
          }
       }
    }

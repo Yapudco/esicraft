@@ -21,7 +21,15 @@ public class MoneyCommand implements CommandExecutor {
 
    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
       if (!sender.hasPermission("esicraft.admin")) {
-         ChatUtil.sendMessage(sender, "&cCette commande est strictement réservée aux administrateurs.");
+         if (args.length == 0 && sender instanceof Player self) {
+            PlayerData own = this.plugin.getDataManager().getPlayerData(self.getUniqueId());
+            if (own != null) {
+               ChatUtil.sendMessage(self, "&6\ud83d\udcb0 Votre solde : &e" + String.format("%.2f", own.getCoins()) + " pièces");
+               return true;
+            }
+         }
+
+         ChatUtil.sendMessage(sender, "&cSeul &e/money &cest disponible pour les joueurs (les autres sous-commandes sont réservées aux administrateurs).");
          return true;
       } else if (args.length == 0) {
          this.sendHelp(sender);
@@ -37,6 +45,9 @@ public class MoneyCommand implements CommandExecutor {
                      ChatUtil.sendMessage(sender, "&aStatistiques anti-farm de &e" + target.getName() + " &aréinitialisées.");
                      return true;
                   }
+
+                  ChatUtil.sendMessage(sender, "&cJoueur introuvable : aucune statistique réinitialisée. (Utilisez &e/money rectify reset all &cpour tout remettre à zéro.)");
+                  return true;
                }
 
                this.plugin.getAntiFarmManager().resetAllStats();
@@ -85,6 +96,10 @@ public class MoneyCommand implements CommandExecutor {
             } else {
                try {
                   double factor = Double.parseDouble(args[1].replace(',', '.'));
+                  if (Double.isNaN(factor) || Double.isInfinite(factor)) {
+                     throw new NumberFormatException();
+                  }
+
                   this.plugin.getAntiFarmManager().setRectifyFactor(factor);
                   ChatUtil.sendMessage(sender, "&aFacteur de rectification anti-farm défini à &6" + String.format("%.2f", factor) + " &a!");
                   ChatUtil.sendMessage(sender, "&7Chaque joueur verra ses gains réduits individuellement selon sa propre proportion de kills.");

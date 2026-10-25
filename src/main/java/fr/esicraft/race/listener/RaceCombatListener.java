@@ -32,6 +32,8 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -311,7 +313,7 @@ public class RaceCombatListener implements Listener {
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          boolean isArcaneConclave = guild != null && guild.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE;
          ItemStack secondItem = inv.getItem(1);
-         if (secondItem != null && secondItem.getType() == Material.ENCHANTED_BOOK && var15 != Race.ARCANIST) {
+         if (secondItem != null && secondItem.getType() == Material.ENCHANTED_BOOK && !this.canHandleEnchantedBooks(player, var15)) {
             event.setResult(null);
          } else {
             if (var15 == Race.BLACKSMITH || isArcaneConclave) {
@@ -368,9 +370,9 @@ public class RaceCombatListener implements Listener {
       if (event.getInventory() instanceof AnvilInventory anvilInv && event.getRawSlot() == 2 && event.getWhoClicked() instanceof Player player) {
          Race race = this.plugin.getRaceManager().getRace(player);
          ItemStack secondItem = anvilInv.getItem(1);
-         if (secondItem != null && secondItem.getType() == Material.ENCHANTED_BOOK && race != Race.ARCANIST) {
+         if (secondItem != null && secondItem.getType() == Material.ENCHANTED_BOOK && !this.canHandleEnchantedBooks(player, race)) {
             event.setCancelled(true);
-            ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes peuvent appliquer des livres enchantés !");
+            ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes (ou Âge 4+ / Rôdeur Solitaire Âge 3+) peuvent appliquer des livres enchantés !");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          }
       }
@@ -382,6 +384,51 @@ public class RaceCombatListener implements Listener {
             sanitizeEnchantments(event.getCurrentItem(), false);
             sanitizeEnchantments(event.getCursor(), false);
          }
+      }
+   }
+
+   /** Même règle que RaceInteractionListener#canPlayerEnchant : Arcaniste, Âge 4+, ou Rôdeur Solitaire dès l'Âge 3. */
+   private boolean canHandleEnchantedBooks(Player player, Race race) {
+      if (race == Race.ARCANIST) {
+         return true;
+      } else {
+         int age = this.plugin.getAgeManager().getPlayerAge(player).getLevel();
+         if (age >= 4) {
+            return true;
+         } else {
+            Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+            return age >= 3 && race == Race.RANGER && guild != null && guild.getSpecialization() == GuildSpecialization.LONE_RANGER;
+         }
+      }
+   }
+
+   private boolean isArcaneMember(Player player) {
+      Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      return guild != null && guild.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE;
+   }
+
+   // Les objets sur-enchantés ne doivent pas circuler hors Conclave Arcanique (ramassage, changement de slot)
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onPickupItem(EntityPickupItemEvent event) {
+      if (event.getEntity() instanceof Player player && !this.isArcaneMember(player)) {
+         ItemStack stack = event.getItem().getItemStack();
+         if (sanitizeEnchantments(stack, false)) {
+            event.getItem().setItemStack(stack);
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onItemHeld(PlayerItemHeldEvent event) {
+      Player player = event.getPlayer();
+      if (!this.isArcaneMember(player)) {
+         sanitizeEnchantments(player.getInventory().getItem(event.getNewSlot()), false);
       }
    }
 

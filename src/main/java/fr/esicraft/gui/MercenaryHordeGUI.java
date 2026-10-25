@@ -29,7 +29,7 @@ public class MercenaryHordeGUI {
       if (playerGuild == null) {
          ChatUtil.sendMessage(player, "&c❌ Vous devez faire partie d'une guilde pour recruter et lancer des hordes de mercenaires !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
-      } else if (!playerGuild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+      } else if (!playerGuild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
          ChatUtil.sendMessage(player, "&c❌ Seuls les Officiers et le Chef de guilde ont l'autorisation de recruter et lancer des hordes !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
       } else {
@@ -166,7 +166,7 @@ public class MercenaryHordeGUI {
       Guild playerGuild = plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
       if (playerGuild == null) {
          ChatUtil.sendMessage(player, "&c❌ Vous devez faire partie d'une guilde pour lancer un raid !");
-      } else if (!playerGuild.getRole(player.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+      } else if (!playerGuild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
          ChatUtil.sendMessage(player, "&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
       } else {

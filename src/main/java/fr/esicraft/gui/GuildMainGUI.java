@@ -33,7 +33,7 @@ public class GuildMainGUI {
             inv.setItem(i, filler);
          }
 
-         GuildRole role = guild.getRole(player.getUniqueId());
+         GuildRole role = guild.getRole(player.getUniqueId()) != null ? guild.getRole(player.getUniqueId()) : GuildRole.RECRUIT;
          inv.setItem(
             13,
             new ItemBuilder(Material.BEACON)
@@ -41,7 +41,7 @@ public class GuildMainGUI {
                .lore(
                   "&7Chef : &e" + Bukkit.getOfflinePlayer(guild.getLeaderUuid()).getName(),
                   "&7Votre rôle : &a" + role.getDisplayName(),
-                  "&7Âge technologique : " + guild.getCurrentAge().getDisplayName() + " &7(Niveau " + guild.getCurrentAge().getLevel() + "/5)",
+                  "&7Âge technologique : " + guild.getCurrentAge().getDisplayName() + " &7(Niveau " + guild.getCurrentAge().getLevel() + "/6)",
                   "&7Spécialisation : " + guild.getSpecialization().getDisplayName(),
                   "&7Membres : &f" + guild.getMembers().size(),
                   "&7Territoires Claimés : &e" + guild.getClaimedChunks().size() + " chunks",

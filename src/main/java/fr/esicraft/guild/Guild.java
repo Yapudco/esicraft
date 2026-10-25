@@ -27,6 +27,7 @@ public class Guild {
    private final Map<Material, Integer> ageDonations = new ConcurrentHashMap<>();
    private long createdAt;
    private boolean canChangeSpecialization;
+   private volatile int peakMembersThisAge = 1;
    private volatile boolean membersDirty = false;
    private volatile boolean claimsDirty = false;
 
@@ -91,13 +92,26 @@ public class Guild {
       return this.members.containsKey(uuid);
    }
 
+   /** Renvoie null pour un non-membre (ne JAMAIS supposer un rang par défaut). */
    public GuildRole getRole(UUID uuid) {
-      return this.members.getOrDefault(uuid, GuildRole.RECRUIT);
+      return this.members.get(uuid);
+   }
+
+   public boolean hasRoleAtLeast(UUID uuid, GuildRole minimum) {
+      GuildRole role = this.members.get(uuid);
+      return role != null && role.isAtLeast(minimum);
    }
 
    public void addMember(UUID uuid, GuildRole role) {
       this.members.put(uuid, role);
+      this.peakMembersThisAge = Math.max(this.peakMembersThisAge, this.members.size());
       this.membersDirty = true;
+   }
+
+   /** Effectif utilisé pour les quotas d'Âge : le pic de l'Âge en cours (empêche de faire sortir ses membres avant de déposer). */
+   public int getEffectiveMemberCount() {
+      this.peakMembersThisAge = Math.max(this.peakMembersThisAge, this.members.size());
+      return Math.max(1, this.peakMembersThisAge);
    }
 
    public void removeMember(UUID uuid) {
@@ -223,6 +237,7 @@ public class Guild {
 
    public void clearDonations() {
       this.ageDonations.clear();
+      this.peakMembersThisAge = Math.max(1, this.members.size());
    }
 
    public long getCreatedAt() {

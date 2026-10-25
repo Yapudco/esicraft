@@ -70,23 +70,23 @@ public class PlayerData {
       this.guildRole = guildRole;
    }
 
-   public double getCoins() {
+   public synchronized double getCoins() {
       return this.coins;
    }
 
-   public void setCoins(double coins) {
+   public synchronized void setCoins(double coins) {
       if (!Double.isNaN(coins) && !Double.isInfinite(coins)) {
          this.coins = Math.max(0.0, coins);
       }
    }
 
-   public void addCoins(double amount) {
+   public synchronized void addCoins(double amount) {
       if (!(amount <= 0.0) && !Double.isNaN(amount) && !Double.isInfinite(amount)) {
          this.coins += amount;
       }
    }
 
-   public boolean removeCoins(double amount) {
+   public synchronized boolean removeCoins(double amount) {
       if (amount <= 0.0 || Double.isNaN(amount) || Double.isInfinite(amount)) {
          return false;
       } else if (this.coins >= amount) {
@@ -115,6 +115,11 @@ public class PlayerData {
 
    public void incrementRaceChangesCount() {
       this.raceChangesCount++;
+   }
+
+   public void resetRaceChangesCount() {
+      this.raceChangesCount = 0;
+      this.lastRaceChangeTimestamp = 0L;
    }
 
    public boolean hasJoinedGuildBefore() {

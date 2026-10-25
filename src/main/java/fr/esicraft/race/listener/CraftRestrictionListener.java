@@ -292,7 +292,19 @@ public class CraftRestrictionListener implements Listener {
             DIAMOND_GEAR.add(m);
          }
 
-         if (name.startsWith("NETHERITE_")) {
+         if (name.startsWith("NETHERITE_")
+            && (
+               name.endsWith("_HELMET")
+                  || name.endsWith("_CHESTPLATE")
+                  || name.endsWith("_LEGGINGS")
+                  || name.endsWith("_BOOTS")
+                  || name.endsWith("_SWORD")
+                  || name.endsWith("_AXE")
+                  || name.endsWith("_PICKAXE")
+                  || name.endsWith("_SHOVEL")
+                  || name.endsWith("_HOE")
+            )) {
+            // Seul l'équipement est restreint : lingots, blocs, débris et templates restent craftables (nécessaires à l'Âge 5).
             NETHERITE_GEAR.add(m);
          }
 

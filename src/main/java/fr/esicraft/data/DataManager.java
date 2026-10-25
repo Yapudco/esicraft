@@ -10,6 +10,8 @@ import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -18,6 +20,12 @@ public class DataManager {
    private final SQLiteStorage storage;
    private final Map<UUID, PlayerData> players = new ConcurrentHashMap<>();
    private volatile double cachedServerWealth = 0.0;
+   // Toutes les écritures de comptes joueurs passent par UN SEUL thread : l'ordre sauvegarde-quit / crédit hors-ligne est garanti (pas de perte d'argent).
+   private final java.util.concurrent.ExecutorService playerIo = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+      Thread t = new Thread(r, "esicraft-player-io");
+      t.setDaemon(false);
+      return t;
+   });
 
    public DataManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -66,13 +74,13 @@ public class DataManager {
    public void unloadPlayer(UUID uuid) {
       PlayerData data = this.players.remove(uuid);
       if (data != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.savePlayerData(data));
+         this.playerIo.execute(() -> this.storage.savePlayerData(data));
       }
    }
 
    public void savePlayer(PlayerData data) {
       if (data != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.savePlayerData(data));
+         this.playerIo.execute(() -> this.storage.savePlayerData(data));
       }
    }
 
@@ -110,7 +118,7 @@ public class DataManager {
          onlineData.addCoins(amount);
          this.savePlayer(onlineData);
       } else {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.updateOfflinePlayerBalance(uuid, amount));
+         this.playerIo.execute(() -> this.storage.updateOfflinePlayerBalance(uuid, amount));
       }
    }
 
@@ -186,6 +194,16 @@ public class DataManager {
 
    public void close() {
       this.saveAll();
+      this.playerIo.shutdown();
+
+      try {
+         if (!this.playerIo.awaitTermination(15L, java.util.concurrent.TimeUnit.SECONDS)) {
+            this.plugin.getLogger().warning("Écritures joueurs encore en attente après 15 s.");
+         }
+      } catch (InterruptedException var2) {
+         Thread.currentThread().interrupt();
+      }
+
       this.storage.close();
    }
 }

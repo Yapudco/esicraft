@@ -17,6 +17,7 @@ market:
     y: 100.0
     z: 0.0
   tax-percentage: 5.0 # Taxe prélevée sur chaque vente
+  max-listings-per-player: 10 # Annonces actives max par joueur (anti-saturation de l'HDV)
   mercenary-hordes-enabled: true
 
 # Progression des Âges (Ressources requises pour débloquer l'Âge supérieur)
@@ -189,6 +190,7 @@ guilds:
   claim-cost-increment: 25.0   # Augmentation douce par chunk supplémentaire (+25 pièces / chunk)
   claim-cost-quadratic: 0.0    # Facteur quadratique (0 = augmentation linéaire douce)
   nexus:
+    heal-cooldown-seconds: 30 # Délai entre deux soins du Nexus par pomme dorée
     base-health: 5000
     regeneration-rate-per-minute: 50
     invulnerable-during-peace: true
@@ -197,6 +199,7 @@ guilds:
 # Contrats de Hordes de Monstres (Achat à l'Hôtel des Ventes)
 raids:
   cooldown-minutes-between-raids: 30
+  max-custom-horde-units: 60 # Plafond de monstres d'une horde personnalisée (anti-crash serveur)
   types:
     ARMORED_ZOMBIES:
       name: "🧟 Horde de Zombies Cuirassés"
@@ -218,3 +221,7 @@ raids:
       price: 7500.0
       mob-count: 15
       target-damage-to-nexus: 80
+
+# Métiers (races)
+races:
+  change-cooldown-hours: 24 # Délai minimum entre deux changements de métier (hors première sélection et admin)

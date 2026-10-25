@@ -68,10 +68,13 @@ public class EsicraftAdminCommand implements CommandExecutor {
 
                try {
                   RaidType type = RaidType.valueOf(args[2].toUpperCase());
-                  this.plugin.getRaidManager().launchRaid(null, target, type, null);
-                  ChatUtil.sendMessage(sender, "&aRaid forcé lancé avec succès sur la guilde &e" + target.getName());
+                  if (this.plugin.getRaidManager().launchAdminRaid(target, type)) {
+                     ChatUtil.sendMessage(sender, "&aRaid forcé lancé avec succès sur la guilde &e" + target.getName());
+                  } else {
+                     ChatUtil.sendMessage(sender, "&cLe raid n'a pas pu être lancé (pas de Nexus, aucun défenseur sur son territoire, raid déjà en cours, cooldown ou /pvp désactivé).");
+                  }
                } catch (IllegalArgumentException var12) {
-                  ChatUtil.sendMessage(sender, "&cType de raid invalide. Types : ARMORED_ZOMBIES, INCENDIARY_SKELETONS, TOXIC_SPIDERS, PILLAGER_SIEGE");
+                  ChatUtil.sendMessage(sender, "&cType de raid invalide. Types : ARMORED_ZOMBIES, INCENDIARY_SKELETONS, TOXIC_SPIDERS, PILLAGER_SIEGE, NETHER_DEMONS, PHANTOM_SWARM, CREEPER_BLITZ, ENDER_INCURSION");
                }
                break;
             }
@@ -139,7 +142,7 @@ public class EsicraftAdminCommand implements CommandExecutor {
    private void sendAdminHelp(CommandSender sender) {
       ChatUtil.sendRaw(sender, "&8&m----------------------------------------");
       ChatUtil.sendRaw(sender, "  &c&lCommandes Administration Esicraft :");
-      ChatUtil.sendRaw(sender, "  &e/esicraftadmin setage <1-5> &7: Définir l'âge");
+      ChatUtil.sendRaw(sender, "  &e/esicraftadmin setage <1-6> &7: Définir l'âge");
       ChatUtil.sendRaw(sender, "  &e/esicraftadmin spawnraid <guilde> <type> &7: Lancer un raid");
       ChatUtil.sendRaw(sender, "  &e/esicraftadmin givecoins <joueur> <montant> &7: Donner de l'argent");
       ChatUtil.sendRaw(sender, "  &e/esicraftadmin forcenexus <guilde> &7: Réparer un Nexus");

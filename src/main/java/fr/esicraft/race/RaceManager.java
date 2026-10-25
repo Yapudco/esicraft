@@ -74,6 +74,17 @@ public class RaceManager {
 
                double changeCost = 10000.0;
                if (!forcedByAdmin) {
+                  long cooldownMs = this.plugin.getConfig().getLong("races.change-cooldown-hours", 24L) * 3600000L;
+                  long sinceLast = System.currentTimeMillis() - data.getLastRaceChangeTimestamp();
+                  if (previousRace != Race.NONE && data.getLastRaceChangeTimestamp() > 0L && sinceLast < cooldownMs) {
+                     long remainingMin = (cooldownMs - sinceLast + 59999L) / 60000L;
+                     ChatUtil.sendMessage(
+                        player, "&c❌ Reconversion impossible pour le moment : prochain changement de métier dans &e" + remainingMin / 60L + "h " + remainingMin % 60L + "min&c."
+                     );
+                     ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                     return false;
+                  }
+
                   if (previousRace != Race.NONE) {
                      int currentChanges = data.getRaceChangesCount();
                      if (currentChanges < 3) {

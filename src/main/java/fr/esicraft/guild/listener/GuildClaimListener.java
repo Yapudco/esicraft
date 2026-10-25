@@ -17,6 +17,7 @@ import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.Villager;
@@ -25,9 +26,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -69,7 +76,7 @@ public class GuildClaimListener implements Listener {
       if (!player.hasPermission("esicraft.admin")) {
          Block block = event.getBlock();
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          if (guild != null && !guild.isMember(player.getUniqueId())) {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c❌ Vous ne pouvez pas casser de blocs sur le territoire de &6" + guild.getName() + " &c!");
@@ -87,7 +94,7 @@ public class GuildClaimListener implements Listener {
       if (!player.hasPermission("esicraft.admin")) {
          Block block = event.getBlock();
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          if (guild != null
             && guild.isMember(player.getUniqueId())
             && guild.getSpecialization() == GuildSpecialization.LONE_RANGER
@@ -120,7 +127,7 @@ public class GuildClaimListener implements Listener {
       if (!player.hasPermission("esicraft.admin")) {
          Block block = event.getBlockClicked().getRelative(event.getBlockFace());
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          if (guild != null && !guild.isMember(player.getUniqueId())) {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c❌ Vous ne pouvez pas vider de seau sur le territoire de &6" + guild.getName() + " &c!");
@@ -138,7 +145,7 @@ public class GuildClaimListener implements Listener {
       if (!player.hasPermission("esicraft.admin")) {
          Block block = event.getBlockClicked();
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          if (guild != null && !guild.isMember(player.getUniqueId())) {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c❌ Vous ne pouvez pas remplir de seau sur le territoire de &6" + guild.getName() + " &c!");
@@ -152,7 +159,8 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onEntityDamage(EntityDamageByEntityEvent event) {
-      if (event.getDamager() instanceof Player player) {
+      Player player = this.resolvePlayer(event.getDamager());
+      if (player != null) {
          if (!player.hasPermission("esicraft.admin")) {
             Entity entity = event.getEntity();
             ChunkKey chunkKey = new ChunkKey(entity.getWorld().getName(), entity.getLocation().getBlockX() >> 4, entity.getLocation().getBlockZ() >> 4);
@@ -187,7 +195,8 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onHangingBreak(HangingBreakByEntityEvent event) {
-      if (event.getRemover() instanceof Player player) {
+      Player player = this.resolvePlayer(event.getRemover());
+      if (player != null) {
          if (!player.hasPermission("esicraft.admin")) {
             Entity hanging = event.getEntity();
             ChunkKey chunkKey = new ChunkKey(hanging.getWorld().getName(), hanging.getLocation().getBlockX() >> 4, hanging.getLocation().getBlockZ() >> 4);
@@ -291,7 +300,7 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onPlayerTeleport(PlayerTeleportEvent event) {
-      if (event.getCause() == TeleportCause.ENDER_PEARL) {
+      if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) {
          Player player = event.getPlayer();
          if (player.hasPermission("esicraft.admin")) {
             return;
@@ -302,9 +311,127 @@ public class GuildClaimListener implements Listener {
          if (targetGuild != null && !targetGuild.isMember(player.getUniqueId())) {
             event.setCancelled(true);
             ChatUtil.sendMessage(
-               player, "&c❌ Vous ne pouvez pas vous téléporter en Ender Pearl dans le territoire de la guilde &6" + targetGuild.getName() + " &c!"
+               player, "&c❌ Vous ne pouvez pas vous téléporter (Ender Pearl / Fruit de Chorus) dans le territoire de la guilde &6" + targetGuild.getName() + " &c!"
             );
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         }
+      }
+   }
+
+
+   /** Guilde protégeant ce chunk : null si le territoire est vulnérable (Nexus détruit il y a moins de 30 min). */
+   private Guild protectedGuildAt(ChunkKey key) {
+      Guild g = this.plugin.getGuildManager().getGuildByChunk(key);
+      return g != null && g.getVulnerableUntil() > System.currentTimeMillis() ? null : g;
+   }
+
+   private Player resolvePlayer(Entity source) {
+      if (source instanceof Player p) {
+         return p;
+      } else {
+         return source instanceof Projectile projectile && projectile.getShooter() instanceof Player shooter ? shooter : null;
+      }
+   }
+
+   private String claimOwnerId(Block block) {
+      Guild g = this.plugin.getGuildManager().getGuildByChunk(new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4));
+      return g != null ? g.getId() : null;
+   }
+
+   private boolean isRaided(String guildId) {
+      return guildId != null && this.plugin.getRaidManager().isGuildUnderRaid(guildId);
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onPistonExtend(BlockPistonExtendEvent event) {
+      this.checkPiston(event.getBlock(), event.getBlocks(), event.getDirection(), event);
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onPistonRetract(BlockPistonRetractEvent event) {
+      this.checkPiston(event.getBlock(), event.getBlocks(), event.getDirection(), event);
+   }
+
+   private void checkPiston(Block piston, java.util.List<Block> moved, org.bukkit.block.BlockFace direction, org.bukkit.event.Cancellable event) {
+      String pistonOwner = this.claimOwnerId(piston);
+      for (Block b : moved) {
+         String from = this.claimOwnerId(b);
+         String to = this.claimOwnerId(b.getRelative(direction));
+         if (from != null && !from.equals(pistonOwner) || to != null && !to.equals(pistonOwner)) {
+            event.setCancelled(true);
+            return;
+         }
+      }
+
+      String front = this.claimOwnerId(piston.getRelative(direction));
+      if (front != null && !front.equals(pistonOwner)) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onLiquidFlow(BlockFromToEvent event) {
+      Block from = event.getBlock();
+      Block to = event.getToBlock();
+      if (from.getX() >> 4 != to.getX() >> 4 || from.getZ() >> 4 != to.getZ() >> 4) {
+         String toOwner = this.claimOwnerId(to);
+         if (toOwner != null && !toOwner.equals(this.claimOwnerId(from)) && !this.isRaided(toOwner)) {
+            event.setCancelled(true);
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onBlockIgnite(BlockIgniteEvent event) {
+      String owner = this.claimOwnerId(event.getBlock());
+      if (owner != null) {
+         if (event.getPlayer() != null) {
+            Guild g = this.plugin.getGuildManager().getGuildById(owner);
+            if (g != null && !g.isMember(event.getPlayer().getUniqueId()) && !event.getPlayer().hasPermission("esicraft.admin")) {
+               event.setCancelled(true);
+            }
+         } else if (event.getIgnitingBlock() != null) {
+            String srcOwner = this.claimOwnerId(event.getIgnitingBlock());
+            if (!owner.equals(srcOwner) && !this.isRaided(owner)) {
+               event.setCancelled(true);
+            }
+         }
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onBlockBurn(BlockBurnEvent event) {
+      String owner = this.claimOwnerId(event.getBlock());
+      if (owner != null && !this.isRaided(owner)) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(
+      priority = EventPriority.HIGH,
+      ignoreCancelled = true
+   )
+   public void onMobGrief(EntityChangeBlockEvent event) {
+      EntityType type = event.getEntityType();
+      if (type == EntityType.ENDERMAN || type == EntityType.WITHER || type == EntityType.RAVAGER || type == EntityType.SILVERFISH) {
+         String owner = this.claimOwnerId(event.getBlock());
+         if (owner != null && !this.isRaided(owner)) {
+            event.setCancelled(true);
          }
       }
    }
@@ -399,7 +526,7 @@ public class GuildClaimListener implements Listener {
    public void onEntityExplode(EntityExplodeEvent event) {
       event.blockList().removeIf(block -> {
          ChunkKey chunkKey = ChunkKey.from(block.getChunk());
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
       });
    }
@@ -411,7 +538,7 @@ public class GuildClaimListener implements Listener {
    public void onBlockExplode(BlockExplodeEvent event) {
       event.blockList().removeIf(block -> {
          ChunkKey chunkKey = ChunkKey.from(block.getChunk());
-         Guild guild = this.plugin.getGuildManager().getGuildByChunk(chunkKey);
+         Guild guild = this.protectedGuildAt(chunkKey);
          return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
       });
    }

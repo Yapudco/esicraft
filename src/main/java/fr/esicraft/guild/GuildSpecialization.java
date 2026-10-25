@@ -125,6 +125,11 @@ public enum GuildSpecialization {
                if (dwarfCount > 1 || sylvanCount > 1) {
                   return false;
                }
+
+               // Min 50% de Rôdeurs / Forgerons (dès 2 membres)
+               if (totalMembers >= 2 && (rangerCount + blacksmithCount) * 2 < totalMembers) {
+                  return false;
+               }
                break;
             case UNDERGROUND_INDUSTRY:
                if (rangerCount > 1) {

@@ -64,6 +64,32 @@ public class RaidManager implements Listener {
       this.startRaidAITask();
    }
 
+   // Après un redémarrage, les raids (en mémoire) n'existent plus : on supprime les mobs de raid orphelins restés dans le monde.
+   @EventHandler
+   public void onEntitiesLoad(org.bukkit.event.world.EntitiesLoadEvent event) {
+      for (Entity entity : event.getEntities()) {
+         if (entity.getScoreboardTags().contains("esicraft_raid_mob") && !this.mobRaidIndex.containsKey(entity.getUniqueId())) {
+            entity.remove();
+         }
+      }
+   }
+
+   private boolean adminLaunch = false;
+
+   /** Raid forcé par un administrateur : gratuit, sans guilde attaquante. */
+   public boolean launchAdminRaid(Guild targetGuild, RaidType raidType) {
+      this.adminLaunch = true;
+
+      boolean var3;
+      try {
+         var3 = this.launchRaid(null, targetGuild, raidType, false, false, null);
+      } finally {
+         this.adminLaunch = false;
+      }
+
+      return var3;
+   }
+
    public boolean isGuildUnderRaid(String guildId) {
       return guildId != null && this.guildIdsUnderRaid.contains(guildId);
    }
@@ -138,26 +164,26 @@ public class RaidManager implements Listener {
                }
 
                return false;
-            } else if (attackerGuild == null) {
+            } else if (attackerGuild == null && !this.adminLaunch) {
                if (buyer != null) {
                   ChatUtil.sendMessage(buyer, "&c❌ Vous devez faire partie d'une guilde pour lancer une horde de mercenaires !");
                   ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                }
 
                return false;
-            } else if (attackerGuild.getId().equals(targetGuild.getId())) {
+            } else if (attackerGuild != null && attackerGuild.getId().equals(targetGuild.getId())) {
                if (buyer != null) {
                   ChatUtil.sendMessage(buyer, "&c❌ Vous ne pouvez pas lancer de raid mercenaire contre votre propre guilde !");
                   ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                }
 
                return false;
-            } else if (buyer != null && !attackerGuild.getRole(buyer.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+            } else if (buyer != null && attackerGuild != null && !attackerGuild.hasRoleAtLeast(buyer.getUniqueId(), GuildRole.OFFICER)) {
                ChatUtil.sendMessage(buyer, "&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !");
                ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                return false;
             } else {
-               GuildSpecialization spec = attackerGuild.getSpecialization();
+               GuildSpecialization spec = attackerGuild != null ? attackerGuild.getSpecialization() : GuildSpecialization.NONE;
                double specMultiplier = spec == GuildSpecialization.WARLORD ? 0.7 : (spec == GuildSpecialization.MERCHANT_SYNDICATE ? 1.3 : 1.0);
                double price = raidType.getBasePrice() * specMultiplier;
                if (explosiveBreachers) {
@@ -172,7 +198,11 @@ public class RaidManager implements Listener {
                   price *= 0.5;
                }
 
-               if (attackerGuild.getBankBalance() < price) {
+               if (attackerGuild == null) {
+                  price = 0.0;
+               }
+
+               if (attackerGuild != null && attackerGuild.getBankBalance() < price) {
                   if (buyer != null) {
                      ChatUtil.sendMessage(
                         buyer,
@@ -188,8 +218,20 @@ public class RaidManager implements Listener {
 
                   return false;
                } else {
-                  attackerGuild.withdrawBank(price);
-                  this.plugin.getDataManager().saveGuild(attackerGuild);
+                  Location preCheckLoc = targetGuild.getNexus().getLocation();
+                  if (preCheckLoc == null || preCheckLoc.getWorld() == null) {
+                     if (buyer != null) {
+                        ChatUtil.sendMessage(buyer, "&c❌ Le monde du Nexus ciblé est introuvable : aucun fonds n'a été prélevé.");
+                     }
+
+                     return false;
+                  }
+
+                  if (attackerGuild != null) {
+                     attackerGuild.withdrawBank(price);
+                     this.plugin.getDataManager().saveGuild(attackerGuild);
+                  }
+
                   if (buyer != null) {
                      String discountTag = isHegemony ? " &6[Cible Hégémonique : -50%]" : "";
                      ChatUtil.sendMessage(
@@ -205,8 +247,8 @@ public class RaidManager implements Listener {
                      return false;
                   } else {
                      String raidId = UUID.randomUUID().toString();
-                     String attackerName = attackerGuild.getName();
-                     String attackerGuildId = attackerGuild.getId();
+                     String attackerName = attackerGuild != null ? attackerGuild.getName() : "Administration";
+                     String attackerGuildId = attackerGuild != null ? attackerGuild.getId() : null;
                      ActiveRaid raid = new ActiveRaid(
                         raidId, attackerGuildId, attackerName, targetGuild.getId(), raidType, explosiveBreachers, lavaImmunity, nexusLoc
                      );
@@ -240,6 +282,7 @@ public class RaidManager implements Listener {
                            living.customName(ChatUtil.component(raidType.getDisplayName() + tag));
                            living.setCustomNameVisible(true);
                            living.setRemoveWhenFarAway(false);
+                           living.addScoreboardTag("esicraft_raid_mob");
                            this.equipMob(living, raidType.getPrimaryMobType());
                            if (lavaImmunity) {
                               living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 24000, 1, false, false));
@@ -301,7 +344,7 @@ public class RaidManager implements Listener {
          }
 
          return false;
-      } else if (buyer != null && !attackerGuild.getRole(buyer.getUniqueId()).isAtLeast(GuildRole.OFFICER)) {
+      } else if (buyer != null && !attackerGuild.hasRoleAtLeast(buyer.getUniqueId(), GuildRole.OFFICER)) {
          ChatUtil.sendMessage(buyer, "&c❌ Seuls les Officiers et le Chef de guilde peuvent lancer des hordes de mercenaires !");
          ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          return false;
@@ -313,6 +356,27 @@ public class RaidManager implements Listener {
 
             return false;
          } else if (composition != null && !composition.isEmpty() && composition.values().stream().mapToInt(Integer::intValue).sum() != 0) {
+            int maxUnits = this.plugin.getConfig().getInt("raids.max-custom-horde-units", 60);
+            long unitsTotal = 0L;
+            boolean invalidAmount = false;
+
+            for (int amt : composition.values()) {
+               if (amt < 0) {
+                  invalidAmount = true;
+               }
+
+               unitsTotal += (long)amt;
+            }
+
+            if (invalidAmount || unitsTotal > (long)maxUnits) {
+               if (buyer != null) {
+                  ChatUtil.sendMessage(buyer, "&c❌ Une horde personnalisée ne peut pas dépasser &e" + maxUnits + " &cmonstres au total (et les quantités doivent être positives).");
+                  ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               }
+
+               return false;
+            }
+
             if (!this.isDefenderInClaim(targetGuild)) {
                if (buyer != null) {
                   ChatUtil.sendMessage(
@@ -366,6 +430,15 @@ public class RaidManager implements Listener {
 
                      return false;
                   } else {
+                     Location preCheckLoc = targetGuild.getNexus().getLocation();
+                     if (preCheckLoc == null || preCheckLoc.getWorld() == null) {
+                        if (buyer != null) {
+                           ChatUtil.sendMessage(buyer, "&c❌ Le monde du Nexus ciblé est introuvable : aucun fonds n'a été prélevé.");
+                        }
+
+                        return false;
+                     }
+
                      attackerGuild.withdrawBank(totalPrice);
                      this.plugin.getDataManager().saveGuild(attackerGuild);
                      if (buyer != null) {
@@ -432,6 +505,7 @@ public class RaidManager implements Listener {
                                  living.customName(ChatUtil.component(unit.getDisplayName() + tag));
                                  living.setCustomNameVisible(true);
                                  living.setRemoveWhenFarAway(false);
+                           living.addScoreboardTag("esicraft_raid_mob");
                                  this.equipMob(living, unit.getEntityType());
                                  if (lavaImmunity) {
                                     living.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 24000, 1, false, false));
@@ -570,7 +644,7 @@ public class RaidManager implements Listener {
 
                               if (mob.getLocation().distanceSquared(nexusLoc) <= 12.25) {
                                  int damage = raid.getMobDamage(mobUuid);
-                                 RaidManager.this.plugin.getNexusManager().damageNexus(targetGuild, damage, raid.getAttackerGuildName());
+                                 RaidManager.this.plugin.getNexusManager().damageNexus(targetGuild, damage, raid.getAttackerGuildName(), RaidManager.this.plugin.getGuildManager().getGuildById(raid.getAttackerGuildId()), null);
                                  mob.getWorld().spawnParticle(Particle.SWEEP_ATTACK, nexusLoc.clone().add(0.5, 0.5, 0.5), 5);
                                  mob.remove();
                                  raid.removeMob(mobUuid);

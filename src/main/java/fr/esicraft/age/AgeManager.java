@@ -73,7 +73,7 @@ public class AgeManager {
          } else if (nextAge == AgeType.SUPREMACY) {
             return baseReqs;
          } else {
-            int memberCount = Math.max(1, guild.getMembers().size());
+            int memberCount = guild.getEffectiveMemberCount();
             if (memberCount <= 1) {
                return baseReqs;
             } else {
@@ -114,7 +114,7 @@ public class AgeManager {
       if (guild == null) {
          return 1.0;
       } else {
-         int memberCount = Math.max(1, guild.getMembers().size());
+         int memberCount = guild.getEffectiveMemberCount();
          if (memberCount <= 1) {
             return 1.0;
          } else {
