@@ -20,6 +20,12 @@ public class HubCommand implements CommandExecutor {
 
    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
       if (sender instanceof Player player) {
+         if (this.plugin.getCombatManager().isInCombat(player)) {
+            ChatUtil.sendMessage(player, "&c❌ Impossible de quitter vers le hub en plein combat ! Attendez &e" + this.plugin.getCombatManager().remainingSeconds(player) + " s&c.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            return true;
+         }
+
          ChatUtil.sendMessage(player, "&aConnexion au Hub en cours...");
          ChatUtil.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.2F);
 

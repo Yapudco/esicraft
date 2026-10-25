@@ -381,7 +381,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/classement` · `/histoire` | Classement de la saison · grands moments |
 | `/hud` | Afficher ou masquer le tableau de bord |
 | `/english` · `/francais` | Passer le jeu en anglais (menus, messages, tableau de bord, livre) · revenir au français |
-| `/hub` | Retourner au hub |
+| `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
 
 ---
 
