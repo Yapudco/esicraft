@@ -397,6 +397,12 @@ public class TreatyManager {
          return "Réservé aux officiers et au chef de guilde concernés.";
       }
 
+      // Retrait atomique : deux officiers qui cliquent en même temps (menus ouverts sur un traité déjà rompu)
+      // ne doivent pas payer deux indemnités ni rompre un traité qui n'existe plus.
+      if (this.treaties.remove(t.getId()) == null) {
+         return "Ce traité n'existe plus.";
+      }
+
       Guild other = this.plugin.getGuildManager().getGuildById(t.other(breaker.getId()));
       boolean betrayal = this.isBetrayal(t, breaker);
       double paid = 0.0;
