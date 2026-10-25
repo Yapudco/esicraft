@@ -107,7 +107,18 @@ public class ActiveRaid {
       return this.aliveMobUuids;
    }
 
+   private int totalMobs;
+
+   public int getTotalMobs() {
+      return this.totalMobs;
+   }
+
+   public long getStartTime() {
+      return this.startTime;
+   }
+
    public void addMob(UUID uuid, int damageToNexus) {
+      this.totalMobs++;
       this.aliveMobUuids.add(uuid);
       this.mobDamageMap.put(uuid, damageToNexus);
    }

@@ -103,6 +103,7 @@ public class RailListener implements Listener {
       event.line(3, ChatUtil.component("&2/station"));
       ChatUtil.sendMessage(player, "&a🚉 Gare &e" + name + " &acréée ! Les voyageurs ouvrent le menu avec &e/station &aà moins de 8 blocs. Gérez péages et relations avec &e/rail&a.");
       ChatUtil.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0F, 1.5F);
+      this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.STATIONMASTER);
    }
 
    private void fail(SignChangeEvent event, Player player, String reason) {

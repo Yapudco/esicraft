@@ -121,6 +121,7 @@ public class RaceManager {
                this.plugin.getDataManager().savePlayer(data);
                this.applyRaceAttributes(player, newRace);
                ChatUtil.sendMessage(player, "&aVous êtes désormais : &e" + newRace.getDisplayName() + " &a!");
+               this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.FIRST_JOB);
                ChatUtil.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.2F);
                return true;
             }

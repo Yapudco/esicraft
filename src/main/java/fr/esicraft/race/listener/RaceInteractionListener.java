@@ -576,6 +576,8 @@ public class RaceInteractionListener implements Listener {
                double antiFarmMultiplier = this.plugin.getAntiFarmManager().getMultiplier(killer.getUniqueId(), entity.getType());
                double finalBounty = baseBounty * antiFarmMultiplier;
                finalBounty *= this.plugin.getEventManager().getBountyMultiplier();
+               finalBounty *= this.plugin.getNatureSeasons().bountyMultiplier();
+               finalBounty *= this.plugin.getSynergy().bountyMultiplier(guild);
                if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
                   finalBounty *= 1.2;
                }

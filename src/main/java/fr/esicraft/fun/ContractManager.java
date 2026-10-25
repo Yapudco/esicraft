@@ -144,6 +144,7 @@ public class ContractManager {
          return;
       }
 
+      this.plugin.getGuildContracts().addProgress(player, this.plugin.getRaceManager().getRace(player), type, amount);
       DayState state = this.getState(player);
       for (int i = 0; i < CONTRACTS_PER_DAY; i++) {
          Contract contract = state.contracts.get(i);
@@ -176,12 +177,14 @@ public class ContractManager {
 
       ChatUtil.sendMessage(player, "&a✔ Contrat accompli : &f" + contract.type().describe(contract.target()) + " &8» &6+" + String.format("%.0f", contract.reward()) + " pièces");
       ChatUtil.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.2F);
+      this.plugin.getAchievements().addStat(player.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_CONTRACTS, 1L);
       if (state.completedCount() == CONTRACTS_PER_DAY) {
          if (data != null) {
             data.addCoins(ALL_DONE_BONUS);
          }
 
          ChatUtil.sendMessage(player, "&6&l★ Tous les contrats du jour sont accomplis ! &e+" + String.format("%.0f", ALL_DONE_BONUS) + " pièces de bonus.");
+         this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.CONTRACTOR);
          ChatUtil.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
       }
 

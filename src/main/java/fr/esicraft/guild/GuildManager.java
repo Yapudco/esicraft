@@ -119,6 +119,9 @@ public class GuildManager {
                   this.plugin.getDataManager().savePlayer(data);
                   this.updatePlayerTab(player);
                   ChatUtil.broadcast("&6&l[Guildes] &e" + player.getName() + " &aa fondé la guilde &6" + name + " &8[&e" + tag + "&8] &a!");
+                  this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.GUILD, player.getName() + " fonde la guilde " + name + " [" + tag + "].", guild.getId(), null);
+                  this.plugin.getChronicle().ageReached(guild, 1);
+                  this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.FOUNDER);
                   ChatUtil.sendMessage(
                      player,
                      "&e⚠ &lIMPORTANT : &eVous avez &61 heure &epour revendiquer un chunk (&e/guild claim&e) et poser votre Nexus (&e/guild nexus place&e) sous peine de dissolution automatique de la guilde !"
@@ -183,6 +186,7 @@ public class GuildManager {
          this.plugin.getDataManager().deleteGuild(guild.getId());
          this.updateAllPlayerTabs();
          ChatUtil.broadcast("&c&l[Guildes] &7La guilde &c" + guild.getName() + " &7a été dissoute.");
+         this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.GUILD, "La guilde " + guild.getName() + " est dissoute.", guild.getId(), null);
          return true;
       }
    }
@@ -412,6 +416,8 @@ public class GuildManager {
             cost *= 1.5;
          }
 
+         cost *= this.plugin.getSynergy().claimCostMultiplier(guild);
+
          return cost;
       }
    }
@@ -527,6 +533,7 @@ public class GuildManager {
                   String maxStr = maxClaims == Integer.MAX_VALUE ? "Illimité" : String.valueOf(maxClaims);
                   double nextCost = this.calculateNextClaimCost(guild);
                   ChatUtil.sendMessage(player, "&a✔ Chunk revendiqué avec succès pour votre guilde ! (&7X: " + chunk.getX() + ", Z: " + chunk.getZ() + "&a)");
+                  this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.FIRST_CLAIM);
                   ChatUtil.sendMessage(
                      player,
                      "&7• Coût prélevé (Banque) : &6"
@@ -838,6 +845,7 @@ public class GuildManager {
                   this.updatePlayerTab(player);
                   this.plugin.getRaceManager().applyRaceAttributes(player, this.plugin.getRaceManager().getRace(player));
                   ChatUtil.sendMessage(player, "&aVous avez rejoint la guilde &6" + guild.getName() + " &a!");
+                  this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.RECRUIT);
                }
             }
          }
@@ -1026,7 +1034,7 @@ public class GuildManager {
    }
 
    public void updatePlayerTab(Player player) {
-      if (player != null && player.isOnline()) {
+      if (player != null && player.isOnline() && this.plugin.getDisguiseManager().get(player.getUniqueId()) == null) {
          Guild guild = this.getGuildByPlayer(player.getUniqueId());
          if (guild != null) {
             player.playerListName(ChatUtil.component("&8[&6" + guild.getTag() + "&8] &f" + player.getName()));

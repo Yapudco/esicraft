@@ -365,6 +365,8 @@ public class RailManager {
          }
 
             ChatUtil.sendMessage(player, "&a🚆 Bon voyage ! Arrivée à &e" + dest.getName() + " &7(-" + String.format(Locale.ROOT, "%.2f", quote.total()) + " pièces)");
+            this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.TRAVELER);
+            this.plugin.getAchievements().addStat(player.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_TRIPS, 1L);
             player.getWorld().spawnParticle(Particle.CLOUD, arrival, 25, 0.6, 0.3, 0.6, 0.02);
             ChatUtil.playSound(player, Sound.ENTITY_MINECART_RIDING, 1.0F, 1.2F);
          } else {

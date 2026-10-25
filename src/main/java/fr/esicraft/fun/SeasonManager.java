@@ -91,7 +91,7 @@ public class SeasonManager {
       if (guild != null) {
          this.statsOf(guild.getId())[0]++;
          this.saveStats(guild.getId());
-         this.addHistory("🛡 " + guild.getName() + " a repoussé une invasion de monstres.");
+         this.addHistory(fr.esicraft.life.Chronicle.Kind.DEFENSE, "🛡 " + guild.getName() + " a repoussé une invasion de monstres.", guild.getId(), null);
       }
    }
 
@@ -99,8 +99,16 @@ public class SeasonManager {
       if (winner != null) {
          this.statsOf(winner.getId())[1]++;
          this.saveStats(winner.getId());
-         this.addHistory("⚔ " + winner.getName() + " a détruit le Nexus de " + (loser != null ? loser.getName() : "?") + " et annexé ses terres.");
+         this.addHistory(fr.esicraft.life.Chronicle.Kind.CONQUEST, "⚔ " + winner.getName() + " a détruit le Nexus de " + (loser != null ? loser.getName() : "?") + " et annexé ses terres.",
+            winner.getId(), loser != null ? loser.getId() : null);
+         this.plugin.getAchievements().grantGuild(winner, fr.esicraft.life.Achievement.CONQUEROR, true);
       }
+   }
+
+   /** Mémorial (/histoire) + journal de guerre (site web). */
+   public void addHistory(fr.esicraft.life.Chronicle.Kind kind, String text, String guildA, String guildB) {
+      this.addHistory(text);
+      this.plugin.getChronicle().log(kind, text.replaceFirst("^\\S+ ", ""), guildA, guildB);
    }
 
    public void addHistory(String text) {
@@ -177,7 +185,8 @@ public class SeasonManager {
 
       ChatUtil.broadcast("&6&l👑 FIN DE SAISON " + endedSeason + " ! &eLa guilde &6&l" + winner.getName() + " &eest sacrée championne avec &f" + ranking.get(0).score() + " points &e!");
       ChatUtil.broadcast("&7Récompense : &6" + String.format("%.0f", CHAMPION_BANK_REWARD) + " pièces en banque de guilde &7et &6" + String.format("%.0f", CHAMPION_MEMBER_REWARD) + " pièces &7par membre. Une nouvelle saison commence !");
-      this.addHistory("👑 " + winner.getName() + " remporte la saison " + endedSeason + ".");
+      this.addHistory(fr.esicraft.life.Chronicle.Kind.SEASON, "👑 " + winner.getName() + " remporte la saison " + endedSeason + ".", winner.getId(), null);
+      this.plugin.getAchievements().grantGuild(winner, fr.esicraft.life.Achievement.CHAMPION, false);
       this.stats.clear();
       this.plugin.getDataManager().getStorage().exec("DELETE FROM guild_stats;");
    }

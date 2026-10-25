@@ -91,6 +91,9 @@ public class ContractListener implements Listener {
       }
 
       this.plugin.getContractManager().addProgress(killer, ContractType.KILL, 1);
+      if (this.plugin.getAchievements().addStat(killer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_MONSTERS, 1L) >= 500L) {
+         this.plugin.getAchievements().grant(killer.getUniqueId(), fr.esicraft.life.Achievement.HUNTER);
+      }
       if (entity.getLastDamageCause() instanceof EntityDamageByEntityEvent byEntity && byEntity.getDamager() instanceof Projectile) {
          this.plugin.getContractManager().addProgress(killer, ContractType.KILL_RANGED, 1);
       }

@@ -56,6 +56,8 @@ public class NexusTrapGUI {
                cost *= 0.5;
             }
 
+            cost *= plugin.getSynergy().trapCostMultiplier(guild);
+
             List<String> lore = new ArrayList<>();
             lore.add(trap.getDescription());
             lore.add("");

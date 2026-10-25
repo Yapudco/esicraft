@@ -210,6 +210,7 @@ public class NexusManager {
             this.updateHologram(guild);
             this.plugin.getDataManager().saveGuild(guild);
             ChatUtil.sendMessage(player, "&a✔ Cœur de Guilde (Nexus) placé avec succès dans votre claim !");
+            this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.NEXUS);
             ChatUtil.sendMessage(player, "&7Le Nexus est maintenant protégé. Vos membres peuvent désormais progresser en toute sécurité.");
             return true;
          }
@@ -427,6 +428,10 @@ public class NexusManager {
             return false;
          }
 
+         if (this.plugin.getDisguiseManager().isDisguisedAs(player.getUniqueId(), guild.getId())) {
+            return false;
+         }
+
          Guild other = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          if (other != null && this.plugin.getTreatyManager().areFriends(guild.getId(), other.getId())) {
             return false;
@@ -464,6 +469,8 @@ public class NexusManager {
          }
       }
 
+      this.plugin.getHelpCalls().cancel(guild.getId());
+      this.plugin.getChronicle().raid(victorGuild != null ? victorGuild.getId() : null, guild.getId(), "destroyed");
       if (victorGuild != null && !victorGuild.getId().equals(guild.getId())) {
          this.plugin.getSeasonManager().recordConquest(victorGuild, guild);
          this.plugin.getGuildManager().registerAnnexation(guild, victorGuild);
@@ -472,6 +479,7 @@ public class NexusManager {
          this.plugin.getDataManager().saveGuild(guild);
          ChatUtil.broadcast("&4&l\ud83d\udca5 LE NEXUS DE LA GUILDE &c" + guild.getName() + " &4&lA ÉTÉ DÉTRUIT PAR " + killer + " !");
          ChatUtil.broadcast("&eLeur territoire est désormais &cVULNÉRABLE &ependant 30 minutes !");
+         this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.CONQUEST, "Le Nexus de " + guild.getName() + " a été détruit par " + killer + " : son territoire est vulnérable.", guild.getId(), null);
       }
    }
 

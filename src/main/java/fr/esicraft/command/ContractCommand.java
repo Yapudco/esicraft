@@ -43,6 +43,15 @@ public class ContractCommand implements CommandExecutor {
 
       ChatUtil.sendRaw(player, "");
       ChatUtil.sendRaw(player, "  &7Les 3 contrats accomplis : &6+400 pièces &7de bonus. Renouvellement à minuit.");
+      fr.esicraft.guild.Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      if (guild != null) {
+         ChatUtil.sendRaw(player, "");
+         for (String line : this.plugin.getGuildContracts().lines(guild)) {
+            ChatUtil.sendRaw(player, line);
+         }
+
+         ChatUtil.sendRaw(player, "  &7Seuls les membres du métier indiqué font avancer chaque objectif.");
+      }
       ChatUtil.sendRaw(player, "&8&m--------------------------------------------------");
       return true;
    }

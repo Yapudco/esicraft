@@ -678,6 +678,14 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM raid_cooldowns;");
             statement.executeUpdate("DELETE FROM guild_stats;");
             statement.executeUpdate("DELETE FROM history;");
+            for (String table : new String[]{"journal", "raid_log", "pvp_log", "guild_history", "age_log", "guild_contract"}) {
+               try {
+                  statement.executeUpdate("DELETE FROM " + table + ";");
+               } catch (SQLException ignored) {
+                  // table pas encore créée
+               }
+            }
+
             statement.executeUpdate("DELETE FROM stations;");
             statement.executeUpdate("DELETE FROM rail_policy;");
             statement.executeUpdate("DELETE FROM rail_relations;");
