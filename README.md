@@ -289,6 +289,12 @@ Menu réservé aux **officiers** pour agir (tous les membres peuvent consulter a
 * **💔 Trahison** : rompre une alliance, un pacte en cours ou son suzerain coûte une **indemnité** (`treaties.break-indemnity`, 500 pièces max, plafonnée à la banque) versée à l'ex-partenaire, annoncée à tout le serveur, et interdit d'attaquer cette guilde pendant `treaties.break-grace-minutes` (30 min).
 * Les traités sont sauvegardés en base (tables `treaties`, `treaty_grace`), inscrits au mémorial de saison, et supprimés si une guilde disparaît. La règle du « défenseur présent » pour les raids reste inchangée.
 
+### 🌐 Site web public (`web.*` dans `config.yml`)
+Le plugin lance un **site web en lecture seule**, accessible à tous : `http://<ip-du-serveur>/` (port `web.port`, **80** par défaut).
+* **Pages** : accueil (joueurs en ligne, saison, événement, top guildes, histoire récente), `/guildes` (classement), `/guilde/<id>` (membres, traités, stats), `/joueurs` (en ligne + plus riches) et `/api/stats.json` (JSON).
+* **Sécurité** : serveur HTTP intégré au JDK (aucune dépendance), GET/HEAD uniquement, texte échappé, en-têtes CSP, données issues d'un **instantané** rafraîchi toutes les `web.refresh-seconds` (le site ne touche jamais au monde). **Aucune coordonnée** (Nexus, bases, claims) ni IP n'est exposée ; les PV du Nexus sont masqués par défaut (`web.show-nexus-health`), banques et soldes réglables (`web.show-guild-banks`, `web.show-balances`).
+* **Port 80 sous Linux** : demande root ou `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))` ; sinon mettez `web.port: 8080`. En cas d'échec, le plugin continue normalement et l'indique dans la console. Pensez à ouvrir le port sur votre box / pare-feu.
+
 ### 📊 Tableau de bord (`/hud`)
 Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état du raid/immunité, vos contrats, votre solde et l'événement en cours. `/hud` l'active ou le masque (réglage conservé).
 
@@ -360,3 +366,4 @@ Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état d
 * **Performances** : la sauvegarde périodique des joueurs et guildes s'exécute en **une seule transaction** SQLite.
 * **Traités** : nouveau paquet `fr.esicraft.treaty` (gestionnaire, menus, protection PvP alliée), branché dans les deux points d'entrée des raids et dans `RailManager.getRelation`.
 * **Optimisation HUD** : le tableau latéral n'est plus reconstruit toutes les 2 s ; il n'est mis à jour que si son contenu a changé et seules les lignes obsolètes sont retirées (moins de paquets scoreboard).
+* **Site web** : nouveau paquet `fr.esicraft.web` (`WebServer`, `WebSnapshot`, `HtmlPages`), démarré/arrêté avec le plugin.

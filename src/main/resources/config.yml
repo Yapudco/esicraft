@@ -252,3 +252,14 @@ treaties:
   break-indemnity: 500.0       # Indemnité versée à l'ex-partenaire en cas de rupture (plafonnée à la banque)
   break-grace-minutes: 30      # Préavis avant que le traître puisse attaquer sa victime
   protect-allies-pvp: true     # Pas de dégâts entre joueurs alliés / suzerain-vassal
+
+# Site web public en lecture seule (guildes, joueurs, saison) — aucune coordonnée n'est jamais exposée
+web:
+  enabled: true
+  port: 80                     # Linux : un port < 1024 demande root ou setcap ; sinon mettre 8080
+  bind: "0.0.0.0"
+  server-name: "Esicraft"
+  refresh-seconds: 15
+  show-guild-banks: true
+  show-balances: true          # Pièces des joueurs en ligne + classement des plus riches
+  show-nexus-health: false     # Les PV du Nexus aideraient les attaquants : masqué par défaut

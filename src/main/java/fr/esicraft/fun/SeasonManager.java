@@ -65,6 +65,14 @@ public class SeasonManager {
       return guildId != null && guildId.equals(this.championGuildId);
    }
 
+   public int getRepelled(String guildId) {
+      return this.statsOf(guildId)[0];
+   }
+
+   public int getConquests(String guildId) {
+      return this.statsOf(guildId)[1];
+   }
+
    private int[] statsOf(String guildId) {
       return this.stats.computeIfAbsent(guildId, k -> new int[2]);
    }
