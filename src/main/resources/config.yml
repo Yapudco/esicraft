@@ -244,6 +244,9 @@ rail:
   search-max-rails: 30000      # Plafond de rails explorés par recherche
 
 # Traités entre guildes (/traite)
+rivalry:
+  half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours
+
 treaties:
   enabled: true
   proposal-minutes: 10         # Durée de validité d'une proposition

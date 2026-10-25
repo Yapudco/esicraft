@@ -66,6 +66,8 @@ public class Chronicle {
       this.db().exec("CREATE TABLE IF NOT EXISTS journal (id INTEGER PRIMARY KEY AUTOINCREMENT, ts BIGINT, kind VARCHAR(16), text TEXT, guild_a VARCHAR(36), guild_b VARCHAR(36));");
       this.db().exec("CREATE TABLE IF NOT EXISTS raid_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts BIGINT, attacker_id VARCHAR(36), target_id VARCHAR(36), outcome VARCHAR(12));");
       this.db().exec("CREATE TABLE IF NOT EXISTS pvp_log (killer_guild VARCHAR(36), victim_guild VARCHAR(36), kills INT DEFAULT 0, PRIMARY KEY (killer_guild, victim_guild));");
+      this.db().exec("CREATE TABLE IF NOT EXISTS pvp_events (ts BIGINT, killer_guild VARCHAR(36), victim_guild VARCHAR(36));");
+      this.db().exec("CREATE TABLE IF NOT EXISTS rivalry_reset (pair VARCHAR(80) PRIMARY KEY, ts BIGINT);");
       this.db().exec("CREATE TABLE IF NOT EXISTS guild_history (ts BIGINT, guild_id VARCHAR(36), score BIGINT, bank DOUBLE, claims INT, members INT, age INT);");
       this.db().exec("CREATE INDEX IF NOT EXISTS idx_guild_history ON guild_history (guild_id, ts);");
       this.db().exec("CREATE TABLE IF NOT EXISTS age_log (guild_id VARCHAR(36), guild_name VARCHAR(32), age INT, ts BIGINT, PRIMARY KEY (guild_id, age));");
@@ -121,6 +123,8 @@ public class Chronicle {
          return;
       }
 
+      long now = System.currentTimeMillis();
+      this.async(() -> this.db().exec("INSERT INTO pvp_events (ts, killer_guild, victim_guild) VALUES (?, ?, ?);", now, killerGuild, victimGuild));
       this.async(() -> this.db().exec("INSERT INTO pvp_log (killer_guild, victim_guild, kills) VALUES (?, ?, 1) "
          + "ON CONFLICT(killer_guild, victim_guild) DO UPDATE SET kills = kills + 1;", killerGuild, victimGuild));
    }
@@ -152,7 +156,7 @@ public class Chronicle {
 
    /** Données effacées par /game reset. */
    public void clear() {
-      for (String table : new String[]{"journal", "raid_log", "pvp_log", "guild_history", "age_log"}) {
+      for (String table : new String[]{"journal", "raid_log", "pvp_log", "pvp_events", "rivalry_reset", "guild_history", "age_log"}) {
          this.db().exec("DELETE FROM " + table + ";");
       }
    }
@@ -190,22 +194,63 @@ public class Chronicle {
       return list;
    }
 
+   private static String pairKey(String a, String b) {
+      return a.compareTo(b) < 0 ? a + "|" + b : b + "|" + a;
+   }
+
+   /** Un traité (alliance, pacte, vassalité) signé entre deux guildes efface leur rivalité passée. */
+   public void resetRivalry(String guildA, String guildB) {
+      long now = System.currentTimeMillis();
+      String key = pairKey(guildA, guildB);
+      this.async(() -> this.db().exec("INSERT INTO rivalry_reset (pair, ts) VALUES (?, ?) ON CONFLICT(pair) DO UPDATE SET ts = excluded.ts;", key, now));
+   }
+
+   /** Poids d'un fait d'hostilité : divisé par deux tous les {@code rivalry.half-life-days} jours. */
+   private double weight(long ts, long now) {
+      double halfLifeMs = Math.max(0.1, this.plugin.getConfig().getDouble("rivalry.half-life-days", 7.0)) * 86400000.0;
+      return Math.pow(0.5, Math.max(0L, now - ts) / halfLifeMs);
+   }
+
+   /** Rivalités entre guildes : raids, trahisons et morts qui s'estompent avec le temps et disparaissent à la signature d'un traité. */
    public List<Rivalry> rivalries() {
-      java.util.Map<String, int[]> map = new java.util.HashMap<>();
-      for (Object[] r : this.db().select("SELECT attacker_id, target_id, COUNT(*) FROM raid_log WHERE outcome IN ('launched', 'betrayal') AND attacker_id IS NOT NULL GROUP BY attacker_id, target_id;", 3)) {
-         map.computeIfAbsent(r[0] + ">" + r[1], k -> new int[2])[0] = (int)num(r[2]);
+      long now = System.currentTimeMillis();
+      java.util.Map<String, Long> resets = new java.util.HashMap<>();
+      for (Object[] r : this.db().select("SELECT pair, ts FROM rivalry_reset;", 2)) {
+         resets.put((String)r[0], num(r[1]));
       }
 
-      for (Object[] r : this.db().select("SELECT killer_guild, victim_guild, kills FROM pvp_log;", 3)) {
-         map.computeIfAbsent(r[0] + ">" + r[1], k -> new int[2])[1] = (int)num(r[2]);
+      java.util.Map<String, double[]> map = new java.util.HashMap<>();
+      for (Object[] r : this.db().select("SELECT ts, attacker_id, target_id FROM raid_log WHERE outcome IN ('launched', 'betrayal') AND attacker_id IS NOT NULL;", 3)) {
+         this.accumulate(map, resets, num(r[0]), (String)r[1], (String)r[2], 0, now);
+      }
+
+      for (Object[] r : this.db().select("SELECT ts, killer_guild, victim_guild FROM pvp_events;", 3)) {
+         this.accumulate(map, resets, num(r[0]), (String)r[1], (String)r[2], 1, now);
       }
 
       List<Rivalry> list = new ArrayList<>();
       for (var e : map.entrySet()) {
-         String[] ids = e.getKey().split(">", 2);
-         list.add(new Rivalry(ids[0], ids[1], e.getValue()[0], e.getValue()[1]));
+         int raids = (int)Math.round(e.getValue()[0]);
+         int kills = (int)Math.round(e.getValue()[1]);
+         if (raids > 0 || kills > 0) {
+            String[] ids = e.getKey().split(">", 2);
+            list.add(new Rivalry(ids[0], ids[1], raids, kills));
+         }
       }
 
       return list;
+   }
+
+   private void accumulate(java.util.Map<String, double[]> map, java.util.Map<String, Long> resets, long ts, String a, String b, int slot, long now) {
+      if (a == null || b == null) {
+         return;
+      }
+
+      Long reset = resets.get(pairKey(a, b));
+      if (reset != null && ts <= reset) {
+         return;
+      }
+
+      map.computeIfAbsent(a + ">" + b, k -> new double[2])[slot] += this.weight(ts, now);
    }
 }

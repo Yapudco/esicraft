@@ -350,6 +350,7 @@ public class TreatyManager {
       this.async(() -> this.plugin.getDataManager().getStorage().exec(
          "INSERT INTO treaties (id, a_id, b_id, type, suzerain_id, created_at, expires_at, last_tribute) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
          t.getId(), t.getAId(), t.getBId(), t.getType().name(), t.getSuzerainId(), t.getCreatedAt(), t.getExpiresAt(), t.getLastTribute()));
+      this.plugin.getChronicle().resetRivalry(from.getId(), target.getId());
       if (p.type().isFriendly()) {
          // Le traité remplace toute relation ferroviaire manuelle entre les deux guildes.
          this.plugin.getRailManager().setRelation(from.getId(), target.getId(), Relation.NORMAL);

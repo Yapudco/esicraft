@@ -4,6 +4,11 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Rivalités
+- Une rivalité s'estompe avec le temps : raids, trahisons et morts perdent la moitié de leur poids tous les 7 jours (`rivalry.half-life-days`).
+- Signer un traité (alliance, pacte, vassalité) efface la rivalité passée entre les deux guildes.
+- Les morts PvP sont désormais datées ; celles d'avant cette mise à jour ne comptent plus dans les rivalités.
+
 ### Rail
 - Seules les guildes **Syndicat Marchand** peuvent prélever un péage sur le rail. Les autres guildes ne font plus payer (avant, toutes appliquaient 2 pièces par défaut) et ne peuvent plus modifier le montant dans `/rail`.
 
