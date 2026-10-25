@@ -1,0 +1,72 @@
+name: Esicraft-Plugin
+version: '1.0.0-SNAPSHOT'
+main: fr.esicraft.EsicraftPlugin
+api-version: '1.20'
+authors: [ Antigravity ]
+description: Plugin de survie hardcore stratégique avec Guildes, Races, Nexus et Âges de Guilde.
+
+commands:
+  esicraft:
+    description: Commande principale Esicraft
+    aliases: [esi]
+    usage: /esicraft [help|reload|info]
+  race:
+    description: Choisir ou consulter sa race / métier
+    aliases: [metier, classe]
+    usage: /race [menu|info|set <joueur> <race>]
+  guild:
+    description: Gestion des guildes et territoires
+    aliases: [g, guilde, faction]
+    usage: /guild [create|invite|join|leave|kick|spec|claim|unclaim|nexus|info|bank|chat]
+  age:
+    description: Menu et progression des Âges de guilde
+    aliases: [ages, era]
+    usage: /age [menu|deposit|info]
+  nexus:
+    description: Gestion et statut du Nexus de guilde
+    usage: /nexus [info|upgrade|repair]
+  ah:
+    description: Hôtel des ventes et contrats de hordes
+    aliases: [hdv, market, marche]
+    usage: /ah [sell <prix>|menu]
+  money:
+    description: Administration économique des joueurs et équilibrage anti-farm
+    permission: esicraft.admin
+    usage: /money <get|set|give|take|rectify|top> <joueur|valeur> [montant]
+  baltop:
+    description: Voir le classement des joueurs les plus riches du serveur
+    aliases: [balancetop, topmoney, richest]
+    usage: /baltop
+  pay:
+    description: Transférer des pièces à un autre joueur
+    aliases: [payer, virement, sendmoney]
+    usage: /pay <joueur> <montant>
+  game:
+    description: Administration globale du jeu
+    permission: esicraft.admin
+    usage: /game reset
+  guide:
+    description: Obtenir le livre officiel de règles et explications
+    aliases: [livre, rules, regles]
+    usage: /guide
+  pvp:
+    description: Activer ou désactiver la destruction des Nexus
+    permission: esicraft.admin
+    aliases: [nexusdestruction, togglenexus]
+    usage: /pvp [on|off|toggle]
+  esicraftadmin:
+    description: Commandes d'administration Esicraft
+    permission: esicraft.admin
+    usage: /esicraftadmin [setage|spawnraid|forcenexus|resetclaims|giveitems]
+  hub:
+    description: Se reconnecter au serveur Hub (/server hub)
+    aliases: [lobby, mainhub]
+    usage: /hub
+
+permissions:
+  esicraft.user:
+    description: Permission de base pour utiliser les fonctionnalités de jeu
+    default: true
+  esicraft.admin:
+    description: Permission d'administration Esicraft
+    default: op

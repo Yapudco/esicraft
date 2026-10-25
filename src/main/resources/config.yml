@@ -1,0 +1,227 @@
+# ==============================================================================
+#                  ESICRAFT-PLUGIN - CONFIGURATION GLOBALE
+#            Survie Hardcore & Stratégique Optimisée (+50 joueurs)
+# ==============================================================================
+
+# Système de Sauvegarde et Performance
+storage:
+  type: "SQLITE" # Types supportés : SQLITE, JSON
+  save-interval-seconds: 180
+  async-chunk-checking: true
+
+# Paramètres du Marché Central et Hôtel des Ventes
+market:
+  location:
+    world: "world"
+    x: 0.0
+    y: 100.0
+    z: 0.0
+  tax-percentage: 5.0 # Taxe prélevée sur chaque vente
+  max-listings-per-player: 10 # Annonces actives max par joueur (anti-saturation de l'HDV)
+  mercenary-hordes-enabled: true
+
+# Progression des Âges (Ressources requises pour débloquer l'Âge supérieur)
+ages:
+  initial-age: 1
+  age-1:
+    name: "Âge Rustique"
+    description: "Outils en pierre et bois uniquement. Débuts de la civilisation."
+    requirements: {} # Âge de départ
+  age-2:
+    name: "Âge de la Métallurgie"
+    description: "Déblocage universel des outils en fer et des boucliers."
+    requirements:
+      COPPER_INGOT: 750
+      LEATHER: 256
+      RAW_IRON: 750
+      OAK_LOG: 1000
+      WHEAT: 1500
+      CARROT: 750
+  age-3:
+    name: "Âge de l'Alchimie"
+    description: "Déblocage universel des armures complètes en fer, outils diamant et potions T1."
+    requirements:
+      IRON_INGOT: 3500
+      GOLD_INGOT: 1500
+      LAPIS_LAZULI: 1500
+      QUARTZ: 1000
+      NETHER_WART: 750
+      BLAZE_ROD: 150
+      MAGMA_CREAM: 150
+      GHAST_TEAR: 15
+      GLOWSTONE_DUST: 750
+      FEATHER: 3500
+      POTATO: 6000
+      SUGAR_CANE: 6000
+      PUMPKIN: 1000
+      MELON_SLICE: 2500
+      BEETROOT: 1500
+  age-4:
+    name: "Âge de Guerre Totale"
+    description: "Déblocage universel des armures en diamant, enchantements, commerce villageois, TNT et machinerie de siège."
+    requirements:
+      DIAMOND: 500
+      IRON_BLOCK: 150
+      GOLD_BLOCK: 100
+      OBSIDIAN: 1000
+      CRYING_OBSIDIAN: 200
+      ENDER_PEARL: 500
+      ELYTRA: 1
+      GOLDEN_CARROT: 2500
+      GOLDEN_APPLE: 150
+      HAY_BLOCK: 1200
+      HONEY_BOTTLE: 800
+      SLIME_BALL: 800
+      REDSTONE: 6000
+      REPEATER: 400
+      PISTON: 350
+      STICKY_PISTON: 200
+      DISPENSER: 150
+      GUNPOWDER: 2500
+      TNT: 250
+      FIREWORK_ROCKET: 750
+      ANVIL: 32
+  age-5:
+    name: "Âge Mythique & Technologique"
+    description: "Déblocage universel de la Netherite de base, Balises, Cités Anciennes et Apex."
+    requirements:
+      NETHERITE_INGOT: 16
+      NETHER_STAR: 5
+      BEACON: 4
+      TOTEM_OF_UNDYING: 8
+      ECHO_SHARD: 16
+      SCULK_CATALYST: 16
+      SCULK_SHRIEKER: 16
+      SCULK_SENSOR: 64
+      SHULKER_SHELL: 64
+      END_STONE: 2500
+      PURPUR_BLOCK: 1200
+      CHORUS_FRUIT: 2500
+      POPPED_CHORUS_FRUIT: 1000
+      REDSTONE_BLOCK: 1000
+      COMPARATOR: 400
+      OBSERVER: 400
+      HOPPER: 250
+      TARGET: 150
+      EMERALD_BLOCK: 150
+  age-6:
+    name: "Âge de Suprématie"
+    description: "L'Âge Suprême de l'univers : reliques sacrées, maîtrise totale et titres de gloire."
+    requirements:
+      # Tous les CD / Disques de musique
+      MUSIC_DISC_13: 1
+      MUSIC_DISC_CAT: 1
+      MUSIC_DISC_BLOCKS: 1
+      MUSIC_DISC_CHIRP: 1
+      MUSIC_DISC_FAR: 1
+      MUSIC_DISC_MALL: 1
+      MUSIC_DISC_MELLOHI: 1
+      MUSIC_DISC_STAL: 1
+      MUSIC_DISC_STRAD: 1
+      MUSIC_DISC_WARD: 1
+      MUSIC_DISC_11: 1
+      MUSIC_DISC_WAIT: 1
+      MUSIC_DISC_OTHERSIDE: 1
+      MUSIC_DISC_5: 1
+      MUSIC_DISC_PIGSTEP: 1
+      MUSIC_DISC_RELIC: 1
+      # Toutes les têtes de monstre
+      WITHER_SKELETON_SKULL: 1
+      ZOMBIE_HEAD: 1
+      SKELETON_SKULL: 1
+      DRAGON_HEAD: 1
+      CREEPER_HEAD: 1
+      PIGLIN_HEAD: 1
+      # Cornes de chèvres
+      GOAT_HORN: 8
+      # Nether Stars
+      NETHER_STAR: 64
+      # Houe en Netherite (Mending + Unbreaking 3 + Fortune 3)
+      NETHERITE_HOE: 1
+      # Tous les Modèles de Forge (Trim Templates)
+      COAST_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      DUNE_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      EYE_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      HOST_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      RAISER_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      RIB_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      TIDE_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      VEX_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      WARD_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      WILD_ARMOR_TRIM_SMITHING_TEMPLATE: 1
+      NETHERITE_UPGRADE_SMITHING_TEMPLATE: 1
+      # Tous les Tessons de Poterie
+      ANGLER_POTTERY_SHERD: 1
+      ARCHER_POTTERY_SHERD: 1
+      ARMS_UP_POTTERY_SHERD: 1
+      BLADE_POTTERY_SHERD: 1
+      BREWER_POTTERY_SHERD: 1
+      BURN_POTTERY_SHERD: 1
+      DANGER_POTTERY_SHERD: 1
+      EXPLORER_POTTERY_SHERD: 1
+      FRIEND_POTTERY_SHERD: 1
+      HEART_POTTERY_SHERD: 1
+      HEARTBREAK_POTTERY_SHERD: 1
+      HOWL_POTTERY_SHERD: 1
+      MINER_POTTERY_SHERD: 1
+      MOURNER_POTTERY_SHERD: 1
+      PLENTY_POTTERY_SHERD: 1
+      PRIZE_POTTERY_SHERD: 1
+      SHEAF_POTTERY_SHERD: 1
+      SHELTER_POTTERY_SHERD: 1
+      SKULL_POTTERY_SHERD: 1
+      SNORT_POTTERY_SHERD: 1
+      # Œuf de l'Ender & Buisson Mort
+      DRAGON_EGG: 1
+      DEAD_BUSH: 1
+
+# Paramètres des Guildes et Claims
+guilds:
+  creation-cost: 500.0 # Monnaie
+  max-members-default: 10
+  max-claims-default: 16
+  claim-cost-base: 100.0       # Coût du premier chunk (100 pièces)
+  claim-cost-increment: 25.0   # Augmentation douce par chunk supplémentaire (+25 pièces / chunk)
+  claim-cost-quadratic: 0.0    # Facteur quadratique (0 = augmentation linéaire douce)
+  nexus:
+    heal-cooldown-seconds: 30 # Délai entre deux soins du Nexus par pomme dorée
+    base-health: 5000
+    regeneration-rate-per-minute: 50
+    invulnerable-during-peace: true
+    hologram-display: true
+
+# Contrats de Hordes de Monstres (Achat à l'Hôtel des Ventes)
+raids:
+  cooldown-minutes-between-raids: 30
+  max-custom-horde-units: 60 # Plafond de monstres d'une horde personnalisée (anti-crash serveur)
+  types:
+    ARMORED_ZOMBIES:
+      name: "🧟 Horde de Zombies Cuirassés"
+      price: 2500.0
+      mob-count: 24
+      target-damage-to-nexus: 25
+    INCENDIARY_SKELETONS:
+      name: "🏹 Légion Squelette Incendiaire"
+      price: 3500.0
+      mob-count: 20
+      target-damage-to-nexus: 35
+    TOXIC_SPIDERS:
+      name: "🕷️ Essaim d'Araignées Toxiques"
+      price: 3000.0
+      mob-count: 30
+      target-damage-to-nexus: 20
+    PILLAGER_SIEGE:
+      name: "👺 Siège de Pillards & Ravageurs"
+      price: 7500.0
+      mob-count: 15
+      target-damage-to-nexus: 80
+
+# Métiers (races)
+races:
+  change-cooldown-hours: 24 # Délai minimum entre deux changements de métier (hors première sélection et admin)
