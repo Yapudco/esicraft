@@ -4,6 +4,10 @@ Les changements récents du plugin, du plus récent au plus ancien. Le guide du 
 
 ## 25/10/2026 (fin de nuit)
 
+### Site : frise des Âges
+- Refonte lisible : une colonne par Âge (1 à 6, avec son nom), une ligne par guilde. Chaque Âge atteint affiche sa date, les Âges non atteints restent vides, l'Âge actuel est cerclé et ★ marque la première guilde à franchir chaque Âge.
+- Avant, les points étaient placés sur une échelle de temps continue : ils se chevauchaient et rien n'indiquait ce que chaque nombre représentait. Le survol donne le délai depuis l'Âge précédent.
+
 ### Correctif traités
 - Frapper le Nexus d'une guilde liée par une alliance ou une vassalité (vassal comme suzerain) rompt désormais le traité automatiquement : trahison et rivalité, comme pour un pacte. Avant, seul le pacte était rompu et les deux guildes restaient liées tout en se frappant.
 
