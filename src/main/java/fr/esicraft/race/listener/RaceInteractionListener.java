@@ -578,6 +578,7 @@ public class RaceInteractionListener implements Listener {
                finalBounty *= this.plugin.getEventManager().getBountyMultiplier();
                finalBounty *= this.plugin.getNatureSeasons().bountyMultiplier();
                finalBounty *= this.plugin.getSynergy().bountyMultiplier(guild);
+               finalBounty *= this.plugin.getBalance().catchUpMultiplier(guild);
                if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
                   finalBounty *= 1.2;
                }

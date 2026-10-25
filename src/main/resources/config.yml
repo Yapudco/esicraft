@@ -246,6 +246,49 @@ rail:
 rivalry:
   half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours
 
+revenge:
+  enabled: true
+  hours: 24                   # Durée de la revanche après un raid perdu
+  discount: 0.5               # Réduction sur le prix des hordes contre le vainqueur (0.5 = -50 %)
+
+catchup:
+  enabled: true
+  max-bonus-percent: 25.0     # Bonus maximal sur les primes de monstres des guildes très en dessous de la médiane (4 guildes minimum)
+
+reputation:
+  enabled: true
+
+mentoring:
+  enabled: true
+  mentor-min-hours: 5         # Temps de jeu minimal du parrain
+  recruit-max-days: 14        # Ancienneté maximale d'une recrue
+  max-recruits: 5
+  rewards:
+    first-job-mentor: 200.0
+    first-job-recruit: 50.0
+    first-claim-mentor: 300.0
+    first-claim-recruit: 100.0
+
+ransom:
+  enabled: true
+  seconds: 90                 # Durée de captivité
+  default-percent: 15.0       # Rançon par défaut : % des pièces du captif
+  min: 100.0
+  max: 2000.0
+  captor-share: 0.3           # Part de la rançon pour le ravisseur (le reste va à la banque de sa guilde)
+  immunity-minutes: 10        # Pas de nouvelle capture juste après une libération
+  on-timeout: kill            # kill (exécution) ou free (libération) si le ravisseur ne décide rien
+
+loans:
+  enabled: true
+  interest-percent: 10.0
+  days: 5                     # Délai de remboursement
+  min: 100.0
+  max: 20000.0
+  max-total-debt: 30000.0
+  seizure-hours: 24           # Dette en retard : un chunk saisi toutes les N heures
+  seizure-value: 300.0        # Montant de dette effacé par chunk saisi
+
 combat:
   enabled: true
   seconds: 15                 # Durée du combat PvP après un coup (pas de /hub, déconnexion punie par la mort)

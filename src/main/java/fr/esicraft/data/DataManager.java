@@ -176,6 +176,9 @@ public class DataManager {
 
       this.plugin.getNexusManager().removeAllHolograms();
       this.plugin.getNexusManager().clearIndex();
+      this.plugin.getBalance().clear();
+      this.plugin.getLoans().clear();
+      this.plugin.getMentors().clear();
       this.plugin.getGuildManager().clearAll();
       this.plugin.getMarketManager().clearAll();
       this.plugin.getRailManager().clearAll();
