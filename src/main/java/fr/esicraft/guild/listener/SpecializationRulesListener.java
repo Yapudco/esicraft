@@ -4,7 +4,7 @@ import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildSpecialization;
 import fr.esicraft.util.ChatUtil;
-import io.papermc.paper.event.player.PlayerArmorChangeEvent;
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
