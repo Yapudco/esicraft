@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 25/10/2026 (fin de nuit)
+
+### Correctifs
+- **Nexus** : l'hologramme des PV réapparaît après un redémarrage du serveur ou une reconnexion (il n'était recréé qu'au premier dégât ou soin).
+- **Nexus** : après un redémarrage, le Nexus est de nouveau retrouvé à sa position (l'index était vidé au démarrage).
+
 ## 25/10/2026 (nuit, suite)
 
 ### Nouvelles mécaniques

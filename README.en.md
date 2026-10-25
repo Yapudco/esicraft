@@ -145,6 +145,8 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 **16-block safety zone** around the Nexus: no water, lava or obsidian (crying obsidian included). The Nexus can't be placed if there's already some, and none can be added later. This prevents moats and unbreakable walls.
 
+**Health points**: the Nexus's HP is shown above it (hologram), including after a server restart or a reconnection.
+
 **Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid.
 
 ### Traps (`/nexus traps`)
