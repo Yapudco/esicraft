@@ -84,6 +84,15 @@ commands:
     aliases: [event]
     usage: /evenement <lune|meteores|marchand|boss|stop|status>
 
+  station:
+    description: Voyager entre les gares du réseau ferroviaire
+    aliases: [gares, train, metro]
+    usage: /station
+  rail:
+    description: Gérer le réseau ferroviaire de votre guilde (péage, relations)
+    aliases: [reseau, gare]
+    usage: /rail
+
 permissions:
   esicraft.user:
     description: Permission de base pour utiliser les fonctionnalités de jeu
