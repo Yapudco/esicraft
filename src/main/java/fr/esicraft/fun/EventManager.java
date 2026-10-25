@@ -44,7 +44,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 /**
  * Événements serveur aléatoires : Lune de Sang, Pluie de Météorites, Marchand du Marché Noir et Boss Mondial.
- * Un seul événement est actif à la fois ; un nouvel événement se déclenche toutes les 45 à 90 minutes (configurable).
+ * Un seul événement est actif à la fois ; un nouvel événement se déclenche tous les 1 à 2 jours (configurable, échéance conservée après un redémarrage).
  */
 public class EventManager implements Listener {
    public enum Type {
@@ -84,8 +84,26 @@ public class EventManager implements Listener {
       this.plugin = plugin;
    }
 
+   private static final String NEXT_EVENT_KEY = "event_next_at";
+
    public void start() {
-      this.scheduleNext(20, 40);
+      // L'échéance est conservée en base : redémarrer le serveur ne remet pas le compteur à zéro (ni ne déclenche un événement de plus).
+      long saved = 0L;
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, NEXT_EVENT_KEY)) {
+         try {
+            saved = Long.parseLong((String)row[0]);
+         } catch (NumberFormatException ignored) {
+         }
+      }
+
+      long now = System.currentTimeMillis();
+      int maxMinutes = this.plugin.getConfig().getInt("events.max-interval-minutes", 2880);
+      if (saved > now && saved - now <= maxMinutes * 60000L) {
+         this.nextEventAt = saved;
+      } else {
+         this.scheduleNext(1440, 2880);
+      }
+
       // Vérification chaque minute : lance un événement aléatoire quand l'échéance est atteinte.
       this.scheduler = Bukkit.getScheduler().runTaskTimer(this.plugin, () -> {
          if (this.active == null && this.plugin.getConfig().getBoolean("events.enabled", true) && System.currentTimeMillis() >= this.nextEventAt
@@ -100,6 +118,11 @@ public class EventManager implements Listener {
       int min = this.plugin.getConfig().getInt("events.min-interval-minutes", minMinutes);
       int max = Math.max(min, this.plugin.getConfig().getInt("events.max-interval-minutes", maxMinutes));
       this.nextEventAt = System.currentTimeMillis() + (long)ThreadLocalRandom.current().nextInt(min, max + 1) * 60000L;
+      long at = this.nextEventAt;
+      if (this.plugin.isEnabled()) {
+         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+            "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", NEXT_EVENT_KEY, String.valueOf(at)));
+      }
    }
 
    public Type getActive() {
@@ -178,7 +201,7 @@ public class EventManager implements Listener {
       }
 
       this.active = null;
-      this.scheduleNext(45, 90);
+      this.scheduleNext(1440, 2880);
    }
 
    /** À l'arrêt du plugin : nettoie boss, marchand et barre. */

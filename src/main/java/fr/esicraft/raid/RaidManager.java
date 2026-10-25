@@ -826,6 +826,7 @@ public class RaidManager implements Listener {
          Guild targetGuild = this.plugin.getGuildManager().getGuildById(raid.getTargetGuildId());
          if (targetGuild != null && targetGuild.hasNexus()) {
             boolean hadTraps = !targetGuild.getNexus().getActiveTraps().isEmpty();
+            this.plugin.getNexusManager().removeGuardians(targetGuild, targetGuild.getNexus().getLocation());
             targetGuild.getNexus().clearTraps();
             this.plugin.getDataManager().saveGuild(targetGuild);
             if (defended) {

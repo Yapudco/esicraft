@@ -133,15 +133,15 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 ### Les pièges (`/nexus traps`)
 
-Payés par la banque de guilde, ils restent actifs (même après un redémarrage) et ne visent que les intrus présents sur vos terres.
+Payés par la banque de guilde, ils restent armés (même après un redémarrage) jusqu'à la **fin de la prochaine horde** : il faut ensuite les racheter. Ils visent les monstres et les **intrus** présents sur vos terres, jamais les membres, les alliés (traité), ni les joueurs en créatif ou spectateur.
 
 | Piège | Prix | Effet |
 | :--- | :--- | :--- |
-| 🔥 Brasier Infernal | 250 | Enflamme les ennemis à moins de 8 blocs |
-| 🕸️ Toile d'Entravement | 200 | Lenteur III et Cécité pour ceux qui approchent |
-| ⚡ Foudre de Riposte | 350 | Foudroie quiconque frappe le Nexus |
-| 🧪 Brume Toxique | 300 | Nuage de Poison II |
-| 🤖 Automate Gardien | 500 | Un golem de fer défend le Nexus |
+| 🔥 Brasier Infernal | 250 | À moins de 8 blocs : 1 cœur de dégâts toutes les 2 s et brûlure |
+| 🕸️ Toile d'Entravement | 200 | Lenteur II à moins de 10 blocs |
+| ⚡ Foudre de Riposte | 350 | Foudroie quiconque frappe le Nexus : 4 cœurs, au plus un éclair toutes les 5 s par joueur |
+| 🧪 Brume Toxique | 300 | Poison I à moins de 8 blocs (le poison ne tue jamais, il affaiblit) |
+| 🤖 Automate Gardien | 500 | Un golem de fer attaque les ennemis ; il est reconstruit 5 min après sa mort |
 
 ---
 
@@ -266,7 +266,7 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 
 ## 🎉 10. La vie du serveur
 
-### Événements (toutes les 45 à 90 minutes)
+### Événements (un tous les 1 à 2 jours)
 
 | Événement | Durée | Ce qui se passe |
 | :--- | :--- | :--- |
