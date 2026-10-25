@@ -275,6 +275,12 @@ Chaque jour (renouvellement à minuit, heure de Paris), chaque joueur ayant un m
 * `/classement` : classement mensuel des guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). Le champion reçoit **5 000 pièces** en banque, **500 par membre** et la couronne 👑 dans le tchat.
 * `/histoire` : les 10 derniers événements marquants (conquêtes, raids repoussés, boss, champions).
 
+### 🚆 Réseau ferroviaire inter-guildes (`/station`, `/rail`)
+* **Voyager (`/station`)** : à moins de 8 blocs d'un panneau `[Gare]`, `/station` ouvre un menu des gares atteignables **par un chemin de rails continu**. Le réseau est un **graphe** : embranchements, croisements et rails collés les uns aux autres sont reliés (une ligne peut donc aller « à droite et à gauche »). Les chunks traversés sont chargés à la demande ; la recherche est étalée sur plusieurs ticks (réseau limité à `rail.search-max-rails` rails).
+* **Prix d'un trajet** : tarif de gare (`rail.base-fare`, 1 pièce, versé à la guilde de la gare d'arrivée) + **péage de chaque guilde dont le territoire est traversé** (versé à sa banque). Votre propre guilde ne se fait pas payer ; les guildes **alliées** passent gratuitement.
+* **Coopération & rivalités (`/rail`, officiers)** : fixez votre péage (0 à `rail.max-toll`) et, pour chaque autre guilde, une relation **Normale / Alliée (gratuit) / Bannie**. Une guilde bannie ne peut plus franchir vos terres : **les lignes qui les traversent sont coupées** pour elle (la recherche contourne la zone, ou la gare devient inaccessible).
+* **Créer une gare** : un officier pose un panneau avec `[Gare]` en ligne 1 et le nom en ligne 2, à moins de 2 blocs d'un rail (Âge 2 minimum, `rail.station-creation-cost` en banque de guilde, 6 gares max par guilde, hors territoire d'une autre guilde). Casser le panneau supprime la gare (officiers de la guilde propriétaire seulement).
+
 ### 📊 Tableau de bord (`/hud`)
 Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état du raid/immunité, vos contrats, votre solde et l'événement en cours. `/hud` l'active ou le masque (réglage conservé).
 
@@ -316,6 +322,7 @@ Un tableau latéral affiche votre guilde, votre Âge, les PV du Nexus, l'état d
 * `/ah sell <prix>` : Mettre en vente l'objet tenu en main à l'Hôtel des Ventes (**10 annonces actives max** par joueur, `market.max-listings-per-player`).
 * Dans `/ah` : **pagination** (flèches ◀ ▶), et un **clic sur sa propre annonce l'annule** et rend l'objet.
 * `/age` : Ouvrir le menu de progression des Âges et déposer des ressources.
+* `/station`, `/rail` : voyager entre gares / gérer péages, relations et gares de sa guilde.
 * `/contrat`, `/classement`, `/histoire`, `/hud` : contrats du jour, classement de saison, mémorial, tableau de bord.
 
 ### 🌐 Navigation & Serveur
