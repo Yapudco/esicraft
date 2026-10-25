@@ -104,7 +104,9 @@ On another guild's land you **can't break or place blocks**, or open its chests,
 
 Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **Chorus Fruit** to teleport in, **End Crystals**, **pistons**, **lava, water and fire** coming from outside, block destruction by Withers, Endermen and Ravagers, and **projectiles** hitting animals, item frames and armor stands.
 
-These protections only drop during a raid against that guild, and for **30 minutes** after its Nexus is destroyed if there's no annexation.
+**Lava and water**: a liquid never crosses from one territory to another (even during a raid), dispensers cannot pour any into a neighbour's land, and a **lava** bucket cannot be emptied within 5 blocks of a player who is neither in your guild nor your ally.
+
+The other protections only drop during a raid against that guild, and for **30 minutes** after its Nexus is destroyed if there's no annexation.
 
 ---
 

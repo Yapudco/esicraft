@@ -101,7 +101,9 @@ Sur les terres d'une autre guilde, tu ne peux **ni casser ni poser de blocs**, n
 
 Y sont aussi interdits : la **TNT** (y compris en wagonnet), les **perles de l'Ender** et le **fruit de Chorus** pour s'y téléporter, les **cristaux de l'End**, les **pistons**, la **lave, l'eau et le feu** qui viennent de l'extérieur, la destruction de blocs par les Withers, Endermen et Ravageurs, et les **projectiles** sur les animaux, cadres et supports d'armure.
 
-Ces protections sautent seulement pendant un raid contre la guilde, et pendant **30 minutes** après la destruction de son Nexus s'il n'y a pas d'annexion.
+**Lave et eau** : un liquide ne passe jamais d'un territoire à un autre (même pendant un raid), les distributeurs ne peuvent pas en verser chez le voisin, et on ne peut pas vider un seau de **lave** à moins de 5 blocs d'un joueur qui n'est ni de sa guilde ni son allié.
+
+Les autres protections sautent seulement pendant un raid contre la guilde, et pendant **30 minutes** après la destruction de son Nexus s'il n'y a pas d'annexion.
 
 ---
 
