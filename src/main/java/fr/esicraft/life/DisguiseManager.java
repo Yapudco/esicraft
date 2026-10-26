@@ -101,6 +101,8 @@ public class DisguiseManager implements Listener {
          return "&cIl vous faut &6" + cost + " pièces &cpour acheter un déguisement.";
       }
 
+      this.plugin.getDataManager().savePlayer(data);
+
       // Emprunte le nom d'un membre hors ligne (sinon garde le sien) : deux joueurs du même nom en ligne trahiraient la ruse.
       List<String> candidates = new ArrayList<>();
       for (UUID member : target.getMembers().keySet()) {

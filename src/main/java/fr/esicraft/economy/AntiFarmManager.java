@@ -35,6 +35,29 @@ public class AntiFarmManager {
       }
    }
 
+   private final Map<UUID, double[]> hourly = new ConcurrentHashMap<>();
+
+   /** Plafond de primes de monstres par heure et par joueur (économie.hourly-bounty-cap) : renvoie la part encore autorisée. */
+   public double capHourlyEarning(UUID playerUuid, double amount) {
+      double cap = this.plugin.getConfig().getDouble("economy.hourly-bounty-cap", 4000.0);
+      if (cap <= 0.0 || playerUuid == null) {
+         return amount;
+      }
+
+      long now = System.currentTimeMillis();
+      double[] w = this.hourly.computeIfAbsent(playerUuid, k -> new double[]{now, 0.0});
+      synchronized (w) {
+         if (now - (long)w[0] >= 3600000L) {
+            w[0] = now;
+            w[1] = 0.0;
+         }
+
+         double allowed = Math.max(0.0, Math.min(amount, cap - w[1]));
+         w[1] += allowed;
+         return allowed;
+      }
+   }
+
    public int getPlayerTotalKills(UUID playerUuid) {
       AtomicInteger cached = this.playerTotalKillsCache.get(playerUuid);
       return cached != null ? cached.get() : 0;

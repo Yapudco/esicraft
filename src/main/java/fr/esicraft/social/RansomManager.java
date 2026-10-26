@@ -313,6 +313,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
                return true;
             }
 
+            this.plugin.getDataManager().savePlayer(data);
             Guild captorGuild = this.plugin.getGuildManager().getGuildById(asVictim.captorGuildId);
             double share = Math.max(0.0, Math.min(1.0, this.plugin.getConfig().getDouble("ransom.captor-share", 0.3)));
             double toCaptor = Math.floor(asVictim.price * share);

@@ -102,6 +102,18 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    private final Map<String, Loan> loans = new ConcurrentHashMap<>();
    private final List<Proposal> proposals = new CopyOnWriteArrayList<>();
    private final Map<String, Inventory> chests = new ConcurrentHashMap<>();
+   // Un seul thread, dans l'ordre : un ancien instantané ne peut plus écraser un plus récent (dupe au redémarrage).
+   private final java.util.concurrent.ExecutorService chestIo = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+      Thread t = new Thread(r, "esicraft-chest-io");
+      t.setDaemon(false);
+      return t;
+   });
+
+   private void saveChestAsync(String key, Inventory inv) {
+      String data = Base64.getEncoder().encodeToString(ItemStack.serializeItemsAsBytes(inv.getContents()));
+      this.chestIo.execute(() -> this.plugin.getDataManager().getStorage().exec(
+         "INSERT INTO shared_chests (pair, data) VALUES (?, ?) ON CONFLICT(pair) DO UPDATE SET data = excluded.data;", key, data));
+   }
 
    public LoanManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -119,6 +131,14 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       }
 
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::tick, 1200L, 6000L);
+      // Un coffre ouvert est enregistré toutes les 30 s : un plantage ne perd plus que quelques secondes.
+      Bukkit.getScheduler().runTaskTimer(this.plugin, () -> {
+         for (Map.Entry<String, Inventory> e : this.chests.entrySet()) {
+            if (!e.getValue().getViewers().isEmpty()) {
+               this.saveChestAsync(e.getKey(), e.getValue());
+            }
+         }
+      }, 600L, 600L);
    }
 
    public void clear() {
@@ -130,7 +150,14 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    /** Enregistre tous les coffres communs (arrêt du serveur). */
    public void shutdown() {
       for (Map.Entry<String, Inventory> e : this.chests.entrySet()) {
-         this.saveChestNow(e.getKey(), e.getValue());
+         this.saveChestAsync(e.getKey(), e.getValue());
+      }
+
+      this.chestIo.shutdown();
+      try {
+         this.chestIo.awaitTermination(10L, java.util.concurrent.TimeUnit.SECONDS);
+      } catch (InterruptedException ignored) {
+         Thread.currentThread().interrupt();
       }
    }
 
@@ -540,17 +567,10 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       return inv;
    }
 
-   private void saveChestNow(String key, Inventory inv) {
-      String data = Base64.getEncoder().encodeToString(ItemStack.serializeItemsAsBytes(inv.getContents()));
-      this.plugin.getDataManager().getStorage().exec("INSERT INTO shared_chests (pair, data) VALUES (?, ?) ON CONFLICT(pair) DO UPDATE SET data = excluded.data;", key, data);
-   }
-
    @EventHandler
    public void onClose(InventoryCloseEvent event) {
       if (event.getInventory().getHolder() instanceof ChestHolder holder) {
-         String data = Base64.getEncoder().encodeToString(ItemStack.serializeItemsAsBytes(event.getInventory().getContents()));
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
-            "INSERT INTO shared_chests (pair, data) VALUES (?, ?) ON CONFLICT(pair) DO UPDATE SET data = excluded.data;", holder.pair, data));
+         this.saveChestAsync(holder.pair, event.getInventory());
       }
    }
 

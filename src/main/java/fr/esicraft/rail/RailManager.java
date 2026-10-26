@@ -353,6 +353,7 @@ public class RailManager {
          return;
       }
 
+      this.plugin.getDataManager().savePlayer(data);
       Location from = player.getLocation();
       if (player.isInsideVehicle()) {
          player.leaveVehicle();

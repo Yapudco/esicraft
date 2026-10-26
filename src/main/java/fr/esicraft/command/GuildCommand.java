@@ -377,8 +377,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   if (pData != null && pData.getCoins() >= amount) {
                      pData.removeCoins(amount);
                      guild.depositBank(amount);
-                     this.plugin.getDataManager().savePlayer(pData);
-                     this.plugin.getDataManager().saveGuild(guild);
+                     this.plugin.getDataManager().savePlayerAndGuild(pData, guild);
                      ChatUtil.sendMessage(player, "&aDépôt de &6" + amount + " pièces &aeffectué dans la banque de guilde !");
                   } else {
                      ChatUtil.sendMessage(player, "&cVous n'avez pas assez d'argent sur vous.");

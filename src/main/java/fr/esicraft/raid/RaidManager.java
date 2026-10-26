@@ -59,6 +59,8 @@ public class RaidManager implements Listener {
    private final Map<String, Long> guildRaidCooldowns = new ConcurrentHashMap<>();
    private final Map<UUID, Location> lastMobPositions = new ConcurrentHashMap<>();
    private final Map<UUID, Integer> mobStuckCounters = new ConcurrentHashMap<>();
+   private final Map<UUID, Location> mobLastKnown = new ConcurrentHashMap<>();
+   private final Map<UUID, Integer> mobMisses = new ConcurrentHashMap<>();
 
    public RaidManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -280,8 +282,7 @@ public class RaidManager implements Listener {
                         double distance = ThreadLocalRandom.current().nextDouble(28.0, 42.0);
                         double x = nexusLoc.getX() + distance * Math.cos(angle);
                         double z = nexusLoc.getZ() + distance * Math.sin(angle);
-                        int y = world.getHighestBlockYAt((int)x, (int)z) + 1;
-                        Location spawnLoc = new Location(world, x, (double)y, z);
+                        Location spawnLoc = this.safeSpawn(world, nexusLoc, x, z);
                         EntityType spawnType = this.spawnTypeFor(raidType, i);
                         Entity entity = world.spawnEntity(spawnLoc, spawnType);
                         if (entity instanceof LivingEntity) {
@@ -511,8 +512,7 @@ public class RaidManager implements Listener {
                               double distance = ThreadLocalRandom.current().nextDouble(28.0, 42.0);
                               double x = nexusLoc.getX() + distance * Math.cos(angle);
                               double z = nexusLoc.getZ() + distance * Math.sin(angle);
-                              int y = world.getHighestBlockYAt((int)x, (int)z) + 1;
-                              Location spawnLoc = new Location(world, x, (double)y, z);
+                              Location spawnLoc = this.safeSpawn(world, nexusLoc, x, z);
                               if (world.spawnEntity(spawnLoc, unit.getEntityType()) instanceof LivingEntity living) {
                                  String tag = "";
                                  if (explosiveBreachers) {
@@ -640,7 +640,14 @@ public class RaidManager implements Listener {
    private void startRaidAITask() {
       (new BukkitRunnable() {
             public void run() {
+               long maxRaidMs = RaidManager.this.plugin.getConfig().getLong("raids.max-minutes", 25L) * 60000L;
                for (ActiveRaid raid : RaidManager.this.activeRaids.values()) {
+                  if (System.currentTimeMillis() - raid.getStartTime() > maxRaidMs) {
+                     // Un raid ne dure pas indéfiniment (mob piégé) : il s'achève sans victoire ni défaite, la guilde n'est plus « en raid ».
+                     RaidManager.this.finishRaid(raid, false);
+                     continue;
+                  }
+
                   if (raid.isFinished()) {
                      RaidManager.this.finishRaid(raid, true);
                   } else {
@@ -649,7 +656,21 @@ public class RaidManager implements Listener {
                         Location nexusLoc = targetGuild.getNexus().getLocation();
 
                         for (UUID mobUuid : raid.getAliveMobUuids()) {
+                           if (Bukkit.getEntity(mobUuid) == null) {
+                              // Chunk déchargé (défenseurs partis) : on recharge au lieu de compter le mob comme mort ; au bout de 6 échecs, il est « évaporé » (pas de victoire offerte).
+                              Location known = RaidManager.this.mobLastKnown.get(mobUuid);
+                              int misses = RaidManager.this.mobMisses.merge(mobUuid, 1, Integer::sum);
+                              if (known != null && known.getWorld() != null && misses <= 6) {
+                                 known.getWorld().getChunkAtAsync(known);
+                                 continue;
+                              }
+
+                              raid.markVanished();
+                           }
+
                            if (Bukkit.getEntity(mobUuid) instanceof Mob mob && !mob.isDead()) {
+                              RaidManager.this.mobMisses.remove(mobUuid);
+                              RaidManager.this.mobLastKnown.put(mobUuid, mob.getLocation());
                               mob.getPathfinder().moveTo(nexusLoc, 1.25);
                               if (raid.hasLavaImmunity() && mob.getLocation().getBlock().getType() == Material.LAVA) {
                                  mob.setVelocity(mob.getVelocity().setY(0.12));
@@ -716,6 +737,17 @@ public class RaidManager implements Listener {
             }
          })
          .runTaskTimer(this.plugin, 40L, 40L);
+   }
+
+   /** Point d'apparition sur un sol solide ; sinon (vide, îlot, End) à côté du Nexus, jamais dans le vide. */
+   private Location safeSpawn(World world, Location nexusLoc, double x, double z) {
+      int y = world.getHighestBlockYAt((int)x, (int)z);
+      Material ground = world.getBlockAt((int)Math.floor(x), y, (int)Math.floor(z)).getType();
+      if (y > world.getMinHeight() && ground.isSolid() && !ground.name().contains("LEAVES")) {
+         return new Location(world, x, (double)(y + 1), z);
+      }
+
+      return nexusLoc.clone().add(ThreadLocalRandom.current().nextDouble(-3.0, 3.0), 2.0, ThreadLocalRandom.current().nextDouble(-3.0, 3.0));
    }
 
    public void cleanFluidsAround(Location center, int radius) {
@@ -832,6 +864,8 @@ public class RaidManager implements Listener {
    }
 
    private void finishRaid(ActiveRaid raid, boolean defended) {
+      // Pas de victoire si une bonne part de la horde s'est volatilisée sans combat (chunk déchargé, vide, mob piégé).
+      defended = defended && raid != null && raid.getVanished() * 4 <= Math.max(1, raid.getTotalMobs());
       if (raid != null) {
          this.activeRaids.remove(raid.getId());
          this.guildIdsUnderRaid.remove(raid.getTargetGuildId());

@@ -20,6 +20,7 @@ public class ActiveRaid {
    private final List<UUID> aliveMobUuids = new CopyOnWriteArrayList<>();
    private final Map<UUID, Integer> mobDamageMap = new ConcurrentHashMap<>();
    private final long startTime;
+   private final java.util.concurrent.atomic.AtomicInteger vanished = new java.util.concurrent.atomic.AtomicInteger();
 
    public ActiveRaid(
       String id,
@@ -65,6 +66,14 @@ public class ActiveRaid {
       this.lavaImmunity = lavaImmunity;
       this.targetNexusLocation = targetNexusLocation;
       this.startTime = System.currentTimeMillis();
+   }
+
+   public void markVanished() {
+      this.vanished.incrementAndGet();
+   }
+
+   public int getVanished() {
+      return this.vanished.get();
    }
 
    public String getId() {

@@ -110,6 +110,7 @@ public class GuildManager {
                   return false;
                } else {
                   data.removeCoins(cost);
+                  this.plugin.getDataManager().savePlayer(data);
                   String guildId = UUID.randomUUID().toString();
                   Guild guild = new Guild(guildId, name, tag, player.getUniqueId());
                   data.setGuildId(guildId);
