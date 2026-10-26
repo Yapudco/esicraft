@@ -2,6 +2,14 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 31/10/2026
+
+### Bourse : un vrai marché
+- Le cours d'une action n'est plus « banque ÷ parts » : il **évolue sur un marché**, mis à jour toutes les 10 minutes. Il est attiré par la **valeur fondamentale** de la guilde, qui combine richesse (capitaux propres), territoire, effectif, **réputation de ses membres** (multiplicateur jusqu'à ×1,5), résultats de la saison, **force du Nexus** (niveau, défenses, vie), diversité des métiers, **Âge** de la guilde et impayés, avec un bruit aléatoire et une **humeur générale du marché**.
+- **Chocs d'événements** : horde repoussée +2 %, siège gagné/perdu ±4 %, boss terrassé +3 %, Nexus détruit −35 %. Les **ordres** déplacent le cours (acheter 10 % du capital : +8 %).
+- Nouvelle commande `/bourse info <guilde>` (décomposition des facteurs), variations ▲▼ sur 24 h dans `/bourse`, et une **page Bourse** sur le site avec cours, variation et mini-graphiques.
+- Revente à 95 % du cours, plafonnée à 3 fois le prix payé (le marché peut maintenant vraiment monter). Réglages : `bourse.*`, `bourse.weights.*`.
+
 ## 30/10/2026 (tavernes)
 
 ### Taverne : conditions de construction et quatre jeux

@@ -460,7 +460,18 @@ Les gains viennent de la banque de la taverne, les pertes y entrent. Succès *Ta
 
 ### 📈 La bourse (`/bourse`)
 
-À partir de l'**Âge 4**, le chef peut **ouvrir le capital** de sa guilde (`/bourse ouvrir`, 1 000 parts). Les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, cours = 10 + capitaux propres ÷ 1 000 ; 100 parts par joueur, 49 % du capital au plus) et les revendent à la guilde à 90 % du cours, **après 24 h de détention** et sans jamais gagner plus de 1,5 fois le prix payé (la bourse ne sert pas à vider la banque). Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de ses **capitaux propres** : banque moins dettes nettes, donc un prêt reçu n'est jamais un bénéfice) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` liste les guildes cotées, `/bourse portefeuille` vos actions. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*.
+À partir de l'**Âge 4**, le chef peut **ouvrir le capital** de sa guilde (`/bourse ouvrir`, 1 000 parts). Le **cours** d'une action n'est pas fixe : c'est un vrai marché, mis à jour toutes les 10 minutes.
+
+**Ce qui fait la valeur d'une guilde** (valeur fondamentale, détaillée par `/bourse info <guilde>`) :
+- sa **richesse** (capitaux propres : banque moins dettes nettes), son **territoire** (chunks) et son **effectif** ;
+- la **réputation de ses membres** (points d'honneur `/merci`) : plus ils sont honorés, plus le multiplicateur grimpe (jusqu'à ×1,5) ;
+- l'**Âge** de la guilde (multiplicateur de ×0,9 à ×1,4), ses **résultats de la saison** et la **diversité** de ses métiers ;
+- la force du **Nexus** : niveau, défenses débloquées et vie restante (un Nexus détruit fait s'effondrer la valeur) ;
+- les **impayés** (une dette en retard pénalise de 15 %).
+
+**Comment le cours bouge** : il se rapproche de la valeur fondamentale (15 % de l'écart à chaque mise à jour) avec un **bruit aléatoire** et l'**humeur générale du marché** (optimiste ou pessimiste, qui tire tous les cours dans le même sens). Des **chocs** immédiats suivent les événements : horde repoussée +2 %, siège gagné +4 % / perdu −4 %, siège repoussé +3 % / raté −3 %, boss terrassé +3 %, **Nexus détruit −35 %**. Enfin, **vos ordres comptent** : acheter 10 % du capital relève le cours de 8 %, vendre le fait baisser.
+
+**Acheter et vendre** : les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, 100 par joueur, 49 % du capital au plus) et les revendent à la guilde à 95 % du cours, **après 24 h de détention** et sans jamais gagner plus de 3 fois le prix payé. Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de ses capitaux propres) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` affiche les cours (▲▼ sur 24 h), `/bourse portefeuille` vos actions ; la page **Bourse** du site montre cours, variation et mini-graphiques. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*. Tous les facteurs se règlent dans `bourse.*` (`bourse.weights.*`).
 
 ### ⚔ Guerres formelles : les sièges (`/siege`)
 
@@ -497,6 +508,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>:8080/`**, qui se me
 | Diplomatie | Réseau des alliances, pactes, vassalités et rivalités, carte des rivalités |
 | Musée | Trophées des guildes, tous les succès avec leur rareté, derniers débloqués |
 | Âges | Frise sur un vrai axe de temps (guildes masquables une à une) et prérequis du prochain Âge de chaque guilde |
+| Bourse | Cours des actions des guildes, variation sur 24 h, mini-graphiques |
 | Panthéon | Boss terrassés (avec la guilde gravée), sièges, règle du Tribunal, titres de la semaine |
 | Votes | Élections hebdomadaires (revendication du pseudo par code dans le chat) |
 | Guide | Toutes les règles, avec une recherche |

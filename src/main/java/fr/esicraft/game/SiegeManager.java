@@ -536,6 +536,14 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
       }
 
       if (winner.equals("ATTACKER")) {
+         this.plugin.getBourse().shock(a.getId(), 0.04, "siège gagné");
+         this.plugin.getBourse().shock(d.getId(), -0.04, "siège perdu");
+      } else if (winner.equals("DEFENDER")) {
+         this.plugin.getBourse().shock(d.getId(), 0.03, "siège repoussé");
+         this.plugin.getBourse().shock(a.getId(), -0.03, "siège raté");
+      }
+
+      if (winner.equals("ATTACKER")) {
          double cap = Math.max(0.0, this.plugin.getConfig().getDouble("siege.loot-cap", 3000.0));
          double loot = Math.min(cap, d.getBankBalance() * Math.max(0.0, this.plugin.getConfig().getDouble("siege.loot-percent", 10.0)) / 100.0);
          if (loot > 0.0 && d.withdrawBank(loot)) {

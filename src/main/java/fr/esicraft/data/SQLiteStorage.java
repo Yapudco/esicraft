@@ -688,7 +688,7 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM guild_stats;");
             statement.executeUpdate("DELETE FROM history;");
             for (String table : new String[]{"journal", "raid_log", "pvp_log", "pvp_events", "rivalry_reset", "guild_history", "age_log", "guild_contract", "revenge", "loans", "shared_chests", "mentoring", "achievements", "player_stats", "contract_progress", "reputation", "reputation_thanks",
-               "boss_wins", "court_votes", "taverns", "nexus_tech", "freight_convoys", "freight_boxes", "sieges", "siege_history", "stock_listings", "stock_positions", "ransom_cells", "web_ballots", "web_titles"}) {
+               "boss_wins", "court_votes", "taverns", "nexus_tech", "freight_convoys", "freight_boxes", "sieges", "siege_history", "stock_listings", "stock_positions", "stock_market", "stock_history", "ransom_cells", "web_ballots", "web_titles"}) {
                try {
                   statement.executeUpdate("DELETE FROM " + table + ";");
                } catch (SQLException ignored) {

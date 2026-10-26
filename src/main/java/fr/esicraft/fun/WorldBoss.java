@@ -557,6 +557,7 @@ public class WorldBoss implements Listener {
       String guildId = guild != null ? guild.getId() : "";
       String guildName = guild != null ? guild.getName() : "";
       if (guild != null) {
+         this.plugin.getBourse().shock(guild.getId(), 0.03, "boss terrassé");
          double bonus = Math.max(0.0, this.cfgDouble("guild-bonus", 500.0)) * (this.heroic ? 1.5 : 1.0);
          if (bonus > 0.0) {
             guild.depositBank(bonus);

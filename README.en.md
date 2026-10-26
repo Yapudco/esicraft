@@ -463,7 +463,18 @@ Winnings come out of the tavern's bank, losses go into it. *Tavern keeper* achie
 
 ### 📈 The stock exchange (`/bourse`)
 
-From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1,000 shares). **Outside** players buy shares (`/bourse acheter <guild> <shares>`, price = 10 + equity ÷ 1,000; 100 shares per player, 49% of the capital at most) and sell them back to the guild at 90% of the price, **after holding them 24 h** and never for more than 1.5 times what they paid (the exchange can't be used to drain the bank). Every 6 hours, **20% of the guild's profit** (rise of its **equity**: bank minus net debts, so a received loan is never profit) is paid to shareholders **pro rata to their shares**. `/bourse` lists listed guilds, `/bourse portefeuille` your shares. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement.
+From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1,000 shares). A share's **price** isn't fixed: it's a real market, updated every 10 minutes.
+
+**What makes a guild valuable** (fundamental value, detailed by `/bourse info <guild>`):
+- its **wealth** (equity: bank minus net debts), its **territory** (chunks) and its **headcount**;
+- its **members' reputation** (honor points from `/merci`): the more honored they are, the higher the multiplier (up to ×1.5);
+- the guild's **Age** (multiplier from ×0.9 to ×1.4), its **season results** and the **diversity** of its professions;
+- the **Nexus** strength: level, unlocked defenses and remaining health (a destroyed Nexus makes the value collapse);
+- **arrears** (an overdue debt costs 15%).
+
+**How the price moves**: it drifts toward the fundamental value (15% of the gap at each update) with **random noise** and the **overall market mood** (optimistic or pessimistic, pulling every price the same way). Immediate **shocks** follow events: horde repelled +2%, siege won +4% / lost −4%, siege repelled +3% / failed −3%, boss slain +3%, **Nexus destroyed −35%**. And **your orders matter**: buying 10% of the capital lifts the price by 8%, selling lowers it.
+
+**Buying and selling**: **outside** players buy shares (`/bourse acheter <guild> <shares>`, 100 per player, 49% of the capital at most) and sell them back to the guild at 95% of the price, **after holding them 24 h** and never for more than 3 times what they paid. Every 6 hours, **20% of the guild's profit** (rise of its equity) is paid to shareholders **pro rata to their shares**. `/bourse` shows prices (▲▼ over 24 h), `/bourse portefeuille` your shares; the website's **Bourse** page shows prices, change and mini charts. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement. Every factor is adjustable in `bourse.*` (`bourse.weights.*`).
 
 ### ⚔ Formal wars: sieges (`/siege`)
 
@@ -500,6 +511,7 @@ The server has a public website: **`http://<server-address>:8080/`**, which upda
 | Diplomacy (*Diplomatie*) | Network of alliances, pacts, vassalages and rivalries, rivalry heat map |
 | Museum (*Musée*) | Guild trophies, every achievement with its rarity, latest unlocks |
 | Ages (*Âges*) | Timeline on a real time axis (guilds can be hidden one by one) and each guild's requirements for the next Age |
+| Stock exchange (*Bourse*) | Guild share prices, 24 h change, mini charts |
 | Pantheon (*Panthéon*) | Slain bosses (with the guild engraved), sieges, Court rule, week's titles |
 | Votes | Weekly elections (claim your username with a code typed in chat) |
 | Guide | All the rules, with a search box |

@@ -575,6 +575,7 @@ public class WebServer {
       map.put("/ages", html(200, HtmlPages.page(name, "ages", "Frise des Âges", ExtraPages.ages(s, x), s, live, raid)));
       map.put("/guide", html(200, HtmlPages.page(name, "guide", "Guide du joueur", ExtraPages.guide(name), s, 0, raid)));
       map.put("/votes", html(200, HtmlPages.page(name, "votes", "Élections de la semaine", WebGame.votes(this.votes == null || this.votes.enabled()), s, 0, raid)));
+      map.put("/bourse", html(200, HtmlPages.page(name, "bourse", "La bourse", WebGame.bourse(this.plugin), s, live, raid)));
       map.put("/pantheon", html(200, HtmlPages.page(name, "pantheon", "Panthéon", WebGame.pantheon(this.plugin), s, 0, raid)));
       map.put("/assets/votes.js", new Page(200, JS, WebGame.VOTES_JS.getBytes(StandardCharsets.UTF_8)));
       map.put("/api/stats.json", new Page(200, JSON, HtmlPages.statsJson(s).getBytes(StandardCharsets.UTF_8)));

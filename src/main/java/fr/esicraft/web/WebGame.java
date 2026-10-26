@@ -30,6 +30,60 @@ final class WebGame {
       return HtmlPages.esc(String.valueOf(o));
    }
 
+   /** Page de la bourse : cours, variation sur 24 h, mini-graphique et facteurs de valeur de chaque guilde cotée. */
+   static String bourse(EsicraftPlugin plugin) {
+      StringBuilder b = new StringBuilder("<section class=\"hero\"><h1>📈 La bourse des guildes</h1><p>Le cours de chaque action suit la valeur de la guilde (richesse, territoire, effectif, "
+         + "réputation de ses membres, résultats de la saison, force du Nexus, diversité des métiers, Âge), l'humeur du marché, les événements (raids, sièges) et les ordres des investisseurs.</p></section>");
+      var quotes = plugin.getBourse().quotes();
+      double mood = plugin.getBourse().moodValue();
+      b.append("<p style=\"margin:14px 0\">Humeur du marché : <b>").append(mood > 0.05 ? "optimiste" : mood < -0.05 ? "pessimiste" : "neutre").append("</b> (")
+         .append(String.format(Locale.ROOT, "%+.1f", mood * 100)).append(" %)</p>");
+      if (quotes.isEmpty()) {
+         return b.append("<div class=\"card\"><p class=\"empty\">Aucune guilde n'est cotée pour l'instant (Âge 4 requis, <b>/bourse ouvrir</b> en jeu).</p></div>").toString();
+      }
+
+      b.append("<div class=\"card\"><table class=\"tbl\"><thead><tr><th>Guilde</th><th>Cours</th><th>24 h</th><th>Évolution</th><th>Âge</th><th>Réputation moy.</th><th>Nexus</th><th>Parts libres</th></tr></thead><tbody>");
+      for (var q : quotes) {
+         double ch = q.change24();
+         b.append("<tr><td>").append(cell(q.guildName())).append("</td><td><b>").append(String.format(Locale.ROOT, "%.2f", q.price())).append("</b></td><td style=\"color:")
+            .append(ch > 0.0005 ? "#2e9e5b" : ch < -0.0005 ? "#d04a4a" : "inherit").append("\">").append(ch > 0.0005 ? "▲ " : ch < -0.0005 ? "▼ " : "■ ")
+            .append(String.format(Locale.ROOT, "%+.1f", ch * 100)).append(" %</td><td>").append(spark(q.spark(), ch)).append("</td>");
+         var f = q.fund();
+         if (f != null) {
+            b.append("<td>").append(f.age()).append("</td><td>❤ ").append(String.format(Locale.ROOT, "%.1f", f.avgRep())).append("</td><td>niv. ").append(f.techLevel()).append(" · ")
+               .append((int)Math.round(f.nexusPct() * 100)).append(" %</td>");
+         } else {
+            b.append("<td>—</td><td>—</td><td>—</td>");
+         }
+
+         b.append("<td>").append(q.free()).append(" / ").append(q.total()).append("</td></tr>");
+      }
+
+      return b.append("</tbody></table></div>").toString();
+   }
+
+   private static String spark(List<Double> pts, double change) {
+      if (pts.size() < 2) {
+         return "—";
+      }
+
+      double min = Double.MAX_VALUE;
+      double max = -Double.MAX_VALUE;
+      for (double p : pts) {
+         min = Math.min(min, p);
+         max = Math.max(max, p);
+      }
+
+      double span = Math.max(0.0001, max - min);
+      StringBuilder pl = new StringBuilder();
+      for (int i = 0; i < pts.size(); i++) {
+         pl.append(String.format(Locale.ROOT, "%.1f,%.1f ", i * 100.0 / (pts.size() - 1), 22.0 - (pts.get(i) - min) / span * 20.0));
+      }
+
+      return "<svg viewBox=\"0 0 100 24\" width=\"110\" height=\"26\" role=\"img\" aria-label=\"évolution du cours\"><polyline fill=\"none\" stroke=\""
+         + (change >= 0 ? "#2e9e5b" : "#d04a4a") + "\" stroke-width=\"2\" points=\"" + pl + "\"/></svg>";
+   }
+
    static String pantheon(EsicraftPlugin plugin) {
       var db = plugin.getDataManager().getStorage();
       StringBuilder b = new StringBuilder("<section class=\"hero\"><h1>🏛 Panthéon</h1><p>Les exploits gravés dans la pierre : boss terrassés, guerres formelles et verdicts du Tribunal.</p></section>");
