@@ -415,14 +415,22 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                      + String.format("%.2f", nextClaimCost)
                      + " pièces&8)"
                );
-               ChatUtil.sendRaw(player, "&7Banque de Guilde : &a" + String.format("%.2f", guild.getBankBalance()) + " pièces");
+               Guild viewerGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+               boolean insider = viewerGuild != null && (viewerGuild.getId().equals(guild.getId()) || this.plugin.getTreatyManager().between(viewerGuild.getId(), guild.getId()) != null)
+                  || player.hasPermission("esicraft.admin");
+               if (insider || this.plugin.getConfig().getBoolean("web.show-guild-banks", true)) {
+                  ChatUtil.sendRaw(player, "&7Banque de Guilde : &a" + String.format("%.2f", guild.getBankBalance()) + " pièces");
+               }
+
                for (String line : this.plugin.getSynergy().describe(guild)) {
                   ChatUtil.sendRaw(player, line);
                }
 
                ChatUtil.sendRaw(
                   player,
-                  "&7Nexus : " + (guild.hasNexus() ? "&a" + guild.getNexus().getCurrentHealth() + "/" + guild.getNexus().getMaxHealth() + " PV" : "&cNon posé")
+                  "&7Nexus : " + (guild.hasNexus()
+                     ? (insider || this.plugin.getConfig().getBoolean("web.show-nexus-health", false) ? "&a" + guild.getNexus().getCurrentHealth() + "/" + guild.getNexus().getMaxHealth() + " PV" : "&aPosé")
+                     : "&cNon posé")
                );
                ChatUtil.sendRaw(player, "&8&m----------------------------------------");
                break;

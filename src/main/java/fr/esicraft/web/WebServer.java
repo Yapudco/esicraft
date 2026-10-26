@@ -158,7 +158,7 @@ public class WebServer {
          for (Map.Entry<UUID, GuildRole> m : g.getMembers().entrySet()) {
             OfflinePlayer op = Bukkit.getOfflinePlayer(m.getKey());
             Player online = op.getPlayer();
-            boolean visible = online != null && !isVanished(online);
+            boolean visible = online != null && !isVanished(online) && this.plugin.getDisguiseManager().get(m.getKey()) == null;
             PlayerData pd = this.plugin.getDataManager().getPlayerData(m.getKey());
             members.add(new WebSnapshot.MemberView(op.getName() != null ? op.getName() : "?", HtmlPages.plain(m.getValue().getDisplayName()),
                pd != null && pd.getRace() != null ? HtmlPages.plain(pd.getRace().getDisplayName()) : null, visible));
@@ -242,8 +242,13 @@ public class WebServer {
             continue;
          }
 
-         int defenders = 0;
+         boolean showDefenders = this.plugin.getConfig().getBoolean("web.show-raid-defenders", false);
+         int defenders = showDefenders ? 0 : -1;
          for (UUID m : t.getMembers().keySet()) {
+            if (!showDefenders) {
+               break;
+            }
+
             Player p = Bukkit.getPlayer(m);
             if (p != null && !isVanished(p) && t.isClaimed(fr.esicraft.util.ChunkKey.from(p.getLocation().getChunk()))) {
                defenders++;
