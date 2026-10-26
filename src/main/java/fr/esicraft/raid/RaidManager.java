@@ -176,7 +176,7 @@ public class RaidManager implements Listener {
             long now = System.currentTimeMillis();
             long cooldownMs = isHegemony ? 120000L : (long)(this.plugin.getConfig().getInt("raids.cooldown-minutes-between-raids", 30) * 60) * 1000L;
             Long lastRaid = this.guildRaidCooldowns.get(targetGuild.getId());
-            if (lastRaid != null && now - lastRaid < cooldownMs) {
+            if (lastRaid != null && now - lastRaid < cooldownMs && !this.plugin.bypassCooldowns(buyer)) {
                long remainingMs = cooldownMs - (now - lastRaid);
                long remainingMin = remainingMs / 60000L;
                long remainingSec = remainingMs % 60000L / 1000L;
@@ -423,7 +423,7 @@ public class RaidManager implements Listener {
                long now = System.currentTimeMillis();
                long cooldownMs = isHegemony ? 120000L : (long)(this.plugin.getConfig().getInt("raids.cooldown-minutes-between-raids", 30) * 60) * 1000L;
                Long lastRaid = this.guildRaidCooldowns.get(targetGuild.getId());
-               if (lastRaid != null && now - lastRaid < cooldownMs) {
+               if (lastRaid != null && now - lastRaid < cooldownMs && !this.plugin.bypassCooldowns(buyer)) {
                   long remainingMs = cooldownMs - (now - lastRaid);
                   long remainingMin = remainingMs / 60000L;
                   long remainingSec = remainingMs % 60000L / 1000L;

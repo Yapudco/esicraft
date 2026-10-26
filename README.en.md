@@ -507,6 +507,10 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/game reset` | Reset **everything**: guilds, Nexus, fortunes, achievements, statistics, contracts, reputation, mentoring, cosmetics, journal, curves, Ages, season, loans and the website (only language preferences are kept) |
 | `/race set <player> <race>` | Change a player's profession |
 
+### Operators and cooldowns
+
+**Operators** (`op`) are not subject to **any cooldown**: disguise (30 min), call for help (10 min), a guild's post-raid protection, Nexus healing (30 s and the block after an attack), profession change (24 h), specialization change (7 days), train line search, `/merci` (once a day per person) and the PvP bounty anti-farm delay. Setting: `admin.ops-bypass-cooldowns` (`true` by default).
+
 ### Built-in anti-cheat
 
 - Mining bonuses never apply to a block placed by a player, or on another guild's land.

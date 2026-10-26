@@ -138,7 +138,7 @@ public class DisguiseManager implements Listener {
 
       long now = System.currentTimeMillis();
       Long cd = this.cooldowns.get(uuid);
-      if (cd != null && cd > now) {
+      if (cd != null && cd > now && !this.plugin.bypassCooldowns(player)) {
          done.accept("&cVotre prochain déguisement sera prêt dans &e" + ((cd - now) / 60000L + 1L) + " min&c.");
          return;
       }

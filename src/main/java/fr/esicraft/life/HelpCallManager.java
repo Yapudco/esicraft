@@ -67,7 +67,7 @@ public class HelpCallManager {
 
       long now = System.currentTimeMillis();
       Long last = this.lastCall.get(guild.getId());
-      if (last != null && now - last < CALL_COOLDOWN_MS) {
+      if (last != null && now - last < CALL_COOLDOWN_MS && !this.plugin.bypassCooldowns(caller)) {
          return "&cVotre guilde a déjà appelé à l'aide il y a moins de 10 minutes.";
       }
 

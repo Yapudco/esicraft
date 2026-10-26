@@ -354,6 +354,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       return this.helpCalls;
    }
 
+   /** Les opérateurs (op) ne sont soumis à aucun délai d'attente (réglable : {@code admin.ops-bypass-cooldowns}). */
+   public boolean bypassCooldowns(org.bukkit.entity.Player player) {
+      return player != null && player.isOp() && this.getConfig().getBoolean("admin.ops-bypass-cooldowns", true);
+   }
+
    public fr.esicraft.life.SkinLookup getSkins() {
       return this.skins;
    }

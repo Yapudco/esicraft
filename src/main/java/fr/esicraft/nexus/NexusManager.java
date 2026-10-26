@@ -652,6 +652,10 @@ public class NexusManager {
    }
 
    private boolean isHealOnCooldown(Guild guild, Player player) {
+      if (this.plugin.bypassCooldowns(player)) {
+         return false;
+      }
+
       long cooldownMs = this.plugin.getConfig().getLong("guilds.nexus.heal-cooldown-seconds", 30L) * 1000L;
       Long last = this.lastPlayerHeal.get(guild.getId());
       if (last != null && System.currentTimeMillis() - last < cooldownMs) {
@@ -674,7 +678,7 @@ public class NexusManager {
             }
 
             return false;
-         } else if (this.wasNexusRecentlyAttacked(guild, this.plugin.getConfig().getLong("nexus.heal-block-seconds", 120L) * 1000L)) {
+         } else if (!this.plugin.bypassCooldowns(player) && this.wasNexusRecentlyAttacked(guild, this.plugin.getConfig().getLong("nexus.heal-block-seconds", 120L) * 1000L)) {
             // Pas de soin pendant ni juste après une attaque de joueurs (2 500 PV toutes les 30 s annuleraient n'importe quel assaut).
             if (player != null) {
                ChatUtil.sendMessage(player, "&c❌ Le Nexus a été attaqué il y a moins de &e" + this.plugin.getConfig().getLong("nexus.heal-block-seconds", 120L) + " s&c : impossible de le soigner maintenant.");

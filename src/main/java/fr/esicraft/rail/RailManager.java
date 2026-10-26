@@ -270,7 +270,7 @@ public class RailManager {
 
       long now = System.currentTimeMillis();
       Long last = this.searchCooldown.get(player.getUniqueId());
-      if (last != null && now - last < 4000L) {
+      if (last != null && now - last < 4000L && !this.plugin.bypassCooldowns(player)) {
          return SearchStatus.COOLDOWN;
       }
 

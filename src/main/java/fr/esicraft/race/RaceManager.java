@@ -76,7 +76,7 @@ public class RaceManager {
                if (!forcedByAdmin) {
                   long cooldownMs = this.plugin.getConfig().getLong("races.change-cooldown-hours", 24L) * 3600000L;
                   long sinceLast = System.currentTimeMillis() - data.getLastRaceChangeTimestamp();
-                  if (previousRace != Race.NONE && data.getLastRaceChangeTimestamp() > 0L && sinceLast < cooldownMs) {
+                  if (previousRace != Race.NONE && data.getLastRaceChangeTimestamp() > 0L && sinceLast < cooldownMs && !this.plugin.bypassCooldowns(player)) {
                      long remainingMin = (cooldownMs - sinceLast + 59999L) / 60000L;
                      ChatUtil.sendMessage(
                         player, "&c❌ Reconversion impossible pour le moment : prochain changement de métier dans &e" + remainingMin / 60L + "h " + remainingMin % 60L + "min&c."

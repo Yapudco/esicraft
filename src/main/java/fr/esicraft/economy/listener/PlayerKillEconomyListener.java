@@ -49,7 +49,7 @@ public class PlayerKillEconomyListener implements Listener {
             }
 
             Long lastKill = this.lastPvPKillTimes.get(pairKey);
-            if (lastKill != null && now - lastKill < 120000L) {
+            if (lastKill != null && now - lastKill < 120000L && !this.plugin.bypassCooldowns(killer)) {
                ChatUtil.sendMessage(killer, "&c⚠️ Anti-Farm : Vous avez combattu &e" + victim.getName() + " &ctrop récemment pour obtenir une nouvelle prime.");
             } else {
                this.lastPvPKillTimes.put(pairKey, now);
