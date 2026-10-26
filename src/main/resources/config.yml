@@ -348,7 +348,7 @@ web:
   port: 80                     # Linux : un port < 1024 demande root ou setcap ; sinon mettre 8080
   bind: "0.0.0.0"
   server-name: "Esicraft"
-  refresh-seconds: 15
+  refresh-seconds: 30          # Rafraîchissement du site (15 auparavant) : le coût est lisible dans le thread principal
   show-guild-banks: true
   show-balances: true          # Pièces des joueurs en ligne + classement des plus riches
   show-nexus-health: false     # Les PV du Nexus aideraient les attaquants : masqué par défaut

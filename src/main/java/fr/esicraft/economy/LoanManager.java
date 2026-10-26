@@ -593,25 +593,47 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       }
 
       String key = pairKey(guild.getId(), other.getId());
-      Inventory inv = this.chests.computeIfAbsent(key, k -> this.loadChest(k, guild.getName(), other.getName()));
-      p.openInventory(inv);
-      ChatUtil.playSound(p, Sound.BLOCK_CHEST_OPEN, 1.0F, 1.0F);
+      Inventory ready = this.chests.get(key);
+      if (ready != null) {
+         p.openInventory(ready);
+         ChatUtil.playSound(p, Sound.BLOCK_CHEST_OPEN, 1.0F, 1.0F);
+         return;
+      }
+
+      // Première ouverture : le contenu est lu en base en tâche de fond, puis le coffre s'ouvre sur le thread principal.
+      String nameA = guild.getName();
+      String nameB = other.getName();
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+         ItemStack[] items = this.readChestItems(key);
+         Bukkit.getScheduler().runTask(this.plugin, () -> {
+            Inventory inv = this.chests.computeIfAbsent(key, k -> this.buildChest(k, nameA, nameB, items));
+            if (p.isOnline()) {
+               p.openInventory(inv);
+               ChatUtil.playSound(p, Sound.BLOCK_CHEST_OPEN, 1.0F, 1.0F);
+            }
+         });
+      });
    }
 
-   private Inventory loadChest(String key, String nameA, String nameB) {
-      ChestHolder holder = new ChestHolder(key);
-      Inventory inv = Bukkit.createInventory(holder, 54, ChatUtil.component("&8» &6Coffre commun · " + nameA + " & " + nameB));
-      holder.inventory = inv;
+   private ItemStack[] readChestItems(String key) {
       List<Object[]> rows = this.plugin.getDataManager().getStorage().select("SELECT data FROM shared_chests WHERE pair = ?;", 1, key);
       if (!rows.isEmpty() && rows.get(0)[0] != null) {
          try {
-            ItemStack[] items = ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode((String)rows.get(0)[0]));
-            for (int i = 0; i < items.length && i < inv.getSize(); i++) {
-               inv.setItem(i, items[i]);
-            }
+            return ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode((String)rows.get(0)[0]));
          } catch (RuntimeException e) {
             this.plugin.getLogger().warning("Coffre commun illisible (" + key + ") : " + e.getMessage());
          }
+      }
+
+      return new ItemStack[0];
+   }
+
+   private Inventory buildChest(String key, String nameA, String nameB, ItemStack[] items) {
+      ChestHolder holder = new ChestHolder(key);
+      Inventory inv = Bukkit.createInventory(holder, 54, ChatUtil.component("&8» &6Coffre commun · " + nameA + " & " + nameB));
+      holder.inventory = inv;
+      for (int i = 0; i < items.length && i < inv.getSize(); i++) {
+         inv.setItem(i, items[i]);
       }
 
       return inv;
