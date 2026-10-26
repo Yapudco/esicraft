@@ -442,6 +442,9 @@ public class GuildManager {
          }
 
          cost *= this.plugin.getSynergy().claimCostMultiplier(guild);
+         if (this.plugin.getCourt() != null && this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.BUILD_BONUS)) {
+            cost *= 0.75;
+         }
 
          return cost;
       }

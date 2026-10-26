@@ -111,6 +111,8 @@ public final class EsicraftPlugin extends JavaPlugin {
    private ReputationManager reputation;
    private MentorManager mentors;
    private RansomManager ransom;
+   private fr.esicraft.game.CourtManager court;
+   private fr.esicraft.game.TruceManager truce;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -147,6 +149,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation = new ReputationManager(this);
       this.mentors = new MentorManager(this);
       this.ransom = new RansomManager(this);
+      this.court = new fr.esicraft.game.CourtManager(this);
+      this.truce = new fr.esicraft.game.TruceManager(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -164,6 +168,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation.init();
       this.mentors.init();
       this.ransom.start();
+      this.court.init();
+      this.truce.start();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -184,6 +190,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.ransom, this);
       pm.registerEvents(this.cosmetics, this);
       pm.registerEvents(this.loans, this);
+      pm.registerEvents(this.truce, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -276,6 +283,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("parrain")).setTabCompleter(this.mentors);
       Objects.requireNonNull(this.getCommand("rancon")).setExecutor(this.ransom);
       Objects.requireNonNull(this.getCommand("rancon")).setTabCompleter(this.ransom);
+      Objects.requireNonNull(this.getCommand("vote")).setExecutor(this.court);
       Objects.requireNonNull(this.getCommand("banque")).setExecutor(this.loans);
       Objects.requireNonNull(this.getCommand("banque")).setTabCompleter(this.loans);
       Objects.requireNonNull(this.getCommand("esicraft")).setExecutor(new EsicraftCommand(this));
@@ -389,6 +397,14 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public MentorManager getMentors() {
       return this.mentors;
+   }
+
+   public fr.esicraft.game.CourtManager getCourt() {
+      return this.court;
+   }
+
+   public fr.esicraft.game.TruceManager getTruce() {
+      return this.truce;
    }
 
    public RansomManager getRansom() {

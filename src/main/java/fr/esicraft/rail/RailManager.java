@@ -192,7 +192,8 @@ public class RailManager {
       }
 
       Double t = this.tolls.get(guildId);
-      return t != null ? t : this.plugin.getConfig().getDouble("rail.default-toll", 2.0);
+      double toll = t != null ? t : this.plugin.getConfig().getDouble("rail.default-toll", 2.0);
+      return this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.TOLL_TAX) ? toll * 2.0 : toll;
    }
 
    public void setToll(String guildId, double toll) {

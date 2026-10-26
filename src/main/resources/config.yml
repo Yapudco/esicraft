@@ -253,10 +253,30 @@ events:
     top-diamonds: 3                      # Diamants du meilleur combattant (8 auparavant)
     top-star-chance: 0.2                 # Probabilité d'une Étoile du Nether (garantie auparavant)
     xp: 500                              # XP lâchée à la mort (2 000 auparavant)
+    hp-per-player: 300.0                 # PV du boss par joueur proche (rayon 150) au moment de l'apparition
+    min-hp: 400.0                        # PV minimum
+    max-hp: 1000.0                       # PV maximum (limite du jeu : 1024)
+    max-attack: 22.0                     # Dégâts de base maximum (8 + 2 par joueur)
+    countdown-seconds: 120               # Compte à rebours avant l'éveil (titre, cor, direction et distance)
+    race-bonus: 0.25                     # +25 % de dégâts du métier favori contre le boss de la semaine (Nain: Cendres, Rôdeur: Forêt, Forgeron: Glaces)
+    guild-bonus: 500.0                   # Pièces versées à la banque de la guilde du meilleur combattant (nom gravé sur le site)
+    heroic-chance: 0.5                   # Chance d'un boss héroïque, une fois la première victoire obtenue
+    heroic-hp-multiplier: 1.5
+    heroic-damage-multiplier: 1.3
+    heroic-pool-multiplier: 1.5
+    heroic-star-chance: 0.35
   blood-moon-extra-spawn-chance: 0.25   # Part des monstres naturels dupliqués pendant la Lune de sang (0.5 doublait les fermes à monstres)
   enabled: true
   min-interval-minutes: 1440   # 24 h minimum entre deux événements
   max-interval-minutes: 2880   # 48 h maximum : un événement tous les 1 à 2 jours
+
+# Trêve hebdomadaire : plus aucun PvP pendant la plage (heure locale du serveur)
+truce:
+  enabled: true
+  days: [FRIDAY, SATURDAY]
+  start-hour: 21
+  start-minute: 0
+  duration-minutes: 60
 
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:

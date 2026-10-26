@@ -120,7 +120,7 @@ public class MarketManager {
                double baseTaxRate = this.plugin.getConfig().getDouble("market.tax-percentage", 5.0) / 100.0;
                Guild sellerGuild = this.plugin.getGuildManager().getGuildByPlayer(listing.getSellerUuid());
                boolean isMerchantSyndicate = sellerGuild != null && sellerGuild.getSpecialization() == GuildSpecialization.MERCHANT_SYNDICATE;
-               double effectiveTaxRate = isMerchantSyndicate ? 0.0 : baseTaxRate;
+               double effectiveTaxRate = isMerchantSyndicate || this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.FREE_MARKET) ? 0.0 : baseTaxRate;
                double sellerEarnings = Math.min(listing.getPrice(), listing.getPrice() * (1.0 - effectiveTaxRate));
 
                this.plugin.getDataManager().creditPlayer(listing.getSellerUuid(), sellerEarnings);
