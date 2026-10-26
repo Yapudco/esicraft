@@ -190,7 +190,7 @@ Every **specialization change** gives the guild the right to **move its Nexus on
 
 ### 🎰 Nexus Russian roulette (`/nexus gamble`)
 
-The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid): **50%** the Nexus gains **+1,000 max HP** (cumulative bonus capped at **3,000**) and **2,000 coins** go to the bank; **50%** it loses **1,500 HP** (it always survives at 1 HP) and **500 max HP** of the roulette bonus, the bank loses **1,000 coins**, and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
+The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid): **50%** (heads) the Nexus gains **+1,000 max HP** and **2,000 coins** go to the bank; **50%** (tails) it loses **1,000 max HP** and **1,500 HP** (it always survives at 1 HP, max HP never below 1,000), the bank loses **2,000 coins** (up to its balance), and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
 
 ---
 

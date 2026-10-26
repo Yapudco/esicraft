@@ -17,31 +17,24 @@ import org.bukkit.entity.Player;
 
 /**
  * Roulette russe du Nexus ({@code /nexus gamble}) : le chef de guilde, face au Nexus, tente un coup de poker ultime.
- * Pile : +1 000 PV max (cumul plafonné par {@code nexus.gamble.max-bonus-hp}) et 2 000 pièces à la banque.
- * Face : −1 500 PV, −500 PV max (bonus de roulette repris), 1 000 pièces perdues par la banque et une mini-horde de pillards sans préavis.
- * Le Nexus survit toujours (1 PV minimum). Le pari est donc risqué sur la durée et le bonus de vie ne peut pas croître sans limite.
+ * Vrai 50/50, enjeux symétriques. Pile : +1 000 PV max et 2 000 pièces à la banque. Face : −1 000 PV max, −1 500 PV, 2 000 pièces perdues par la banque
+ * et une mini-horde de pillards sans préavis. Le Nexus survit toujours (1 PV minimum, PV max jamais sous {@code nexus.gamble.min-max-hp}).
  */
 public class NexusGamble {
    private final EsicraftPlugin plugin;
    /** Chef ayant demandé confirmation → échéance. */
    private final Map<UUID, Long> pending = new ConcurrentHashMap<>();
    private final Map<String, Long> last = new ConcurrentHashMap<>();
-   /** Bonus de PV max cumulé par la roulette (guilde → PV). */
-   private final Map<String, Integer> bonus = new ConcurrentHashMap<>();
 
    public NexusGamble(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }
 
    public void init() {
-      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'gamble:%' OR k LIKE 'gamble_bonus:%';", 2)) {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'gamble:%';", 2)) {
          String k = String.valueOf(row[0]);
          try {
-            if (k.startsWith("gamble_bonus:")) {
-               this.bonus.put(k.substring(13), Integer.parseInt(String.valueOf(row[1])));
-            } else {
-               this.last.put(k.substring(7), Long.parseLong(String.valueOf(row[1])));
-            }
+            this.last.put(k.substring(7), Long.parseLong(String.valueOf(row[1])));
          } catch (NumberFormatException ignored) {
          }
       }
@@ -86,7 +79,7 @@ public class NexusGamble {
       Long ask = this.pending.get(player.getUniqueId());
       if (ask == null || ask < now) {
          this.pending.put(player.getUniqueId(), now + 15000L);
-         ChatUtil.sendMessage(player, "&4&l☠ ROULETTE RUSSE &c: 50 % de gagner &a+1000 PV max &cet &62000 pièces&c ; 50 % de perdre &41500 PV&c, &4500 PV max&c, &61000 pièces de la banque&c et de subir une horde de pillards. Retapez &e/nexus gamble &cdans 15 s pour confirmer.");
+         ChatUtil.sendMessage(player, "&4&l☠ ROULETTE RUSSE &c: pile ou face à 50/50. Pile : &a+1000 PV max &cet &62000 pièces&c. Face : &4-1000 PV max&c, &4-1500 PV&c, &6-2000 pièces de la banque&c et une horde de pillards. Retapez &e/nexus gamble &cdans 15 s pour confirmer.");
          return;
       }
 
@@ -98,44 +91,37 @@ public class NexusGamble {
       Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.resolve(player, guild, nexus, loc), 40L);
    }
 
-   private void setBonus(String guildId, int value) {
-      this.bonus.put(guildId, value);
-      this.kvSet("gamble_bonus:" + guildId, String.valueOf(value));
-   }
-
    private void resolve(Player player, Guild guild, Nexus nexus, Location loc) {
       if (!nexus.isAlive() || !guild.hasNexus()) {
          return;
       }
 
-      int current = this.bonus.getOrDefault(guild.getId(), 0);
+      // Vrai pile ou face : mêmes enjeux des deux côtés (PV max et pièces), la horde s'ajoute seulement à la défaite.
+      int hp = this.plugin.getConfig().getInt("nexus.gamble.stake-max-hp", 1000);
+      double stake = this.plugin.getConfig().getDouble("nexus.gamble.stake-coins", 2000.0);
       if (ThreadLocalRandom.current().nextBoolean()) {
-         int cap = this.plugin.getConfig().getInt("nexus.gamble.max-bonus-hp", 3000);
-         int gainHp = Math.max(0, Math.min(this.plugin.getConfig().getInt("nexus.gamble.win-max-hp", 1000), cap - current));
-         double coins = this.plugin.getConfig().getDouble("nexus.gamble.win-coins", 2000.0);
-         nexus.setMaxHealth(nexus.getMaxHealth() + gainHp);
-         nexus.heal(gainHp);
-         this.setBonus(guild.getId(), current + gainHp);
-         guild.depositBank(coins);
+         nexus.setMaxHealth(nexus.getMaxHealth() + hp);
+         nexus.heal(hp);
+         guild.depositBank(stake);
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, loc.clone().add(0.5, 1.0, 0.5), 80, 1.0, 1.0, 1.0, 0.3);
          loc.getWorld().playSound(loc, Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
          this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.NEXUS_GAMBLER);
-         ChatUtil.broadcast("&a&l✔ LA CHANCE SOURIT À &6" + guild.getName() + " &a: Nexus &2+" + gainHp + " PV max&a" + (gainHp == 0 ? " (plafond atteint)" : "") + " et &6+" + (long)coins + " pièces &adans la banque !");
+         ChatUtil.broadcast("&a&l✔ PILE ! LA CHANCE SOURIT À &6" + guild.getName() + " &a: Nexus &2+" + hp + " PV max&a et &6+" + (long)stake + " pièces &adans la banque !");
       } else {
+         int floor = this.plugin.getConfig().getInt("nexus.gamble.min-max-hp", 1000);
+         int lostMax = Math.max(0, Math.min(hp, nexus.getMaxHealth() - floor));
          int loss = this.plugin.getConfig().getInt("nexus.gamble.lose-hp", 1500);
-         int maxLoss = Math.min(current, this.plugin.getConfig().getInt("nexus.gamble.lose-max-hp", 500));
-         nexus.setMaxHealth(nexus.getMaxHealth() - maxLoss);
+         nexus.setMaxHealth(nexus.getMaxHealth() - lostMax);
          nexus.setCurrentHealth(Math.max(1, Math.min(nexus.getCurrentHealth() - loss, nexus.getMaxHealth())));
-         this.setBonus(guild.getId(), current - maxLoss);
-         double fine = Math.min(guild.getBankBalance(), this.plugin.getConfig().getDouble("nexus.gamble.lose-coins", 1000.0));
+         double fine = Math.min(guild.getBankBalance(), stake);
          guild.withdrawBank(fine);
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, loc.clone().add(0.5, 1.0, 0.5), 3, 1.0, 0.5, 1.0, 0.0);
          loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3.0F, 0.6F);
-         ChatUtil.broadcast("&4&l✖ LA ROULETTE A TOURNÉ CONTRE &6" + guild.getName() + " &4: Nexus &c-" + loss + " PV&4, &c-" + (long)fine + " pièces &4et une horde de pillards surgit !");
+         ChatUtil.broadcast("&4&l✖ FACE ! LA ROULETTE A TOURNÉ CONTRE &6" + guild.getName() + " &4: Nexus &c-" + loss + " PV&4, &c-" + lostMax + " PV max&4, &c-" + (long)fine + " pièces &4et une horde de pillards surgit !");
          this.spawnHorde(loc);
       }
    }
@@ -167,6 +153,5 @@ public class NexusGamble {
    public void clear() {
       this.pending.clear();
       this.last.clear();
-      this.bonus.clear();
    }
 }

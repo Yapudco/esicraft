@@ -363,12 +363,10 @@ nexus:
   relocation-days: 7               # Durée du droit de déplacer le Nexus (/nexus move) après un changement de spécialisation
   gamble:                          # Roulette russe (/nexus gamble)
     cooldown-hours: 72
-    win-max-hp: 1000
-    win-coins: 2000.0
-    max-bonus-hp: 3000             # Bonus de PV max cumulé au plus par la roulette
-    lose-hp: 1500                  # Le Nexus survit toujours (1 PV minimum)
-    lose-max-hp: 500               # PV max repris (du bonus de roulette uniquement)
-    lose-coins: 1000.0             # Pièces retirées de la banque en cas de défaite
+    stake-max-hp: 1000             # PV max gagnés (pile) ou perdus (face)
+    stake-coins: 2000.0            # Pièces gagnées (pile) ou retirées de la banque (face)
+    lose-hp: 1500                  # PV perdus en plus à la défaite (le Nexus survit toujours à 1 PV)
+    min-max-hp: 1000               # Les PV max ne descendent jamais sous cette valeur
     horde-size: 6
 
 economy:

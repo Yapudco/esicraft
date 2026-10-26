@@ -187,7 +187,7 @@ Chaque **changement de spécialisation** offre à la guilde le droit de **dépla
 
 ### 🎰 Roulette russe du Nexus (`/nexus gamble`)
 
-Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid) : **50 %** le Nexus gagne **+1 000 PV max** (bonus cumulé plafonné à **3 000**) et **2 000 pièces** vont à la banque ; **50 %** il perd **1 500 PV** (il survit toujours à 1 PV) et **500 PV max** du bonus de roulette, la banque perd **1 000 pièces**, et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
+Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid) : **50 %** (pile) le Nexus gagne **+1 000 PV max** et **2 000 pièces** vont à la banque ; **50 %** (face) il perd **1 000 PV max** et **1 500 PV** (il survit toujours à 1 PV, PV max jamais sous 1 000), la banque perd **2 000 pièces** (dans la limite de son solde), et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
 
 ---
 
