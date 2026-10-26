@@ -109,6 +109,14 @@ public class Guild {
    }
 
    /** Effectif utilisé pour les quotas d'Âge : le pic de l'Âge en cours (empêche de faire sortir ses membres avant de déposer). */
+   public int getPeakMembers() {
+      return this.peakMembersThisAge;
+   }
+
+   public void setPeakMembers(int peak) {
+      this.peakMembersThisAge = Math.max(this.members.size(), Math.max(1, peak));
+   }
+
    public int getEffectiveMemberCount() {
       this.peakMembersThisAge = Math.max(this.peakMembersThisAge, this.members.size());
       return Math.max(1, this.peakMembersThisAge);

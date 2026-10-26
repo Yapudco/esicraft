@@ -182,10 +182,15 @@ ages:
       DEAD_BUSH: 1
 
 # Paramètres des Guildes et Claims
+restrictions:
+  block-use: true                  # L'équipement verrouillé (métier / Âge) ne peut ni frapper ni miner, même acheté ou trouvé
+
 claims:
   enemy-buffer-chunks: 1          # Distance minimale (en chunks) entre un nouveau claim et le territoire d'une guilde sans traité avec la nôtre
 
 guilds:
+  spec-change-min-hours: 2          # Temps de jeu minimal d'un nouveau membre pour débloquer un changement de spécialisation
+  spec-change-cooldown-days: 7      # Délai minimal entre deux changements de spécialisation
   officer-daily-spend-cap: 3000.0   # Dépenses quotidiennes maximales d'un officier (claims, pièges) ; le chef n'a pas de limite (0 = aucune)
   creation-cost: 500.0 # Monnaie
   max-members-default: 10

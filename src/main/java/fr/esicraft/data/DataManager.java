@@ -40,6 +40,17 @@ public class DataManager {
          this.plugin.getGuildManager().registerGuild(g);
       }
 
+      // Le pic de membres de l'Âge (quotas de dépôt) survit aux redémarrages : on ne baisse plus les exigences en expulsant puis en redémarrant.
+      for (Object[] row : this.storage.select("SELECT k, v FROM kv WHERE k LIKE 'peak:%';", 2)) {
+         Guild g = this.plugin.getGuildManager().getGuildById(((String)row[0]).substring(5));
+         if (g != null) {
+            try {
+               g.setPeakMembers(Integer.parseInt((String)row[1]));
+            } catch (NumberFormatException ignored) {
+            }
+         }
+      }
+
       Map<String, MarketListing> loadedListings = this.storage.loadAllMarketListings();
 
       for (MarketListing listing : loadedListings.values()) {
@@ -121,7 +132,10 @@ public class DataManager {
 
    public void saveGuild(Guild guild) {
       if (guild != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.saveGuild(guild));
+         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            this.storage.saveGuild(guild);
+            this.storage.exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "peak:" + guild.getId(), String.valueOf(guild.getPeakMembers()));
+         });
       }
    }
 

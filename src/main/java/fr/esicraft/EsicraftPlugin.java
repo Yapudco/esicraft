@@ -102,6 +102,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private HelpCallManager helpCalls;
    private DisguiseManager disguiseManager;
    private CombatManager combatManager;
+   private AgeDimensionListener ageDimension;
    private BalanceManager balance;
    private LoanManager loans;
    private ReputationManager reputation;
@@ -192,7 +193,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new GUIListener(this), this);
       pm.registerEvents(new ChatFormatListener(this), this);
       pm.registerEvents(new PlayerKillEconomyListener(this), this);
-      pm.registerEvents(new AgeDimensionListener(this), this);
+      this.ageDimension = new AgeDimensionListener(this);
+      pm.registerEvents(this.ageDimension, this);
       this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
       this.registerCommands();
       new RaceBuffTask(this, this.specializationRules).runTaskTimer(this, 40L, 40L);
@@ -331,6 +333,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public HelpCallManager getHelpCalls() {
       return this.helpCalls;
+   }
+
+   public AgeDimensionListener getAgeDimension() {
+      return this.ageDimension;
    }
 
    public BalanceManager getBalance() {

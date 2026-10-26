@@ -169,6 +169,25 @@ public class SpecializationRulesListener implements Listener {
       }
    }
 
+   /** Une potion de niveau II jetée par un allié ne doit pas affecter un membre de l'Industrie Souterraine. */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onSplashAffect(org.bukkit.event.entity.PotionSplashEvent event) {
+      if (event.getPotion().getItem().getItemMeta() instanceof PotionMeta meta && isLevelTwo(meta)) {
+         for (org.bukkit.entity.LivingEntity target : event.getAffectedEntities()) {
+            if (target instanceof Player victim && this.specOf(victim) == GuildSpecialization.UNDERGROUND_INDUSTRY) {
+               event.setIntensity(victim, 0.0);
+            }
+         }
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onBeacon(com.destroystokyo.paper.event.block.BeaconEffectEvent event) {
+      if (event.getEffect().getAmplifier() >= 1 && this.specOf(event.getPlayer()) == GuildSpecialization.UNDERGROUND_INDUSTRY) {
+         event.setCancelled(true);
+      }
+   }
+
    private void deny(Player player) {
       ChatUtil.sendActionbar(player, "&c❌ Les potions de niveau 2 sont interdites dans l'&6Industrie Souterraine &c!");
       ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);

@@ -185,6 +185,12 @@ public class GuildManager {
          this.guildsById.remove(guild.getId());
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
+         for (UUID memberUuid : guild.getMembers().keySet()) {
+            Player online = Bukkit.getPlayer(memberUuid);
+            if (online != null) {
+               Bukkit.getScheduler().runTask(this.plugin, () -> this.plugin.getAgeDimension().checkAndExpelIfUnderage(online));
+            }
+         }
          this.updateAllPlayerTabs();
          ChatUtil.broadcast("&c&l[Guildes] &7La guilde &c" + guild.getName() + " &7a été dissoute.");
          this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.GUILD, "La guilde " + guild.getName() + " est dissoute.", guild.getId(), null);
@@ -231,6 +237,7 @@ public class GuildManager {
             this.updatePlayerTab(player);
             this.plugin.getRaceManager().applyRaceAttributes(player, this.plugin.getRaceManager().getRace(player));
             this.plugin.getDataManager().saveGuild(guild);
+            this.plugin.getAgeDimension().checkAndExpelIfUnderage(player);
             ChatUtil.sendMessage(player, "&aVous avez quitté la guilde &6" + guild.getName() + " &aavec succès.");
 
             for (UUID memberUuid : guild.getMembers().keySet()) {
@@ -262,6 +269,8 @@ public class GuildManager {
             } else if (targetRole.ordinal() >= officerRole.ordinal()) {
                ChatUtil.sendMessage(officer, "&cVous ne pouvez pas expulser un membre ayant un rang égal ou supérieur au vôtre.");
                return false;
+            } else if (!this.canDisbandNow(guild, officer)) {
+               return false;
             } else {
                guild.removeMember(targetUuid);
                this.playerGuildMap.remove(targetUuid);
@@ -277,6 +286,7 @@ public class GuildManager {
                if (target.isOnline() && target.getPlayer() != null) {
                   this.updatePlayerTab(target.getPlayer());
                   this.plugin.getRaceManager().applyRaceAttributes(target.getPlayer(), this.plugin.getRaceManager().getRace(target.getPlayer()));
+                  this.plugin.getAgeDimension().checkAndExpelIfUnderage(target.getPlayer());
                }
 
                ChatUtil.sendMessage(officer, "&aVous avez expulsé &e" + (target.getName() != null ? target.getName() : "le joueur") + " &ade la guilde.");
@@ -727,7 +737,30 @@ public class GuildManager {
       }
    }
 
+   private long specCooldownLeftMs(Guild guild) {
+      long days = this.plugin.getConfig().getLong("guilds.spec-change-cooldown-days", 7L);
+      var rows = this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, "speccd:" + guild.getId());
+      if (days <= 0L || rows.isEmpty()) {
+         return 0L;
+      }
+
+      try {
+         return Math.max(0L, Long.parseLong((String)rows.get(0)[0]) + days * 86400000L - System.currentTimeMillis());
+      } catch (NumberFormatException e) {
+         return 0L;
+      }
+   }
+
    public boolean setSpecialization(Guild guild, GuildSpecialization spec, Player player) {
+      if (guild != null && spec != null && guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec) {
+         long left = this.specCooldownLeftMs(guild);
+         if (left > 0L) {
+            ChatUtil.sendMessage(player, "&c❌ La guilde a changé de spécialisation récemment : encore &e" + fr.esicraft.treaty.TreatyManager.formatDuration(left) + "&c d'attente.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            return false;
+         }
+      }
+
       if (guild != null && spec != null) {
          if (guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec && !guild.canChangeSpecialization()) {
             ChatUtil.sendMessage(player, "&c❌ Votre guilde ne peut pas changer de spécialisation pour le moment !");
@@ -769,6 +802,9 @@ public class GuildManager {
                GuildSpecialization oldSpec = guild.getSpecialization();
                guild.setSpecialization(spec);
                guild.setCanChangeSpecialization(false);
+               String cdKey = "speccd:" + guild.getId();
+               Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage()
+                  .exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", cdKey, String.valueOf(System.currentTimeMillis())));
                if (guild.hasNexus()) {
                   Nexus nexus = guild.getNexus();
                   int baseHealth = this.plugin.getConfig().getInt("guilds.nexus.base-health", 5000);
@@ -938,8 +974,14 @@ public class GuildManager {
                   this.playerGuildMap.put(player.getUniqueId(), guild.getId());
                   if (!guild.isHistoricalMember(player.getUniqueId())) {
                      guild.addHistoricalMember(player.getUniqueId());
-                     guild.setCanChangeSpecialization(true);
-                     ChatUtil.sendMessage(player, "&a✨ Votre arrivée en tant que nouveau membre débloque un changement de spécialisation pour la guilde !");
+                     long hours = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 72000L;
+                     long minHours = this.plugin.getConfig().getLong("guilds.spec-change-min-hours", 2L);
+                     if (hours >= minHours) {
+                        guild.setCanChangeSpecialization(true);
+                        ChatUtil.sendMessage(player, "&a✨ Votre arrivée en tant que nouveau membre débloque un changement de spécialisation pour la guilde !");
+                     } else {
+                        ChatUtil.sendMessage(player, "&7Un nouveau membre ne débloque un changement de spécialisation qu'après &e" + minHours + " h &7de jeu.");
+                     }
                   }
 
                   this.plugin.getDataManager().saveGuild(guild);
