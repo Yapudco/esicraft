@@ -196,6 +196,8 @@ public class GuildManager {
          this.guildsById.remove(guild.getId());
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
+         this.plugin.getBourse().onGuildDisbanded(guild.getId());
+         this.plugin.getNexusTech().onGuildDisbanded(guild.getId());
          for (UUID memberUuid : guild.getMembers().keySet()) {
             Player online = Bukkit.getPlayer(memberUuid);
             if (online != null) {

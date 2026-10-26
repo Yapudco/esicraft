@@ -136,7 +136,7 @@ commands:
   rancon:
     description: Gérer un prisonnier capturé en combat (rançon, libération, exécution)
     aliases: [ransom]
-    usage: /rancon [payer|prix <montant>|liberer|executer]
+    usage: /rancon [payer|prix <montant>|liberer|executer|cellule]
   banque:
     description: Banque de guilde (prêts entre guildes, dettes, coffre commun)
     aliases: [bank, pret]

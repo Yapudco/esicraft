@@ -148,6 +148,11 @@ public class NexusTech implements Listener {
       }
    }
 
+   public void onGuildDisbanded(String guildId) {
+      this.states.remove(guildId);
+      this.plugin.getDataManager().getStorage().exec("DELETE FROM nexus_tech WHERE guild_id = ?;", guildId);
+   }
+
    public void clear() {
       this.states.clear();
       this.nextShot.clear();

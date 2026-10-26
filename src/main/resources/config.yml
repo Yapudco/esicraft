@@ -313,6 +313,18 @@ siege:
   loot-cap: 3000.0
   pair-cooldown-hours: 72
 
+# Bourse des guildes (/bourse)
+bourse:
+  enabled: true
+  min-age: 4                             # Âge minimal pour ouvrir le capital
+  total-shares: 1000
+  floor-price: 10.0                      # Cours = prix plancher + banque de la guilde / nombre de parts
+  max-public-percent: 49.0               # Part maximale du capital détenue par le public
+  max-shares-per-player: 100
+  buyback-ratio: 0.9                     # Une part revendue à la guilde est rachetée à 90 % du cours
+  dividend-minutes: 360                  # Période de calcul des dividendes
+  dividend-percent: 20.0                 # Part du bénéfice de la période (hausse de la banque) versée aux actionnaires
+
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
   freight:                               # Trains de fret (Maj + clic sur une destination de /station)
@@ -375,6 +387,8 @@ mentoring:
     first-claim-recruit: 100.0
 
 ransom:
+  cell:
+    rescue-actions: 15                   # Clics des alliés sur le bloc de la cellule pour délivrer un captif
   enabled: true
   seconds: 90                 # Durée de captivité
   default-percent: 15.0       # Rançon par défaut : % des pièces du captif

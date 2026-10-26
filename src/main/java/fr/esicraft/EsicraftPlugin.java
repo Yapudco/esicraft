@@ -120,6 +120,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.nexus.NexusTech nexusTech;
    private fr.esicraft.rail.FreightManager freight;
    private fr.esicraft.game.SiegeManager siege;
+   private fr.esicraft.game.BourseManager bourse;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -164,6 +165,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.nexusGamble = new fr.esicraft.nexus.NexusGamble(this);
       this.nexusTech = new fr.esicraft.nexus.NexusTech(this);
       this.siege = new fr.esicraft.game.SiegeManager(this);
+      this.bourse = new fr.esicraft.game.BourseManager(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -187,6 +189,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.tavern.init();
       this.nexusTech.init();
       this.siege.init();
+      this.bourse.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -324,6 +327,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("taverne")).setTabCompleter(this.tavern);
       Objects.requireNonNull(this.getCommand("siege")).setExecutor(this.siege);
       Objects.requireNonNull(this.getCommand("siege")).setTabCompleter(this.siege);
+      Objects.requireNonNull(this.getCommand("bourse")).setExecutor(this.bourse);
+      Objects.requireNonNull(this.getCommand("bourse")).setTabCompleter(this.bourse);
       Objects.requireNonNull(this.getCommand("duel")).setExecutor(this.duels);
       Objects.requireNonNull(this.getCommand("duel")).setTabCompleter(this.duels);
       Objects.requireNonNull(this.getCommand("pari")).setExecutor(this.betting);
@@ -453,6 +458,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.TavernManager getTavern() {
       return this.tavern;
+   }
+
+   public fr.esicraft.game.BourseManager getBourse() {
+      return this.bourse;
    }
 
    public fr.esicraft.game.SiegeManager getSiege() {
