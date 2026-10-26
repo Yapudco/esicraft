@@ -2,6 +2,14 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/10/2026
+
+### Boss mondial (Seigneur des Cendres) : butin réduit
+- **Cagnotte** de pièces : 3 000 → **1 000**, réservée à ceux qui infligent au moins **10 %** des dégâts (un coup en passant ne rapporte plus rien), plafonnée à **400 pièces** par joueur.
+- **Meilleur combattant** : 8 diamants + Étoile du Nether garantie → **3 diamants** et une Étoile du Nether avec **20 %** de chance.
+- **XP** lâchée : 2 000 → 500.
+- Tout se règle dans `events.boss.*` de `config.yml`.
+
 ## 26/10/2026 (nuit)
 
 ### Cosmétiques

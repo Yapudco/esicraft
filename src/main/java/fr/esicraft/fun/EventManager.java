@@ -66,7 +66,10 @@ public class EventManager implements Listener {
 
    public static final String TRADER_TAG = "esicraft_blackmarket";
    private static final String BOSS_TAG = "esicraft_worldboss";
-   private static final double BOSS_COIN_POOL = 3000.0;
+   /** Cagnotte de pièces du boss (events.boss.coin-pool), à partager selon les dégâts infligés. */
+   private double bossPool() {
+      return Math.max(0.0, this.plugin.getConfig().getDouble("events.boss.coin-pool", 1000.0));
+   }
 
    private final EsicraftPlugin plugin;
    private Type active;
@@ -478,7 +481,7 @@ public class EventManager implements Listener {
       this.bossDamage.clear();
       this.endsAt = System.currentTimeMillis() + 15 * 60000L;
       this.createBar("&4&l☠ SEIGNEUR DES CENDRES &c— " + rough(loc), BarColor.RED);
-      ChatUtil.broadcast("&4&l☠ LE SEIGNEUR DES CENDRES S'EST ÉVEILLÉ près de &c" + rough(loc) + " &4! &7Alliez-vous pour le terrasser en 15 minutes : &6" + String.format("%.0f", BOSS_COIN_POOL) + " pièces &7à se partager selon les dégâts infligés !");
+      ChatUtil.broadcast("&4&l☠ LE SEIGNEUR DES CENDRES S'EST ÉVEILLÉ près de &c" + rough(loc) + " &4! &7Alliez-vous pour le terrasser en 15 minutes : &6" + String.format("%.0f", this.bossPool()) + " pièces &7à se partager entre ceux qui infligent au moins " + this.plugin.getConfig().getInt("events.boss.min-share-percent", 10) + " % des dégâts !");
       this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "Le Seigneur des Cendres s'est éveillé : 15 minutes pour le terrasser.");
       this.runTicker(20, () -> {
          if (this.boss == null || !this.boss.isValid()) {
@@ -523,20 +526,31 @@ public class EventManager implements Listener {
       }
 
       event.getDrops().clear();
-      event.setDroppedExp(2000);
+      event.setDroppedExp(Math.max(0, this.plugin.getConfig().getInt("events.boss.xp", 500)));
       double total = this.bossDamage.values().stream().mapToDouble(Double::doubleValue).sum();
       UUID top = this.bossDamage.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
       ChatUtil.broadcast("&6&l☠ LE SEIGNEUR DES CENDRES EST TOMBÉ ! &eHonneur aux combattants :");
       if (total > 0) {
-         List<Map.Entry<UUID, Double>> sorted = new ArrayList<>(this.bossDamage.entrySet());
+         // Seuls ceux qui ont réellement participé (au moins X % des dégâts) touchent la cagnotte : un coup en passant ne rapporte plus rien,
+         // et personne ne peut empocher plus de events.boss.max-per-player pièces.
+         double minShare = Math.max(0.0, this.plugin.getConfig().getInt("events.boss.min-share-percent", 10) / 100.0);
+         double cap = Math.max(0.0, this.plugin.getConfig().getDouble("events.boss.max-per-player", 400.0));
+         List<Map.Entry<UUID, Double>> sorted = new ArrayList<>();
+         double qualifiedTotal = 0.0;
+         for (Map.Entry<UUID, Double> entry : this.bossDamage.entrySet()) {
+            if (entry.getValue() / total >= minShare) {
+               sorted.add(entry);
+               qualifiedTotal += entry.getValue();
+            }
+         }
+
          sorted.sort(Map.Entry.<UUID, Double>comparingByValue().reversed());
          int shown = 0;
          for (Map.Entry<UUID, Double> entry : sorted) {
-            double share = entry.getValue() / total;
-            double reward = Math.round(BOSS_COIN_POOL * share);
+            double reward = Math.min(cap, Math.round(this.bossPool() * entry.getValue() / qualifiedTotal));
             this.plugin.getDataManager().creditPlayer(entry.getKey(), reward);
-            Player p = Bukkit.getPlayer(entry.getKey());
             if (shown++ < 5) {
+               Player p = Bukkit.getPlayer(entry.getKey());
                String name = p != null ? p.getName() : Bukkit.getOfflinePlayer(entry.getKey()).getName();
                ChatUtil.broadcast("  &f" + name + " &8» &c" + String.format("%.0f", entry.getValue()) + " dégâts &8(&6+" + String.format("%.0f", reward) + " pièces&8)");
             }
@@ -546,17 +560,28 @@ public class EventManager implements Listener {
       if (top != null) {
          Player topPlayer = Bukkit.getPlayer(top);
          String topName = topPlayer != null ? topPlayer.getName() : Bukkit.getOfflinePlayer(top).getName();
+         // Butin modeste : quelques diamants, et une Étoile du Nether seulement avec une faible probabilité (events.boss.*).
+         int diamonds = Math.max(0, this.plugin.getConfig().getInt("events.boss.top-diamonds", 3));
+         boolean star = ThreadLocalRandom.current().nextDouble() < this.plugin.getConfig().getDouble("events.boss.top-star-chance", 0.2);
+         List<ItemStack> lootList = new ArrayList<>();
+         if (diamonds > 0) {
+            lootList.add(new ItemStack(Material.DIAMOND, diamonds));
+         }
+
+         if (star) {
+            lootList.add(new ItemStack(Material.NETHER_STAR, 1));
+         }
+
          // Le butin va directement dans l'inventaire du meilleur combattant (sinon n'importe qui le ramasse au sol) ; le surplus est réservé à son nom.
-         ItemStack[] loot = {new ItemStack(Material.NETHER_STAR, 1), new ItemStack(Material.DIAMOND, 8)};
          if (topPlayer != null) {
-            for (ItemStack left : topPlayer.getInventory().addItem(loot).values()) {
+            for (ItemStack left : topPlayer.getInventory().addItem(lootList.toArray(new ItemStack[0])).values()) {
                topPlayer.getWorld().dropItem(topPlayer.getLocation(), left, dropped -> dropped.setOwner(top));
             }
          } else {
-            event.getDrops().add(loot[0]);
-            event.getDrops().add(loot[1]);
+            event.getDrops().addAll(lootList);
          }
-         ChatUtil.broadcast("&7Le plus grand pourfendeur, &e" + topName + "&7, voit tomber une &fÉtoile du Nether &7et &b8 diamants&7 !");
+
+         ChatUtil.broadcast("&7Le plus grand pourfendeur, &e" + topName + "&7, empoche " + (diamonds > 0 ? "&b" + diamonds + " diamants" : "") + (star ? (diamonds > 0 ? " &7et une " : "une ") + "&fÉtoile du Nether" : "") + "&7 !");
          this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.EVENT, "☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : " + topName + ").", null, null);
          this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.SLAYER);
       }
