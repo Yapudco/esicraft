@@ -281,6 +281,8 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
          for (PotionEffect e : new ArrayList<>(p.getActivePotionEffects())) {
             p.removePotionEffect(e.getType());
          }
+
+         this.giveKit(p);
       }
 
       ChatUtil.broadcast("&6⚔ &e" + challenger.getName() + " &7et &e" + player.getName() + " &7s'affrontent en duel d'honneur" + (c.stake > 0 ? " (mise : &6" + (long)c.stake + " pièces&7)" : "") + " !");
@@ -307,6 +309,25 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
             }
          }
       }, 100L);
+   }
+
+   /** Équipement identique pour les deux duellistes : armure en fer complète, épée, hache, bouclier, arc, flèches, steaks et une potion de soin. */
+   private void giveKit(Player p) {
+      var inv = p.getInventory();
+      inv.clear();
+      inv.setHelmet(new ItemStack(Material.IRON_HELMET));
+      inv.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+      inv.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+      inv.setBoots(new ItemStack(Material.IRON_BOOTS));
+      inv.setItemInOffHand(new ItemStack(Material.SHIELD));
+      inv.addItem(new ItemStack(Material.IRON_SWORD), new ItemStack(Material.IRON_AXE), new ItemStack(Material.BOW), new ItemStack(Material.ARROW, 16), new ItemStack(Material.COOKED_BEEF, 64));
+      ItemStack heal = new ItemStack(Material.POTION);
+      if (heal.getItemMeta() instanceof org.bukkit.inventory.meta.PotionMeta meta) {
+         meta.setBasePotionType(org.bukkit.potion.PotionType.HEALING);
+         heal.setItemMeta(meta);
+      }
+
+      inv.addItem(heal);
    }
 
    // ------------------------------------------------------------------ arène
