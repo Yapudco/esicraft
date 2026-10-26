@@ -2,6 +2,20 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/10/2026 (performances)
+
+### Optimisations (audit de lag)
+- **Site** : les noms de guildes et de joueurs protégés de la traduction sont indexés par première lettre (plus de parcours de toute la liste pour chaque texte) ; fiches et pages anglaises construites à la demande ; rafraîchissement par défaut à **30 s** (15 s avant).
+- **Base de données** : une seconde connexion en **lecture seule** (mode WAL) : les lectures n'attendent plus les sauvegardes. L'**hégémonie** est recalculée en tâche de fond toutes les 30 s et lue en mémoire par le tableau de bord, le menu des hordes et les cooldowns ; le délai de changement de spécialisation est en mémoire ; le **coffre commun** se charge en tâche de fond à la première ouverture ; supprimer une annonce du marché n'attend plus la base.
+- **Surbrillance des claims** (`/guild claim show`) : seuls les bords extérieurs sont dessinés, un point tous les 4 blocs, une fois par seconde, rayon de 2 chunks (quelques dizaines de particules au lieu de milliers).
+- **Entonnoirs** : plus d'écouteur `InventoryMoveItemEvent` (Paper garde l'optimisation de tous les entonnoirs) ; la restriction de l'alambic alimenté par entonnoir s'applique à la fin du brassage.
+- **Nexus** : filtre O(1) par chunk avant toute vérification (liquides, pistons, casse de blocs, explosions) ; tâche périodique sans analyse d'entités ni particules quand aucun joueur n'est à 40 blocs (sauf raid) ; ennemis calculés une seule fois par passage (fin du coût en O(E²)) ; retour visuel, sonore et effets de spécialisation des coups limités à **une fois par seconde par guilde** (les dégâts comptent toujours à chaque coup) ; loups de garde supprimés après 5 minutes et plus d'accumulation.
+- **Potions de métier** : durée 11 s (plus de clignotement d'icône) et renouvelées seulement quand elles s'épuisent (plus un paquet toutes les 2 s) ; le filet de sécurité du Netherite ne passe plus qu'une fois sur cinq.
+- **Mobs de raid** : chemin recalculé toutes les 6 s au lieu de 2 s ; message « Sapeur détonateur » réservé à la guilde attaquée.
+- **Blocs posés par les joueurs** : marques gardées en mémoire par chunk (ensemble) et écrites au déchargement, toutes les 5 minutes et à l'arrêt, au lieu de recopier un tableau à chaque pose et à chaque casse.
+- **Traduction du jeu** : les traductions déjà faites sont mémorisées (tableau de bord, menus).
+- **Fuites de mémoire** : cosmétiques (plus de position gardée pour les joueurs déconnectés ; seuls les joueurs en ligne sont parcourus), délais de déguisement, immunités de rançon, invitations de guilde expirées et statistiques de primes sont purgés.
+
 ## 27/10/2026 (marché noir)
 
 ### Marchand du Marché noir : bien plus dur

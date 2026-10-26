@@ -45,6 +45,10 @@ public class AntiFarmManager {
       }
 
       long now = System.currentTimeMillis();
+      if (this.hourly.size() > 500) {
+         this.hourly.values().removeIf(v -> now - (long)v[0] >= 3600000L);
+      }
+
       double[] w = this.hourly.computeIfAbsent(playerUuid, k -> new double[]{now, 0.0});
       synchronized (w) {
          if (now - (long)w[0] >= 3600000L) {

@@ -245,6 +245,8 @@ public final class EsicraftPlugin extends JavaPlugin {
          this.nexusManager.removeAllHolograms();
       }
 
+      fr.esicraft.util.PlacedBlockTracker.flushShared();
+
       if (this.loans != null) {
          this.loans.shutdown();
       }

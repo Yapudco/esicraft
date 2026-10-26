@@ -1220,6 +1220,9 @@ public class GuildManager {
          }
 
          this.hegemonyCache.keySet().removeIf(id -> this.getGuildById(id) == null);
+         long nowMs = System.currentTimeMillis();
+         this.pendingInvites.values().forEach(m -> m.values().removeIf(expiry -> expiry < nowMs));
+         this.pendingInvites.values().removeIf(Map::isEmpty);
       }, 200L, 600L);
    }
 

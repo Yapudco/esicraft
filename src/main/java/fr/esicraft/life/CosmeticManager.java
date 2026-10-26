@@ -227,32 +227,41 @@ public class CosmeticManager implements Listener, CommandExecutor {
       return n;
    }
 
-   /** Particules des cosmétiques équipés : aura toutes les 10 ticks, traînée (si le joueur s'est déplacé) toutes les 5 ticks. */
+   /** Particules des cosmétiques équipés (joueurs EN LIGNE seulement) : aura toutes les 10 ticks, traînée (si le joueur s'est déplacé) toutes les 5 ticks. */
    private void tickEffects() {
       this.tick++;
-      if (this.tick % 2 == 0) {
-         for (Map.Entry<UUID, String> e : this.equipped.get(Slot.AURA).entrySet()) {
-            Player p = this.visible(e.getKey());
-            Cosmetic c = this.catalog.get(e.getValue());
-            if (p != null && c != null && this.owns(e.getKey(), c)) {
-               p.getWorld().spawnParticle(c.particle(), p.getLocation().add(0.0, 1.0, 0.0), c.count(), 0.45, 0.7, 0.45, 0.01);
-            }
-         }
-      }
-
-      for (Map.Entry<UUID, String> e : this.equipped.get(Slot.TRAIL).entrySet()) {
-         Player p = this.visible(e.getKey());
-         Cosmetic c = this.catalog.get(e.getValue());
-         if (p == null || c == null || !this.owns(e.getKey(), c)) {
+      boolean auraTurn = this.tick % 2 == 0;
+      for (Player p : Bukkit.getOnlinePlayers()) {
+         UUID uuid = p.getUniqueId();
+         String auraId = auraTurn ? this.equipped.get(Slot.AURA).get(uuid) : null;
+         String trailId = this.equipped.get(Slot.TRAIL).get(uuid);
+         if (auraId == null && trailId == null) {
             continue;
          }
 
-         Location now = p.getLocation();
-         Location before = this.lastSeen.put(e.getKey(), now);
-         if (before != null && before.getWorld() == now.getWorld() && before.distanceSquared(now) > 0.04) {
-            p.getWorld().spawnParticle(c.particle(), now.clone().add(0.0, 0.15, 0.0), c.count(), 0.15, 0.05, 0.15, 0.01);
+         if (this.visible(uuid) == null) {
+            continue;
+         }
+
+         Cosmetic aura = auraId == null ? null : this.catalog.get(auraId);
+         if (aura != null && this.owns(uuid, aura)) {
+            p.getWorld().spawnParticle(aura.particle(), p.getLocation().add(0.0, 1.0, 0.0), aura.count(), 0.45, 0.7, 0.45, 0.01);
+         }
+
+         Cosmetic trail = trailId == null ? null : this.catalog.get(trailId);
+         if (trail != null && this.owns(uuid, trail)) {
+            Location now = p.getLocation();
+            Location before = this.lastSeen.put(uuid, now);
+            if (before != null && before.getWorld() == now.getWorld() && before.distanceSquared(now) > 0.04) {
+               p.getWorld().spawnParticle(trail.particle(), now.clone().add(0.0, 0.15, 0.0), trail.count(), 0.15, 0.05, 0.15, 0.01);
+            }
          }
       }
+   }
+
+   @EventHandler
+   public void onQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+      this.lastSeen.remove(event.getPlayer().getUniqueId());
    }
 
    private Player visible(UUID uuid) {

@@ -641,7 +641,10 @@ public class RaidManager implements Listener {
 
    private void startRaidAITask() {
       (new BukkitRunnable() {
+            private int aiTick = 0;
+
             public void run() {
+               this.aiTick++;
                long maxRaidMs = RaidManager.this.plugin.getConfig().getLong("raids.max-minutes", 25L) * 60000L;
                for (ActiveRaid raid : RaidManager.this.activeRaids.values()) {
                   if (System.currentTimeMillis() - raid.getStartTime() > maxRaidMs) {
@@ -673,7 +676,10 @@ public class RaidManager implements Listener {
                            if (Bukkit.getEntity(mobUuid) instanceof Mob mob && !mob.isDead()) {
                               RaidManager.this.mobMisses.remove(mobUuid);
                               RaidManager.this.mobLastKnown.put(mobUuid, mob.getLocation());
-                              mob.getPathfinder().moveTo(nexusLoc, 1.25);
+                              // Chemin recalculé toutes les 6 s, ou tout de suite si le mob n'en a plus (jusqu'à 60 mobs : le calcul de chemin est coûteux).
+                              if (this.aiTick % 3 == 0 || mob.getPathfinder().getCurrentPath() == null) {
+                                 mob.getPathfinder().moveTo(nexusLoc, 1.25);
+                              }
                               if (raid.hasLavaImmunity() && mob.getLocation().getBlock().getType() == Material.LAVA) {
                                  mob.setVelocity(mob.getVelocity().setY(0.12));
                               }
@@ -695,7 +701,7 @@ public class RaidManager implements Listener {
                                           RaidManager.this.mobRaidIndex.remove(mobUuid);
                                           RaidManager.this.mobStuckCounters.remove(mobUuid);
                                           RaidManager.this.lastMobPositions.remove(mobUuid);
-                                          ChatUtil.broadcast(
+                                          ChatUtil.broadcastGuild(targetGuild, 
                                              "&c\ud83d\udca3 &lSAPEUR DÉTONATEUR : &7Un monstre bloqué a explosé pour ouvrir une brèche et vaporiser l'eau/lave !"
                                           );
                                           continue;

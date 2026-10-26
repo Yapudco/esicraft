@@ -357,6 +357,7 @@ public class DisguiseManager implements Listener {
 
    private void expire() {
       long now = System.currentTimeMillis();
+      this.cooldowns.values().removeIf(until -> until < now);
       for (Map.Entry<UUID, Disguise> e : this.active.entrySet()) {
          if (e.getValue().until() <= now) {
             Player p = Bukkit.getPlayer(e.getKey());
