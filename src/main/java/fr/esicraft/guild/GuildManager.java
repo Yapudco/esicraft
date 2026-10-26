@@ -105,7 +105,9 @@ public class GuildManager {
                return false;
             } else {
                double cost = this.plugin.getConfig().getDouble("guilds.creation-cost", 500.0);
-               if (data.getCoins() < cost) {
+               if (this.plugin.getCombatManager().denySpending(player)) {
+                  return false;
+               } else if (data.getCoins() < cost) {
                   ChatUtil.sendMessage(player, "&cVous n'avez pas assez d'argent pour fonder une guilde (&e" + cost + " pièces &crequises).");
                   return false;
                } else {
@@ -1227,10 +1229,15 @@ public class GuildManager {
             }
          }
 
+         // Richesse de la guilde = sa banque + les pièces de tous ses membres : vider la banque dans les poches (ou l'inverse) ne change rien.
          double totalServerWealth = this.plugin.getDataManager().getTotalServerWealth();
          if (totalServerWealth > 0.0) {
-            double share = targetGuild.getBankBalance() / totalServerWealth;
-            if (share >= 0.3) {
+            double guildWealth = targetGuild.getBankBalance();
+            for (UUID memberUuid : members) {
+               guildWealth += this.plugin.getDataManager().getPlayerCoins(memberUuid);
+            }
+
+            if (guildWealth / totalServerWealth >= 0.3) {
                return true;
             }
          }

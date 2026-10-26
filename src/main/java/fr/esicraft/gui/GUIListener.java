@@ -326,6 +326,10 @@ public class GUIListener implements Listener {
                               return;
                            }
 
+                           if (this.plugin.getCombatManager().denySpending(player)) {
+                              return;
+                           }
+
                            pData.removeCoins(cost);
                            this.plugin.getDataManager().savePlayer(pData);
                            paid = true;

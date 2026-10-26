@@ -108,6 +108,10 @@ public class RaceManager {
                            return false;
                         }
 
+                        if (this.plugin.getCombatManager().denySpending(player)) {
+                           return false;
+                        }
+
                         data.removeCoins(changeCost);
                         this.plugin.getDataManager().savePlayer(data);
                         data.incrementRaceChangesCount();

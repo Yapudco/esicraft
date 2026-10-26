@@ -53,6 +53,10 @@ public class PayCommand implements CommandExecutor, TabCompleter {
                      ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                      return true;
                   } else {
+                     if (this.plugin.getCombatManager().denySpending(player)) {
+                        return true;
+                     }
+
                      PlayerData targetData = this.plugin.getDataManager().getPlayerData(target.getUniqueId());
                      if (targetData == null) {
                         targetData = this.plugin.getDataManager().loadPlayer(target);

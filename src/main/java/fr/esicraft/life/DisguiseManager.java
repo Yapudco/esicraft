@@ -95,6 +95,10 @@ public class DisguiseManager implements Listener {
          return "&cVotre prochain déguisement sera prêt dans &e" + ((cd - now) / 60000L + 1L) + " min&c.";
       }
 
+      if (this.plugin.getCombatManager().isInCombat(player)) {
+         return "&cImpossible de s'acheter un déguisement en plein combat.";
+      }
+
       PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
       long cost = this.cost();
       if (data == null || !data.removeCoins(cost)) {

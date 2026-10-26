@@ -198,7 +198,7 @@ Options possibles : des **sapeurs** qui font exploser les murs et assèchent l'e
 
 ### ⭐ Les guildes trop riches sont des cibles
 
-Une guilde passe en **Hégémonie économique** si au moins la moitié de ses membres sont dans le top 5 des plus riches (`/baltop`), ou si sa banque détient plus de 30 % de tout l'argent du serveur. Contre elle, les raids coûtent **2× moins cher** et sa protection après un raid ne dure que **2 minutes**. Elle est marquée d'une ⭐ dans le menu des cibles.
+Une guilde passe en **Hégémonie économique** si au moins la moitié de ses membres sont dans le top 5 des plus riches (`/baltop`), ou si sa **banque plus les pièces de ses membres** détiennent plus de 30 % de tout l'argent du serveur. Contre elle, les raids coûtent **2× moins cher** et sa protection après un raid ne dure que **2 minutes**. Elle est marquée d'une ⭐ dans le menu des cibles.
 
 ---
 
@@ -338,7 +338,7 @@ Pour **750 pièces**, tu te fais passer pendant **5 minutes** pour un membre de 
 
 ### ⚔ Combat PvP
 
-Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…) ou être frappé met « en combat » 15 secondes. Pendant ce temps : **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… sont bloqués**, les téléportations par commande aussi, et **se déconnecter est puni de mort** (kick compris ; seul l'arrêt du serveur est excusé).
+Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…) ou être frappé met « en combat » 15 secondes. Pendant ce temps : **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… sont bloqués**, les téléportations par commande aussi, et **se déconnecter est puni de mort** (kick compris ; seul l'arrêt du serveur est excusé). Dépenser ou transférer ses pièces est aussi impossible (achats, `/pay`, banque, métier, déguisement) ; seul le paiement d'une rançon reste permis.
 
 ### 🏦 Banque de guilde : prêts et coffre commun (`/banque`)
 
