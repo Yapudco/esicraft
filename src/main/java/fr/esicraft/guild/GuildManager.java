@@ -197,6 +197,8 @@ public class GuildManager {
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
          this.plugin.getBourse().onGuildDisbanded(guild.getId());
+         this.plugin.getTreatyManager().purgeGuild(guild.getId());
+         this.plugin.getRailManager().purgeGuild(guild.getId());
          this.plugin.getNexusTech().onGuildDisbanded(guild.getId());
          for (UUID memberUuid : guild.getMembers().keySet()) {
             Player online = Bukkit.getPlayer(memberUuid);
@@ -205,6 +207,11 @@ public class GuildManager {
             }
          }
          this.updateAllPlayerTabs();
+         // Le site reflète aussitôt la dissolution (sans attendre le prochain rafraîchissement).
+         if (this.plugin.getWebServer() != null) {
+            this.plugin.getWebServer().refreshNow();
+         }
+
          ChatUtil.broadcast("&c&l[Guildes] &7La guilde &c" + guild.getName() + " &7a été dissoute.");
          this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.GUILD, "La guilde " + guild.getName() + " est dissoute.", guild.getId(), null);
          return true;

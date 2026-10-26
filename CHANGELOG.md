@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (dissolution)
+
+### Correctif : une guilde dissoute disparaît du site
+- Le site est **reconstruit aussitôt** à la dissolution (au lieu d'attendre le prochain rafraîchissement). Les **traités, propositions, préavis, gares, péages et relations ferroviaires** de la guilde dissoute sont supprimés : ils laissaient une guilde fantôme dans le réseau diplomatique. Le site ignore en plus tout lien vers une guilde qui n'existe plus.
+
 ## 30/10/2026 (roulette)
 
 ### Roulette russe du Nexus : un vrai 50/50
