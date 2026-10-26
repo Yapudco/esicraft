@@ -502,7 +502,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/money get\|set\|give\|take\|rectify\|top` | Manage player money |
 | `/evenement <lune\|meteores\|marchand\|boss\|stop\|status>` | Start or stop an event |
 | `/pvp [on\|off\|toggle]` | Turn raids and Nexus destruction on or off |
-| `/game reset` | Reset the whole game |
+| `/game reset` | Reset **everything**: guilds, Nexus, fortunes, achievements, statistics, contracts, reputation, mentoring, cosmetics, journal, curves, Ages, season, loans and the website (only language preferences are kept) |
 | `/race set <player> <race>` | Change a player's profession |
 
 ### Built-in anti-cheat

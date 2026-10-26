@@ -37,6 +37,11 @@ public class HelpCallManager {
    private final Map<String, Call> calls = new ConcurrentHashMap<>();
    private final Map<String, Long> lastCall = new ConcurrentHashMap<>();
 
+   public void clearAll() {
+      this.calls.clear();
+      this.lastCall.clear();
+   }
+
    public HelpCallManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }

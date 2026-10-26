@@ -68,6 +68,12 @@ public class DisguiseManager implements Listener {
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::expire, 20L, 20L);
    }
 
+   /** /game reset : tous les déguisements tombent (skins rendus) et les délais sont oubliés. */
+   public void clearAll() {
+      this.shutdown();
+      this.cooldowns.clear();
+   }
+
    /** Restaure les vrais profils (arrêt ou rechargement du plugin). */
    public void shutdown() {
       for (UUID uuid : new ArrayList<>(this.active.keySet())) {

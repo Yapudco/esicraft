@@ -70,6 +70,11 @@ public class ContractManager {
    private final EsicraftPlugin plugin;
    private final Map<UUID, DayState> states = new ConcurrentHashMap<>();
 
+   /** /game reset : progression des contrats du jour effacée. */
+   public void clearAll() {
+      this.states.clear();
+   }
+
    public ContractManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
       // Sauvegarde différée de la progression (toutes les 30 s) : évite une écriture SQL par bloc cassé.

@@ -52,6 +52,12 @@ public class SeasonManager {
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::checkSeason, 12000L, 12000L);
    }
 
+   /** /game reset : statistiques de guildes et championne effacées. */
+   public void clearAll() {
+      this.stats.clear();
+      this.championGuildId = null;
+   }
+
    public static String currentSeason() {
       return YearMonth.now(ZONE).toString();
    }

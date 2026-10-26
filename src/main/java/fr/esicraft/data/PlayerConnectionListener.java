@@ -46,6 +46,9 @@ public class PlayerConnectionListener implements Listener {
       }
 
       data.setSessionLoginTime(System.currentTimeMillis());
+      if (this.plugin.getWebServer() != null) {
+         this.plugin.getWebServer().rememberSkin(player);
+      }
 
       this.plugin.getGuildManager().reconcilePlayerGuild(player, data);
       this.plugin.getRaceManager().applyRaceAttributes(player, data.getRace());

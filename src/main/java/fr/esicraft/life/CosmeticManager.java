@@ -168,6 +168,16 @@ public class CosmeticManager implements Listener, CommandExecutor {
       this.add(Slot.BURST, "s_electric", "Victoire : Tempête électrique", Material.LIGHTNING_ROD, "electric_spark", 60, Kind.SHOP, "", 12000L, "");
    }
 
+   /** /game reset : cosmétiques débloqués, achetés et équipés effacés (la base est vidée par le reset). */
+   public void clearAll() {
+      this.diamond.clear();
+      this.bought.clear();
+      this.lastSeen.clear();
+      for (Map<UUID, String> slot : this.equipped.values()) {
+         slot.clear();
+      }
+   }
+
    public void init() {
       this.buildCatalog();
       for (Slot s : Slot.values()) {

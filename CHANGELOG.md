@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/10/2026 (têtes et reset)
+
+### Correctifs
+- **Têtes des joueurs sur le site** : la cause la plus probable était la limite de requêtes du site (60 par 10 s et par adresse) : une page de joueurs demande des dizaines d'images d'un coup et recevait des réponses 429, donc des images cassées. Les têtes et ressources ont maintenant leur propre plafond, 20 fois plus large, et se chargent à la demande (`loading="lazy"`). Le skin est retenu dès la connexion du joueur (aucun appel à Mojang pour les joueurs du serveur, même derrière un proxy BungeeCord) ; pour les autres, la recherche Mojang force le mode en ligne. Le visage de remplacement est désormais écrit en Java pur (plus de dépendance à l'interface graphique, absente de certains JRE). Si le serveur ne peut pas joindre Mojang ou n'a pas le module d'images, un avertissement unique est écrit dans la console.
+- **`/game reset` remet vraiment tout à zéro** : en plus des guildes, Nexus, fortunes et claims, il efface maintenant les **succès et statistiques des joueurs**, les contrats du jour et de guilde, la **réputation**, les parrainages, les **cosmétiques** (débloqués, achetés, équipés), les prêts, les délais de spécialisation, la saison et la championne, ainsi que le journal, les courbes, les Âges et les rivalités du **site web**, qui est reconstruit aussitôt. Les raids et événements en cours sont arrêtés et les déguisements tombent (skins rendus). Seules les préférences de langue sont conservées.
+
 ## 27/10/2026 (performances)
 
 ### Optimisations (audit de lag)
