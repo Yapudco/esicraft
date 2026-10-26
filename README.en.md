@@ -339,6 +339,8 @@ For **750 coins** you change **skin and name** for **5 minutes** (the skin is re
 - `/deguisement <Name>`: take the skin and name of **any Minecraft account**, even one that isn't on the server (`/deguisement aypierre_`). If that player belongs to another guild on the server, you also borrow its guild identity. Not possible while that player is online.
 - `/deguisement off`: remove the disguise (original name and skin restored).
 
+**Offline-mode server behind Velocity or BungeeCord**: it works. The skins of the server's own players are the ones the proxy forwards at login (enable **modern** forwarding: `player-info-forwarding-mode = "modern"` in Velocity and `velocity-support` in Paper), and other accounts are looked up directly with Mojang (the server must be able to reach `api.mojang.com` and `sessionserver.mojang.com`).
+
 Land protections stay active. **Dealing damage or hitting the Nexus unmasks you**, and the imitated guild is warned. One disguise every 30 minutes; coins are only charged if the skin was actually found. Death messages never reveal your real name.
 
 ### ✨ Cosmetics (`/cosmetique`)

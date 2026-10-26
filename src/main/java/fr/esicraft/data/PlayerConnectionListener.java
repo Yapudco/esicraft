@@ -46,6 +46,7 @@ public class PlayerConnectionListener implements Listener {
       }
 
       data.setSessionLoginTime(System.currentTimeMillis());
+      this.plugin.getSkins().remember(player);
       if (this.plugin.getWebServer() != null) {
          this.plugin.getWebServer().rememberSkin(player);
       }

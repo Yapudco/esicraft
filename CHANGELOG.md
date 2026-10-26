@@ -2,6 +2,14 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/10/2026 (skins hors ligne)
+
+### Correctif : déguisement et têtes sur un serveur hors ligne (Velocity, BungeeCord)
+- Un serveur en mode hors ligne ne peut pas interroger Mojang par lui-même, donc `/deguisement <Pseudo>` répondait « skin introuvable ». Les skins passent maintenant par un service dédié (`SkinLookup`) : le **skin transmis par le proxy** à la connexion est retenu (signature comprise, aucun appel réseau pour les joueurs du serveur), et les autres comptes sont cherchés **directement auprès de l'API Mojang** (nom → identifiant → profil signé), avec un cache de 6 h.
+- Les messages distinguent « le compte n'existe pas » de « Mojang injoignable depuis le serveur » (aucune pièce débitée dans les deux cas). La casse exacte du compte est reprise.
+- Les **têtes du site** utilisent le même service.
+- À savoir : pour que les skins des joueurs du serveur soient connus, le proxy doit transmettre les profils (Velocity : `player-info-forwarding-mode = "modern"`).
+
 ## 27/10/2026 (têtes et reset)
 
 ### Correctifs

@@ -1,6 +1,5 @@
 package fr.esicraft.web;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import fr.esicraft.EsicraftPlugin;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -145,18 +144,19 @@ final class HeadService {
    private byte[] render(String name, String key) throws Exception {
       URL skin = this.skinUrls.get(key);
       if (skin == null) {
-         PlayerProfile profile = org.bukkit.Bukkit.createProfile(name);
-         boolean ok;
+         // Recherche directe auprès de Mojang (indépendante du mode du serveur : hors ligne derrière Velocity ou BungeeCord).
+         fr.esicraft.life.SkinLookup.Skin found = this.plugin.getSkins().cachedByName(name);
          try {
-            // true, true : recherche Mojang même sur un serveur en mode hors ligne (derrière un proxy, par exemple).
-            ok = profile.complete(true, true);
-         } catch (RuntimeException e) {
-            ok = false;
+            if (found == null) {
+               found = this.plugin.getSkins().fetchBlocking(name);
+            }
+         } catch (java.io.IOException e) {
+            this.warnOnce("mojang", "Mojang est injoignable depuis le serveur (" + e.getMessage() + ") : un visage de remplacement est affiché pour les joueurs dont le skin n'a pas été vu en ligne.");
+            return null;
          }
 
-         skin = ok ? profile.getTextures().getSkin() : null;
+         skin = found == null ? null : found.skinUrl();
          if (skin == null) {
-            this.warnOnce("mojang", "skin de « " + name + " » introuvable (compte inexistant, ou Mojang injoignable depuis le serveur) : un visage de remplacement est affiché.");
             return null;
          }
 
