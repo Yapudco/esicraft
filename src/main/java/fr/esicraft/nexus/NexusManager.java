@@ -6,6 +6,7 @@ import fr.esicraft.guild.GuildSpecialization;
 import fr.esicraft.util.ChatUtil;
 import fr.esicraft.util.ChunkKey;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,40 @@ public class NexusManager {
    private final Set<String> activeNexusGuilds = ConcurrentHashMap.newKeySet();
    /** Chunk du Nexus → guilde (recherche en O(1), sans charger de chunk). */
    private final Map<ChunkKey, String> nexusChunks = new ConcurrentHashMap<>();
+   /** Monde → chunks situés à moins de 2 chunks d'un Nexus (empaquetés) : premier filtre en O(1) pour les événements fréquents (liquides, pistons, casse, explosions). */
+   private final Map<String, Set<Long>> nearChunks = new ConcurrentHashMap<>();
+   private final Map<String, Long> lastFeedback = new ConcurrentHashMap<>();
+   private final Set<String> holoDirty = ConcurrentHashMap.newKeySet();
+   /** Loups de garde : naissance (ils sont supprimés après 5 minutes et ne s'accumulent plus). */
+   private final Map<UUID, Long> beastBorn = new ConcurrentHashMap<>();
+
+   private static long pack(int cx, int cz) {
+      return (long)cx << 32 ^ (long)cz & 0xFFFFFFFFL;
+   }
+
+   /** Faux positifs possibles, jamais de faux négatif : une position hors de ce filtre n'est certainement pas près d'un Nexus. */
+   public boolean mayBeNexusNear(World world, int blockX, int blockZ) {
+      Set<Long> set = world == null ? null : this.nearChunks.get(world.getName());
+      return set != null && set.contains(pack(blockX >> 4, blockZ >> 4));
+   }
+
+   private void rebuildNearChunks() {
+      Map<String, Set<Long>> fresh = new HashMap<>();
+      for (Guild g : this.nexusLocationIndex.values()) {
+         Location nl = g.hasNexus() ? g.getNexus().getLocation() : null;
+         if (nl != null && nl.getWorld() != null) {
+            Set<Long> set = fresh.computeIfAbsent(nl.getWorld().getName(), k -> new java.util.HashSet<>());
+            for (int dx = -2; dx <= 2; dx++) {
+               for (int dz = -2; dz <= 2; dz++) {
+                  set.add(pack((nl.getBlockX() >> 4) + dx, (nl.getBlockZ() >> 4) + dz));
+               }
+            }
+         }
+      }
+
+      this.nearChunks.keySet().retainAll(fresh.keySet());
+      this.nearChunks.putAll(fresh);
+   }
 
    public NexusManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -61,6 +96,7 @@ public class NexusManager {
             this.activeNexusGuilds.add(guild.getId());
             Location nl = guild.getNexus().getLocation();
             this.nexusChunks.put(new ChunkKey(nl.getWorld().getName(), nl.getBlockX() >> 4, nl.getBlockZ() >> 4), guild.getId());
+            this.rebuildNearChunks();
          }
       }
    }
@@ -78,12 +114,16 @@ public class NexusManager {
             if (nl.getWorld() != null) {
                this.nexusChunks.remove(new ChunkKey(nl.getWorld().getName(), nl.getBlockX() >> 4, nl.getBlockZ() >> 4));
             }
+
+            this.rebuildNearChunks();
          }
       }
    }
 
    public Guild getGuildByNexusLocation(Location loc) {
       if (loc == null) {
+         return null;
+      } else if (!this.mayBeNexusNear(loc.getWorld(), loc.getBlockX(), loc.getBlockZ())) {
          return null;
       } else {
          String key = locKey(loc);
@@ -93,6 +133,10 @@ public class NexusManager {
 
    public boolean isNearNexus(Location loc, double radius) {
       if (loc != null && loc.getWorld() != null) {
+         if (radius <= 32.0 && !this.mayBeNexusNear(loc.getWorld(), loc.getBlockX(), loc.getBlockZ())) {
+            return false;
+         }
+
          double radiusSq = radius * radius;
 
          for (Guild g : this.nexusLocationIndex.values()) {
@@ -317,6 +361,7 @@ public class NexusManager {
    }
 
    public void clearIndex() {
+      this.nearChunks.clear();
       this.nexusChunks.clear();
       this.nexusLocationIndex.clear();
       this.activeNexusGuilds.clear();
@@ -339,13 +384,26 @@ public class NexusManager {
    public void damageNexus(Guild guild, int damage, String attackerName, Guild attackerGuild, Player attackerPlayer) {
       if (guild != null && guild.hasNexus()) {
          Nexus nexus = guild.getNexus();
-         this.lastNexusDamage.put(guild.getId(), System.currentTimeMillis());
+         long hitAt = System.currentTimeMillis();
+         this.lastNexusDamage.put(guild.getId(), hitAt);
          nexus.damage(damage);
-         this.updateHologram(guild);
+         // Les dégâts comptent à chaque coup, mais hologramme, particules, sons, messages et effets de spécialisation une fois par seconde et par guilde.
+         Long previousFx = this.lastFeedback.get(guild.getId());
+         boolean fx = previousFx == null || hitAt - previousFx >= 1000L || !nexus.isAlive();
+         if (fx) {
+            this.lastFeedback.put(guild.getId(), hitAt);
+            this.updateHologram(guild);
+         } else {
+            this.holoDirty.add(guild.getId());
+         }
+
          Location loc = nexus.getLocation();
          if (loc != null && loc.getWorld() != null) {
-            loc.getWorld().spawnParticle(Particle.CRIT, loc.clone().add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.1);
-            loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_LAND, 1.0F, 0.6F);
+            if (fx) {
+               loc.getWorld().spawnParticle(Particle.CRIT, loc.clone().add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.1);
+               loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_LAND, 1.0F, 0.6F);
+            }
+
             if (nexus.hasTrap(NexusTrapType.LIGHTNING_STRIKE) && attackerPlayer != null && attackerPlayer.isOnline() && this.lightningReady(attackerPlayer)) {
                {
                   loc.getWorld().strikeLightningEffect(attackerPlayer.getLocation());
@@ -354,9 +412,9 @@ public class NexusManager {
                }
             }
 
-            if (guild.getSpecialization() == GuildSpecialization.DRUIDIC_ENCLAVE) {
+            if (fx && guild.getSpecialization() == GuildSpecialization.DRUIDIC_ENCLAVE) {
                List<Wolf> guardBeasts = new ArrayList<>();
-               for (Entity near : loc.getWorld().getNearbyEntities(loc, 15.0, 15.0, 15.0)) {
+               for (Entity near : loc.getWorld().getNearbyEntities(loc, 40.0, 40.0, 40.0)) {
                   if (near instanceof Wolf w && w.getScoreboardTags().contains("druidic_guard_beast")) {
                      guardBeasts.add(w);
                   }
@@ -378,7 +436,9 @@ public class NexusManager {
                      wolf.setCustomNameVisible(true);
                      wolf.setAngry(true);
                      wolf.addScoreboardTag("druidic_guard_beast");
-                     wolf.setRemoveWhenFarAway(false);
+                     wolf.setRemoveWhenFarAway(true);
+                     wolf.setPersistent(false);
+                     this.beastBorn.put(wolf.getUniqueId(), System.currentTimeMillis());
                      if (attackerPlayer != null && attackerPlayer.isOnline()) {
                         wolf.setTarget(attackerPlayer);
                      }
@@ -389,7 +449,7 @@ public class NexusManager {
                }
             }
 
-            if (guild.getSpecialization() == GuildSpecialization.WARLORD) {
+            if (fx && guild.getSpecialization() == GuildSpecialization.WARLORD) {
                loc.getWorld().playSound(loc, Sound.EVENT_RAID_HORN, 2.0F, 1.0F);
 
                for (Player defender : loc.getWorld().getPlayers()) {
@@ -403,7 +463,7 @@ public class NexusManager {
          }
 
          for (Player member : Bukkit.getOnlinePlayers()) {
-            if (guild.isMember(member.getUniqueId())) {
+            if (fx && guild.isMember(member.getUniqueId())) {
                ChatUtil.sendActionbar(
                   member,
                   "&c\ud83d\udea8 ALERTE : Votre Nexus est attaqué par &e"
@@ -672,6 +732,17 @@ public class NexusManager {
 
             public void run() {
                long now = System.currentTimeMillis();
+               // Loups de garde : 5 minutes de vie au plus.
+               for (Map.Entry<UUID, Long> born : NexusManager.this.beastBorn.entrySet()) {
+                  Entity beast = Bukkit.getEntity(born.getKey());
+                  if (beast == null || beast.isDead()) {
+                     NexusManager.this.beastBorn.remove(born.getKey());
+                  } else if (now - born.getValue() > 300000L) {
+                     beast.remove();
+                     NexusManager.this.beastBorn.remove(born.getKey());
+                  }
+               }
+
                this.unplacedCheckCounter++;
                if (this.unplacedCheckCounter >= 15) {
                   this.unplacedCheckCounter = 0;
@@ -704,23 +775,36 @@ public class NexusManager {
                      if (loc != null && loc.getWorld() != null && loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
                         if (nexus.isAlive()) {
                            ArmorStand holo = NexusManager.this.holograms.get(guildId);
-                           if (holo == null || !holo.isValid()) {
+                           if (holo == null || !holo.isValid() || NexusManager.this.holoDirty.remove(guildId)) {
                               NexusManager.this.updateHologram(guildx);
                            }
                         }
 
-                        try {
-                           loc.getWorld().spawnParticle(Particle.PORTAL, loc.clone().add(0.5, 0.8, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
-                        } catch (Exception var23) {
+                        // Ni particules ni analyse des entités alentour si personne n'est à proximité (sauf raid en cours : les pièges doivent jouer).
+                        boolean playersNear = !loc.getWorld().getNearbyPlayers(loc, 40.0).isEmpty() || NexusManager.this.plugin.getRaidManager().isGuildUnderRaid(guildId);
+                        if (playersNear) {
+                           try {
+                              loc.getWorld().spawnParticle(Particle.PORTAL, loc.clone().add(0.5, 0.8, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
+                           } catch (Exception var23) {
+                           }
                         }
 
                         if (nexus.isAlive()) {
-                           Collection<Entity> nearbyEntities = loc.getWorld().getNearbyEntities(loc, 18.0, 18.0, 18.0);
+                           Collection<Entity> nearbyEntities = playersNear ? loc.getWorld().getNearbyEntities(loc, 18.0, 18.0, 18.0) : java.util.List.of();
                            if (!nearbyEntities.isEmpty()) {
                               boolean hasArcane = guildx.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE;
                               boolean hasFlameTrap = nexus.hasTrap(NexusTrapType.INFERNAL_FLAMES);
                               boolean hasWebTrap = nexus.hasTrap(NexusTrapType.SLOWDOWN_WEB);
                               boolean hasPoisonTrap = nexus.hasTrap(NexusTrapType.POISON_MIST);
+                              // Ennemis calculés UNE fois par passage (au lieu de recalculer isEnemy pour chaque golem, loup et piège : coût en O(E²)).
+                              List<LivingEntity> enemies = new ArrayList<>();
+                              for (Entity candidate : nearbyEntities) {
+                                 if (candidate instanceof LivingEntity cl && !cl.isDead() && NexusManager.this.isEnemy(guildx, candidate)) {
+                                    enemies.add(cl);
+                                 }
+                              }
+
+                              java.util.Set<Entity> enemySet = new java.util.HashSet<>(enemies);
                               if (hasFlameTrap) {
                                  try {
                                     loc.getWorld().spawnParticle(Particle.FLAME, loc.clone().add(0.5, 0.2, 0.5), 8, 1.5, 0.1, 1.5, 0.02);
@@ -739,16 +823,11 @@ public class NexusManager {
                                  LivingEntity closestAttacker = null;
                                  double closestDistSq = Double.MAX_VALUE;
 
-                                 for (Entity entity : nearbyEntities) {
-                                    if (entity instanceof LivingEntity) {
-                                       LivingEntity living = (LivingEntity)entity;
-                                       if (!living.isDead() && NexusManager.this.isEnemy(guildx, entity)) {
-                                          double dSq = entity.getLocation().distanceSquared(loc);
-                                          if (dSq < closestDistSq) {
-                                             closestDistSq = dSq;
-                                             closestAttacker = living;
-                                          }
-                                       }
+                                 for (LivingEntity living : enemies) {
+                                    double dSq = living.getLocation().distanceSquared(loc);
+                                    if (dSq < closestDistSq) {
+                                       closestDistSq = dSq;
+                                       closestAttacker = living;
                                     }
                                  }
 
@@ -774,13 +853,11 @@ public class NexusManager {
                                     LivingEntity bestTarget = null;
                                     double bestDist = 256.0;
 
-                                    for (Entity candidate : nearbyEntities) {
-                                       if (candidate instanceof LivingEntity candLiving && !candLiving.isDead() && NexusManager.this.isEnemy(guildx, candidate)) {
-                                          double cd = candidate.getLocation().distanceSquared(golem.getLocation());
-                                          if (cd < bestDist) {
-                                             bestDist = cd;
-                                             bestTarget = candLiving;
-                                          }
+                                    for (LivingEntity candLiving : enemies) {
+                                       double cd = candLiving.getLocation().distanceSquared(golem.getLocation());
+                                       if (cd < bestDist) {
+                                          bestDist = cd;
+                                          bestTarget = candLiving;
                                        }
                                     }
 
@@ -794,9 +871,9 @@ public class NexusManager {
                                     if (cur == null || cur.isDead() || !NexusManager.this.isEnemy(guildx, cur)) {
                                        LivingEntity best = null;
                                        double bd = 400.0;
-                                       for (Entity candidate : nearbyEntities) {
-                                          if (candidate instanceof LivingEntity cl && !cl.isDead() && !(candidate instanceof Wolf) && NexusManager.this.isEnemy(guildx, candidate)) {
-                                             double cd = candidate.getLocation().distanceSquared(beast.getLocation());
+                                       for (LivingEntity cl : enemies) {
+                                          if (!(cl instanceof Wolf)) {
+                                             double cd = cl.getLocation().distanceSquared(beast.getLocation());
                                              if (cd < bd) {
                                                 bd = cd;
                                                 best = cl;
@@ -811,7 +888,7 @@ public class NexusManager {
                                     }
                                  }
 
-                                 if (NexusManager.this.isEnemy(guildx, entityx)) {
+                                 if (enemySet.contains(entityx)) {
                                     if (hasFlameTrap && distSq <= 64.0) {
                                        entityx.setFireTicks(60);
                                        if (entityx instanceof Damageable d) {

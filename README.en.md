@@ -403,7 +403,7 @@ With no decision, they are executed. Logging out while captive counts as dying. 
 
 ### The website
 
-The server has a public website: **`http://<server-address>/`**, which updates itself (every 15 seconds). It shows **no coordinates**: nothing that helps find a base. The website is in French.
+The server has a public website: **`http://<server-address>/`**, which updates itself (every 30 seconds, adjustable with `web.refresh-seconds`). It shows **no coordinates**: nothing that helps find a base. The website is in French.
 
 | Page | Content |
 | :--- | :--- |

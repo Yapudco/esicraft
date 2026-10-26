@@ -165,11 +165,8 @@ public class DataManager {
 
    public void deleteMarketListingSync(String listingId) {
       if (listingId != null) {
-         try {
-            this.marketIo.submit(() -> this.storage.deleteMarketListing(listingId)).get(3L, java.util.concurrent.TimeUnit.SECONDS);
-         } catch (Exception e) {
-            this.plugin.getLogger().warning("Suppression d'annonce retardée : " + e.getMessage());
-         }
+         // Mis en file derrière un éventuel INSERT de la même annonce (même thread) : le thread principal n'attend plus la base.
+         this.marketIo.execute(() -> this.storage.deleteMarketListing(listingId));
       }
    }
 

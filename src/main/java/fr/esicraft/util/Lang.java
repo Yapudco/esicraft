@@ -113,6 +113,28 @@ public final class Lang {
          return text;
       }
 
+      // Les mêmes textes reviennent sans cesse (tableau de bord toutes les 2 s, menus) : mémoire des traductions déjà faites.
+      String cached = CACHE.get(text);
+      if (cached != null) {
+         return cached;
+      }
+
+      String translated = translate(text);
+      if (text.length() <= 400) {
+         if (CACHE.size() > 4000) {
+            CACHE.clear();
+         }
+
+         CACHE.put(text, translated);
+      }
+
+      return translated;
+   }
+
+   private static final Map<String, String> CACHE = new ConcurrentHashMap<>();
+
+   private static String translate(String text) {
+
       StringBuilder out = null;
       int last = 0;
       int i = 0;

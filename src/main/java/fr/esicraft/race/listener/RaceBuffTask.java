@@ -20,23 +20,38 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class RaceBuffTask extends BukkitRunnable {
    private final EsicraftPlugin plugin;
-   private static final PotionEffect DWARF_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 1, false, false, true);
+   private static final PotionEffect DWARF_HASTE = new PotionEffect(PotionEffectType.HASTE, 220, 1, false, false, true);
    private static final PotionEffect DWARF_NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 240, 0, false, false, false);
    private static final PotionEffect DWARF_SLOWNESS = new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false, false);
-   private static final PotionEffect RANGER_SPEED = new PotionEffect(PotionEffectType.SPEED, 60, 0, false, false, false);
+   private static final PotionEffect RANGER_SPEED = new PotionEffect(PotionEffectType.SPEED, 220, 0, false, false, false);
    private static final PotionEffect RANGER_SLOWNESS = new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false, true);
-   private static final PotionEffect BLACKSMITH_FIRE_RES = new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 100, 0, false, false, false);
-   private static final PotionEffect SYLVAN_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_WARLORD_STRENGTH = new PotionEffect(PotionEffectType.STRENGTH, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_WARLORD_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_INDUSTRY_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 1, false, false, true);
-   private static final PotionEffect SPEC_DRUID_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 60, 0, false, false, true);
-   private static final PotionEffect SPEC_DRUID_SATURATION = new PotionEffect(PotionEffectType.SATURATION, 60, 0, false, false, true);
-   private static final PotionEffect AGE_SPEED = new PotionEffect(PotionEffectType.SPEED, 60, 0, false, false, true);
-   private static final PotionEffect AGE_HASTE = new PotionEffect(PotionEffectType.HASTE, 60, 0, false, false, true);
-   private static final PotionEffect AGE_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 60, 0, false, false, true);
+   private static final PotionEffect BLACKSMITH_FIRE_RES = new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 220, 0, false, false, false);
+   private static final PotionEffect SYLVAN_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 220, 0, false, false, true);
+   private static final PotionEffect SPEC_WARLORD_STRENGTH = new PotionEffect(PotionEffectType.STRENGTH, 220, 0, false, false, true);
+   private static final PotionEffect SPEC_WARLORD_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 220, 0, false, false, true);
+   private static final PotionEffect SPEC_INDUSTRY_HASTE = new PotionEffect(PotionEffectType.HASTE, 220, 1, false, false, true);
+   private static final PotionEffect SPEC_DRUID_REGEN = new PotionEffect(PotionEffectType.REGENERATION, 220, 0, false, false, true);
+   private static final PotionEffect SPEC_DRUID_SATURATION = new PotionEffect(PotionEffectType.SATURATION, 220, 0, false, false, true);
+   private static final PotionEffect AGE_SPEED = new PotionEffect(PotionEffectType.SPEED, 220, 0, false, false, true);
+   private static final PotionEffect AGE_HASTE = new PotionEffect(PotionEffectType.HASTE, 220, 0, false, false, true);
+   private static final PotionEffect AGE_RESIST = new PotionEffect(PotionEffectType.RESISTANCE, 220, 0, false, false, true);
 
    private final SpecializationRulesListener specializationRules;
+
+   private int runs;
+
+   /**
+    * Applique un effet seulement s'il manque ou s'il va s'épuiser : plus de paquet toutes les 2 secondes, et la durée dépasse 10 s,
+    * seuil sous lequel le client fait clignoter l'icône de l'effet.
+    */
+   private static void buff(Player player, PotionEffect effect) {
+      PotionEffect current = player.getPotionEffect(effect.getType());
+      if (current != null && current.getAmplifier() >= effect.getAmplifier() && current.getDuration() > (effect.getDuration() > 100 ? 100 : 40)) {
+         return;
+      }
+
+      player.addPotionEffect(effect);
+   }
 
    public RaceBuffTask(EsicraftPlugin plugin, SpecializationRulesListener specializationRules) {
       this.plugin = plugin;
@@ -44,6 +59,8 @@ public class RaceBuffTask extends BukkitRunnable {
    }
 
    public void run() {
+      // La restriction du Netherite est déjà appliquée par écouteur : ce filet de sécurité ne passe qu'une fois sur cinq.
+      boolean enforce = ++this.runs % 5 == 0;
       Iterator var1 = Bukkit.getOnlinePlayers().iterator();
 
       while (true) {
@@ -58,36 +75,38 @@ public class RaceBuffTask extends BukkitRunnable {
 
             player = (Player)var1.next();
             if (player.isValid() && player.getLocation().getWorld() != null) {
-               this.specializationRules.enforceNoNetherite(player);
+               if (enforce) {
+                  this.specializationRules.enforceNoNetherite(player);
+               }
                Race race = this.plugin.getRaceManager().getRace(player);
                loc = player.getLocation();
                y = loc.getBlockY();
                switch (race) {
                   case DWARF:
                      if (y <= 0) {
-                        player.addPotionEffect(DWARF_HASTE);
-                        player.addPotionEffect(DWARF_NIGHT_VISION);
+                        buff(player, DWARF_HASTE);
+                        buff(player, DWARF_NIGHT_VISION);
                      } else if (y > 60 && loc.getWorld() != null && loc.getWorld().isClearWeather() && loc.getBlock().getLightFromSky() >= 14) {
-                        player.addPotionEffect(DWARF_SLOWNESS);
+                        buff(player, DWARF_SLOWNESS);
                      }
                      break label65;
                   case RANGER:
                      Biome biome = loc.getBlock().getBiome();
                      String biomeName = biome.name();
                      if (biomeName.contains("PLAINS") || biomeName.contains("FOREST") || biomeName.contains("JUNGLE") || biomeName.contains("TAIGA")) {
-                        player.addPotionEffect(RANGER_SPEED);
+                        buff(player, RANGER_SPEED);
                      }
 
                      ItemStack chest = player.getInventory().getChestplate();
                      if (chest != null && (chest.getType() == Material.DIAMOND_CHESTPLATE || chest.getType() == Material.NETHERITE_CHESTPLATE)) {
-                        player.addPotionEffect(RANGER_SLOWNESS);
+                        buff(player, RANGER_SLOWNESS);
                      }
                      break label65;
                   case BLACKSMITH:
-                     player.addPotionEffect(BLACKSMITH_FIRE_RES);
+                     buff(player, BLACKSMITH_FIRE_RES);
                      break label65;
                   case SYLVAN:
-                     player.addPotionEffect(SYLVAN_REGEN);
+                     buff(player, SYLVAN_REGEN);
                      if (loc.getWorld() != null) {
                         Guild sylvanGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
                         for (Player nearby : loc.getWorld().getNearbyPlayers(loc, 4.0)) {
@@ -95,7 +114,7 @@ public class RaceBuffTask extends BukkitRunnable {
                            Guild nearbyGuild = this.plugin.getGuildManager().getGuildByPlayer(nearby.getUniqueId());
                            boolean isAlly = sylvanGuild != null && nearbyGuild != null && sylvanGuild.getId().equals(nearbyGuild.getId());
                            if (isAlly) {
-                              nearby.addPotionEffect(SYLVAN_REGEN);
+                              buff(nearby, SYLVAN_REGEN);
                            }
                         }
                      }
@@ -111,34 +130,34 @@ public class RaceBuffTask extends BukkitRunnable {
          Guild chunkGuild = this.plugin.getGuildManager().getGuildByChunk(currentChunk);
          Guild playerGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          if (playerGuild != null && playerGuild.getSpecialization() == GuildSpecialization.LONE_RANGER) {
-            player.addPotionEffect(RANGER_SPEED);
+            buff(player, RANGER_SPEED);
          }
 
          if (chunkGuild != null && chunkGuild.isMember(player.getUniqueId())) {
             GuildSpecialization spec = chunkGuild.getSpecialization();
             switch (spec) {
                case WARLORD:
-                  player.addPotionEffect(SPEC_WARLORD_STRENGTH);
-                  player.addPotionEffect(SPEC_WARLORD_RESIST);
+                  buff(player, SPEC_WARLORD_STRENGTH);
+                  buff(player, SPEC_WARLORD_RESIST);
                   break;
                case UNDERGROUND_INDUSTRY:
                   if (y <= 30) {
-                     player.addPotionEffect(SPEC_INDUSTRY_HASTE);
+                     buff(player, SPEC_INDUSTRY_HASTE);
                   }
                   break;
                case DRUIDIC_ENCLAVE:
-                  player.addPotionEffect(SPEC_DRUID_REGEN);
-                  player.addPotionEffect(SPEC_DRUID_SATURATION);
+                  buff(player, SPEC_DRUID_REGEN);
+                  buff(player, SPEC_DRUID_SATURATION);
             }
          }
 
          AgeType playerAge = this.plugin.getAgeManager().getPlayerAge(player);
          if (playerAge == AgeType.TOTAL_WAR) {
-            player.addPotionEffect(AGE_SPEED);
+            buff(player, AGE_SPEED);
          } else if (playerAge == AgeType.MYTHIC || playerAge == AgeType.SUPREMACY) {
-            player.addPotionEffect(AGE_HASTE);
-            player.addPotionEffect(AGE_SPEED);
-            player.addPotionEffect(AGE_RESIST);
+            buff(player, AGE_HASTE);
+            buff(player, AGE_SPEED);
+            buff(player, AGE_RESIST);
          }
       }
    }

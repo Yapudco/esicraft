@@ -95,7 +95,7 @@ Le territoire se compte en **chunks** (carrés de 16 × 16 blocs). Avec `/guild 
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Chunks max | 16 | 32 | 64 | 128 | illimité |
 
-`/guild claim show` affiche les bordures de ton territoire.
+`/guild claim show` affiche pendant une minute les **bords extérieurs** des territoires dans un rayon de 2 chunks (vert : le tien, rouge : les autres).
 
 ### Ce qui est protégé chez une guilde
 
@@ -400,7 +400,7 @@ Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mou
 
 ### Le site web
 
-Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à jour tout seul (toutes les 15 secondes). Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
+Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à jour tout seul (toutes les 30 secondes, réglable avec `web.refresh-seconds`). Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
 
 | Page | Contenu |
 | :--- | :--- |

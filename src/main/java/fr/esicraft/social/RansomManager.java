@@ -272,6 +272,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
 
    private void tick() {
       long now = System.currentTimeMillis();
+      this.immuneUntil.values().removeIf(until -> until < now);
       for (Captive c : new ArrayList<>(this.captives.values())) {
          Player victim = Bukkit.getPlayer(c.victim);
          if (victim == null) {

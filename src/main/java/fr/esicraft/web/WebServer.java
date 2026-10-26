@@ -49,7 +49,7 @@ public class WebServer {
    private volatile Map<String, Page> pages = Map.of();
    /** HTML brut (français, avec marqueur de langue) : la version anglaise n'est traduite qu'à la première demande puis gardée jusqu'au prochain instantané. */
    private volatile Map<String, String> rawPages = Map.of();
-   private volatile java.util.List<String> protectedNames = java.util.List.of();
+   private volatile WebI18n.NameIndex protectedIndex = WebI18n.NameIndex.of(java.util.List.of());
    private final Map<String, Page> pagesEn = new ConcurrentHashMap<>();
    private volatile String rawNotFound = "";
    private final HeadService heads;
@@ -163,7 +163,7 @@ public class WebServer {
          return;
       }
 
-      long period = Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 15L)) * 20L;
+      long period = Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 30L)) * 20L;
       this.refreshTask = Bukkit.getScheduler().runTaskTimer(this.plugin, this::capture, 40L, period);
    }
 
@@ -527,7 +527,7 @@ public class WebServer {
    private void render(WebSnapshot s, WebExtra x) {
       String name = HtmlPages.plain(this.plugin.getConfig().getString("web.server-name", "Esicraft"));
       Map<String, Page> map = new HashMap<>();
-      int live = (int)Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 15L));
+      int live = (int)Math.max(5L, this.plugin.getConfig().getLong("web.refresh-seconds", 30L));
       boolean raid = !x.raids().isEmpty();
       map.put("/", html(200, HtmlPages.page(name, "home", "Accueil", HtmlPages.home(name, s, x), s, live, raid)));
       map.put("/guildes", html(200, HtmlPages.page(name, "guildes", "Guildes", HtmlPages.guilds(s), s, live, raid)));
@@ -583,7 +583,7 @@ public class WebServer {
       String missing = HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s, 0, raid);
       this.notFound = html(404, WebI18n.french(missing));
       this.rawNotFound = missing;
-      this.protectedNames = java.util.List.copyOf(names);
+      this.protectedIndex = WebI18n.NameIndex.of(names);
       this.rawPages = Map.copyOf(raws);
       this.pagesEn.clear();
       this.pages = Map.copyOf(french);
@@ -617,13 +617,13 @@ public class WebServer {
          return fr;
       }
 
-      Page en = html(fr.status(), WebI18n.english(raw, this.protectedNames));
+      Page en = html(fr.status(), WebI18n.english(raw, this.protectedIndex));
       this.pagesEn.putIfAbsent(path, en);
       return en;
    }
 
    private Page englishNotFound() {
-      return html(404, WebI18n.english(this.rawNotFound, this.protectedNames));
+      return html(404, WebI18n.english(this.rawNotFound, this.protectedIndex));
    }
 
    private static Page html(int status, String body) {

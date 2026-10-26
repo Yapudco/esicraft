@@ -23,18 +23,45 @@ final class WebI18n {
       return html.replace(MARKER, "<a class=\"nl lang\" data-lang=\"en\" href=\"?lang=en\" hreflang=\"en\" title=\"English\">EN</a>");
    }
 
-   /** {@code names} : noms de guildes et de joueurs (échappés en HTML), jamais traduits même s'ils contiennent un mot du dictionnaire. */
-   static String english(String html, java.util.Collection<String> names) {
-      java.util.List<String> protectedNames = names.stream().filter(n -> n != null && n.length() >= 3).sorted((a, b) -> Integer.compare(b.length(), a.length())).toList();
+   /**
+    * Noms de guildes et de joueurs (échappés en HTML), jamais traduits même s'ils contiennent un mot du dictionnaire.
+    * Indexés par première lettre : la recherche dans un texte coûte quelques comparaisons, pas un parcours de tous les noms.
+    */
+   static final class NameIndex {
+      private final java.util.Map<Character, String[]> byFirst;
+
+      private NameIndex(java.util.Map<Character, String[]> byFirst) {
+         this.byFirst = byFirst;
+      }
+
+      static NameIndex of(java.util.Collection<String> names) {
+         java.util.Map<Character, java.util.List<String>> tmp = new java.util.HashMap<>();
+         for (String n : new java.util.HashSet<>(names)) {
+            if (n != null && n.length() >= 3) {
+               tmp.computeIfAbsent(n.charAt(0), k -> new java.util.ArrayList<>()).add(n);
+            }
+         }
+
+         java.util.Map<Character, String[]> out = new java.util.HashMap<>();
+         for (var e : tmp.entrySet()) {
+            e.getValue().sort((x, y) -> Integer.compare(y.length(), x.length()));
+            out.put(e.getKey(), e.getValue().toArray(new String[0]));
+         }
+
+         return new NameIndex(out);
+      }
+   }
+
+   static String english(String html, NameIndex names) {
       String page = html.replace(MARKER, "<a class=\"nl lang\" data-lang=\"fr\" href=\"?lang=fr\" hreflang=\"fr\" title=\"Français\">FR</a>").replace("<html lang=\"fr\">", "<html lang=\"en\">");
       Matcher m = TOKEN.matcher(page);
       StringBuilder out = new StringBuilder(page.length() + 256);
       while (m.find()) {
          String rep;
          if (m.group(1) != null) {
-            rep = ">" + translate(m.group(1), protectedNames) + "<";
+            rep = ">" + translate(m.group(1), names) + "<";
          } else if (m.group(3) != null) {
-            rep = m.group(2) + "=\"" + translate(m.group(3), protectedNames) + "\"";
+            rep = m.group(2) + "=\"" + translate(m.group(3), names) + "\"";
          } else if (m.group(4) != null) {
             rep = "href=\"" + link(m.group(4)) + "\"";
          } else {
@@ -48,26 +75,42 @@ final class WebI18n {
       return out.toString();
    }
 
-   private static String translate(String text, java.util.List<String> protectedNames) {
+   private static String translate(String text, NameIndex names) {
       if (text.isBlank()) {
          return text;
       }
 
-      int bestAt = -1;
-      String best = null;
-      for (String name : protectedNames) {
-         int at = text.indexOf(name);
-         if (at >= 0 && (bestAt < 0 || at < bestAt)) {
-            bestAt = at;
-            best = name;
+      StringBuilder out = null;
+      int last = 0;
+      int i = 0;
+      int n = text.length();
+      while (i < n) {
+         String[] candidates = names.byFirst.get(text.charAt(i));
+         String hit = null;
+         if (candidates != null) {
+            for (String c : candidates) {
+               if (text.startsWith(c, i)) {
+                  hit = c;
+                  break;
+               }
+            }
          }
+
+         if (hit == null) {
+            i++;
+            continue;
+         }
+
+         if (out == null) {
+            out = new StringBuilder(n + 16);
+         }
+
+         out.append(translateSegment(text.substring(last, i))).append(hit);
+         i += hit.length();
+         last = i;
       }
 
-      if (best != null) {
-         return translate(text.substring(0, bestAt), protectedNames) + best + translate(text.substring(bestAt + best.length()), protectedNames);
-      }
-
-      return translateSegment(text);
+      return out == null ? translateSegment(text) : out.append(translateSegment(text.substring(last))).toString();
    }
 
    private static String translateSegment(String text) {

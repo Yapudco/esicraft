@@ -163,6 +163,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.mentors.init();
       this.ransom.start();
       this.cosmetics.init();
+      this.guildManager.initCaches();
       this.disguiseManager.init();
       this.railManager.load();
       this.treatyManager.load();
@@ -243,6 +244,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       if (this.nexusManager != null) {
          this.nexusManager.removeAllHolograms();
       }
+
+      fr.esicraft.util.PlacedBlockTracker.flushShared();
 
       if (this.loans != null) {
          this.loans.shutdown();

@@ -750,16 +750,8 @@ public class GuildManager {
 
    private long specCooldownLeftMs(Guild guild) {
       long days = this.plugin.getConfig().getLong("guilds.spec-change-cooldown-days", 7L);
-      var rows = this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, "speccd:" + guild.getId());
-      if (days <= 0L || rows.isEmpty()) {
-         return 0L;
-      }
-
-      try {
-         return Math.max(0L, Long.parseLong((String)rows.get(0)[0]) + days * 86400000L - System.currentTimeMillis());
-      } catch (NumberFormatException e) {
-         return 0L;
-      }
+      Long changed = this.specChangedAt.get(guild.getId());
+      return days <= 0L || changed == null ? 0L : Math.max(0L, changed + days * 86400000L - System.currentTimeMillis());
    }
 
    public boolean setSpecialization(Guild guild, GuildSpecialization spec, Player player) {
@@ -814,6 +806,7 @@ public class GuildManager {
                guild.setSpecialization(spec);
                guild.setCanChangeSpecialization(false);
                String cdKey = "speccd:" + guild.getId();
+               this.specChangedAt.put(guild.getId(), System.currentTimeMillis());
                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage()
                   .exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", cdKey, String.valueOf(System.currentTimeMillis())));
                if (guild.hasNexus()) {
@@ -1209,22 +1202,46 @@ public class GuildManager {
       return this.pendingAnnexationChoices.get(playerUuid);
    }
 
-   private final java.util.Map<String, long[]> hegemonyCache = new java.util.concurrent.ConcurrentHashMap<>();
+   private final java.util.Map<String, Boolean> hegemonyCache = new java.util.concurrent.ConcurrentHashMap<>();
+   private final java.util.Map<String, Long> specChangedAt = new java.util.concurrent.ConcurrentHashMap<>();
 
-   /** Résultat gardé 30 s par guilde : le calcul lit le classement et les comptes de tous les membres (base de données). */
+   /** À appeler au démarrage : charge les délais de spécialisation et lance le recalcul périodique (asynchrone) de l'hégémonie. */
+   public void initCaches() {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'speccd:%';", 2)) {
+         try {
+            this.specChangedAt.put(((String)row[0]).substring(7), Long.parseLong((String)row[1]));
+         } catch (NumberFormatException ignored) {
+         }
+      }
+
+      Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, () -> {
+         for (Guild g : this.getAllGuilds()) {
+            this.hegemonyCache.put(g.getId(), this.computeEconomicHegemony(g));
+         }
+
+         this.hegemonyCache.keySet().removeIf(id -> this.getGuildById(id) == null);
+         long nowMs = System.currentTimeMillis();
+         this.pendingInvites.values().forEach(m -> m.values().removeIf(expiry -> expiry < nowMs));
+         this.pendingInvites.values().removeIf(Map::isEmpty);
+      }, 200L, 600L);
+   }
+
+   /**
+    * Statut d'hégémonie : lu en mémoire (recalculé toutes les 30 s en tâche de fond). Le calcul (classement, comptes des membres)
+    * lit la base de données, il n'est donc jamais fait pendant un tick du serveur, sauf pour une guilde jamais calculée.
+    */
    public boolean isEconomicHegemony(Guild targetGuild) {
       if (targetGuild == null) {
          return false;
       }
 
-      long now = System.currentTimeMillis();
-      long[] cached = this.hegemonyCache.get(targetGuild.getId());
-      if (cached != null && now - cached[0] < 30000L) {
-         return cached[1] == 1L;
+      Boolean cached = this.hegemonyCache.get(targetGuild.getId());
+      if (cached != null) {
+         return cached;
       }
 
       boolean result = this.computeEconomicHegemony(targetGuild);
-      this.hegemonyCache.put(targetGuild.getId(), new long[]{now, result ? 1L : 0L});
+      this.hegemonyCache.put(targetGuild.getId(), result);
       return result;
    }
 

@@ -82,7 +82,7 @@ public class RaceInteractionListener implements Listener {
    );
 
    public RaceInteractionListener(EsicraftPlugin plugin) {
-      this.placedTracker = new fr.esicraft.util.PlacedBlockTracker(plugin);
+      this.placedTracker = fr.esicraft.util.PlacedBlockTracker.shared(plugin);
       this.plugin = plugin;
    }
 
@@ -381,31 +381,44 @@ public class RaceInteractionListener implements Listener {
    // Les bonus de drop sont calculés APRÈS les protections (claims en HIGH), sinon un bloc protégé
    // (cancel tardif) laisserait quand même tomber les drops bonus.
    // Alambic : l'alimentation automatique par entonnoir ne doit pas contourner la restriction (Arcaniste / Âge 3)
+   // Alambic alimenté par entonnoir : la restriction (Arcaniste / Âge 3) s'applique à la fin du brassage (BrewEvent) plutôt qu'à chaque objet déplacé
+   // par un entonnoir : écouter InventoryMoveItemEvent fait perdre à Paper l'optimisation de tous les entonnoirs du serveur.
    @EventHandler(
       priority = EventPriority.HIGH,
       ignoreCancelled = true
    )
-   public void onHopperToBrewingStand(org.bukkit.event.inventory.InventoryMoveItemEvent event) {
-      if (event.getDestination().getType() == InventoryType.BREWING && event.getDestination().getLocation() != null) {
-         Block stand = event.getDestination().getLocation().getBlock();
-         Guild owner = this.plugin.getGuildManager().getGuildByChunk(ChunkKey.from(stand.getChunk()));
-         boolean allowed = false;
-         if (owner != null) {
-            if (owner.getCurrentAge().getLevel() >= 3) {
-               allowed = true;
-            } else {
-               for (java.util.UUID memberUuid : owner.getMembers().keySet()) {
-                  if (this.plugin.getRaceManager().getRace(memberUuid) == Race.ARCANIST) {
-                     allowed = true;
-                     break;
-                  }
+   public void onBrewHopperFed(org.bukkit.event.inventory.BrewEvent event) {
+      Block stand = event.getBlock();
+      boolean hopperFed = false;
+      for (org.bukkit.block.BlockFace face : new org.bukkit.block.BlockFace[]{org.bukkit.block.BlockFace.UP, org.bukkit.block.BlockFace.NORTH, org.bukkit.block.BlockFace.SOUTH,
+         org.bukkit.block.BlockFace.EAST, org.bukkit.block.BlockFace.WEST, org.bukkit.block.BlockFace.DOWN}) {
+         if (stand.getRelative(face).getType() == Material.HOPPER) {
+            hopperFed = true;
+            break;
+         }
+      }
+
+      if (!hopperFed) {
+         return;
+      }
+
+      Guild owner = this.plugin.getGuildManager().getGuildByChunk(new ChunkKey(stand.getWorld().getName(), stand.getX() >> 4, stand.getZ() >> 4));
+      boolean allowed = false;
+      if (owner != null) {
+         if (owner.getCurrentAge().getLevel() >= 3) {
+            allowed = true;
+         } else {
+            for (java.util.UUID memberUuid : owner.getMembers().keySet()) {
+               if (this.plugin.getRaceManager().getRace(memberUuid) == Race.ARCANIST) {
+                  allowed = true;
+                  break;
                }
             }
          }
+      }
 
-         if (!allowed) {
-            event.setCancelled(true);
-         }
+      if (!allowed) {
+         event.setCancelled(true);
       }
    }
 

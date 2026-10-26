@@ -41,7 +41,7 @@ public class ContractListener implements Listener {
 
    public ContractListener(EsicraftPlugin plugin) {
       this.plugin = plugin;
-      this.placedTracker = new PlacedBlockTracker(plugin);
+      this.placedTracker = PlacedBlockTracker.shared(plugin);
    }
 
    private static boolean isOre(Material mat) {

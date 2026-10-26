@@ -39,6 +39,9 @@ public class SQLiteStorage {
    private final EsicraftPlugin plugin;
    private final File dbFile;
    private Connection connection;
+   /** Seconde connexion, en lecture seule (mode WAL) : les lectures ne font plus la queue derrière les sauvegardes. */
+   private Connection readConnection;
+   private final Object readLock = new Object();
 
    public SQLiteStorage(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -56,6 +59,11 @@ public class SQLiteStorage {
          this.applyPragmas();
          this.createTables();
          this.runMigrations();
+         this.readConnection = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile.getAbsolutePath());
+         try (Statement st = this.readConnection.createStatement()) {
+            st.execute("PRAGMA busy_timeout=5000;");
+            st.execute("PRAGMA query_only=ON;");
+         }
          this.plugin.getLogger().info("Base de données SQLite initialisée avec succès.");
       } catch (Exception var2) {
          this.plugin.getLogger().log(Level.SEVERE, "Impossible d'initialiser SQLite !", (Throwable)var2);
@@ -66,6 +74,7 @@ public class SQLiteStorage {
       try (Statement st = this.connection.createStatement()) {
          st.execute("PRAGMA journal_mode=WAL;");
          st.execute("PRAGMA synchronous=NORMAL;");
+         st.execute("PRAGMA busy_timeout=5000;");
          st.execute("PRAGMA cache_size=-4000;");
       }
    }
@@ -715,10 +724,12 @@ public class SQLiteStorage {
    }
 
    /** Lecture SQL générique : renvoie les lignes sous forme de tableaux de {@code columns} colonnes. */
-   public synchronized List<Object[]> select(String sql, int columns, Object... params) {
+   public List<Object[]> select(String sql, int columns, Object... params) {
       List<Object[]> rows = new java.util.ArrayList<>();
-      if (this.connection != null) {
-         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+      Connection source = this.readConnection != null ? this.readConnection : this.connection;
+      if (source != null) {
+         synchronized (this.readLock) {
+         try (PreparedStatement ps = source.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
                ps.setObject(i + 1, params[i]);
             }
@@ -735,6 +746,7 @@ public class SQLiteStorage {
             }
          } catch (SQLException e) {
             this.plugin.getLogger().log(Level.WARNING, "Erreur SQL (" + sql + ") : " + e.getMessage());
+         }
          }
       }
 
@@ -919,6 +931,17 @@ public class SQLiteStorage {
    }
 
    public synchronized void close() {
+      synchronized (this.readLock) {
+         if (this.readConnection != null) {
+            try {
+               this.readConnection.close();
+            } catch (SQLException ignored) {
+            }
+
+            this.readConnection = null;
+         }
+      }
+
       if (this.connection != null) {
          try {
             this.connection.close();
