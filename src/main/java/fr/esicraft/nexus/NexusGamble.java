@@ -14,34 +14,42 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 /**
  * Roulette russe du Nexus ({@code /nexus gamble}) : le chef de guilde, face au Nexus, tente un coup de poker ultime.
- * Pile : +1 000 PV max et 2 000 pièces à la banque. Face : −1 500 PV et une mini-horde de pillards surgit sans préavis (le Nexus survit toujours à 1 PV).
+ * Pile : +1 000 PV max (cumul plafonné par {@code nexus.gamble.max-bonus-hp}) et 2 000 pièces à la banque.
+ * Face : −1 500 PV, −500 PV max (bonus de roulette repris), 1 000 pièces perdues par la banque et une mini-horde de pillards sans préavis.
+ * Le Nexus survit toujours (1 PV minimum). Le pari est donc risqué sur la durée et le bonus de vie ne peut pas croître sans limite.
  */
 public class NexusGamble {
    private final EsicraftPlugin plugin;
    /** Chef ayant demandé confirmation → échéance. */
    private final Map<UUID, Long> pending = new ConcurrentHashMap<>();
+   private final Map<String, Long> last = new ConcurrentHashMap<>();
+   /** Bonus de PV max cumulé par la roulette (guilde → PV). */
+   private final Map<String, Integer> bonus = new ConcurrentHashMap<>();
 
    public NexusGamble(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }
 
-   private String key(Guild guild) {
-      return "gamble:" + guild.getId();
-   }
-
-   private long lastGamble(Guild guild) {
-      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, this.key(guild))) {
+   public void init() {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'gamble:%' OR k LIKE 'gamble_bonus:%';", 2)) {
+         String k = String.valueOf(row[0]);
          try {
-            return Long.parseLong(String.valueOf(row[0]));
+            if (k.startsWith("gamble_bonus:")) {
+               this.bonus.put(k.substring(13), Integer.parseInt(String.valueOf(row[1])));
+            } else {
+               this.last.put(k.substring(7), Long.parseLong(String.valueOf(row[1])));
+            }
          } catch (NumberFormatException ignored) {
          }
       }
+   }
 
-      return 0L;
+   private void kvSet(String key, String value) {
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+         "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", key, value));
    }
 
    public void attempt(Player player, Guild guild) {
@@ -67,10 +75,10 @@ public class NexusGamble {
          return;
       }
 
-      long cooldownMs = this.plugin.getConfig().getLong("nexus.gamble.cooldown-hours", 24L) * 3600000L;
-      long left = this.lastGamble(guild) + cooldownMs - System.currentTimeMillis();
+      long cooldownMs = this.plugin.getConfig().getLong("nexus.gamble.cooldown-hours", 72L) * 3600000L;
+      long left = this.last.getOrDefault(guild.getId(), 0L) + cooldownMs - System.currentTimeMillis();
       if (left > 0 && !this.plugin.bypassCooldowns(player)) {
-         ChatUtil.sendMessage(player, "&c❌ Le Nexus a déjà tenté sa chance : revenez dans &e" + (left / 60000L) + " min&c.");
+         ChatUtil.sendMessage(player, "&c❌ Le Nexus a déjà tenté sa chance : revenez dans &e" + fr.esicraft.treaty.TreatyManager.formatDuration(left) + "&c.");
          return;
       }
 
@@ -78,17 +86,21 @@ public class NexusGamble {
       Long ask = this.pending.get(player.getUniqueId());
       if (ask == null || ask < now) {
          this.pending.put(player.getUniqueId(), now + 15000L);
-         ChatUtil.sendMessage(player, "&4&l☠ ROULETTE RUSSE &c: 50 % de chance de gagner &a+1000 PV max &cet &62000 pièces&c, 50 % de perdre &41500 PV &cet de subir une horde de pillards. Retapez &e/nexus gamble &cdans 15 s pour confirmer.");
+         ChatUtil.sendMessage(player, "&4&l☠ ROULETTE RUSSE &c: 50 % de gagner &a+1000 PV max &cet &62000 pièces&c ; 50 % de perdre &41500 PV&c, &4500 PV max&c, &61000 pièces de la banque&c et de subir une horde de pillards. Retapez &e/nexus gamble &cdans 15 s pour confirmer.");
          return;
       }
 
       this.pending.remove(player.getUniqueId());
-      String key = this.key(guild);
-      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
-         "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", key, String.valueOf(System.currentTimeMillis())));
+      this.last.put(guild.getId(), now);
+      this.kvSet("gamble:" + guild.getId(), String.valueOf(now));
       ChatUtil.broadcast("&4&l☠ " + player.getName() + " &c fait tourner la roulette russe du Nexus de &6" + guild.getName() + " &c…");
       loc.getWorld().playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2.0F, 0.6F);
       Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.resolve(player, guild, nexus, loc), 40L);
+   }
+
+   private void setBonus(String guildId, int value) {
+      this.bonus.put(guildId, value);
+      this.kvSet("gamble_bonus:" + guildId, String.valueOf(value));
    }
 
    private void resolve(Player player, Guild guild, Nexus nexus, Location loc) {
@@ -96,26 +108,34 @@ public class NexusGamble {
          return;
       }
 
+      int current = this.bonus.getOrDefault(guild.getId(), 0);
       if (ThreadLocalRandom.current().nextBoolean()) {
-         int gainHp = this.plugin.getConfig().getInt("nexus.gamble.win-max-hp", 1000);
+         int cap = this.plugin.getConfig().getInt("nexus.gamble.max-bonus-hp", 3000);
+         int gainHp = Math.max(0, Math.min(this.plugin.getConfig().getInt("nexus.gamble.win-max-hp", 1000), cap - current));
          double coins = this.plugin.getConfig().getDouble("nexus.gamble.win-coins", 2000.0);
          nexus.setMaxHealth(nexus.getMaxHealth() + gainHp);
          nexus.heal(gainHp);
+         this.setBonus(guild.getId(), current + gainHp);
          guild.depositBank(coins);
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, loc.clone().add(0.5, 1.0, 0.5), 80, 1.0, 1.0, 1.0, 0.3);
          loc.getWorld().playSound(loc, Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
          this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.NEXUS_GAMBLER);
-         ChatUtil.broadcast("&a&l✔ LA CHANCE SOURIT À &6" + guild.getName() + " &a: Nexus &2+" + gainHp + " PV max&a et &6+" + (long)coins + " pièces &adans la banque !");
+         ChatUtil.broadcast("&a&l✔ LA CHANCE SOURIT À &6" + guild.getName() + " &a: Nexus &2+" + gainHp + " PV max&a" + (gainHp == 0 ? " (plafond atteint)" : "") + " et &6+" + (long)coins + " pièces &adans la banque !");
       } else {
          int loss = this.plugin.getConfig().getInt("nexus.gamble.lose-hp", 1500);
-         nexus.setCurrentHealth(Math.max(1, nexus.getCurrentHealth() - loss));
+         int maxLoss = Math.min(current, this.plugin.getConfig().getInt("nexus.gamble.lose-max-hp", 500));
+         nexus.setMaxHealth(nexus.getMaxHealth() - maxLoss);
+         nexus.setCurrentHealth(Math.max(1, Math.min(nexus.getCurrentHealth() - loss, nexus.getMaxHealth())));
+         this.setBonus(guild.getId(), current - maxLoss);
+         double fine = Math.min(guild.getBankBalance(), this.plugin.getConfig().getDouble("nexus.gamble.lose-coins", 1000.0));
+         guild.withdrawBank(fine);
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, loc.clone().add(0.5, 1.0, 0.5), 3, 1.0, 0.5, 1.0, 0.0);
          loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3.0F, 0.6F);
-         ChatUtil.broadcast("&4&l✖ LA ROULETTE A TOURNÉ CONTRE &6" + guild.getName() + " &4: Nexus &c-" + loss + " PV&4 et une horde de pillards surgit !");
+         ChatUtil.broadcast("&4&l✖ LA ROULETTE A TOURNÉ CONTRE &6" + guild.getName() + " &4: Nexus &c-" + loss + " PV&4, &c-" + (long)fine + " pièces &4et une horde de pillards surgit !");
          this.spawnHorde(loc);
       }
    }
@@ -127,6 +147,7 @@ public class NexusGamble {
          double angle = Math.PI * 2 * i / count;
          Location s = nexusLoc.clone().add(Math.cos(angle) * 4.0, 1.0, Math.sin(angle) * 4.0);
          EntityType type = i == 0 ? EntityType.VINDICATOR : EntityType.PILLAGER;
+         // Apparus par commande (raison CUSTOM) : ces mobs ne rapportent aucune prime.
          Mob mob = (Mob)nexusLoc.getWorld().spawnEntity(s, type);
          mob.setRemoveWhenFarAway(true);
          mob.setPersistent(false);
@@ -134,8 +155,7 @@ public class NexusGamble {
       }
 
       // La horde se dissipe au bout de 5 minutes si elle n'a pas été abattue.
-      BukkitTask[] holder = new BukkitTask[1];
-      holder[0] = Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+      Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
          for (Mob m : horde) {
             if (m.isValid()) {
                m.remove();
@@ -146,5 +166,7 @@ public class NexusGamble {
 
    public void clear() {
       this.pending.clear();
+      this.last.clear();
+      this.bonus.clear();
    }
 }

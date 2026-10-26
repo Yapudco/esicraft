@@ -188,6 +188,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.duels.init();
       this.tavern.init();
       this.nexusTech.init();
+      this.nexusGamble.init();
       this.siege.init();
       this.bourse.init();
       this.cosmetics.init();

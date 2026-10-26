@@ -104,6 +104,16 @@ public class TruceManager implements Listener {
       return from.isBefore(end) && to.isAfter(start);
    }
 
+   /** Vrai (avec message) si la trêve interdit l'action : on ne frappe ni Nexus, ni convoi, on ne lance pas de horde, on ne pille pas. */
+   public boolean denyHostile(Player player) {
+      if (!this.isTruce() || this.plugin.bypassCooldowns(player)) {
+         return false;
+      }
+
+      ChatUtil.sendActionbar(player, "&a🕊 Trêve : aucune attaque (Nexus, raids, convois) n'est permise pour l'instant.");
+      return true;
+   }
+
    private void tick() {
       boolean now = this.isTruce();
       if (now != this.wasTruce) {

@@ -294,7 +294,8 @@ betting:
   window-seconds: 120                    # Durée pendant laquelle on peut parier après le début d'un raid / duel
   tax-percent: 5.0                       # Taxe du serveur sur la cagnotte
   min: 10
-  max: 5000
+  max: 1000
+  min-account-days: 3                    # Ancienneté minimale du compte pour parier
 
 # Tavernes (zones neutres, pile ou face)
 taverns:
@@ -351,10 +352,13 @@ nexus:
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
   gamble:                          # Roulette russe (/nexus gamble)
-    cooldown-hours: 24
+    cooldown-hours: 72
     win-max-hp: 1000
     win-coins: 2000.0
+    max-bonus-hp: 3000             # Bonus de PV max cumulé au plus par la roulette
     lose-hp: 1500                  # Le Nexus survit toujours (1 PV minimum)
+    lose-max-hp: 500               # PV max repris (du bonus de roulette uniquement)
+    lose-coins: 1000.0             # Pièces retirées de la banque en cas de défaite
     horde-size: 6
 
 economy:

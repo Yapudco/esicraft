@@ -235,6 +235,10 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
          return false;
       }
 
+      if (this.plugin.getTruce().denyHostile(player)) {
+         return true;
+      }
+
       long now = System.currentTimeMillis();
       Long last = this.lastPickaxe.get(player.getUniqueId());
       if (last == null || now - last >= 500L) {
@@ -450,7 +454,7 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
                ChatUtil.broadcast("&c⚔ Dans moins d'une heure : siège de &6" + d.getName() + " &cpar &6" + a.getName() + " &c!");
             }
 
-            if (now >= s.start) {
+            if (now >= s.start && !this.plugin.getTruce().isTruce()) {
                s.state = State.ACTIVE;
                this.persist(s);
                ChatUtil.broadcast("&4&l⚔ LE SIÈGE COMMENCE ! &c" + a.getName() + " &7assiège &6" + d.getName() + "&7 pendant " + (s.end - s.start) / 60000L + " minutes : Nexus attaquable à la pioche et à l'arme lourde !");

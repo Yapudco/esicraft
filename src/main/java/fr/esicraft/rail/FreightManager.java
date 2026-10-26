@@ -3,7 +3,6 @@ package fr.esicraft.rail;
 import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.age.AgeType;
 import fr.esicraft.data.PlayerData;
-import fr.esicraft.gui.holder.BaseGUIHolder;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildRole;
 import fr.esicraft.util.ChatUtil;
@@ -38,6 +37,7 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -64,6 +64,7 @@ public class FreightManager implements Listener {
       StorageMinecart cart;
       String lastOwner = "";
       long lastHit;
+      boolean watched;
 
       Convoy(String id, String guildId, UUID sender, String senderName, String fromStation, String toStation, String world, long started, long duration, long[] path, ItemStack[] cargo, int hits) {
          this.id = id;
@@ -93,14 +94,25 @@ public class FreightManager implements Listener {
       }
    }
 
-   static final class LoadHolder extends BaseGUIHolder {
+   /** Coffre de chargement : ce n'est volontairement PAS un BaseGUIHolder (le listener global annulerait tous les clics et rien ne pourrait y être déposé). */
+   static final class LoadHolder implements InventoryHolder {
       RailSearch.Reached trip;
       boolean done;
+
+      @Override
+      public Inventory getInventory() {
+         return null;
+      }
    }
 
-   static final class BoxHolder extends BaseGUIHolder {
+   static final class BoxHolder implements InventoryHolder {
       String guildId;
       String stationId;
+
+      @Override
+      public Inventory getInventory() {
+         return null;
+      }
    }
 
    private final EsicraftPlugin plugin;
@@ -108,6 +120,14 @@ public class FreightManager implements Listener {
    private final Map<String, Convoy> convoys = new ConcurrentHashMap<>();
    private final Map<UUID, Convoy> byCart = new ConcurrentHashMap<>();
    private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
+   /** Une seule boîte de livraison en mémoire par (guilde, gare) : tous les officiers qui l'ouvrent partagent le même inventaire, donc rien ne se duplique. */
+   private final Map<String, Inventory> boxes = new ConcurrentHashMap<>();
+   /** Toutes les écritures passent par ce fil unique : leur ordre est garanti. */
+   private final java.util.concurrent.ExecutorService io = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+      Thread t = new Thread(r, "esicraft-freight-io");
+      t.setDaemon(true);
+      return t;
+   });
    private int tickCounter;
 
    public FreightManager(EsicraftPlugin plugin, RailManager rails) {
@@ -149,9 +169,9 @@ public class FreightManager implements Listener {
    }
 
    private void async(Runnable r) {
-      if (this.plugin.isEnabled()) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, r);
-      } else {
+      try {
+         this.io.execute(r);
+      } catch (java.util.concurrent.RejectedExecutionException e) {
          r.run();
       }
    }
@@ -178,6 +198,18 @@ public class FreightManager implements Listener {
          this.despawn(c);
       }
 
+      for (Map.Entry<String, Inventory> e : this.boxes.entrySet()) {
+         String[] k = e.getKey().split("\\|", 2);
+         this.saveBox(k[0], k[1], e.getValue().getContents());
+      }
+
+      this.io.shutdown();
+      try {
+         this.io.awaitTermination(10L, java.util.concurrent.TimeUnit.SECONDS);
+      } catch (InterruptedException ignored) {
+         Thread.currentThread().interrupt();
+      }
+
       for (Map.Entry<UUID, Pending> e : this.pending.entrySet()) {
          Player p = Bukkit.getPlayer(e.getKey());
          if (p != null) {
@@ -197,6 +229,7 @@ public class FreightManager implements Listener {
       this.convoys.clear();
       this.byCart.clear();
       this.pending.clear();
+      this.boxes.clear();
    }
 
    public java.util.Collection<Convoy> convoys() {
@@ -387,6 +420,10 @@ public class FreightManager implements Listener {
 
    // ------------------------------------------------------------------ livraisons
 
+   private static String boxKey(String guildId, String stationId) {
+      return guildId + "|" + stationId;
+   }
+
    private void saveBox(String guildId, String stationId, ItemStack[] items) {
       String data = encodeItems(items);
       this.async(() -> this.plugin.getDataManager().getStorage().exec(
@@ -404,6 +441,37 @@ public class FreightManager implements Listener {
       return new ItemStack[0];
    }
 
+   /** Donne la boîte partagée (chargée en tâche de fond à la première utilisation) à l'action, sur le thread principal. */
+   private void withBox(String guildId, String stationId, java.util.function.Consumer<Inventory> action) {
+      String key = boxKey(guildId, stationId);
+      Inventory ready = this.boxes.get(key);
+      if (ready != null) {
+         action.accept(ready);
+         return;
+      }
+
+      this.async(() -> {
+         ItemStack[] items = this.readBox(guildId, stationId);
+         Bukkit.getScheduler().runTask(this.plugin, () -> {
+            Inventory inv = this.boxes.computeIfAbsent(key, k -> {
+               BoxHolder holder = new BoxHolder();
+               holder.guildId = guildId;
+               holder.stationId = stationId;
+               Station st = this.rails.stationById(stationId);
+               Inventory created = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l📦 Livraisons — " + (st != null ? st.getName() : "gare")));
+               for (ItemStack it : items) {
+                  if (it != null && !it.getType().isAir()) {
+                     created.addItem(it);
+                  }
+               }
+
+               return created;
+            });
+            action.accept(inv);
+         });
+      });
+   }
+
    /** /station fret recuperer : ouvre les marchandises livrées à la gare où se tient l'officier. */
    public void openBox(Player player) {
       Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
@@ -418,23 +486,31 @@ public class FreightManager implements Listener {
          return;
       }
 
-      BoxHolder holder = new BoxHolder();
-      holder.guildId = guild.getId();
-      holder.stationId = station.getId();
-      Inventory inv = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l📦 Livraisons — " + station.getName()));
-      for (ItemStack it : this.readBox(guild.getId(), station.getId())) {
-         if (it != null) {
-            inv.addItem(it);
+      this.withBox(guild.getId(), station.getId(), inv -> {
+         if (player.isOnline()) {
+            player.openInventory(inv);
          }
-      }
+      });
+   }
 
-      player.openInventory(inv);
+   /** Supprime la ligne du convoi (et enregistre la boîte du même coup, dans une seule transaction : un plantage ne livre jamais deux fois). */
+   private void finishRow(String convoyId, String boxGuild, String boxStation, ItemStack[] boxItems) {
+      String data = boxItems == null ? null : encodeItems(boxItems);
+      this.async(() -> {
+         var db = this.plugin.getDataManager().getStorage();
+         db.runInTransaction(() -> {
+            if (data != null) {
+               db.exec("INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?) ON CONFLICT(guild_id, station_id) DO UPDATE SET cargo = excluded.cargo;", boxGuild, boxStation, data);
+            }
+
+            db.exec("DELETE FROM freight_convoys WHERE id = ?;", convoyId);
+         });
+      });
    }
 
    private void deliver(Convoy c, boolean silent) {
       this.convoys.remove(c.id);
       this.despawn(c);
-      this.async(() -> this.plugin.getDataManager().getStorage().exec("DELETE FROM freight_convoys WHERE id = ?;", c.id));
       Station dest = this.rails.stationById(c.toStation);
       Guild guild = this.plugin.getGuildManager().getGuildById(c.guildId);
       List<ItemStack> leftovers = new ArrayList<>();
@@ -456,29 +532,28 @@ public class FreightManager implements Listener {
          }
       }
 
-      if (dest != null && !leftovers.isEmpty()) {
-         List<ItemStack> all = new ArrayList<>(java.util.Arrays.asList(this.readBox(c.guildId, dest.getId())));
-         all.removeIf(java.util.Objects::isNull);
-         Inventory tmp = Bukkit.createInventory(null, 54);
-         for (ItemStack it : all) {
-            tmp.addItem(it);
-         }
-
+      int donatedFinal = donated;
+      boolean hasLeftovers = !leftovers.isEmpty();
+      if (dest != null && hasLeftovers) {
          World w = Bukkit.getWorld(dest.getWorld());
-         for (ItemStack it : leftovers) {
-            for (ItemStack overflow : tmp.addItem(it).values()) {
-               if (w != null) {
-                  w.dropItemNaturally(new Location(w, dest.getRailX() + 0.5, dest.getRailY() + 1.0, dest.getRailZ() + 0.5), overflow);
+         this.withBox(c.guildId, dest.getId(), inv -> {
+            for (ItemStack it : leftovers) {
+               for (ItemStack overflow : inv.addItem(it).values()) {
+                  if (w != null) {
+                     w.dropItemNaturally(new Location(w, dest.getRailX() + 0.5, dest.getRailY() + 1.0, dest.getRailZ() + 0.5), overflow);
+                  }
                }
             }
-         }
 
-         this.saveBox(c.guildId, dest.getId(), tmp.getContents());
+            this.finishRow(c.id, c.guildId, dest.getId(), inv.getContents());
+         });
+      } else {
+         this.finishRow(c.id, null, null, null);
       }
 
       if (guild != null && !silent) {
          ChatUtil.broadcastGuild(guild, "&a🚂 Le convoi de fret est arrivé à &e" + (dest != null ? dest.getName() : "destination") + "&a !"
-            + (donated > 0 ? " &7" + donated + " objet(s) ont été offerts automatiquement à la progression d'Âge." : "") + (leftovers.isEmpty() ? "" : " &7Récupérez le reste avec &e/station fret recuperer&7 dans cette gare."));
+            + (donatedFinal > 0 ? " &7" + donatedFinal + " objet(s) ont été offerts automatiquement à la progression d'Âge." : "") + (hasLeftovers ? " &7Récupérez le reste avec &e/station fret recuperer&7 dans cette gare." : ""));
          this.plugin.getAchievements().grantGuild(guild, fr.esicraft.life.Achievement.FREIGHT_RUNNER, true);
       }
    }
@@ -530,15 +605,20 @@ public class FreightManager implements Listener {
          }
 
          Location loc = this.positionOf(c, t, world);
-         boolean watched = false;
-         for (Player p : world.getPlayers()) {
-            if (p.getLocation().distanceSquared(loc) <= 96.0 * 96.0) {
-               watched = true;
-               break;
+         if (this.tickCounter % 5 == 0 || c.cart == null) {
+            // Les joueurs proches ne sont recherchés que toutes les 10 ticks : le coût ne dépend plus de convois × joueurs à chaque demi-seconde.
+            boolean near = false;
+            for (Player p : world.getPlayers()) {
+               if (p.getLocation().distanceSquared(loc) <= 96.0 * 96.0) {
+                  near = true;
+                  break;
+               }
             }
+
+            c.watched = near;
          }
 
-         if (!watched || !world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+         if (!c.watched || !world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
             this.despawn(c);
          } else if (c.cart == null || !c.cart.isValid()) {
             this.spawn(c, loc);
@@ -617,6 +697,10 @@ public class FreightManager implements Listener {
          return;
       }
 
+      if (this.plugin.getTruce().denyHostile(attacker)) {
+         return;
+      }
+
       Guild mine = this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId());
       if (mine == null || mine.getId().equals(c.guildId)) {
          ChatUtil.sendActionbar(attacker, "&7🚂 Ce wagon appartient à une guilde qui n'est pas votre ennemie.");
@@ -650,7 +734,7 @@ public class FreightManager implements Listener {
    private void loot(Convoy c, Player attacker, Guild looters, Location loc) {
       this.convoys.remove(c.id);
       this.despawn(c);
-      this.async(() -> this.plugin.getDataManager().getStorage().exec("DELETE FROM freight_convoys WHERE id = ?;", c.id));
+      this.finishRow(c.id, null, null, null);
       for (ItemStack it : c.cargo) {
          if (it != null && !it.getType().isAir()) {
             loc.getWorld().dropItemNaturally(loc, it);
