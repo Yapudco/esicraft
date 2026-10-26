@@ -687,7 +687,7 @@ public class SQLiteStorage {
             statement.executeUpdate("DELETE FROM raid_cooldowns;");
             statement.executeUpdate("DELETE FROM guild_stats;");
             statement.executeUpdate("DELETE FROM history;");
-            for (String table : new String[]{"journal", "raid_log", "pvp_log", "pvp_events", "rivalry_reset", "guild_history", "age_log", "guild_contract", "revenge", "loans", "shared_chests", "mentoring"}) {
+            for (String table : new String[]{"journal", "raid_log", "pvp_log", "pvp_events", "rivalry_reset", "guild_history", "age_log", "guild_contract", "revenge", "loans", "shared_chests", "mentoring", "achievements", "player_stats", "contract_progress", "reputation", "reputation_thanks"}) {
                try {
                   statement.executeUpdate("DELETE FROM " + table + ";");
                } catch (SQLException ignored) {
@@ -695,6 +695,10 @@ public class SQLiteStorage {
                }
             }
 
+            // Données gardées en clé/valeur : cosmétiques (équipés, achetés, secrets), délais de spécialisation, pics de membres, saison et championne.
+            // Seules les préférences de langue des joueurs survivent à un reset.
+            statement.executeUpdate("DELETE FROM kv WHERE k LIKE 'cosmetic%' OR k LIKE 'cos_aura:%' OR k LIKE 'cos_trail:%' OR k LIKE 'cos_burst:%' OR k LIKE 'cos_buy:%' OR k LIKE 'cos_title:%'"
+               + " OR k LIKE 'speccd:%' OR k LIKE 'peak:%' OR k = 'season' OR k = 'season_champion';");
             statement.executeUpdate("DELETE FROM stations;");
             statement.executeUpdate("DELETE FROM rail_policy;");
             statement.executeUpdate("DELETE FROM rail_relations;");

@@ -95,7 +95,7 @@ final class HtmlPages {
       .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
       .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
       .net a:hover circle{stroke:var(--acc)}
-      .av.head{background-size:cover;background-position:center;background-repeat:no-repeat;image-rendering:pixelated;background-color:var(--card2)}[hidden]{display:none!important}
+      .av.head{overflow:hidden;background:var(--card2)}.av.head img{width:100%;height:100%;display:block;object-fit:cover;image-rendering:pixelated}[hidden]{display:none!important}
       .logoimg{width:36px;height:36px;border-radius:10px;image-rendering:pixelated;display:block}.nl.lang{margin-left:auto;font-weight:800;border:1px solid var(--line)}
       .gk:not(.on){opacity:.4;text-decoration:line-through}.fdl{display:grid;gap:10px}
       .fd summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none}.fd summary::-webkit-details-marker{display:none}.fd summary::before{content:'▸';color:var(--mut)}.fd[open] summary::before{content:'▾'}
@@ -190,7 +190,7 @@ final class HtmlPages {
 
    /** Avatar d'un joueur : sa tête (servie par {@code /head/<pseudo>}, jamais un service externe) ; visage de remplacement tant qu'elle n'est pas prête. */
    static String playerAvatar(String name, String size) {
-      return "<span class=\"av head" + (size.isEmpty() ? "" : " " + size) + "\" style=\"background-image:url('/head/" + esc(name) + "')\" aria-hidden=\"true\"></span>";
+      return "<span class=\"av head" + (size.isEmpty() ? "" : " " + size) + "\" aria-hidden=\"true\"><img src=\"/head/" + esc(name) + "\" alt=\"\" loading=\"lazy\" decoding=\"async\" width=\"64\" height=\"64\"></span>";
    }
 
    static String avatar(String label, String seed, String size, boolean two) {

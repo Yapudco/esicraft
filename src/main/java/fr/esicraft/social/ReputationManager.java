@@ -55,6 +55,8 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
 
    public void clear() {
       this.points.clear();
+      this.thankedToday.clear();
+      this.givenToday.clear();
    }
 
    public int get(UUID uuid) {

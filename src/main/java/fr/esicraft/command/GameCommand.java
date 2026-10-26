@@ -52,7 +52,7 @@ public class GameCommand implements CommandExecutor {
 
             ChatUtil.broadcast("&m--------------------------------------------------");
             ChatUtil.broadcast("&4&l\ud83d\udca5 RÉINITIALISATION GLOBALE DU SERVEUR ! \ud83d\udca5");
-            ChatUtil.broadcast("&cToutes les guildes, territoires, cœurs de Nexus et fortunes ont été réinitialisés !");
+            ChatUtil.broadcast("&cGuildes, territoires, Nexus, fortunes, succès, cosmétiques et site web ont été réinitialisés !");
             ChatUtil.broadcast("&eChaque joueur repart avec 100 pièces et peut refonder une nouvelle dynastie (&e/guild&e, &e/race&e) !");
             ChatUtil.broadcast("&m--------------------------------------------------");
             ChatUtil.sendMessage(sender, "&aLe jeu a été réinitialisé avec succès.");
@@ -65,6 +65,8 @@ public class GameCommand implements CommandExecutor {
             ChatUtil.sendRaw(sender, "   &8• &cTous les Nexus et améliorations");
             ChatUtil.sendRaw(sender, "   &8• &cToutes les fortunes et banques (reset à 100 pièces)");
             ChatUtil.sendRaw(sender, "   &8• &cTous les items en vente à l'Hôtel des Ventes");
+            ChatUtil.sendRaw(sender, "   &8• &cTous les succès, statistiques, contrats, réputation, parrainages et cosmétiques");
+            ChatUtil.sendRaw(sender, "   &8• &cLe journal, les courbes, les Âges, la saison et les prêts : tout le site web repart de zéro");
             ChatUtil.sendRaw(sender, "");
             ChatUtil.sendRaw(sender, "  &ePour confirmer le reset global, tapez :");
             ChatUtil.sendRaw(sender, "  &4&l➤ &c/game reset confirm");

@@ -348,6 +348,10 @@ public final class EsicraftPlugin extends JavaPlugin {
       return this.helpCalls;
    }
 
+   public WebServer getWebServer() {
+      return this.webServer;
+   }
+
    public CosmeticManager getCosmetics() {
       return this.cosmetics;
    }

@@ -69,6 +69,14 @@ public class AchievementManager {
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::checkWealth, 1200L, 1200L);
    }
 
+   /** /game reset : plus aucun succès ni statistique, en mémoire comme en base (la base est vidée par le reset). */
+   public void clearAll() {
+      this.unlocked.clear();
+      this.holders.clear();
+      this.stats.clear();
+      this.dirtyStats.clear();
+   }
+
    public void refreshKnownPlayers() {
       var rows = this.plugin.getDataManager().getStorage().select("SELECT COUNT(*) FROM players;", 1);
       this.knownPlayers = rows.isEmpty() ? 1 : Math.max(1, ((Number)rows.get(0)[0]).intValue());

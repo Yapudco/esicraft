@@ -501,7 +501,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/money get\|set\|give\|take\|rectify\|top` | Gérer l'argent des joueurs |
 | `/evenement <lune\|meteores\|marchand\|boss\|stop\|status>` | Lancer ou arrêter un événement |
 | `/pvp [on\|off\|toggle]` | Activer ou couper les raids et la destruction des Nexus |
-| `/game reset` | Remettre tout le jeu à zéro |
+| `/game reset` | Remettre **tout** le jeu à zéro : guildes, Nexus, fortunes, succès, statistiques, contrats, réputation, parrainages, cosmétiques, journal, courbes, Âges, saison, prêts et site web (seules les préférences de langue sont gardées) |
 | `/race set <joueur> <race>` | Changer le métier d'un joueur |
 
 ### Anti-triche intégré

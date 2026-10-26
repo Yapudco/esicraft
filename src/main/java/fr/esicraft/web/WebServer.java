@@ -210,7 +210,23 @@ public class WebServer {
       return false;
    }
 
+   /** Retient l'adresse du skin d'un joueur en ligne (têtes du site). */
+   public void rememberSkin(Player player) {
+      this.heads.remember(player);
+   }
+
+   /** Reconstruit tout de suite l'instantané du site (après un /game reset, par exemple). */
+   public void refreshNow() {
+      if (this.server != null) {
+         Bukkit.getScheduler().runTask(this.plugin, this::capture);
+      }
+   }
+
    private void capture() {
+      for (Player online : Bukkit.getOnlinePlayers()) {
+         this.heads.remember(online);
+      }
+
       boolean showBank = this.plugin.getConfig().getBoolean("web.show-guild-banks", true);
       boolean showCoins = this.plugin.getConfig().getBoolean("web.show-balances", true);
       boolean showNexus = this.plugin.getConfig().getBoolean("web.show-nexus-health", false);
@@ -679,6 +695,10 @@ public class WebServer {
    }
 
    private boolean allow(String ip) {
+      return this.allow(ip, this.rateLimit);
+   }
+
+   private boolean allow(String ip, long limit) {
       long now = System.currentTimeMillis();
       long[] w = this.hits.computeIfAbsent(ip, k -> new long[]{now, 0L});
       synchronized (w) {
@@ -687,7 +707,7 @@ public class WebServer {
             w[1] = 0L;
          }
 
-         return ++w[1] <= this.rateLimit;
+         return ++w[1] <= limit;
       }
    }
 
@@ -712,7 +732,11 @@ public class WebServer {
          String method = ex.getRequestMethod();
          InetSocketAddress remote = ex.getRemoteAddress();
          String ip = this.clientKey(ex);
-         if (!this.allowGlobal() || !this.allow(ip)) {
+         String rawPath = ex.getRequestURI().getRawPath();
+         // Têtes et ressources : légères, mises en cache par le navigateur et nombreuses (une page de joueurs en demande des dizaines) ;
+         // elles ont leur propre plafond, bien plus large, pour ne pas déclencher la limite des pages (réponse 429 = images cassées).
+         boolean cheap = rawPath != null && (rawPath.startsWith("/head/") || rawPath.startsWith("/assets/"));
+         if (cheap ? !this.allow("a:" + ip, (long)this.rateLimit * 20L) : !this.allowGlobal() || !this.allow(ip)) {
             ex.getResponseHeaders().set("Retry-After", String.valueOf(this.rateWindowMs / 1000L));
             this.send(ex, new Page(429, "text/plain; charset=utf-8", "Trop de requêtes, réessayez dans quelques secondes.".getBytes(StandardCharsets.UTF_8)), false);
             return;

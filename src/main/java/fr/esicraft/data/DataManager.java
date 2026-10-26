@@ -225,6 +225,7 @@ public class DataManager {
          pData.setGuildId(null);
          pData.setGuildRole(null);
          pData.resetRaceChangesCount();
+         pData.setHasJoinedGuildBefore(false);
       }
 
       for (Guild guild : this.plugin.getGuildManager().getAllGuilds()) {
@@ -242,6 +243,11 @@ public class DataManager {
          }
       }
 
+      // Raids et événements en cours, déguisements : on les arrête avant d'effacer les données.
+      this.plugin.getRaidManager().stopAllRaids();
+      this.plugin.getRaidManager().resetAllCooldowns();
+      this.plugin.getEventManager().stop();
+      this.plugin.getDisguiseManager().clearAll();
       this.plugin.getNexusManager().removeAllHolograms();
       this.plugin.getNexusManager().clearIndex();
       this.plugin.getBalance().clear();
@@ -252,7 +258,19 @@ public class DataManager {
       this.plugin.getRailManager().clearAll();
       this.plugin.getTreatyManager().clearAll();
       this.plugin.getAntiFarmManager().resetStats();
+      this.plugin.getAchievements().clearAll();
+      this.plugin.getSeasonManager().clearAll();
+      this.plugin.getContractManager().clearAll();
+      this.plugin.getGuildContracts().clear();
+      this.plugin.getHelpCalls().clearAll();
+      this.plugin.getReputation().clear();
+      this.plugin.getCosmetics().clearAll();
+      this.plugin.getRansom().clear();
       this.storage.resetAllGameData();
+      // Le site reflète aussitôt le reset (guildes, journal, courbes, Âges, succès, classements).
+      if (this.plugin.getWebServer() != null) {
+         this.plugin.getWebServer().refreshNow();
+      }
    }
 
    public void saveAll() {
