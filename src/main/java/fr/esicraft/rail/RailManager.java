@@ -184,24 +184,31 @@ public class RailManager {
 
    // ------------------------------------------------------------------ péages et relations
 
-   /** Seul le Syndicat Marchand peut prélever un péage. */
+   /** Toute guilde peut prélever un péage. */
    public boolean canTax(Guild guild) {
-      return guild != null && guild.getSpecialization() == fr.esicraft.guild.GuildSpecialization.MERCHANT_SYNDICATE;
+      return guild != null;
    }
 
-   /** Péage réellement appliqué : 0 pour toute guilde qui n'est pas un Syndicat Marchand. */
+   /** Péage maximal : 10 pièces pour toutes les spécialisations, 100 pour le Syndicat Marchand. */
+   public double maxToll(Guild guild) {
+      return guild != null && guild.getSpecialization() == fr.esicraft.guild.GuildSpecialization.MERCHANT_SYNDICATE
+         ? this.plugin.getConfig().getDouble("rail.max-toll-merchant", 100.0) : this.plugin.getConfig().getDouble("rail.max-toll", 10.0);
+   }
+
+   /** Péage réellement appliqué (plafonné selon la spécialisation, même si elle a changé depuis). */
    public double getToll(String guildId) {
-      if (!this.canTax(this.plugin.getGuildManager().getGuildById(guildId))) {
+      Guild owner = this.plugin.getGuildManager().getGuildById(guildId);
+      if (!this.canTax(owner)) {
          return 0.0;
       }
 
       Double t = this.tolls.get(guildId);
-      double toll = t != null ? t : this.plugin.getConfig().getDouble("rail.default-toll", 2.0);
+      double toll = Math.min(this.maxToll(owner), t != null ? t : this.plugin.getConfig().getDouble("rail.default-toll", 2.0));
       return this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.TOLL_TAX) ? toll * 2.0 : toll;
    }
 
    public void setToll(String guildId, double toll) {
-      double clamped = Math.max(0.0, Math.min(this.plugin.getConfig().getDouble("rail.max-toll", 500.0), toll));
+      double clamped = Math.max(0.0, Math.min(this.maxToll(this.plugin.getGuildManager().getGuildById(guildId)), toll));
       this.tolls.put(guildId, clamped);
       this.cache.clear();
       this.async(() -> this.plugin.getDataManager().getStorage().exec(

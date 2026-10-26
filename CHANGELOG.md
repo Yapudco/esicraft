@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (péages)
+
+### Péages ferroviaires pour toutes les guildes
+- **Toutes les spécialisations** peuvent fixer un péage, jusqu'à **10 pièces** ; le **Syndicat Marchand** jusqu'à **100** (`rail.max-toll`, `rail.max-toll-merchant`). Un péage déjà fixé est plafonné à la nouvelle limite.
+
 ## 30/10/2026 (duels)
 
 ### Équipement de duel
