@@ -346,7 +346,8 @@ rail:
   enabled: true
   base-fare: 1.0              # Tarif de base d'un trajet (versé à la guilde de la gare d'arrivée)
   default-toll: 2.0           # Péage par défaut d'une guilde dont le territoire est traversé
-  max-toll: 500.0
+  max-toll: 10.0              # Péage maximal de toutes les spécialisations
+  max-toll-merchant: 100.0    # Péage maximal d'un Syndicat Marchand
   station-creation-cost: 500.0 # Prélevé sur la banque de guilde
   max-stations-per-guild: 6
   min-age-level: 2             # Âge minimal de la guilde pour créer une gare
