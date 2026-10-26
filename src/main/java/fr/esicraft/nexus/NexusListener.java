@@ -190,16 +190,23 @@ public class NexusListener implements Listener {
                      long lastHit = this.lastAttackTime.getOrDefault(attacker.getUniqueId(), 0L);
                      if (now - lastHit >= 500L) {
                         this.lastAttackTime.put(attacker.getUniqueId(), now);
-                        if (!this.isDefenderPresent(guild)) {
-                           ChatUtil.sendActionbar(attacker, "&c\ud83d\udee1️ Attaque impossible : aucun défenseur n'est présent sur le territoire !");
-                           ChatUtil.sendMessage(
-                              attacker,
-                              "&cLe Nexus ne peut être attaqué que si au moins un membre de la guilde est connecté et présent sur son territoire (Anti-Backstab) !"
-                           );
-                           ChatUtil.playSound(attacker, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
-                        } else {
+                        Location center = guild.getNexus().getLocation().clone().add(0.5, 0.5, 0.5);
+                        // Portée et ligne de vue vérifiées côté serveur : un client modifié ne frappe pas le Nexus à travers les murs.
+                        if (attacker.getWorld() != center.getWorld() || attacker.getEyeLocation().distanceSquared(center) > 49.0 || !this.canSee(attacker, block)) {
+                           ChatUtil.sendActionbar(attacker, "&c❌ Vous devez voir le Nexus pour le frapper.");
+                           return;
+                        }
+
+                        {
+                           double factor = 1.0;
+                           if (!this.isDefenderPresent(guild)) {
+                              // Plus d'immunité totale quand tous les défenseurs sont absents (hors ligne ou loin des claims) : les dégâts sont réduits.
+                              factor = this.plugin.getConfig().getDouble("nexus.undefended-damage-factor", 0.25);
+                              ChatUtil.sendActionbar(attacker, "&e\ud83d\udee1️ Aucun défenseur présent : le Nexus encaisse &6" + Math.round(factor * 100.0) + " % &edes dégâts.");
+                           }
+
                            ItemStack weapon = attacker.getInventory().getItemInMainHand();
-                           int damage = this.getWeaponDamage(weapon.getType());
+                           int damage = Math.max(1, (int)Math.round(this.getWeaponDamage(weapon.getType()) * factor));
                            this.plugin.getDisguiseManager().reveal(attacker, true);
                            this.plugin.getTreatyManager().onAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), guild, attacker);
                            this.plugin.getNexusManager().damageNexus(guild, damage, attacker.getName(), this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), attacker);
@@ -211,6 +218,20 @@ public class NexusListener implements Listener {
             }
          }
       }
+   }
+
+   /** Ligne de vue entre l'œil du joueur et le Nexus : aucun autre bloc plein ne doit s'interposer. */
+   private boolean canSee(Player attacker, Block nexusBlock) {
+      Location eye = attacker.getEyeLocation();
+      Location target = nexusBlock.getLocation().add(0.5, 0.5, 0.5);
+      org.bukkit.util.Vector dir = target.toVector().subtract(eye.toVector());
+      double dist = dir.length();
+      if (dist < 0.01) {
+         return true;
+      }
+
+      org.bukkit.util.RayTraceResult hit = eye.getWorld().rayTraceBlocks(eye, dir.normalize(), dist + 0.5, org.bukkit.FluidCollisionMode.NEVER, true);
+      return hit == null || hit.getHitBlock() == null || hit.getHitBlock().equals(nexusBlock);
    }
 
    private boolean isDefenderPresent(Guild guild) {

@@ -150,7 +150,7 @@ public class GuildManager {
       if (guild != null && guild.hasNexus()) {
          if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getNexusManager().wasNexusRecentlyAttacked(guild, 600000L)) {
             if (player != null) {
-               ChatUtil.sendMessage(player, "&c❌ Impossible de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !");
+               ChatUtil.sendMessage(player, "&c❌ Impossible de quitter ou de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !");
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             }
 
@@ -214,6 +214,9 @@ public class GuildManager {
                );
                return false;
             }
+         } else if (!this.canDisbandNow(guild, player)) {
+            // Pas de départ en plein raid : sinon on vide la guilde pour priver l'adversaire de l'annexion.
+            return false;
          } else {
             guild.removeMember(uuid);
             this.playerGuildMap.remove(uuid);

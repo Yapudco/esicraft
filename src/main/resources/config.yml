@@ -198,6 +198,7 @@ guilds:
 
 # Contrats de Hordes de Monstres (Achat à l'Hôtel des Ventes)
 raids:
+  max-minutes: 25               # Durée maximale d'un raid (mob piégé) ; au-delà il s'achève sans victoire ni défaite
   cooldown-minutes-between-raids: 30
   max-custom-horde-units: 60 # Plafond de monstres d'une horde personnalisée (anti-crash serveur)
   types:
@@ -245,6 +246,13 @@ rail:
 
 rivalry:
   half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours
+
+nexus:
+  undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
+  heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
+
+economy:
+  hourly-bounty-cap: 4000.0        # Plafond de primes de monstres par joueur et par heure (0 = aucun)
 
 revenge:
   enabled: true
