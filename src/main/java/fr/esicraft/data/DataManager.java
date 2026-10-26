@@ -266,6 +266,19 @@ public class DataManager {
       this.plugin.getReputation().clear();
       this.plugin.getCosmetics().clearAll();
       this.plugin.getRansom().clear();
+      this.plugin.getCourt().clear();
+      this.plugin.getBetting().clear();
+      this.plugin.getDuels().clear();
+      this.plugin.getTavern().clear();
+      this.plugin.getNexusTech().clear();
+      this.plugin.getNexusGamble().clear();
+      this.plugin.getFreight().clear();
+      this.plugin.getSiege().clear();
+      this.plugin.getBourse().clear();
+      if (this.plugin.getWebServer() != null) {
+         this.plugin.getWebServer().clearVotes();
+      }
+
       this.storage.resetAllGameData();
       // Le site reflète aussitôt le reset (guildes, journal, courbes, Âges, succès, classements).
       if (this.plugin.getWebServer() != null) {

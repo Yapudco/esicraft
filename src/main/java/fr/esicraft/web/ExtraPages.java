@@ -922,7 +922,7 @@ final class ExtraPages {
          b.append("<span class=\"chip\">Sans guilde</span>");
       }
 
-      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + " honneur</span>" : "").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section>");
+      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + " honneur</span>" : "").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section><p style=\"margin-top:10px\"><a class=\"nl\" href=\"/votes?claim=").append(esc(p.name())).append("\">🗳 C'est vous ? Revendiquer ce pseudo pour voter</a></p>");
       b.append("<div class=\"grid\" style=\"margin-top:16px\">").append(stat("🏅", p.achievements().size() + " / " + x.achievements().size(), "Succès")).append(stat("❤", String.valueOf(p.reputation()), "Réputation"));
       if (p.coins() != null) {
          b.append(stat("💰", money(p.coins()), "Pièces"));

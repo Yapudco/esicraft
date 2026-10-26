@@ -70,9 +70,18 @@ public class TruceManager implements Listener {
       return LocalTime.of(Math.max(0, Math.min(23, this.plugin.getConfig().getInt("truce.start-hour", 21))), Math.max(0, Math.min(59, this.plugin.getConfig().getInt("truce.start-minute", 0))));
    }
 
-   /** La trêve est-elle en cours à cet instant ? */
+   private volatile boolean cachedTruce;
+   private volatile long cachedAt;
+
+   /** La trêve est-elle en cours à cet instant ? (résultat gardé une seconde : cette méthode est appelée à chaque coup entre joueurs). */
    public boolean isTruce() {
-      return this.isTruceAt(LocalDateTime.now());
+      long now = System.currentTimeMillis();
+      if (now - this.cachedAt >= 1000L) {
+         this.cachedTruce = this.isTruceAt(LocalDateTime.now());
+         this.cachedAt = now;
+      }
+
+      return this.cachedTruce;
    }
 
    public boolean isTruceAt(LocalDateTime at) {

@@ -53,6 +53,8 @@ public class WebServer {
    private final Map<String, Page> pagesEn = new ConcurrentHashMap<>();
    private volatile String rawNotFound = "";
    private final HeadService heads;
+   private WebVotes votes;
+   private static final java.util.Set<String> VOTE_GET = java.util.Set.of("/api/me", "/api/votes", "/api/claim/status");
 
    /** Données du dernier instantané, pour construire à la demande les fiches de guilde et de joueur. */
    private record Ctx(String name, WebSnapshot s, WebExtra x, int live, boolean raid) {
@@ -151,6 +153,8 @@ public class WebServer {
          this.server.setExecutor(this.pool);
          this.server.createContext("/", this::handle);
          this.server.start();
+         this.votes = new WebVotes(this.plugin);
+         this.votes.init();
          this.plugin.getLogger().info("Site web démarré sur http://" + ("0.0.0.0".equals(bind) ? "<ip-du-serveur>" : bind) + (port == 80 ? "" : ":" + port) + "/");
       } catch (IOException | RuntimeException e) {
          this.server = null;
@@ -178,6 +182,12 @@ public class WebServer {
    private static void setIfAbsent(String key, String value) {
       if (System.getProperty(key) == null) {
          System.setProperty(key, value);
+      }
+   }
+
+   public void clearVotes() {
+      if (this.votes != null) {
+         this.votes.clear();
       }
    }
 
@@ -556,6 +566,9 @@ public class WebServer {
       map.put("/evolution", html(200, HtmlPages.page(name, "guildes", "Courbes d'évolution", ExtraPages.evolution(s, x), s, live, raid)));
       map.put("/ages", html(200, HtmlPages.page(name, "ages", "Frise des Âges", ExtraPages.ages(s, x), s, live, raid)));
       map.put("/guide", html(200, HtmlPages.page(name, "guide", "Guide du joueur", ExtraPages.guide(name), s, 0, raid)));
+      map.put("/votes", html(200, HtmlPages.page(name, "votes", "Élections de la semaine", WebGame.votes(), s, 0, raid)));
+      map.put("/pantheon", html(200, HtmlPages.page(name, "pantheon", "Panthéon", WebGame.pantheon(this.plugin), s, 0, raid)));
+      map.put("/assets/votes.js", new Page(200, JS, WebGame.VOTES_JS.getBytes(StandardCharsets.UTF_8)));
       map.put("/api/stats.json", new Page(200, JSON, HtmlPages.statsJson(s).getBytes(StandardCharsets.UTF_8)));
       map.put("/api/journal.json", new Page(200, JSON, ExtraPages.journalJson(x).getBytes(StandardCharsets.UTF_8)));
       map.put("/api/raids.json", new Page(200, JSON, ExtraPages.raidsJson(x).getBytes(StandardCharsets.UTF_8)));
@@ -741,6 +754,20 @@ public class WebServer {
             ex.getResponseHeaders().set("Retry-After", String.valueOf(this.rateWindowMs / 1000L));
             this.send(ex, new Page(429, "text/plain; charset=utf-8", "Trop de requêtes, réessayez dans quelques secondes.".getBytes(StandardCharsets.UTF_8)), false);
             return;
+         }
+
+         if (this.votes != null && rawPath != null && rawPath.startsWith("/api/") && (method.equals("POST") || method.equals("GET") && VOTE_GET.contains(rawPath))) {
+            WebVotes.Resp r = this.votes.handle(ex, method, rawPath, ip);
+            if (r != null) {
+               var rh = ex.getResponseHeaders();
+               rh.set("Cache-Control", "no-store");
+               if (r.setCookie() != null) {
+                  rh.add("Set-Cookie", r.setCookie());
+               }
+
+               this.send(ex, new Page(r.status(), JSON, r.json().getBytes(StandardCharsets.UTF_8)), false);
+               return;
+            }
          }
 
          if (!method.equals("GET") && !method.equals("HEAD")) {
