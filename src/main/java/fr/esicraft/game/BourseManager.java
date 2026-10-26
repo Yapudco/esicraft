@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -24,7 +25,19 @@ import org.jetbrains.annotations.NotNull;
  * une part des bénéfices de la guilde (augmentation de sa banque : ventes, primes de raids, dons) est versée aux actionnaires au prorata de leurs parts.
  */
 public class BourseManager implements CommandExecutor, TabCompleter {
+   /** Décomposition de la valeur fondamentale d'une guilde (ce que le marché « croit » qu'elle vaut). */
+   public record Fund(double equity, int age, int members, int chunks, double avgRep, long season, int techLevel, int defenses, double nexusPct, int diversity,
+                      double ageMult, double repMult, double healthMult, double debtMult, double marketCap, double perShare) {
+   }
+
+   /** Ligne de cote (lecture seule) pour l'affichage et le site. */
+   public record Quote(String guildId, String guildName, double price, double change24, int free, int total, int holders, Fund fund, List<Double> spark) {
+   }
+
    private static final class Listing {
+      volatile double price = 10.0;
+      volatile double change24;
+      volatile Fund fund;
       final String guildId;
       int total;
       int treasury;
@@ -79,12 +92,170 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          }
       }
 
+      db.exec("CREATE TABLE IF NOT EXISTS stock_market (guild_id VARCHAR(64) PRIMARY KEY, price REAL);");
+      db.exec("CREATE TABLE IF NOT EXISTS stock_history (guild_id VARCHAR(64), ts BIGINT, price REAL);");
+      db.exec("CREATE INDEX IF NOT EXISTS idx_stock_history ON stock_history (guild_id, ts);");
+      java.util.Set<String> priced = new java.util.HashSet<>();
+      for (Object[] row : db.select("SELECT guild_id, price FROM stock_market;", 2)) {
+         Listing l = this.listings.get(String.valueOf(row[0]));
+         if (l != null) {
+            l.price = ((Number)row[1]).doubleValue();
+            priced.add(l.guildId);
+         }
+      }
+
+      // Une guilde déjà cotée avant l'arrivée du marché démarre à sa valeur fondamentale.
+      for (Listing l : this.listings.values()) {
+         Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
+         if (g != null && !priced.contains(l.guildId)) {
+            l.fund = this.fundamentals(g, l);
+            l.price = l.fund.perShare();
+         }
+      }
+
+      long updateTicks = Math.max(1L, this.plugin.getConfig().getLong("bourse.update-minutes", 10L)) * 1200L;
+      Bukkit.getScheduler().runTaskTimer(this.plugin, this::updateMarket, 200L, updateTicks);
       long period = Math.max(1L, this.plugin.getConfig().getLong("bourse.dividend-minutes", 360L)) * 1200L;
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::dividends, period, Math.min(period, 6000L));
    }
 
    public void clear() {
       this.listings.clear();
+      this.mood = 0.0;
+   }
+
+   // ------------------------------------------------------------------ le marché : valeur fondamentale, humeur, cours
+
+   /** Humeur générale du marché (−0,2 à +0,2) : une marche aléatoire qui revient vers zéro et tire tous les cours dans le même sens. */
+   private volatile double mood;
+
+   private double weight(String key, double def) {
+      return this.plugin.getConfig().getDouble("bourse.weights." + key, def);
+   }
+
+   /**
+    * Valeur fondamentale : bien plus que les capitaux propres. Elle additionne la richesse (banque moins dettes), le territoire, les effectifs, la
+    * réputation de ses membres, les résultats de la saison, la force du Nexus (niveau, défenses, vie) et la diversité des métiers, puis la module par
+    * l'Âge de la guilde, la réputation moyenne (plus ses joueurs sont honorés, plus le multiplicateur monte), l'état du Nexus et d'éventuels impayés.
+    */
+   private Fund fundamentals(Guild g, Listing l) {
+      double equity = Math.max(0.0, this.equity(g));
+      int members = Math.max(1, g.getMembers().size());
+      int chunks = g.getClaimedChunks().size();
+      double sumRep = 0.0;
+      for (UUID m : g.getMembers().keySet()) {
+         sumRep += this.plugin.getReputation().get(m);
+      }
+
+      double avgRep = sumRep / members;
+      long season = this.plugin.getSeasonManager().score(g);
+      int age = g.getCurrentAge().getLevel();
+      int tech = this.plugin.getNexusTech().level(g.getId());
+      int defenses = this.plugin.getNexusTech().unlockedCount(g);
+      double pct = g.hasNexus() && g.getNexus().isAlive() ? Math.max(0.0, Math.min(1.0, g.getNexus().getHealthPercentage() / 100.0)) : 0.0;
+      int diversity = this.plugin.getSynergy().diversity(g);
+      double base = equity * this.weight("equity", 1.0) + age * this.weight("age", 2000.0) + chunks * this.weight("chunk", 150.0) + members * this.weight("member", 300.0)
+         + sumRep * this.weight("reputation", 40.0) + season * this.weight("season", 2.0) + (tech * this.weight("tech-level", 400.0) + defenses * this.weight("defense", 150.0)) * pct
+         + diversity * this.weight("diversity", 250.0);
+      double ageMult = 0.8 + 0.1 * age;
+      double repMult = 1.0 + Math.min(0.5, avgRep / 100.0);
+      double healthMult = g.hasNexus() && g.getNexus().isAlive() ? 0.6 + 0.4 * pct : 0.3;
+      double debtMult = this.plugin.getLoans().hasOverdue(g.getId()) ? 0.85 : 1.0;
+      double cap = base * ageMult * repMult * healthMult * debtMult * (1.0 + this.mood);
+      double floor = Math.max(1.0, this.plugin.getConfig().getDouble("bourse.floor-price", 5.0));
+      double perShare = Math.round((floor + cap / Math.max(1, l.total)) * 100.0) / 100.0;
+      return new Fund(equity, age, members, chunks, avgRep, season, tech, defenses, pct, diversity, ageMult, repMult, healthMult, debtMult, cap, perShare);
+   }
+
+   private double minPrice() {
+      return Math.max(1.0, this.plugin.getConfig().getDouble("bourse.min-price", 1.0));
+   }
+
+   private void savePrice(Listing l) {
+      double p = l.price;
+      this.async(() -> this.plugin.getDataManager().getStorage().exec("INSERT INTO stock_market (guild_id, price) VALUES (?, ?) ON CONFLICT(guild_id) DO UPDATE SET price = excluded.price;", l.guildId, p));
+   }
+
+   /** Mise à jour périodique : le cours est attiré par la valeur fondamentale (vitesse réglable) et bruité par la volatilité ; l'humeur du marché évolue. */
+   private void updateMarket() {
+      this.mood = Math.max(-0.2, Math.min(0.2, this.mood * 0.92 + ThreadLocalRandom.current().nextGaussian() * this.plugin.getConfig().getDouble("bourse.mood-volatility", 0.025)));
+      double speed = Math.max(0.01, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.reversion-speed", 0.15)));
+      double vol = Math.max(0.0, this.plugin.getConfig().getDouble("bourse.volatility", 0.02));
+      long now = System.currentTimeMillis();
+      var db = this.plugin.getDataManager().getStorage();
+      for (Listing l : this.listings.values()) {
+         Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
+         if (g == null) {
+            continue;
+         }
+
+         Fund f = this.fundamentals(g, l);
+         l.fund = f;
+         double p = l.price;
+         p += speed * (f.perShare() - p) + p * vol * ThreadLocalRandom.current().nextGaussian();
+         l.price = Math.round(Math.max(this.minPrice(), p) * 100.0) / 100.0;
+         double price = l.price;
+         String id = l.guildId;
+         this.async(() -> {
+            db.exec("INSERT INTO stock_history (guild_id, ts, price) VALUES (?, ?, ?);", id, now, price);
+            db.exec("DELETE FROM stock_history WHERE guild_id = ? AND ts < ?;", id, now - 3L * 86400000L);
+         });
+         this.savePrice(l);
+         var rows = db.select("SELECT price FROM stock_history WHERE guild_id = ? AND ts <= ? ORDER BY ts DESC LIMIT 1;", 1, id, now - 86400000L);
+         if (rows.isEmpty()) {
+            rows = db.select("SELECT price FROM stock_history WHERE guild_id = ? ORDER BY ts ASC LIMIT 1;", 1, id);
+         }
+
+         double ref = rows.isEmpty() ? price : ((Number)rows.get(0)[0]).doubleValue();
+         l.change24 = ref <= 0.0 ? 0.0 : (price - ref) / ref;
+      }
+   }
+
+   /**
+    * Choc de cours lié à un événement de la guilde (horde repoussée, siège, Nexus détruit…) : le prix bouge aussitôt, avant même la prochaine mise à jour.
+    */
+   public void shock(String guildId, double pct, String reason) {
+      Listing l = guildId == null ? null : this.listings.get(guildId);
+      if (l == null || pct == 0.0) {
+         return;
+      }
+
+      double before = l.price;
+      l.price = Math.round(Math.max(this.minPrice(), before * (1.0 + pct)) * 100.0) / 100.0;
+      this.savePrice(l);
+      Guild g = this.plugin.getGuildManager().getGuildById(guildId);
+      for (UUID holder : l.holders.keySet()) {
+         Player p = Bukkit.getPlayer(holder);
+         if (p != null && g != null) {
+            ChatUtil.sendMessage(p, (pct > 0 ? "&a📈 " : "&c📉 ") + "&e" + g.getName() + " &7: " + (pct > 0 ? "+" : "") + Math.round(pct * 100) + " % (" + reason + ") — cours &6" + String.format(Locale.ROOT, "%.2f", l.price));
+         }
+      }
+   }
+
+   /** Cotes actuelles (copie pour le site et les commandes). */
+   public List<Quote> quotes() {
+      List<Quote> out = new ArrayList<>();
+      var db = this.plugin.getDataManager().getStorage();
+      for (Listing l : this.listings.values()) {
+         Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
+         if (g == null) {
+            continue;
+         }
+
+         List<Double> spark = new ArrayList<>();
+         for (Object[] r : db.select("SELECT price FROM stock_history WHERE guild_id = ? ORDER BY ts DESC LIMIT 36;", 1, l.guildId)) {
+            spark.add(0, ((Number)r[0]).doubleValue());
+         }
+
+         out.add(new Quote(l.guildId, g.getName(), l.price, l.change24, l.treasury, l.total, l.holders.size(), l.fund, spark));
+      }
+
+      out.sort((a, b) -> Double.compare(b.price() * b.total(), a.price() * a.total()));
+      return out;
+   }
+
+   public double moodValue() {
+      return this.mood;
    }
 
    private void saveListing(Listing l) {
@@ -119,10 +290,9 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       }
    }
 
-   /** Cours d'une part : prix plancher + banque de la guilde répartie sur l'ensemble des parts. */
+   /** Cours d'une part sur le marché. */
    public double price(Guild guild, Listing l) {
-      double floor = Math.max(1.0, this.plugin.getConfig().getDouble("bourse.floor-price", 10.0));
-      return Math.round((floor + Math.max(0.0, this.equity(guild)) / Math.max(1, l.total)) * 100.0) / 100.0;
+      return l.price;
    }
 
    /** Une guilde dissoute disparaît de la cote (ses actions ne valent plus rien). */
@@ -132,6 +302,8 @@ public class BourseManager implements CommandExecutor, TabCompleter {
             var db = this.plugin.getDataManager().getStorage();
             db.exec("DELETE FROM stock_listings WHERE guild_id = ?;", guildId);
             db.exec("DELETE FROM stock_positions WHERE guild_id = ?;", guildId);
+            db.exec("DELETE FROM stock_market WHERE guild_id = ?;", guildId);
+            db.exec("DELETE FROM stock_history WHERE guild_id = ?;", guildId);
          });
       }
    }
@@ -200,29 +372,49 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          case "acheter" -> this.buy(player, args);
          case "vendre" -> this.sell(player, args);
          case "portefeuille", "wallet" -> this.wallet(player);
+         case "info" -> this.info(player, args);
          default -> this.list(player);
       }
 
       return true;
    }
 
+   private static String arrow(double change) {
+      return change > 0.0005 ? "&a▲ +" + String.format(Locale.ROOT, "%.1f", change * 100) + " %" : change < -0.0005 ? "&c▼ " + String.format(Locale.ROOT, "%.1f", change * 100) + " %" : "&7■ 0,0 %";
+   }
+
    private void list(Player player) {
-      ChatUtil.sendMessage(player, "&6📈 Bourse des guildes :");
+      String humeur = this.mood > 0.05 ? "&aoptimiste" : this.mood < -0.05 ? "&cpessimiste" : "&7neutre";
+      ChatUtil.sendMessage(player, "&6📈 Bourse des guildes &7— marché " + humeur + " &7(" + (this.mood >= 0 ? "+" : "") + String.format(Locale.ROOT, "%.1f", this.mood * 100) + " %)");
       boolean any = false;
-      for (Listing l : this.listings.values()) {
-         Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
-         if (g != null) {
-            any = true;
-            ChatUtil.sendRaw(player, " &8• &e" + g.getName() + " &7— cours &6" + String.format(Locale.ROOT, "%.2f", this.price(g, l)) + " &7| disponibles &a" + l.treasury + "&7/" + l.total
-               + " &7| banque " + (long)g.getBankBalance());
-         }
+      for (Quote q : this.quotes()) {
+         any = true;
+         ChatUtil.sendRaw(player, " &8• &e" + q.guildName() + " &7— &6" + String.format(Locale.ROOT, "%.2f", q.price()) + " " + arrow(q.change24()) + " &7| disponibles &a" + q.free() + "&7/" + q.total() + " &7| actionnaires " + q.holders());
       }
 
       if (!any) {
          ChatUtil.sendRaw(player, " &7Aucune guilde cotée. Dès l'&eÂge 4&7, un chef de guilde peut ouvrir le capital avec &e/bourse ouvrir&7.");
       }
 
-      ChatUtil.sendRaw(player, "&7/bourse acheter <guilde> <parts> &8| &7/bourse vendre <guilde> <parts> &8| &7/bourse portefeuille");
+      ChatUtil.sendRaw(player, "&7/bourse info <guilde> &8| &7/bourse acheter <guilde> <parts> &8| &7/bourse vendre <guilde> <parts> &8| &7/bourse portefeuille");
+   }
+
+   private void info(Player player, String[] args) {
+      Guild g = args.length > 1 ? this.plugin.getGuildManager().getGuildByName(String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length))) : this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      Listing l = g == null ? null : this.listings.get(g.getId());
+      if (l == null) {
+         ChatUtil.sendMessage(player, "&c❌ Cette guilde n'est pas cotée. Usage : &e/bourse info <guilde>");
+         return;
+      }
+
+      Fund f = l.fund != null ? l.fund : this.fundamentals(g, l);
+      ChatUtil.sendMessage(player, "&6📊 &e" + g.getName() + " &7— cours &6" + String.format(Locale.ROOT, "%.2f", l.price) + " " + arrow(l.change24) + " &7(valeur fondamentale &e" + String.format(Locale.ROOT, "%.2f", f.perShare()) + "&7)");
+      ChatUtil.sendRaw(player, " &7Richesse : capitaux propres &6" + (long)f.equity() + " &7· territoire &f" + f.chunks() + " chunks &7· effectif &f" + f.members());
+      ChatUtil.sendRaw(player, " &7Réputation moyenne : &c❤" + String.format(Locale.ROOT, "%.1f", f.avgRep()) + " &7(multiplicateur ×" + String.format(Locale.ROOT, "%.2f", f.repMult()) + ")");
+      ChatUtil.sendRaw(player, " &7Âge " + f.age() + " (×" + String.format(Locale.ROOT, "%.1f", f.ageMult()) + ") · saison &f" + f.season() + " pts &7· métiers &f" + f.diversity() + "/6");
+      ChatUtil.sendRaw(player, " &7Nexus : niveau &d" + f.techLevel() + " &7· défenses &f" + f.defenses() + " &7· vie &f" + (int)Math.round(f.nexusPct() * 100) + " % &7(×" + String.format(Locale.ROOT, "%.2f", f.healthMult()) + ")"
+         + (f.debtMult() < 1.0 ? " &c· impayés (×0,85)" : ""));
+      ChatUtil.sendRaw(player, " &7Capitalisation estimée : &6" + (long)f.marketCap() + " pièces &7· le cours se rapproche de la valeur fondamentale, avec l'humeur du marché, des chocs (raids, sièges) et vos ordres.");
    }
 
    private void open(Player player) {
@@ -245,9 +437,12 @@ public class BourseManager implements CommandExecutor, TabCompleter {
 
       int total = Math.max(10, this.plugin.getConfig().getInt("bourse.total-shares", 1000));
       Listing l = new Listing(g.getId(), total, total, this.equity(g), System.currentTimeMillis());
+      l.fund = this.fundamentals(g, l);
+      l.price = l.fund.perShare();
       this.listings.put(g.getId(), l);
       this.saveListing(l);
-      ChatUtil.broadcast("&6📈 &e" + g.getName() + " &6entre en bourse ! &7" + total + " parts disponibles, cours initial &6" + String.format(Locale.ROOT, "%.2f", this.price(g, l)) + " &7(/bourse).");
+      this.savePrice(l);
+      ChatUtil.broadcast("&6📈 &e" + g.getName() + " &6entre en bourse ! &7" + total + " parts disponibles, cours initial &6" + String.format(Locale.ROOT, "%.2f", l.price) + " &7(/bourse).");
    }
 
    private void close(Player player) {
@@ -321,7 +516,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          return;
       }
 
-      double price = this.price(g, l);
+      double price = l.price;
       double cost = Math.ceil(price * n);
       PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
       if (data == null || !data.removeCoins(cost)) {
@@ -339,6 +534,9 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       l.costs.merge(player.getUniqueId(), cost, Double::sum);
       long bought = System.currentTimeMillis();
       l.since.put(player.getUniqueId(), bought);
+      // Une demande forte fait monter le cours : acheter 10 % du capital le relève de 8 % (bourse.impact).
+      l.price = Math.round(l.price * (1.0 + this.plugin.getConfig().getDouble("bourse.impact", 0.8) * n / Math.max(1, l.total)) * 100.0) / 100.0;
+      this.savePrice(l);
       this.saveListing(l);
       this.saveHolding(g.getId(), player.getUniqueId(), l.holders.get(player.getUniqueId()), l.costs.get(player.getUniqueId()), bought);
       this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.SHAREHOLDER);
@@ -370,8 +568,8 @@ public class BourseManager implements CommandExecutor, TabCompleter {
 
       // Revente à la guilde : 90 % du cours, et jamais plus de 1,5 fois le prix de revient (une guilde ne peut pas vider sa banque vers un complice).
       double avgCost = l.costs.getOrDefault(player.getUniqueId(), 0.0) / Math.max(1, owned);
-      double marketValue = this.price(g, l) * n * Math.max(0.1, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.buyback-ratio", 0.9)));
-      double proceeds = Math.floor(Math.min(marketValue, avgCost * n * Math.max(1.0, this.plugin.getConfig().getDouble("bourse.max-gain-ratio", 1.5))));
+      double marketValue = l.price * n * Math.max(0.1, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.buyback-ratio", 0.95)));
+      double proceeds = Math.floor(Math.min(marketValue, avgCost * n * Math.max(1.0, this.plugin.getConfig().getDouble("bourse.max-gain-ratio", 3.0))));
       if (!g.withdrawBank(proceeds)) {
          ChatUtil.sendMessage(player, "&c❌ La banque de la guilde ne peut pas racheter vos parts pour l'instant (" + (long)proceeds + " pièces nécessaires).");
          return;
@@ -392,6 +590,9 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       }
 
       l.treasury += n;
+      // L'offre fait baisser le cours.
+      l.price = Math.round(Math.max(this.minPrice(), l.price * (1.0 - this.plugin.getConfig().getDouble("bourse.impact", 0.8) * n / Math.max(1, l.total))) * 100.0) / 100.0;
+      this.savePrice(l);
       this.saveListing(l);
       this.saveHolding(g.getId(), player.getUniqueId(), left, Math.max(0.0, remainingCost), boughtAt);
       ChatUtil.sendMessage(player, "&a📈 Vous revendez &e" + n + " part(s) de " + g.getName() + " &apour &6" + (long)proceeds + " pièces&a.");
@@ -406,7 +607,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
          if (owned > 0 && g != null) {
             any = true;
-            double value = this.price(g, l) * owned;
+            double value = l.price * owned;
             total += value;
             ChatUtil.sendRaw(player, " &8• &e" + g.getName() + " &7: &f" + owned + " part(s) &7≈ &6" + (long)value + " pièces");
          }
@@ -421,7 +622,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       for (Listing l : this.listings.values()) {
          Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
          if (g != null) {
-            total += this.price(g, l) * l.holders.getOrDefault(uuid, 0);
+            total += l.price * l.holders.getOrDefault(uuid, 0);
          }
       }
 
@@ -431,8 +632,8 @@ public class BourseManager implements CommandExecutor, TabCompleter {
    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
       List<String> out = new ArrayList<>();
       if (args.length == 1) {
-         out.addAll(List.of("liste", "ouvrir", "fermer", "acheter", "vendre", "portefeuille"));
-      } else if (args.length == 2 && (args[0].equalsIgnoreCase("acheter") || args[0].equalsIgnoreCase("vendre"))) {
+         out.addAll(List.of("liste", "info", "ouvrir", "fermer", "acheter", "vendre", "portefeuille"));
+      } else if (args.length == 2 && (args[0].equalsIgnoreCase("acheter") || args[0].equalsIgnoreCase("vendre") || args[0].equalsIgnoreCase("info"))) {
          for (String id : this.listings.keySet()) {
             Guild g = this.plugin.getGuildManager().getGuildById(id);
             if (g != null) {

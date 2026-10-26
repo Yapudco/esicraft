@@ -684,6 +684,7 @@ public class NexusManager {
 
    public void onNexusDestroyed(Guild guild, String killer, Guild attackerGuild) {
       this.plugin.getSiege().onNexusDestroyed(guild, attackerGuild);
+      this.plugin.getBourse().shock(guild.getId(), -0.35, "Nexus détruit");
       this.unindexGuildNexus(guild);
       Nexus nexus = guild.getNexus();
       if (nexus != null && nexus.getLocation() != null) {

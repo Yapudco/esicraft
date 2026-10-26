@@ -923,6 +923,7 @@ public class RaidManager implements Listener {
                if (worthy) {
                   this.plugin.getSeasonManager().recordRepelled(targetGuild);
                   this.plugin.getNexusTech().onRaidRepelled(targetGuild);
+                  this.plugin.getBourse().shock(targetGuild.getId(), 0.02, "horde repoussée");
                }
 
                if (this.repelCredits.size() > 500) {

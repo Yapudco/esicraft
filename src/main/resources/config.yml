@@ -327,14 +327,30 @@ bourse:
   enabled: true
   min-age: 4                             # Âge minimal pour ouvrir le capital
   total-shares: 1000
-  floor-price: 10.0                      # Cours = prix plancher + banque de la guilde / nombre de parts
+  floor-price: 5.0                       # Prix plancher ajouté à la valeur fondamentale par part
+  update-minutes: 10                     # Fréquence de mise à jour du marché
+  reversion-speed: 0.15                  # Part de l'écart entre le cours et la valeur fondamentale comblée à chaque mise à jour
+  volatility: 0.02                       # Bruit aléatoire du cours (écart-type par mise à jour)
+  mood-volatility: 0.025                 # Variation de l'humeur générale du marché (tire tous les cours dans le même sens)
+  impact: 0.8                            # Effet d'un ordre sur le cours : acheter 10 % du capital le relève de 8 %
+  min-price: 1.0
+  weights:                               # Contribution de chaque facteur à la valeur fondamentale (en pièces)
+    equity: 1.0                          # par pièce de capitaux propres (banque moins dettes)
+    age: 2000.0                          # par niveau d'Âge
+    chunk: 150.0                         # par chunk revendiqué
+    member: 300.0                        # par membre
+    reputation: 40.0                     # par point d'honneur (/merci) des membres
+    season: 2.0                          # par point de la saison
+    tech-level: 400.0                    # par niveau du Nexus (x vie du Nexus)
+    defense: 150.0                       # par défense débloquée (x vie du Nexus)
+    diversity: 250.0                     # par métier différent
   max-public-percent: 49.0               # Part maximale du capital détenue par le public
   max-shares-per-player: 100
-  buyback-ratio: 0.9                     # Une part revendue à la guilde est rachetée à 90 % du cours
+  buyback-ratio: 0.95                    # Une part revendue à la guilde est rachetée à 95 % du cours
   dividend-minutes: 360                  # Période de calcul des dividendes
   dividend-percent: 20.0                 # Part du bénéfice de la période (hausse des capitaux propres : banque moins dettes nettes) versée aux actionnaires
   min-hold-hours: 24                     # Délai minimal avant de revendre des parts
-  max-gain-ratio: 1.5                    # Une revente ne rapporte jamais plus de 1,5 fois le prix payé
+  max-gain-ratio: 3.0                    # Une revente ne rapporte jamais plus de 3 fois le prix payé
 
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
