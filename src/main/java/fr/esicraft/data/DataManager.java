@@ -40,6 +40,17 @@ public class DataManager {
          this.plugin.getGuildManager().registerGuild(g);
       }
 
+      // Le pic de membres de l'Âge (quotas de dépôt) survit aux redémarrages : on ne baisse plus les exigences en expulsant puis en redémarrant.
+      for (Object[] row : this.storage.select("SELECT k, v FROM kv WHERE k LIKE 'peak:%';", 2)) {
+         Guild g = this.plugin.getGuildManager().getGuildById(((String)row[0]).substring(5));
+         if (g != null) {
+            try {
+               g.setPeakMembers(Integer.parseInt((String)row[1]));
+            } catch (NumberFormatException ignored) {
+            }
+         }
+      }
+
       Map<String, MarketListing> loadedListings = this.storage.loadAllMarketListings();
 
       for (MarketListing listing : loadedListings.values()) {
@@ -56,15 +67,39 @@ public class DataManager {
       return this.players.get(uuid);
    }
 
+   /** Charge un compte avant la connexion : jamais par-dessus une session encore en mémoire (sinon le solde revient en arrière). */
    public PlayerData preloadPlayer(UUID uuid, String name) {
+      PlayerData existing = this.players.get(uuid);
+      if (existing != null) {
+         return existing;
+      }
+
+      this.flushPlayerWrites();
       PlayerData data = this.storage.loadPlayerData(uuid, name);
-      this.players.put(uuid, data);
-      return data;
+      PlayerData raced = this.players.putIfAbsent(uuid, data);
+      return raced != null ? raced : data;
+   }
+
+   /** Attend que les écritures de comptes en attente soient passées (ordre garanti : sauvegarde de l'ancienne session avant lecture de la nouvelle). */
+   private void flushPlayerWrites() {
+      try {
+         this.playerIo.submit(() -> { }).get(5L, java.util.concurrent.TimeUnit.SECONDS);
+      } catch (Exception ignored) {
+         // on charge quand même : le thread d'écriture est unique, au pire on lit un état de quelques millisecondes plus ancien
+      }
+   }
+
+   /** Oublie un compte préchargé si le joueur n'est jamais entré (connexion refusée par un autre plugin). */
+   public void discardPreloaded(UUID uuid) {
+      if (Bukkit.getPlayer(uuid) == null) {
+         this.players.remove(uuid);
+      }
    }
 
    public PlayerData loadPlayer(Player player) {
       PlayerData data = this.players.get(player.getUniqueId());
       if (data == null) {
+         this.flushPlayerWrites();
          data = this.storage.loadPlayerData(player.getUniqueId(), player.getName());
          this.players.put(player.getUniqueId(), data);
       }
@@ -85,9 +120,22 @@ public class DataManager {
       }
    }
 
+   /** Joueur et banque de guilde dans la MÊME transaction : un plantage ne peut pas dupliquer (ni perdre) un dépôt. */
+   public void savePlayerAndGuild(PlayerData data, Guild guild) {
+      if (data != null && guild != null) {
+         this.playerIo.execute(() -> this.storage.runInTransaction(() -> {
+            this.storage.savePlayerData(data);
+            this.storage.saveGuild(guild);
+         }));
+      }
+   }
+
    public void saveGuild(Guild guild) {
       if (guild != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.saveGuild(guild));
+         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            this.storage.saveGuild(guild);
+            this.storage.exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "peak:" + guild.getId(), String.valueOf(guild.getPeakMembers()));
+         });
       }
    }
 
@@ -95,21 +143,33 @@ public class DataManager {
       Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.deleteGuild(guildId));
    }
 
+   // Création et suppression d'annonces passent par UN SEUL thread, dans l'ordre : une annulation immédiate ne peut plus être
+   // suivie d'un INSERT tardif (annonce fantôme au redémarrage, objet dupliqué).
+   private final java.util.concurrent.ExecutorService marketIo = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+      Thread t = new Thread(r, "esicraft-market-io");
+      t.setDaemon(false);
+      return t;
+   });
+
    public void saveMarketListing(MarketListing listing) {
       if (listing != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.saveMarketListing(listing));
+         this.marketIo.execute(() -> this.storage.saveMarketListing(listing));
       }
    }
 
    public void deleteMarketListing(String listingId) {
       if (listingId != null) {
-         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.storage.deleteMarketListing(listingId));
+         this.marketIo.execute(() -> this.storage.deleteMarketListing(listingId));
       }
    }
 
    public void deleteMarketListingSync(String listingId) {
       if (listingId != null) {
-         this.storage.deleteMarketListing(listingId);
+         try {
+            this.marketIo.submit(() -> this.storage.deleteMarketListing(listingId)).get(3L, java.util.concurrent.TimeUnit.SECONDS);
+         } catch (Exception e) {
+            this.plugin.getLogger().warning("Suppression d'annonce retardée : " + e.getMessage());
+         }
       }
    }
 

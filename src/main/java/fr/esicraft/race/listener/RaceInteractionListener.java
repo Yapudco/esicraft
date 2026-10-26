@@ -549,6 +549,10 @@ public class RaceInteractionListener implements Listener {
       }
    }
 
+   /** Seuls les animaux d'élevage voient leur butin doublé : jamais les bêtes de bât (âne, mulet, lama, cheval) ni celles qui portent un objet (renard, loup). */
+   private static final java.util.Set<org.bukkit.entity.EntityType> DOUBLED_LOOT = java.util.EnumSet.of(org.bukkit.entity.EntityType.COW, org.bukkit.entity.EntityType.MOOSHROOM,
+      org.bukkit.entity.EntityType.PIG, org.bukkit.entity.EntityType.SHEEP, org.bukkit.entity.EntityType.CHICKEN, org.bukkit.entity.EntityType.RABBIT);
+
    @EventHandler(
       priority = EventPriority.MONITOR,
       ignoreCancelled = true
@@ -559,7 +563,7 @@ public class RaceInteractionListener implements Listener {
       if (killer != null) {
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(killer.getUniqueId());
          GuildSpecialization spec = guild != null ? guild.getSpecialization() : GuildSpecialization.NONE;
-         if (entity instanceof Animals && spec == GuildSpecialization.DRUIDIC_ENCLAVE) {
+         if (entity instanceof Animals && spec == GuildSpecialization.DRUIDIC_ENCLAVE && DOUBLED_LOOT.contains(entity.getType())) {
             List<ItemStack> extraDrops = new ArrayList<>();
 
             for (ItemStack drop : event.getDrops()) {
@@ -570,6 +574,15 @@ public class RaceInteractionListener implements Listener {
             ChatUtil.sendActionbar(killer, "&a\ud83c\udf43 Élevage d'Enclave : Butin animal doublé !");
             killer.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, entity.getLocation().add(0.0, 0.5, 0.0), 8, 0.3, 0.3, 0.3, 0.05);
          } else {
+            org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason = entity.getEntitySpawnReason();
+            boolean naturalSpawn = switch (reason) {
+               case NATURAL, CHUNK_GEN, JOCKEY, REINFORCEMENTS, PATROL, VILLAGE_INVASION, TRAP, LIGHTNING, SILVERFISH_BLOCK -> true;
+               default -> false;
+            };
+            if (!naturalSpawn || entity.getScoreboardTags().contains("esicraft_raid_mob")) {
+               return;
+            }
+
             this.plugin.getAntiFarmManager().registerKill(killer.getUniqueId(), entity.getType());
             double baseBounty = this.getMobBounty(entity);
             if (baseBounty > 0.0) {
@@ -579,6 +592,7 @@ public class RaceInteractionListener implements Listener {
                finalBounty *= this.plugin.getNatureSeasons().bountyMultiplier();
                finalBounty *= this.plugin.getSynergy().bountyMultiplier(guild);
                finalBounty *= this.plugin.getBalance().catchUpMultiplier(guild);
+               finalBounty = this.plugin.getAntiFarmManager().capHourlyEarning(killer.getUniqueId(), finalBounty);
                if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
                   finalBounty *= 1.2;
                }

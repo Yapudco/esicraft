@@ -26,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 public class ReputationManager implements CommandExecutor, TabCompleter {
    private final EsicraftPlugin plugin;
    private final Map<UUID, Integer> points = new ConcurrentHashMap<>();
+   /** « giver|receiver|jour » déjà remerciés : l'ajout est atomique, donc 20 /merci dans le même tick ne donnent qu'un point. */
+   private final java.util.Set<String> thankedToday = ConcurrentHashMap.newKeySet();
+   private final Map<String, Integer> givenToday = new ConcurrentHashMap<>();
 
    public ReputationManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -43,6 +46,11 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       }
 
       db.exec("DELETE FROM reputation_thanks WHERE day < ?;", LocalDate.now().toEpochDay() - 2);
+      long today = LocalDate.now().toEpochDay();
+      for (Object[] row : db.select("SELECT giver, receiver FROM reputation_thanks WHERE day = ?;", 2, today)) {
+         this.thankedToday.add(row[0] + "|" + row[1] + "|" + today);
+         this.givenToday.merge(row[0] + "|" + today, 1, Integer::sum);
+      }
    }
 
    public void clear() {
@@ -72,10 +80,6 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       return p > 0 ? " &c❤" + p : "";
    }
 
-   private boolean alreadyThanked(UUID giver, UUID receiver, long day) {
-      return !this.plugin.getDataManager().getStorage().select("SELECT 1 FROM reputation_thanks WHERE giver = ? AND receiver = ? AND day = ?;", 1,
-         giver.toString(), receiver.toString(), day).isEmpty();
-   }
 
    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
       if (!(sender instanceof Player player)) {
@@ -118,11 +122,21 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       }
 
       long day = LocalDate.now().toEpochDay();
-      if (this.alreadyThanked(giver, receiver, day)) {
+      int perDay = this.plugin.getConfig().getInt("reputation.max-thanks-per-day", 5);
+      String giverDay = giver + "|" + day;
+      if (this.givenToday.getOrDefault(giverDay, 0) >= perDay) {
+         ChatUtil.sendMessage(player, "&c❌ Vous avez déjà remercié &e" + perDay + " &cjoueurs aujourd'hui. Revenez demain !");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return true;
+      }
+
+      if (!this.thankedToday.add(giver + "|" + receiver + "|" + day)) {
          ChatUtil.sendMessage(player, "&c❌ Vous avez déjà remercié &e" + target.getName() + " &caujourd'hui. Revenez demain !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          return true;
       }
+
+      this.givenToday.merge(giverDay, 1, Integer::sum);
 
       this.points.merge(receiver, 1, Integer::sum);
       int total = this.points.get(receiver);

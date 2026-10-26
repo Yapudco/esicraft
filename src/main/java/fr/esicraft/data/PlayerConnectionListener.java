@@ -22,12 +22,15 @@ public class PlayerConnectionListener implements Listener {
       this.plugin = plugin;
    }
 
+   // MONITOR : les refus des autres plugins (ban, liste blanche) sont déjà connus ; un compte préchargé d'une connexion avortée est oublié.
    @EventHandler(
-      priority = EventPriority.LOWEST
+      priority = EventPriority.MONITOR
    )
    public void onAsyncPreLogin(AsyncPlayerPreLoginEvent event) {
       if (event.getLoginResult() == Result.ALLOWED) {
-         this.plugin.getDataManager().preloadPlayer(event.getUniqueId(), event.getName());
+         java.util.UUID uuid = event.getUniqueId();
+         this.plugin.getDataManager().preloadPlayer(uuid, event.getName());
+         org.bukkit.Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.plugin.getDataManager().discardPreloaded(uuid), 600L);
       }
    }
 
@@ -37,9 +40,12 @@ public class PlayerConnectionListener implements Listener {
    public void onPlayerJoin(PlayerJoinEvent event) {
       Player player = event.getPlayer();
       PlayerData data = this.plugin.getDataManager().loadPlayer(player);
-      if (data != null) {
-         data.setSessionLoginTime(System.currentTimeMillis());
+      if (data == null) {
+         player.kick(ChatUtil.component("&cVos données n'ont pas pu être chargées. Réessayez dans un instant."));
+         return;
       }
+
+      data.setSessionLoginTime(System.currentTimeMillis());
 
       this.plugin.getGuildManager().reconcilePlayerGuild(player, data);
       this.plugin.getRaceManager().applyRaceAttributes(player, data.getRace());

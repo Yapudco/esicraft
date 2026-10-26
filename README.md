@@ -85,7 +85,9 @@ Chaque métier a des **objets qu'il est seul à pouvoir fabriquer**, des **avant
 
 Le territoire se compte en **chunks** (carrés de 16 × 16 blocs). Avec `/guild claim`, un officier revendique le chunk où il se trouve.
 
-- **Tous les chunks doivent se toucher.** Seul le premier peut être placé n'importe où. On ne peut pas non plus abandonner un chunk (`/guild unclaim`) si ça coupe le territoire en deux, ni celui du Nexus.
+- **Tous les chunks doivent se toucher** par un **côté** (pas en diagonale : plus de « serpents »). Seul le premier peut être placé n'importe où. Seul le **chef** peut abandonner un chunk (`/guild unclaim`), et pas si ça coupe le territoire en deux, ni celui du Nexus.
+- **Tampon anti-encerclement** : un nouveau chunk doit rester à au moins **1 chunk** du territoire d'une guilde sans traité avec la tienne.
+- **Plafond des officiers** : un officier dépense au plus **3 000 pièces par jour** de la banque (claims, pièges) ; le chef n'a pas de limite.
 - **Prix** : payé par la banque de guilde. Le premier coûte 100 pièces, puis chaque nouveau chunk coûte 25 pièces de plus que le précédent (100, 125, 150, 175…).
 - **Taille maximale selon l'Âge** :
 
@@ -102,6 +104,10 @@ Sur les terres d'une autre guilde, tu ne peux **ni casser ni poser de blocs**, n
 Y sont aussi interdits : la **TNT** (y compris en wagonnet), les **perles de l'Ender** et le **fruit de Chorus** pour s'y téléporter, les **cristaux de l'End**, les **pistons**, la **lave, l'eau et le feu** qui viennent de l'extérieur, la destruction de blocs par les Withers, Endermen et Ravageurs, et les **projectiles** sur les animaux, cadres et supports d'armure.
 
 **Lave et eau** : un liquide ne passe jamais d'un territoire à un autre (même pendant un raid), les distributeurs ne peuvent pas en verser chez le voisin, et on ne peut pas vider un seau de **lave** à moins de 5 blocs d'un joueur qui n'est ni de sa guilde ni son allié.
+
+**Entités protégées** : cadres, supports d'armure, minecarts (même à coffre), chevaux, ânes, animaux et laisses ne peuvent être ni frappés, ni montés, ni ouverts par un étranger. Les explosions n'abîment aucun bloc d'un territoire, et les distributeurs ne peuvent y vider ni seau, ni boule de feu, ni TNT venus de l'extérieur.
+
+**Zone de siège** : pour qu'un Nexus reste atteignable, un assaillant peut casser les blocs (hors coffres et conteneurs) à moins de **4 blocs** d'un Nexus vivant, et les membres ne peuvent pas poser de bloc plein à moins de **2 blocs** de lui (pas de Nexus muré).
 
 Les autres protections sautent seulement pendant un raid contre la guilde, et pendant **30 minutes** après la destruction de son Nexus s'il n'y a pas d'annexion.
 
@@ -146,7 +152,9 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 **Qui est épargné** : le golem gardien et les pièges ne visent jamais les membres de la guilde ni ceux d'une guilde liée par un traité (alliance, pacte de non-agression ou vassalité).
 
-**Le soigner** : un membre jette une **pomme dorée** dessus (ou fait un clic droit avec) : +500 PV, ou +2 500 PV avec une pomme dorée enchantée. Il faut attendre 30 secondes entre deux soins, et c'est impossible pendant un raid.
+**Le Nexus doit être visible** : un coup n'est compté que si l'assaillant le voit (portée et ligne de vue vérifiées). Le Nexus n'existe que dans l'Overworld.
+
+**Le soigner** : un membre jette une **pomme dorée** dessus (ou fait un clic droit avec) : +500 PV, ou +2 500 PV avec une pomme dorée enchantée. Il faut attendre 30 secondes entre deux soins, et c'est impossible pendant un raid ou dans les 2 minutes qui suivent une attaque de joueurs.
 
 ### Les pièges (`/nexus traps`)
 
@@ -177,7 +185,8 @@ Options possibles : des **sapeurs** qui font exploser les murs et assèchent l'e
 ### Conditions
 
 - Seuls les **officiers et le chef** peuvent lancer un raid.
-- **Au moins un défenseur doit être connecté et sur ses terres**, sinon le raid est refusé.
+- **Sans défenseur** connecté et sur ses terres, un raid est encore possible mais le Nexus n'encaisse que **25 %** des dégâts.
+- **Durée maximale** : 25 minutes ; au-delà, le raid s'achève sans victoire ni défaite (un monstre piégé ne rend plus une guilde intouchable). Si une part importante de la horde se volatilise sans combat (chunk déchargé…), la victoire n'est pas créditée.
 - Après un raid, la guilde visée est **protégée 30 minutes**.
 - Impossible d'attaquer une guilde avec qui on a un **traité** (voir [Diplomatie](#-9-diplomatie-et-transports)).
 
@@ -327,6 +336,10 @@ Pour **750 pièces**, tu te fais passer pendant **5 minutes** pour un membre de 
 
 `/journal` résume les derniers grands faits (raids, conquêtes, traités, trahisons, Âges, événements). `/succes` liste tes **26 succès** (premier métier, conquérant, traître, maître espion, quatre saisons…) et le pourcentage de joueurs qui les ont. Un succès obtenu par moins de 10 % des joueurs est **rare** et annoncé dans le journal.
 
+### ⚔ Combat PvP
+
+Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…) ou être frappé met « en combat » 15 secondes. Pendant ce temps : **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… sont bloqués**, les téléportations par commande aussi, et **se déconnecter est puni de mort** (kick compris ; seul l'arrêt du serveur est excusé).
+
 ### 🏦 Banque de guilde : prêts et coffre commun (`/banque`)
 
 Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
@@ -419,6 +432,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/merci <joueur>` | Offrir un point d'honneur (une fois par jour et par personne) |
 | `/parrain <joueur>` | Parrainer une recrue (`accepter` / `refuser` pour répondre) |
 | `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
+| `/cosmetique` | Activer ou cacher ses cosmétiques débloqués |
 | `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
 
 ---

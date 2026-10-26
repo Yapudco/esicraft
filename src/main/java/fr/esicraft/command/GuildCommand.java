@@ -309,8 +309,8 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
-                  ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent unclaim.");
+               if (!guild.getLeaderUuid().equals(player.getUniqueId())) {
+                  ChatUtil.sendMessage(player, "&cSeul le chef de guilde peut abandonner un chunk.");
                   return true;
                }
 
@@ -377,8 +377,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   if (pData != null && pData.getCoins() >= amount) {
                      pData.removeCoins(amount);
                      guild.depositBank(amount);
-                     this.plugin.getDataManager().savePlayer(pData);
-                     this.plugin.getDataManager().saveGuild(guild);
+                     this.plugin.getDataManager().savePlayerAndGuild(pData, guild);
                      ChatUtil.sendMessage(player, "&aDépôt de &6" + amount + " pièces &aeffectué dans la banque de guilde !");
                   } else {
                      ChatUtil.sendMessage(player, "&cVous n'avez pas assez d'argent sur vous.");
@@ -416,14 +415,22 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                      + String.format("%.2f", nextClaimCost)
                      + " pièces&8)"
                );
-               ChatUtil.sendRaw(player, "&7Banque de Guilde : &a" + String.format("%.2f", guild.getBankBalance()) + " pièces");
+               Guild viewerGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+               boolean insider = viewerGuild != null && (viewerGuild.getId().equals(guild.getId()) || this.plugin.getTreatyManager().between(viewerGuild.getId(), guild.getId()) != null)
+                  || player.hasPermission("esicraft.admin");
+               if (insider || this.plugin.getConfig().getBoolean("web.show-guild-banks", true)) {
+                  ChatUtil.sendRaw(player, "&7Banque de Guilde : &a" + String.format("%.2f", guild.getBankBalance()) + " pièces");
+               }
+
                for (String line : this.plugin.getSynergy().describe(guild)) {
                   ChatUtil.sendRaw(player, line);
                }
 
                ChatUtil.sendRaw(
                   player,
-                  "&7Nexus : " + (guild.hasNexus() ? "&a" + guild.getNexus().getCurrentHealth() + "/" + guild.getNexus().getMaxHealth() + " PV" : "&cNon posé")
+                  "&7Nexus : " + (guild.hasNexus()
+                     ? (insider || this.plugin.getConfig().getBoolean("web.show-nexus-health", false) ? "&a" + guild.getNexus().getCurrentHealth() + "/" + guild.getNexus().getMaxHealth() + " PV" : "&aPosé")
+                     : "&cNon posé")
                );
                ChatUtil.sendRaw(player, "&8&m----------------------------------------");
                break;

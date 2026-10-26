@@ -333,6 +333,17 @@ public class RailManager {
 
    /** Débite le joueur, verse péages et tarif aux banques de guilde, puis téléporte. */
    public void travel(Player player, RailSearch.Reached trip) {
+      this.travel(player, trip, -1.0);
+   }
+
+   /** {@code expectedTotal} : prix affiché au joueur (négatif = non vérifié) ; le trajet est refusé si les péages ont augmenté depuis. */
+   public void travel(Player player, RailSearch.Reached trip, double expectedTotal) {
+      if (this.plugin.getRansom().isCaptive(player.getUniqueId()) || this.plugin.getCombatManager().isInCombat(player)) {
+         ChatUtil.sendMessage(player, "&c❌ Impossible de voyager : vous êtes en combat ou captif.");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return;
+      }
+
       Station dest = trip.station();
       Location arrival = this.arrivalOf(dest);
       if (arrival == null || !this.stations.containsKey(dest.getId())) {
@@ -346,6 +357,13 @@ public class RailManager {
          return;
       }
 
+      if (expectedTotal >= 0.0 && quote.total() > expectedTotal + 0.001) {
+         ChatUtil.sendMessage(player, "&c❌ Les péages ont changé depuis l'affichage du devis (&e" + String.format(Locale.ROOT, "%.2f", expectedTotal) + " &c→ &e"
+            + String.format(Locale.ROOT, "%.2f", quote.total()) + "&c). Rouvrez le menu pour confirmer le nouveau prix.");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return;
+      }
+
       PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
       if (data == null || !data.removeCoins(quote.total())) {
          ChatUtil.sendMessage(player, "&c❌ Il vous faut &6" + String.format(Locale.ROOT, "%.2f", quote.total()) + " pièces &cpour ce trajet.");
@@ -353,6 +371,7 @@ public class RailManager {
          return;
       }
 
+      this.plugin.getDataManager().savePlayer(data);
       Location from = player.getLocation();
       if (player.isInsideVehicle()) {
          player.leaveVehicle();

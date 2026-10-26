@@ -158,6 +158,12 @@ public class GuildContractManager {
       state.done[i] = true;
       Part part = state.parts.get(i);
       double mult = this.plugin.getSynergy().contractMultiplier(guild);
+      int minMembers = this.plugin.getConfig().getInt("guilds.contract-min-members", 3);
+      if (guild.getMembers().size() < minMembers) {
+         ChatUtil.broadcastGuild(guild, "&e🧩 Objectif accompli, mais les récompenses de contrat de guilde demandent au moins &6" + minMembers + " membres&e.");
+         return;
+      }
+
       guild.depositBank(PART_REWARD * mult);
       ChatUtil.broadcastGuild(guild, "&a🧩 Contrat de guilde : objectif &f" + this.label(part) + " &aaccompli ! &6+" + Math.round(PART_REWARD * mult) + " pièces &7(banque)");
       if (state.allDone()) {

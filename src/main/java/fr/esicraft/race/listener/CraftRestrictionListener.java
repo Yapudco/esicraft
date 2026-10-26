@@ -121,6 +121,50 @@ public class CraftRestrictionListener implements Listener {
       }
    }
 
+   /** Bloc Crafter (1.21) : pas de joueur, donc l'Âge de la guilde qui possède le territoire (Âge 1 hors claim) décide, sans bonus de métier. */
+   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+   public void onCrafter(org.bukkit.event.block.CrafterCraftEvent event) {
+      ItemStack result = event.getResult();
+      if (result == null || result.getType().isAir()) {
+         return;
+      }
+
+      org.bukkit.block.Block b = event.getBlock();
+      Guild owner = this.plugin.getGuildManager().getGuildByChunk(new fr.esicraft.util.ChunkKey(b.getWorld().getName(), b.getX() >> 4, b.getZ() >> 4));
+      AgeType age = owner != null ? owner.getCurrentAge() : AgeType.RUSTIC;
+      if (!this.canCraft(result.getType(), null, Race.NONE, age)) {
+         event.setCancelled(true);
+      }
+   }
+
+   private boolean usageLocked(Player player, ItemStack item) {
+      if (item == null || item.getType().isAir() || player.hasPermission("esicraft.admin") || !this.plugin.getConfig().getBoolean("restrictions.block-use", true)) {
+         return false;
+      }
+
+      Material m = item.getType();
+      boolean gear = this.isDiamondGear(m) || this.isNetheriteGear(m) || this.isIronCombatGear(m) || this.isIronTool(m) || m == Material.BOW || m == Material.CROSSBOW;
+      return gear && !this.canCraft(m, player, this.plugin.getRaceManager().getRace(player), this.plugin.getAgeManager().getPlayerAge(player));
+   }
+
+   /** Acheter l'équipement interdit (marché, villageois, coffres) ne suffit plus : on ne frappe ni ne mine avec tant que l'Âge ou le métier manque. */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onUseWeapon(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+      if (event.getDamager() instanceof Player player && this.usageLocked(player, player.getInventory().getItemInMainHand())) {
+         event.setCancelled(true);
+         ChatUtil.sendActionbar(player, "&c❌ Cet équipement est verrouillé : &7" + this.getRequiredInfo(player.getInventory().getItemInMainHand().getType()));
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onUseTool(org.bukkit.event.block.BlockBreakEvent event) {
+      Player player = event.getPlayer();
+      if (this.usageLocked(player, player.getInventory().getItemInMainHand())) {
+         event.setCancelled(true);
+         ChatUtil.sendActionbar(player, "&c❌ Cet outil est verrouillé : &7" + this.getRequiredInfo(player.getInventory().getItemInMainHand().getType()));
+      }
+   }
+
    public boolean canCraft(Material mat, Player player, Race race, AgeType age) {
       int ageLevel = age.getLevel();
       if (this.isBasicMaterial(mat)) {
@@ -293,7 +337,10 @@ public class CraftRestrictionListener implements Listener {
             BASIC_MATERIALS.add(m);
          }
 
-         if (name.startsWith("DIAMOND_")) {
+         if (name.startsWith("DIAMOND_")
+            && (name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE") || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS") || name.endsWith("_SWORD")
+               || name.endsWith("_AXE") || name.endsWith("_PICKAXE") || name.endsWith("_SHOVEL") || name.endsWith("_HOE"))) {
+            // Seul l'équipement est restreint : le diamant, les blocs de diamant et le minerai restent utilisables (nécessaires à l'Âge 3).
             DIAMOND_GEAR.add(m);
          }
 

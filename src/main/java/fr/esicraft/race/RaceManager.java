@@ -109,6 +109,7 @@ public class RaceManager {
                         }
 
                         data.removeCoins(changeCost);
+                        this.plugin.getDataManager().savePlayer(data);
                         data.incrementRaceChangesCount();
                         ChatUtil.sendMessage(player, "&6" + String.format("%.0f", changeCost) + " pièces &aont été débitées pour votre reconversion.");
                      }

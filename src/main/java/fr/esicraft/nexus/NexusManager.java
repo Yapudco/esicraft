@@ -135,6 +135,11 @@ public class NexusManager {
             ChatUtil.sendMessage(player, "&7Faites &e/guild claim &7pour revendiquer ce chunk d'abord.");
             return false;
          } else {
+            if (location.getWorld().getEnvironment() != World.Environment.NORMAL) {
+               ChatUtil.sendMessage(player, "&c❌ Le Nexus ne peut être posé que dans l'Overworld (pas dans le Nether ni dans l'End).");
+               return false;
+            }
+
             World world = location.getWorld();
             int cx = location.getBlockX();
             int cy = location.getBlockY();
@@ -602,6 +607,14 @@ public class NexusManager {
          if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId())) {
             if (player != null) {
                ChatUtil.sendMessage(player, "&c❌ Impossible de soigner le Nexus : une invasion de monstres est en cours !");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            }
+
+            return false;
+         } else if (this.wasNexusRecentlyAttacked(guild, this.plugin.getConfig().getLong("nexus.heal-block-seconds", 120L) * 1000L)) {
+            // Pas de soin pendant ni juste après une attaque de joueurs (2 500 PV toutes les 30 s annuleraient n'importe quel assaut).
+            if (player != null) {
+               ChatUtil.sendMessage(player, "&c❌ Le Nexus a été attaqué il y a moins de &e" + this.plugin.getConfig().getLong("nexus.heal-block-seconds", 120L) + " s&c : impossible de le soigner maintenant.");
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             }
 

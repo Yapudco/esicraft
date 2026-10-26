@@ -25,6 +25,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -60,6 +66,8 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    private final Map<UUID, Captive> captives = new ConcurrentHashMap<>();
    private final Map<UUID, Long> immuneUntil = new ConcurrentHashMap<>();
    private final Set<UUID> executing = ConcurrentHashMap.newKeySet();
+   /** « guilde ravisseuse>guilde de la victime » → fin du délai avant une nouvelle capture (contre les complices qui se relaient). */
+   private final Map<String, Long> pairCooldown = new ConcurrentHashMap<>();
 
    public RansomManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -85,11 +93,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    // ------------------------------------------------------------------ capture
 
    private static Player shooter(EntityDamageByEntityEvent event) {
-      if (event.getDamager() instanceof Player p) {
-         return p;
-      }
-
-      return event.getDamager() instanceof Projectile proj && proj.getShooter() instanceof Player p ? p : null;
+      return fr.esicraft.combat.CombatManager.attackerOf(event.getDamager());
    }
 
    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -122,6 +126,18 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
          return;
       }
 
+      // Pas de capture entre guildes liées par un traité (complices, alliés), ni deux fois de suite entre les mêmes guildes en peu de temps.
+      if (this.plugin.getTreatyManager().between(captorGuild.getId(), victimGuild.getId()) != null) {
+         return;
+      }
+
+      String pair = captorGuild.getId() + ">" + victimGuild.getId();
+      Long cooldown = this.pairCooldown.get(pair);
+      if (cooldown != null && cooldown > System.currentTimeMillis()) {
+         return;
+      }
+
+      this.pairCooldown.put(pair, System.currentTimeMillis() + this.plugin.getConfig().getLong("ransom.pair-cooldown-minutes", 10L) * 60000L);
       event.setCancelled(true);
       this.capture(victim, captor, captorGuild, victimGuild);
    }
@@ -171,9 +187,55 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       }
    }
 
+   private boolean held(org.bukkit.entity.HumanEntity e) {
+      return e instanceof Player p && this.captives.containsKey(p.getUniqueId());
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onDrop(PlayerDropItemEvent event) {
+      if (this.captives.containsKey(event.getPlayer().getUniqueId())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onSwap(PlayerSwapHandItemsEvent event) {
+      if (this.captives.containsKey(event.getPlayer().getUniqueId())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onInteract(PlayerInteractEvent event) {
+      if (this.captives.containsKey(event.getPlayer().getUniqueId())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onClick(InventoryClickEvent event) {
+      if (this.held(event.getWhoClicked())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onOpen(InventoryOpenEvent event) {
+      if (this.held(event.getPlayer())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(ignoreCancelled = true)
+   public void onPickup(EntityPickupItemEvent event) {
+      if (event.getEntity() instanceof Player p && this.captives.containsKey(p.getUniqueId())) {
+         event.setCancelled(true);
+      }
+   }
+
    @EventHandler(ignoreCancelled = true)
    public void onTeleport(PlayerTeleportEvent event) {
-      if (this.captives.containsKey(event.getPlayer().getUniqueId()) && event.getCause() != PlayerTeleportEvent.TeleportCause.PLUGIN) {
+      if (this.captives.containsKey(event.getPlayer().getUniqueId())) {
          event.setCancelled(true);
       }
    }
@@ -241,7 +303,10 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    private void free(Captive c, boolean paid, String reason) {
       Player victim = Bukkit.getPlayer(c.victim);
       this.release(c, victim);
-      this.immuneUntil.put(c.victim, System.currentTimeMillis() + this.plugin.getConfig().getLong("ransom.immunity-minutes", 10L) * 60000L);
+      if (paid) {
+         this.immuneUntil.put(c.victim, System.currentTimeMillis() + this.plugin.getConfig().getLong("ransom.immunity-minutes", 10L) * 60000L);
+      }
+
       if (victim != null) {
          ChatUtil.sendMessage(victim, paid ? "&a⛓ Vous êtes libre ! &7(rançon payée)" : "&a⛓ Vous êtes libéré. &7(" + reason + ")");
          ChatUtil.playSound(victim, Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
@@ -259,11 +324,12 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       this.executing.add(c.victim);
       try {
          ChatUtil.sendMessage(victim, "&c⛓ Votre captivité s'achève par l'exécution (" + reason + ").");
+         // setHealth(0) ne passe pas par le totem d'immortalité (équipé pendant la captivité) ; le tueur reste crédité de la prime.
          if (captor != null && captor.isOnline()) {
-            victim.damage(10000.0, captor);
-         } else {
-            victim.setHealth(0.0);
+            victim.setKiller(captor);
          }
+
+         victim.setHealth(0.0);
       } finally {
          this.executing.remove(c.victim);
       }
@@ -278,15 +344,38 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       }
 
       Captive asVictim = this.captives.get(player.getUniqueId());
-      Captive asCaptor = null;
+      List<Captive> mine = new ArrayList<>();
       for (Captive c : this.captives.values()) {
          if (c.captor.equals(player.getUniqueId())) {
-            asCaptor = c;
-            break;
+            mine.add(c);
          }
       }
 
       String sub = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
+      // Plusieurs prisonniers : le nom se donne en dernier argument (/rancon prix <montant> <joueur>, /rancon liberer <joueur>).
+      String nameArg = sub.equals("prix") ? (args.length > 2 ? args[2] : null) : (args.length > 1 ? args[1] : null);
+      Captive asCaptor = null;
+      if (nameArg != null) {
+         for (Captive c : mine) {
+            String n = Bukkit.getOfflinePlayer(c.victim).getName();
+            if (n != null && n.equalsIgnoreCase(nameArg)) {
+               asCaptor = c;
+            }
+         }
+      } else if (mine.size() == 1) {
+         asCaptor = mine.get(0);
+      }
+
+      if (asCaptor == null && mine.size() > 1 && (sub.equals("prix") || sub.equals("liberer") || sub.equals("libérer") || sub.equals("executer") || sub.equals("exécuter"))) {
+         StringBuilder names = new StringBuilder();
+         for (Captive c : mine) {
+            names.append(' ').append(Bukkit.getOfflinePlayer(c.victim).getName());
+         }
+
+         ChatUtil.sendMessage(player, "&eVous avez plusieurs prisonniers :&f" + names + "&e. Ajoutez le nom du joueur à la commande.");
+         return true;
+      }
+
       if (sub.isEmpty()) {
          if (asVictim != null) {
             ChatUtil.sendMessage(player, "&c⛓ Vous êtes captif. Rançon : &6" + String.format(Locale.ROOT, "%.0f", asVictim.price) + " pièces&c. &e/rancon payer");
@@ -313,6 +402,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
                return true;
             }
 
+            this.plugin.getDataManager().savePlayer(data);
             Guild captorGuild = this.plugin.getGuildManager().getGuildById(asVictim.captorGuildId);
             double share = Math.max(0.0, Math.min(1.0, this.plugin.getConfig().getDouble("ransom.captor-share", 0.3)));
             double toCaptor = Math.floor(asVictim.price * share);

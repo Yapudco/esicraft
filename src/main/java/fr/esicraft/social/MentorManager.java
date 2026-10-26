@@ -49,6 +49,35 @@ public class MentorManager implements CommandExecutor, TabCompleter {
    private final EsicraftPlugin plugin;
    private final Map<UUID, Bond> bonds = new ConcurrentHashMap<>();
    private final Map<UUID, Offer> offers = new ConcurrentHashMap<>();
+   private final Map<UUID, java.util.ArrayDeque<Long>> payouts = new ConcurrentHashMap<>();
+
+   private static boolean sameAddress(Player a, Player b) {
+      var x = a.getAddress();
+      var y = b.getAddress();
+      return x != null && y != null && x.getAddress() != null && x.getAddress().equals(y.getAddress());
+   }
+
+   private long playMinutes(Player p) {
+      return p.getStatistic(Statistic.PLAY_ONE_MINUTE) / 1200L;
+   }
+
+   /** Plafond de jalons payés par parrain et par 24 h (mentoring.max-payouts-per-day). */
+   private boolean payoutAllowed(UUID mentor) {
+      var q = this.payouts.computeIfAbsent(mentor, k -> new java.util.ArrayDeque<>());
+      long now = System.currentTimeMillis();
+      synchronized (q) {
+         while (!q.isEmpty() && now - q.peekFirst() > 86400000L) {
+            q.pollFirst();
+         }
+
+         if (q.size() >= this.plugin.getConfig().getInt("mentoring.max-payouts-per-day", 3)) {
+            return false;
+         }
+
+         q.addLast(now);
+         return true;
+      }
+   }
 
    public MentorManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -128,13 +157,21 @@ public class MentorManager implements CommandExecutor, TabCompleter {
             continue;
          }
 
-         if (!b.raceDone && this.plugin.getRaceManager().getRace(recruit) != Race.NONE) {
+         Player mentorOnline = Bukkit.getPlayer(b.mentor);
+         if (mentorOnline != null && sameAddress(mentorOnline, recruit)) {
+            continue;
+         }
+
+         long minutes = this.playMinutes(recruit);
+         if (!b.raceDone && this.plugin.getRaceManager().getRace(recruit) != Race.NONE && minutes >= this.plugin.getConfig().getLong("mentoring.min-recruit-minutes-job", 30L)
+            && this.payoutAllowed(b.mentor)) {
             b.raceDone = true;
             this.pay(b, "race", "premier métier", this.reward("first-job-mentor", 200.0), this.reward("first-job-recruit", 50.0), recruit);
          }
 
          Guild g = this.plugin.getGuildManager().getGuildByPlayer(b.recruit);
-         if (!b.claimDone && g != null && !g.getClaimedChunks().isEmpty()) {
+         if (!b.claimDone && g != null && !g.getClaimedChunks().isEmpty() && g.getMembers().size() >= 2
+            && minutes >= this.plugin.getConfig().getLong("mentoring.min-recruit-minutes-claim", 120L) && this.payoutAllowed(b.mentor)) {
             b.claimDone = true;
             this.pay(b, "claim", "premier territoire", this.reward("first-claim-mentor", 300.0), this.reward("first-claim-recruit", 100.0), recruit);
          }
@@ -230,6 +267,11 @@ public class MentorManager implements CommandExecutor, TabCompleter {
 
       if (recruit.equals(mentor)) {
          ChatUtil.sendMessage(mentor, "&c❌ Vous ne pouvez pas vous parrainer vous-même.");
+         return;
+      }
+
+      if (sameAddress(mentor, recruit)) {
+         ChatUtil.sendMessage(mentor, "&c❌ Le parrain et la recrue ne peuvent pas jouer depuis la même connexion.");
          return;
       }
 

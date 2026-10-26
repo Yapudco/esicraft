@@ -134,13 +134,20 @@ public class HelpCallManager {
             break;
          }
 
-         this.plugin.getDataManager().creditPlayer(uuid, reward);
+         // Récompense TRANSFÉRÉE depuis la banque de la guilde défendue (et non créée) : plus de planche à billets entre guildes complices.
+         long paid = (long)Math.min((double)reward, Math.floor(guild.getBankBalance()));
+         if (paid > 0L && guild.withdrawBank((double)paid)) {
+            this.plugin.getDataManager().creditPlayer(uuid, (double)paid);
+         } else {
+            paid = 0L;
+         }
+
          this.plugin.getAchievements().grant(uuid, Achievement.SAVIOR);
          this.plugin.getAchievements().addStat(uuid, AchievementManager.STAT_HELPS, 1L);
          Player p = Bukkit.getPlayer(uuid);
          if (p != null) {
             names.add(p.getName());
-            ChatUtil.sendMessage(p, "&a🆘 Merci pour votre aide ! La horde a été repoussée : &6+" + reward + " pièces&a.");
+            ChatUtil.sendMessage(p, "&a🆘 Merci pour votre aide ! La horde a été repoussée" + (paid > 0L ? " : &6+" + paid + " pièces &a(versées par la banque de la guilde)&a." : "&a."));
          }
       }
 

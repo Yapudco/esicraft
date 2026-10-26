@@ -322,7 +322,7 @@ public class EventManager implements Listener {
          return;
       }
 
-      if (event.getEntity() instanceof Monster && ThreadLocalRandom.current().nextDouble() < 0.5) {
+      if (event.getEntity() instanceof Monster && ThreadLocalRandom.current().nextDouble() < this.plugin.getConfig().getDouble("events.blood-moon-extra-spawn-chance", 0.25)) {
          this.cloning = true;
          try {
             Location loc = event.getLocation();
@@ -510,7 +510,9 @@ public class EventManager implements Listener {
       }
 
       if (damager instanceof Player player) {
-         this.bossDamage.merge(player.getUniqueId(), event.getFinalDamage(), Double::sum);
+         // Seuls les PV réellement retirés comptent (pas l'excédent du coup fatal).
+         double dealt = this.boss instanceof org.bukkit.entity.LivingEntity living ? Math.min(event.getFinalDamage(), Math.max(0.0, living.getHealth())) : event.getFinalDamage();
+         this.bossDamage.merge(player.getUniqueId(), dealt, Double::sum);
       }
    }
 
@@ -544,8 +546,16 @@ public class EventManager implements Listener {
       if (top != null) {
          Player topPlayer = Bukkit.getPlayer(top);
          String topName = topPlayer != null ? topPlayer.getName() : Bukkit.getOfflinePlayer(top).getName();
-         event.getDrops().add(new ItemStack(Material.NETHER_STAR, 1));
-         event.getDrops().add(new ItemStack(Material.DIAMOND, 8));
+         // Le butin va directement dans l'inventaire du meilleur combattant (sinon n'importe qui le ramasse au sol) ; le surplus est réservé à son nom.
+         ItemStack[] loot = {new ItemStack(Material.NETHER_STAR, 1), new ItemStack(Material.DIAMOND, 8)};
+         if (topPlayer != null) {
+            for (ItemStack left : topPlayer.getInventory().addItem(loot).values()) {
+               topPlayer.getWorld().dropItem(topPlayer.getLocation(), left, dropped -> dropped.setOwner(top));
+            }
+         } else {
+            event.getDrops().add(loot[0]);
+            event.getDrops().add(loot[1]);
+         }
          ChatUtil.broadcast("&7Le plus grand pourfendeur, &e" + topName + "&7, voit tomber une &fÉtoile du Nether &7et &b8 diamants&7 !");
          this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.EVENT, "☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : " + topName + ").", null, null);
          this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.SLAYER);

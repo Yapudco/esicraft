@@ -52,6 +52,7 @@ public class WebServer {
    private static final byte[] LOGO = loadLogo();
    private volatile Page notFound = new Page(404, "text/plain; charset=utf-8", "Introuvable".getBytes(StandardCharsets.UTF_8));
    private final Map<String, long[]> hits = new ConcurrentHashMap<>();
+   private final long[] globalHits = new long[]{System.currentTimeMillis(), 0L};
    private volatile long lastErrorLog;
    private HttpServer server;
    private ThreadPoolExecutor pool;
@@ -73,7 +74,9 @@ public class WebServer {
       this.rateLimit = Math.max(5, this.plugin.getConfig().getInt("web.rate-limit.requests", 60));
       this.rateWindowMs = Math.max(1L, this.plugin.getConfig().getLong("web.rate-limit.window-seconds", 10L)) * 1000L;
       // Délais d'expiration du serveur HTTP du JDK (lus une seule fois par la JVM : on ne remplace pas un réglage existant).
-      setIfAbsent("sun.net.httpserver.maxReqTime", "10");
+      setIfAbsent("sun.net.httpserver.maxReqTime", "5");
+      setIfAbsent("sun.net.httpserver.maxIdleConnections", "200");
+      setIfAbsent("sun.net.httpserver.idleInterval", "20");
       setIfAbsent("sun.net.httpserver.maxRspTime", "30");
       setIfAbsent("sun.net.httpserver.maxReqHeaders", "64");
       this.render(WebSnapshot.empty(), WebExtra.empty());
@@ -81,7 +84,7 @@ public class WebServer {
       try {
          this.server = HttpServer.create(new InetSocketAddress(bind, port), 64);
          // 4 threads, file bornée ; si elle déborde, le thread d'acceptation traite lui-même (contre-pression, pas de croissance mémoire).
-         this.pool = new ThreadPoolExecutor(2, 4, 30L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(128), r -> {
+         this.pool = new ThreadPoolExecutor(4, 12, 30L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(256), r -> {
             Thread t = new Thread(r, "esicraft-web");
             t.setDaemon(true);
             return t;
@@ -158,7 +161,7 @@ public class WebServer {
          for (Map.Entry<UUID, GuildRole> m : g.getMembers().entrySet()) {
             OfflinePlayer op = Bukkit.getOfflinePlayer(m.getKey());
             Player online = op.getPlayer();
-            boolean visible = online != null && !isVanished(online);
+            boolean visible = online != null && !isVanished(online) && this.plugin.getDisguiseManager().get(m.getKey()) == null;
             PlayerData pd = this.plugin.getDataManager().getPlayerData(m.getKey());
             members.add(new WebSnapshot.MemberView(op.getName() != null ? op.getName() : "?", HtmlPages.plain(m.getValue().getDisplayName()),
                pd != null && pd.getRace() != null ? HtmlPages.plain(pd.getRace().getDisplayName()) : null, visible));
@@ -242,8 +245,13 @@ public class WebServer {
             continue;
          }
 
-         int defenders = 0;
+         boolean showDefenders = this.plugin.getConfig().getBoolean("web.show-raid-defenders", false);
+         int defenders = showDefenders ? 0 : -1;
          for (UUID m : t.getMembers().keySet()) {
+            if (!showDefenders) {
+               break;
+            }
+
             Player p = Bukkit.getPlayer(m);
             if (p != null && !isVanished(p) && t.isClaimed(fr.esicraft.util.ChunkKey.from(p.getLocation().getChunk()))) {
                defenders++;
@@ -529,6 +537,52 @@ public class WebServer {
 
    // ------------------------------------------------------------------ limite de débit
 
+   /**
+    * Clé de limitation : adresse IPv4 telle quelle, plage /64 pour l'IPv6 (un client en possède des milliers), et, derrière un proxy inverse
+    * déclaré dans {@code web.trusted-proxies}, l'adresse transmise par X-Forwarded-For (sinon tous les visiteurs partageraient celle du proxy).
+    */
+   private String clientKey(HttpExchange ex) {
+      InetSocketAddress remote = ex.getRemoteAddress();
+      String ip = remote != null && remote.getAddress() != null ? remote.getAddress().getHostAddress() : "?";
+      if (this.plugin.getConfig().getBoolean("web.trust-proxy-header", false) && this.plugin.getConfig().getStringList("web.trusted-proxies").contains(ip)) {
+         String forwarded = ex.getRequestHeaders().getFirst("X-Forwarded-For");
+         if (forwarded != null && !forwarded.isBlank()) {
+            ip = forwarded.split(",")[0].trim();
+         }
+      }
+
+      if (ip.indexOf(':') >= 0) {
+         try {
+            byte[] raw = java.net.InetAddress.getByName(ip).getAddress();
+            if (raw.length == 16) {
+               StringBuilder sb = new StringBuilder("v6:");
+               for (int i = 0; i < 8; i++) {
+                  sb.append(String.format("%02x", raw[i]));
+               }
+
+               return sb.toString();
+            }
+         } catch (java.net.UnknownHostException | RuntimeException ignored) {
+            // adresse illisible : on la garde telle quelle
+         }
+      }
+
+      return ip;
+   }
+
+   private boolean allowGlobal() {
+      long now = System.currentTimeMillis();
+      long[] w = this.globalHits;
+      synchronized (w) {
+         if (now - w[0] >= this.rateWindowMs) {
+            w[0] = now;
+            w[1] = 0L;
+         }
+
+         return ++w[1] <= (long)this.rateLimit * 20L;
+      }
+   }
+
    private boolean allow(String ip) {
       long now = System.currentTimeMillis();
       long[] w = this.hits.computeIfAbsent(ip, k -> new long[]{now, 0L});
@@ -546,7 +600,13 @@ public class WebServer {
       long now = System.currentTimeMillis();
       this.hits.entrySet().removeIf(e -> now - e.getValue()[0] >= this.rateWindowMs);
       if (this.hits.size() > 50000) {
-         this.hits.clear();
+         // Jamais de remise à zéro globale (un attaquant remplirait la table pour libérer tous les compteurs) : on retire seulement les plus anciennes entrées.
+         java.util.Iterator<Map.Entry<String, long[]>> it = this.hits.entrySet().iterator();
+         int toDrop = this.hits.size() - 40000;
+         while (it.hasNext() && toDrop-- > 0) {
+            it.next();
+            it.remove();
+         }
       }
    }
 
@@ -556,8 +616,8 @@ public class WebServer {
       try {
          String method = ex.getRequestMethod();
          InetSocketAddress remote = ex.getRemoteAddress();
-         String ip = remote != null && remote.getAddress() != null ? remote.getAddress().getHostAddress() : "?";
-         if (!this.allow(ip)) {
+         String ip = this.clientKey(ex);
+         if (!this.allowGlobal() || !this.allow(ip)) {
             ex.getResponseHeaders().set("Retry-After", String.valueOf(this.rateWindowMs / 1000L));
             this.send(ex, new Page(429, "text/plain; charset=utf-8", "Trop de requêtes, réessayez dans quelques secondes.".getBytes(StandardCharsets.UTF_8)), false);
             return;

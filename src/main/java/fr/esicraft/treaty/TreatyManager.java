@@ -137,7 +137,13 @@ public class TreatyManager {
       double amount = Math.floor(vassal.getBankBalance() * percent) / 100.0;
       t.setLastTribute(now);
       this.async(() -> this.plugin.getDataManager().getStorage().exec("UPDATE treaties SET last_tribute = ? WHERE id = ?;", now, t.getId()));
-      if (amount >= 1.0 && vassal.withdrawBank(amount)) {
+      double minTribute = this.plugin.getConfig().getDouble("treaties.vassal-min-tribute", 50.0);
+      boolean collected = amount >= 1.0 && vassal.withdrawBank(amount);
+      if (!collected || amount < minTribute) {
+         this.plugin.getLoans().addForcedDebt(suzerain, vassal, minTribute - (collected ? amount : 0.0), 2);
+      }
+
+      if (collected) {
          suzerain.depositBank(amount);
          this.plugin.getDataManager().saveGuild(vassal);
          this.plugin.getDataManager().saveGuild(suzerain);
@@ -407,6 +413,12 @@ public class TreatyManager {
     * Agression d'un joueur ou du Nexus d'une guilde liée par un traité (pacte, alliance, vassalité, suzerain compris) : le traité est rompu
     * automatiquement (trahison : indemnité et préavis) et une rivalité s'ouvre entre les deux guildes.
     */
+   /** Vrai si l'agresseur est une simple recrue d'une guilde liée par traité à la victime : son coup est annulé sans rompre le traité (sabotage par infiltré). */
+   public boolean blocksRecruitAggression(Guild aggressor, Guild victim, Player actor) {
+      return aggressor != null && victim != null && actor != null && this.between(aggressor.getId(), victim.getId()) != null
+         && !aggressor.hasRoleAtLeast(actor.getUniqueId(), GuildRole.MEMBER);
+   }
+
    public void onAggression(Guild aggressor, Guild victim, Player actor) {
       if (!this.enabled() || aggressor == null || victim == null || aggressor.getId().equals(victim.getId())) {
          return;
@@ -437,6 +449,12 @@ public class TreatyManager {
             this.plugin.getDataManager().saveGuild(other);
          } else {
             paid = 0.0;
+         }
+
+         // Banque vidée avant la rupture ? Le manque à payer devient une dette (prélevée d'office puis garantie par les territoires).
+         double shortfall = this.plugin.getConfig().getDouble("treaties.break-indemnity", 500.0) - paid;
+         if (shortfall >= 1.0) {
+            this.plugin.getLoans().addForcedDebt(other, breaker, shortfall, 2);
          }
 
          long until = System.currentTimeMillis() + this.plugin.getConfig().getLong("treaties.break-grace-minutes", 30L) * 60000L;

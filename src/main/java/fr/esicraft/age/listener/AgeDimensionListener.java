@@ -142,7 +142,8 @@ public class AgeDimensionListener implements Listener {
       Bukkit.getScheduler().runTask(this.plugin, () -> this.checkAndExpelIfUnderage(moved));
    }
 
-   private void checkAndExpelIfUnderage(Player player) {
+   /** Appelé aussi quand un joueur quitte ou est expulsé de sa guilde : on ne garde pas le Nether / l'End d'un Âge « emprunté ». */
+   public void checkAndExpelIfUnderage(Player player) {
       if (player != null && player.isOnline()) {
          if (!player.hasPermission("esicraft.admin")) {
             World world = player.getWorld();

@@ -249,6 +249,23 @@ public class AgeManager {
                ChatUtil.broadcast("&e&l\ud83d\udc51 EXPLOIT LÉGENDAIRE : &6La guilde &e" + guild.getName() + " &6a conquis l'&eÂge de Suprématie &6!");
             }
 
+            // Œuf de dragon et bloc de Netherite : UN seul exemplaire par guilde (le chef s'il est connecté, sinon le premier membre en ligne),
+            // et non un par membre connecté (sinon remplir la guilde juste avant le dernier dépôt crée autant de blocs que de joueurs).
+            UUID rewardTo = null;
+            if (next == AgeType.SUPREMACY) {
+               Player leader = Bukkit.getPlayer(guild.getLeaderUuid());
+               if (leader != null && guild.isMember(leader.getUniqueId())) {
+                  rewardTo = leader.getUniqueId();
+               } else {
+                  for (UUID candidate : guild.getMembers().keySet()) {
+                     if (Bukkit.getPlayer(candidate) != null) {
+                        rewardTo = candidate;
+                        break;
+                     }
+                  }
+               }
+            }
+
             for (UUID memberUuid : guild.getMembers().keySet()) {
                Player member = Bukkit.getPlayer(memberUuid);
                if (member != null && member.isOnline()) {
@@ -265,7 +282,7 @@ public class AgeManager {
                   ChatUtil.sendRaw(member, "       " + next.getDisplayName());
                   ChatUtil.sendRaw(member, " &7" + next.getDescription());
                   ChatUtil.sendRaw(member, " &aVos membres débloquent de nouvelles technologies et crafts !");
-                  if (next == AgeType.SUPREMACY) {
+                  if (next == AgeType.SUPREMACY && memberUuid.equals(rewardTo)) {
                      ItemStack dragonEgg = new ItemStack(Material.DRAGON_EGG, 1);
                      ItemStack netheriteBlock = new ItemStack(Material.NETHERITE_BLOCK, 1);
                      HashMap<Integer, ItemStack> leftover = member.getInventory().addItem(new ItemStack[]{dragonEgg, netheriteBlock});

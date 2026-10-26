@@ -29,6 +29,8 @@ public final class RailGui {
       public final RailSearch.Result result;
       public final List<RailSearch.Reached> trips;
       public int page;
+      /** Prix affiché pour chaque destination : le trajet est refusé si les péages ont augmenté entre l'affichage et le clic. */
+      public final java.util.Map<RailSearch.Reached, Double> shown = new java.util.HashMap<>();
 
       public TravelHolder(RailSearch.Result result, List<RailSearch.Reached> trips) {
          this.result = result;
@@ -50,6 +52,10 @@ public final class RailGui {
       for (int i = 0; i < PAGE_SIZE && from + i < holder.trips.size(); i++) {
          RailSearch.Reached trip = holder.trips.get(from + i);
          inv.setItem(i, travelItem(plugin, player, holder.result.origin(), trip, traveler));
+         RailManager.Quote q = plugin.getRailManager().quote(player, trip);
+         if (q != null) {
+            holder.shown.put(trip, q.total());
+         }
       }
 
       int pages = Math.max(1, (holder.trips.size() + PAGE_SIZE - 1) / PAGE_SIZE);

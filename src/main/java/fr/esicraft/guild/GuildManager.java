@@ -110,6 +110,7 @@ public class GuildManager {
                   return false;
                } else {
                   data.removeCoins(cost);
+                  this.plugin.getDataManager().savePlayer(data);
                   String guildId = UUID.randomUUID().toString();
                   Guild guild = new Guild(guildId, name, tag, player.getUniqueId());
                   data.setGuildId(guildId);
@@ -146,10 +147,19 @@ public class GuildManager {
 
    /** Vérifie qu'un joueur peut dissoudre sa guilde (pas en plein raid / attaque de Nexus). */
    public boolean canDisbandNow(Guild guild, Player player) {
+      if (guild != null && this.plugin.getLoans().hasDebt(guild.getId())) {
+         if (player != null) {
+            ChatUtil.sendMessage(player, "&c❌ Impossible de dissoudre la guilde : elle a une dette en cours (&e/banque dettes&c).");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         }
+
+         return false;
+      }
+
       if (guild != null && guild.hasNexus()) {
          if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getNexusManager().wasNexusRecentlyAttacked(guild, 600000L)) {
             if (player != null) {
-               ChatUtil.sendMessage(player, "&c❌ Impossible de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !");
+               ChatUtil.sendMessage(player, "&c❌ Impossible de quitter ou de dissoudre la guilde : votre Nexus est attaqué ou a été attaqué il y a moins de 10 minutes !");
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             }
 
@@ -184,6 +194,12 @@ public class GuildManager {
          this.guildsById.remove(guild.getId());
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
+         for (UUID memberUuid : guild.getMembers().keySet()) {
+            Player online = Bukkit.getPlayer(memberUuid);
+            if (online != null) {
+               Bukkit.getScheduler().runTask(this.plugin, () -> this.plugin.getAgeDimension().checkAndExpelIfUnderage(online));
+            }
+         }
          this.updateAllPlayerTabs();
          ChatUtil.broadcast("&c&l[Guildes] &7La guilde &c" + guild.getName() + " &7a été dissoute.");
          this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.GUILD, "La guilde " + guild.getName() + " est dissoute.", guild.getId(), null);
@@ -213,6 +229,9 @@ public class GuildManager {
                );
                return false;
             }
+         } else if (!this.canDisbandNow(guild, player)) {
+            // Pas de départ en plein raid : sinon on vide la guilde pour priver l'adversaire de l'annexion.
+            return false;
          } else {
             guild.removeMember(uuid);
             this.playerGuildMap.remove(uuid);
@@ -227,6 +246,7 @@ public class GuildManager {
             this.updatePlayerTab(player);
             this.plugin.getRaceManager().applyRaceAttributes(player, this.plugin.getRaceManager().getRace(player));
             this.plugin.getDataManager().saveGuild(guild);
+            this.plugin.getAgeDimension().checkAndExpelIfUnderage(player);
             ChatUtil.sendMessage(player, "&aVous avez quitté la guilde &6" + guild.getName() + " &aavec succès.");
 
             for (UUID memberUuid : guild.getMembers().keySet()) {
@@ -258,6 +278,8 @@ public class GuildManager {
             } else if (targetRole.ordinal() >= officerRole.ordinal()) {
                ChatUtil.sendMessage(officer, "&cVous ne pouvez pas expulser un membre ayant un rang égal ou supérieur au vôtre.");
                return false;
+            } else if (!this.canDisbandNow(guild, officer)) {
+               return false;
             } else {
                guild.removeMember(targetUuid);
                this.playerGuildMap.remove(targetUuid);
@@ -273,6 +295,7 @@ public class GuildManager {
                if (target.isOnline() && target.getPlayer() != null) {
                   this.updatePlayerTab(target.getPlayer());
                   this.plugin.getRaceManager().applyRaceAttributes(target.getPlayer(), this.plugin.getRaceManager().getRace(target.getPlayer()));
+                  this.plugin.getAgeDimension().checkAndExpelIfUnderage(target.getPlayer());
                }
 
                ChatUtil.sendMessage(officer, "&aVous avez expulsé &e" + (target.getName() != null ? target.getName() : "le joueur") + " &ade la guilde.");
@@ -422,6 +445,48 @@ public class GuildManager {
       }
    }
 
+   /** Un chunk d'une autre guilde (sans traité avec la nôtre) se trouve-t-il dans le tampon de {@code claims.enemy-buffer-chunks} chunks ? Évite l'encerclement. */
+   private boolean hasEnemyNeighbor(Guild guild, ChunkKey key) {
+      int buffer = Math.max(0, this.plugin.getConfig().getInt("claims.enemy-buffer-chunks", 1));
+      for (int dx = -buffer; dx <= buffer; dx++) {
+         for (int dz = -buffer; dz <= buffer; dz++) {
+            Guild other = this.chunkClaims.get(new ChunkKey(key.getWorldName(), key.getX() + dx, key.getZ() + dz));
+            if (other != null && !other.getId().equals(guild.getId()) && this.plugin.getTreatyManager().between(guild.getId(), other.getId()) == null) {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   private final java.util.Map<String, Double> officerSpend = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /** Plafond quotidien de dépenses (claims, pièges) d'un officier ; le chef de guilde n'a pas de limite. */
+   public boolean officerMaySpend(Guild guild, Player player, double amount) {
+      if (guild.getLeaderUuid().equals(player.getUniqueId())) {
+         return true;
+      }
+
+      double cap = this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0);
+      if (cap <= 0.0) {
+         return true;
+      }
+
+      long day = java.time.LocalDate.now().toEpochDay();
+      String key = guild.getId() + "|" + player.getUniqueId() + "|" + day;
+      synchronized (this.officerSpend) {
+         this.officerSpend.keySet().removeIf(k -> !k.endsWith("|" + day));
+         double current = this.officerSpend.getOrDefault(key, 0.0);
+         if (current + amount > cap) {
+            return false;
+         }
+
+         this.officerSpend.put(key, current + amount);
+         return true;
+      }
+   }
+
    public boolean isAdjacentToGuildClaims(Guild guild, ChunkKey chunkKey) {
       if (guild != null && chunkKey != null) {
          if (guild.getClaimedChunks().isEmpty()) {
@@ -431,9 +496,10 @@ public class GuildManager {
             int x = chunkKey.getX();
             int z = chunkKey.getZ();
 
+            // Adjacence orthogonale uniquement (pas de « serpents » en diagonale) pour les NOUVEAUX claims.
             for (int dx = -1; dx <= 1; dx++) {
                for (int dz = -1; dz <= 1; dz++) {
-                  if (dx != 0 || dz != 0) {
+                  if ((dx == 0) != (dz == 0)) {
                      ChunkKey neighbor = new ChunkKey(world, x + dx, z + dz);
                      Guild neighborOwner = this.chunkClaims.get(neighbor);
                      if (neighborOwner != null && neighborOwner.getId().equals(guild.getId())) {
@@ -470,6 +536,11 @@ public class GuildManager {
          Guild existing = this.chunkClaims.get(chunkKey);
          if (existing != null) {
             ChatUtil.sendMessage(player, "&cCe chunk est déjà revendiqué par la guilde &e" + existing.getName() + " &c!");
+            return false;
+         } else if (this.hasEnemyNeighbor(guild, chunkKey)) {
+            ChatUtil.sendMessage(player, "&c❌ Trop près d'un territoire ennemi : laissez au moins &e" + this.plugin.getConfig().getInt("claims.enemy-buffer-chunks", 1)
+               + " chunk &cde distance (sauf avec une guilde liée par un traité).");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             return false;
          } else if (this.plugin.getLoans().hasOverdue(guild.getId())) {
             ChatUtil.sendMessage(player, "&c❌ Votre guilde a une dette impayée : plus aucune revendication tant qu'elle n'est pas remboursée (&e/banque dettes&c).");
@@ -527,6 +598,11 @@ public class GuildManager {
                         + "&c)."
                   );
                   ChatUtil.sendMessage(player, "&7Déposez de l'argent dans la banque de guilde avec &e/guild bank <montant>&7.");
+                  ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                  return false;
+               } else if (!this.officerMaySpend(guild, player, claimCost)) {
+                  ChatUtil.sendMessage(player, "&c❌ Plafond quotidien de dépenses des officiers atteint (&e" + this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0)
+                     + " pièces&c) : seul le chef de guilde peut dépenser davantage aujourd'hui.");
                   ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                   return false;
                } else {
@@ -670,7 +746,30 @@ public class GuildManager {
       }
    }
 
+   private long specCooldownLeftMs(Guild guild) {
+      long days = this.plugin.getConfig().getLong("guilds.spec-change-cooldown-days", 7L);
+      var rows = this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, "speccd:" + guild.getId());
+      if (days <= 0L || rows.isEmpty()) {
+         return 0L;
+      }
+
+      try {
+         return Math.max(0L, Long.parseLong((String)rows.get(0)[0]) + days * 86400000L - System.currentTimeMillis());
+      } catch (NumberFormatException e) {
+         return 0L;
+      }
+   }
+
    public boolean setSpecialization(Guild guild, GuildSpecialization spec, Player player) {
+      if (guild != null && spec != null && guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec) {
+         long left = this.specCooldownLeftMs(guild);
+         if (left > 0L) {
+            ChatUtil.sendMessage(player, "&c❌ La guilde a changé de spécialisation récemment : encore &e" + fr.esicraft.treaty.TreatyManager.formatDuration(left) + "&c d'attente.");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+            return false;
+         }
+      }
+
       if (guild != null && spec != null) {
          if (guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec && !guild.canChangeSpecialization()) {
             ChatUtil.sendMessage(player, "&c❌ Votre guilde ne peut pas changer de spécialisation pour le moment !");
@@ -712,6 +811,9 @@ public class GuildManager {
                GuildSpecialization oldSpec = guild.getSpecialization();
                guild.setSpecialization(spec);
                guild.setCanChangeSpecialization(false);
+               String cdKey = "speccd:" + guild.getId();
+               Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage()
+                  .exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", cdKey, String.valueOf(System.currentTimeMillis())));
                if (guild.hasNexus()) {
                   Nexus nexus = guild.getNexus();
                   int baseHealth = this.plugin.getConfig().getInt("guilds.nexus.base-health", 5000);
@@ -881,8 +983,14 @@ public class GuildManager {
                   this.playerGuildMap.put(player.getUniqueId(), guild.getId());
                   if (!guild.isHistoricalMember(player.getUniqueId())) {
                      guild.addHistoricalMember(player.getUniqueId());
-                     guild.setCanChangeSpecialization(true);
-                     ChatUtil.sendMessage(player, "&a✨ Votre arrivée en tant que nouveau membre débloque un changement de spécialisation pour la guilde !");
+                     long hours = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 72000L;
+                     long minHours = this.plugin.getConfig().getLong("guilds.spec-change-min-hours", 2L);
+                     if (hours >= minHours) {
+                        guild.setCanChangeSpecialization(true);
+                        ChatUtil.sendMessage(player, "&a✨ Votre arrivée en tant que nouveau membre débloque un changement de spécialisation pour la guilde !");
+                     } else {
+                        ChatUtil.sendMessage(player, "&7Un nouveau membre ne débloque un changement de spécialisation qu'après &e" + minHours + " h &7de jeu.");
+                     }
                   }
 
                   this.plugin.getDataManager().saveGuild(guild);

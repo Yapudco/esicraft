@@ -328,8 +328,7 @@ final class ExtraPages {
             .append("<a href=\"/guilde/").append(esc(r.targetId())).append("\">").append(esc(r.targetName())).append("</a> assiégée</div><div class=\"chips\">")
             .append("<span class=\"chip bad\">").append(esc(r.type())).append("</span><span class=\"chip\">par ").append(esc(r.attackerName())).append("</span>")
             .append("<span class=\"chip\">⏱ ").append(esc(duration(s.generatedAt() - r.startedAt()))).append("</span>")
-            .append("<span class=\"chip ").append(r.defenders() > 0 ? "ok" : "bad").append("\">🛡 ").append(r.defenders())
-            .append(r.defenders() > 1 ? " défenseurs" : " défenseur").append(" sur place</span>");
+            .append(r.defenders() >= 0 ? "<span class=\"chip " + (r.defenders() > 0 ? "ok" : "bad") + "\">🛡 " + r.defenders() + (r.defenders() > 1 ? " défenseurs" : " défenseur") + " sur place</span>" : "");
          if (r.nexusPercent() != null) {
             b.append("<span class=\"chip acc\">💎 Nexus ").append(r.nexusPercent()).append(" %</span>");
          }

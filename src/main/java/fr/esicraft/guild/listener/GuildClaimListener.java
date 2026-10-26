@@ -78,6 +78,10 @@ public class GuildClaimListener implements Listener {
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
          Guild guild = this.protectedGuildAt(chunkKey);
          if (guild != null && !guild.isMember(player.getUniqueId())) {
+            if (this.siegeBreakAllowed(player, block, guild)) {
+               return;
+            }
+
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c❌ Vous ne pouvez pas casser de blocs sur le territoire de &6" + guild.getName() + " &c!");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.8F, 1.2F);
@@ -102,6 +106,11 @@ public class GuildClaimListener implements Listener {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c❌ La spécialisation Rôdeur Solitaire interdit d'avoir des coffres dans ses claims !");
             ChatUtil.sendMessage(player, "&c❌ Vous ne pouvez pas poser de coffres ou conteneurs de stockage sur votre territoire de Rôdeur Solitaire !");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         } else if (guild != null && guild.isMember(player.getUniqueId()) && this.buriesNexus(guild, block)) {
+            // Pas de Nexus muré : les blocs pleins sont interdits à moins de 2 blocs du Nexus (sinon aucun assaillant ne peut l'atteindre).
+            event.setCancelled(true);
+            ChatUtil.sendActionbar(player, "&c❌ Le Nexus doit rester accessible : pas de bloc plein à moins de 2 blocs de lui.");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          } else {
             if (guild != null && !guild.isMember(player.getUniqueId())) {
@@ -181,7 +190,7 @@ public class GuildClaimListener implements Listener {
                   return;
                }
 
-               if (entity instanceof Animals || entity instanceof Tameable || entity instanceof Villager || entity instanceof ArmorStand) {
+               if (entity instanceof Animals || entity instanceof Tameable || entity instanceof Villager || entity instanceof ArmorStand || entity instanceof org.bukkit.entity.Hanging || entity instanceof Vehicle) {
                   event.setCancelled(true);
                   ChatUtil.sendActionbar(player, "&c❌ Vous ne pouvez pas attaquer les animaux/entités sur le territoire de &6" + guild.getName());
                }
@@ -318,6 +327,36 @@ public class GuildClaimListener implements Listener {
       }
    }
 
+
+   /** Un assaillant peut casser les blocs (hors conteneurs) à moins de {@code nexus.siege-radius} blocs d'un Nexus vivant : on doit pouvoir l'atteindre. */
+   private boolean siegeBreakAllowed(Player player, Block block, Guild owner) {
+      if (!owner.hasNexus() || !owner.getNexus().isAlive() || !this.plugin.isNexusDestructionEnabled() || owner.getNexus().getLocation() == null
+         || owner.getNexus().getLocation().getWorld() != block.getWorld() || this.isContainerBlock(block) || block.getType() == Material.CRYING_OBSIDIAN) {
+         return false;
+      }
+
+      Guild attacker = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      if (attacker != null && this.plugin.getTreatyManager().between(attacker.getId(), owner.getId()) != null) {
+         return false;
+      }
+
+      int radius = this.plugin.getConfig().getInt("nexus.siege-radius", 4);
+      Location n = owner.getNexus().getLocation();
+      return Math.abs(block.getX() - n.getBlockX()) <= radius && Math.abs(block.getY() - n.getBlockY()) <= radius && Math.abs(block.getZ() - n.getBlockZ()) <= radius;
+   }
+
+   private boolean buriesNexus(Guild guild, Block block) {
+      if (!guild.hasNexus() || guild.getNexus().getLocation() == null || guild.getNexus().getLocation().getWorld() != block.getWorld() || !block.getType().isOccluding()) {
+         return false;
+      }
+
+      Location n = guild.getNexus().getLocation();
+      int dx = block.getX() - n.getBlockX();
+      int dy = block.getY() - n.getBlockY();
+      int dz = block.getZ() - n.getBlockZ();
+      boolean foundation = dx == 0 && dz == 0 && dy < 0;
+      return !foundation && Math.abs(dx) <= 2 && Math.abs(dy) <= 2 && Math.abs(dz) <= 2;
+   }
 
    /** Guilde protégeant ce chunk : null si le territoire est vulnérable (Nexus détruit il y a moins de 30 min). */
    private Guild protectedGuildAt(ChunkKey key) {
@@ -581,7 +620,7 @@ public class GuildClaimListener implements Listener {
    )
    public void onBlockDispense(BlockDispenseEvent event) {
       Material itemType = event.getItem().getType();
-      if ((itemType == Material.LAVA_BUCKET || itemType == Material.WATER_BUCKET)
+      if ((itemType.name().endsWith("_BUCKET") || itemType == Material.FIRE_CHARGE || itemType == Material.TNT || itemType == Material.FLINT_AND_STEEL)
          && event.getBlock().getBlockData() instanceof org.bukkit.block.data.Directional directional) {
          Block target = event.getBlock().getRelative(directional.getFacing());
          String targetOwner = this.claimOwnerId(target);
@@ -597,6 +636,66 @@ public class GuildClaimListener implements Listener {
          if (guild != null) {
             event.setCancelled(true);
          }
+      }
+   }
+
+   /** Interagir avec une entité d'un territoire adverse (cadres, supports d'armure, minecarts et ânes à coffre, chevaux, laisses, véhicules). */
+   private boolean entityLocked(Player player, Entity entity) {
+      if (player.hasPermission("esicraft.admin")) {
+         return false;
+      }
+
+      boolean sensitive = entity instanceof org.bukkit.entity.Hanging || entity instanceof ArmorStand || entity instanceof Vehicle || entity instanceof org.bukkit.entity.AbstractHorse
+         || entity instanceof Animals || entity instanceof Tameable;
+      if (!sensitive) {
+         return false;
+      }
+
+      Guild guild = this.protectedGuildAt(ChunkKey.from(entity.getLocation().getChunk()));
+      return guild != null && !guild.isMember(player.getUniqueId());
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onInteractEntity(org.bukkit.event.player.PlayerInteractEntityEvent event) {
+      if (this.entityLocked(event.getPlayer(), event.getRightClicked())) {
+         event.setCancelled(true);
+         ChatUtil.sendActionbar(event.getPlayer(), "&c❌ Territoire protégé : vous ne pouvez pas interagir avec cette entité.");
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onInteractAt(org.bukkit.event.player.PlayerInteractAtEntityEvent event) {
+      if (this.entityLocked(event.getPlayer(), event.getRightClicked())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onArmorStand(org.bukkit.event.player.PlayerArmorStandManipulateEvent event) {
+      if (this.entityLocked(event.getPlayer(), event.getRightClicked())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onLeash(org.bukkit.event.entity.PlayerLeashEntityEvent event) {
+      if (this.entityLocked(event.getPlayer(), event.getEntity())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onUnleash(org.bukkit.event.player.PlayerUnleashEntityEvent event) {
+      if (this.entityLocked(event.getPlayer(), event.getEntity())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onVehicleDamage(org.bukkit.event.vehicle.VehicleDamageEvent event) {
+      Player player = this.resolvePlayer(event.getAttacker());
+      if (player != null && this.entityLocked(player, event.getVehicle())) {
+         event.setCancelled(true);
       }
    }
 
