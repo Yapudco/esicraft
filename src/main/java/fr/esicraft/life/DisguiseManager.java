@@ -103,16 +103,14 @@ public class DisguiseManager implements Listener {
 
       this.plugin.getDataManager().savePlayer(data);
 
-      // Emprunte le nom d'un membre hors ligne (sinon garde le sien) : deux joueurs du même nom en ligne trahiraient la ruse.
-      List<String> candidates = new ArrayList<>();
-      for (UUID member : target.getMembers().keySet()) {
-         OfflinePlayer op = Bukkit.getOfflinePlayer(member);
-         if (!op.isOnline() && op.getName() != null) {
-            candidates.add(op.getName());
-         }
-      }
-
-      String fake = candidates.isEmpty() ? player.getName() : candidates.get(ThreadLocalRandom.current().nextInt(candidates.size()));
+      // Pseudonyme inventé (jamais le nom d'un vrai joueur : on ne peut pas se faire passer pour quelqu'un et escroquer sa guilde).
+      String[] aliases = {"Ombre", "Corbeau", "Passant", "Voyageur", "Marchand", "Pelerin", "Eclaireur", "Vagabond"};
+      String fake;
+      int tries = 0;
+      do {
+         fake = aliases[ThreadLocalRandom.current().nextInt(aliases.length)] + "_" + (100 + ThreadLocalRandom.current().nextInt(900));
+         tries++;
+      } while (Bukkit.getOfflinePlayerIfCached(fake) != null && tries < 20);
       Disguise d = new Disguise(target.getId(), target.getTag(), target.getName(), fake, now + this.durationMs());
       this.active.put(player.getUniqueId(), d);
       this.cooldowns.put(player.getUniqueId(), now + this.cooldownMs());
@@ -201,11 +199,28 @@ public class DisguiseManager implements Listener {
 
    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
    public void onDamage(EntityDamageByEntityEvent event) {
-      Entity damager = event.getDamager();
-      Player attacker = damager instanceof Player p ? p : damager instanceof Projectile proj && proj.getShooter() instanceof Player shooter ? shooter : null;
+      Player attacker = fr.esicraft.combat.CombatManager.attackerOf(event.getDamager());
       if (attacker != null && this.get(attacker.getUniqueId()) != null) {
          this.reveal(attacker, true);
       }
+   }
+
+   /** Les messages de mort ne trahissent pas le vrai nom d'un espion (victime ou tueur). */
+   @EventHandler(priority = EventPriority.HIGH)
+   public void onDeathMessage(org.bukkit.event.entity.PlayerDeathEvent event) {
+      net.kyori.adventure.text.Component message = event.deathMessage();
+      if (message == null) {
+         return;
+      }
+
+      for (Player p : new Player[]{event.getEntity(), event.getEntity().getKiller()}) {
+         Disguise d = p != null ? this.get(p.getUniqueId()) : null;
+         if (d != null) {
+            message = message.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder().matchLiteral(p.getName()).replacement(d.fakeName()).build());
+         }
+      }
+
+      event.deathMessage(message);
    }
 
    @EventHandler

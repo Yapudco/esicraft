@@ -276,7 +276,8 @@ ransom:
   min: 100.0
   max: 2000.0
   captor-share: 0.3           # Part de la rançon pour le ravisseur (le reste va à la banque de sa guilde)
-  immunity-minutes: 10        # Pas de nouvelle capture juste après une libération
+  immunity-minutes: 10        # Immunité après le PAIEMENT d'une rançon (pas après une libération gratuite)
+  pair-cooldown-minutes: 10   # Délai entre deux captures d'une même guilde par une même guilde (anti-complices)
   on-timeout: kill            # kill (exécution) ou free (libération) si le ravisseur ne décide rien
 
 loans:
@@ -291,6 +292,8 @@ loans:
 
 combat:
   enabled: true
+  blocked-commands: [hub, lobby, mainhub, station, gares, train, metro, rail, pay, payer, virement, sendmoney, ah, hdv, market, marche, banque, bank, pret, deguisement, masque, disguise, home, spawn, tpa, tpaccept, warp, back, sethome, esicraft:hub]
+  blocked-guild-subcommands: [bank, home, leave, disband]
   seconds: 15                 # Durée du combat PvP après un coup (pas de /hub, déconnexion punie par la mort)
 
 # Traités entre guildes (/traite)
