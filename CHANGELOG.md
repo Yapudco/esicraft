@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 28/10/2026 (golem)
+
+### Correctif
+- Le **golem gardien** du Nexus ne s'en prend plus jamais à un membre de sa guilde, même si celui-ci le frappe : il ne le cible pas et ne lui inflige aucun dégât. Même protection pour les joueurs liés à la guilde par un traité et pour un espion déguisé en l'un de ses membres.
+
 ## 28/10/2026
 
 ### Opérateurs sans délai d'attente

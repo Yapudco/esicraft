@@ -572,6 +572,32 @@ public class NexusManager {
    private static final long GUARDIAN_RESPAWN_MS = 300000L;
    private final Map<String, Long> guardianMissingSince = new java.util.concurrent.ConcurrentHashMap<>();
 
+   /** Identifiant de la guilde dont ce golem est le gardien (d'après son étiquette), ou null si ce n'est pas un golem gardien. */
+   public static String guardianGuildId(Entity golem) {
+      for (String tag : golem.getScoreboardTags()) {
+         if (tag.startsWith("esicraft_guardian_")) {
+            return tag.substring("esicraft_guardian_".length());
+         }
+      }
+
+      return null;
+   }
+
+   /** Un golem gardien ne s'en prend jamais aux membres de sa guilde, aux joueurs liés à elle par un traité, ni à un espion déguisé en l'un d'eux. */
+   public boolean isGuardianFriend(String guildId, Player player) {
+      Guild guild = this.plugin.getGuildManager().getGuildById(guildId);
+      if (guild == null) {
+         return false;
+      }
+
+      if (guild.isMember(player.getUniqueId()) || this.plugin.getDisguiseManager().isDisguisedAs(player.getUniqueId(), guildId)) {
+         return true;
+      }
+
+      Guild other = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      return other != null && this.plugin.getTreatyManager().between(guildId, other.getId()) != null;
+   }
+
    public static String guardianTag(Guild guild) {
       return "esicraft_guardian_" + guild.getId();
    }
