@@ -64,6 +64,8 @@ public class NexusListener implements Listener {
             ChatUtil.sendMessage(
                player, "&e[Admin] Nexus de la guilde &6" + guild.getName() + " &cretiré (désindexé, hologramme supprimé). La guilde dispose d'1 h pour en reposer un."
             );
+         } else if (this.plugin.getSiege().pickaxeAttack(player, guild)) {
+            event.setCancelled(true);
          } else {
             event.setCancelled(true);
             ChatUtil.sendActionbar(player, "&c\ud83d\udee1️ Le Nexus est indestructible à la pioche ! Frappez-le avec une arme.");
@@ -199,14 +201,14 @@ public class NexusListener implements Listener {
 
                         {
                            double factor = 1.0;
-                           if (!this.isDefenderPresent(guild)) {
+                           if (!this.isDefenderPresent(guild) && !this.plugin.getSiege().isSiegeAttacker(attacker, guild)) {
                               // Plus d'immunité totale quand tous les défenseurs sont absents (hors ligne ou loin des claims) : les dégâts sont réduits.
                               factor = this.plugin.getConfig().getDouble("nexus.undefended-damage-factor", 0.25);
                               ChatUtil.sendActionbar(attacker, "&e\ud83d\udee1️ Aucun défenseur présent : le Nexus encaisse &6" + Math.round(factor * 100.0) + " % &edes dégâts.");
                            }
 
                            ItemStack weapon = attacker.getInventory().getItemInMainHand();
-                           int damage = Math.max(1, (int)Math.round(this.getWeaponDamage(weapon.getType()) * factor));
+                           int damage = Math.max(1, (int)Math.round(this.getWeaponDamage(weapon.getType()) * factor * this.plugin.getSiege().multiplierFor(attacker, guild)));
                            this.plugin.getDisguiseManager().reveal(attacker, true);
                            if (this.plugin.getTreatyManager().blocksRecruitAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), guild, attacker)) {
                               ChatUtil.sendActionbar(attacker, "&c❌ Une recrue ne peut pas attaquer le Nexus d'une guilde liée à la sienne par un traité.");

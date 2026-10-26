@@ -302,6 +302,17 @@ taverns:
   coinflip:
     win-chance: 0.47                     # 47 % de gagner : l'avantage va à la banque de la taverne
 
+# Guerres formelles (/siege)
+siege:
+  notice-hours: 24                       # Préavis minimal entre la déclaration et le début du siège
+  duration-minutes: 60
+  declaration-fee: 500.0                 # Frais déposés dans la banque de l'assaillant (perdus au profit du défenseur s'il tient bon)
+  damage-multiplier: 2.0                 # Dégâts au Nexus majorés pendant le siège (armes et pioches), même sans défenseur présent
+  win-damage-percent: 40.0               # Part des PV max du Nexus à infliger pour l'emporter si le Nexus ne tombe pas
+  loot-percent: 10.0                     # Part de la banque du vaincu pillée en cas de victoire
+  loot-cap: 3000.0
+  pair-cooldown-hours: 72
+
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
   freight:                               # Trains de fret (Maj + clic sur une destination de /station)

@@ -119,6 +119,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.nexus.NexusGamble nexusGamble;
    private fr.esicraft.nexus.NexusTech nexusTech;
    private fr.esicraft.rail.FreightManager freight;
+   private fr.esicraft.game.SiegeManager siege;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -162,6 +163,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.tavern = new fr.esicraft.game.TavernManager(this);
       this.nexusGamble = new fr.esicraft.nexus.NexusGamble(this);
       this.nexusTech = new fr.esicraft.nexus.NexusTech(this);
+      this.siege = new fr.esicraft.game.SiegeManager(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -184,6 +186,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.duels.init();
       this.tavern.init();
       this.nexusTech.init();
+      this.siege.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -210,6 +213,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.duels, this);
       pm.registerEvents(this.tavern, this);
       pm.registerEvents(this.nexusTech, this);
+      pm.registerEvents(this.siege, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -318,6 +322,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("vote")).setExecutor(this.court);
       Objects.requireNonNull(this.getCommand("taverne")).setExecutor(this.tavern);
       Objects.requireNonNull(this.getCommand("taverne")).setTabCompleter(this.tavern);
+      Objects.requireNonNull(this.getCommand("siege")).setExecutor(this.siege);
+      Objects.requireNonNull(this.getCommand("siege")).setTabCompleter(this.siege);
       Objects.requireNonNull(this.getCommand("duel")).setExecutor(this.duels);
       Objects.requireNonNull(this.getCommand("duel")).setTabCompleter(this.duels);
       Objects.requireNonNull(this.getCommand("pari")).setExecutor(this.betting);
@@ -447,6 +453,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.TavernManager getTavern() {
       return this.tavern;
+   }
+
+   public fr.esicraft.game.SiegeManager getSiege() {
+      return this.siege;
    }
 
    public fr.esicraft.rail.FreightManager getFreight() {

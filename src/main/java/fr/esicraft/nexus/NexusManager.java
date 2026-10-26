@@ -417,6 +417,7 @@ public class NexusManager {
          long hitAt = System.currentTimeMillis();
          this.lastNexusDamage.put(guild.getId(), hitAt);
          nexus.damage(damage);
+         this.plugin.getSiege().addDamage(attackerGuild, guild, damage);
          // Les dégâts comptent à chaque coup, mais hologramme, particules, sons, messages et effets de spécialisation une fois par seconde et par guilde.
          Long previousFx = this.lastFeedback.get(guild.getId());
          boolean fx = previousFx == null || hitAt - previousFx >= 1000L || !nexus.isAlive();
@@ -564,6 +565,7 @@ public class NexusManager {
    }
 
    public void onNexusDestroyed(Guild guild, String killer, Guild attackerGuild) {
+      this.plugin.getSiege().onNexusDestroyed(guild, attackerGuild);
       this.unindexGuildNexus(guild);
       Nexus nexus = guild.getNexus();
       if (nexus != null && nexus.getLocation() != null) {
