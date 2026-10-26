@@ -453,7 +453,7 @@ Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde
 
 ### 🔱 Atlantes
 
-La spécialisation **Atlante** (voir la table ci-dessus) exige un Nexus **dans l'eau** : posez-le contre un bloc d'eau (l'eau autour est alors autorisée pour cette spécialisation). Les membres ont tous les avantages sous-marins **dans l'eau** et subissent **Lenteur I sur la terre ferme**.
+La spécialisation **Atlante** (voir la table ci-dessus) exige un Nexus **dans l'eau** : posez-le contre un bloc d'eau. L'eau est autorisée tout autour (pose, seaux, écoulement) dans le chunk du Nexus ; la lave et l'obsidienne restent interdites. Les membres ont tous les avantages sous-marins **dans l'eau** et subissent **Lenteur I sur la terre ferme**.
 
 ### 🗳 Élections du site et Panthéon
 
