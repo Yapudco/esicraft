@@ -340,7 +340,19 @@ Les protections de territoire restent actives. **Infliger des dégâts ou frappe
 
 ### ✨ Les cosmétiques (`/cosmetique`)
 
-**Chaque succès débloque un aura** (des particules autour de toi, une par succès) **et un titre** (affiché dans le tchat devant ton nom). Le menu `/cosmetique` liste les 26 auras (rangée du haut) et les 26 titres (en bas) : clic pour équiper ou retirer. Un aura et un titre au plus sont équipés à la fois ; `/cosmetique off` retire tout. Il y a aussi des secrets à découvrir…
+Trois emplacements, un cosmétique équipé dans chacun :
+
+- **Auras** : des particules autour de toi.
+- **Traînées** : des particules derrière tes pas.
+- **Effets de victoire** : une gerbe de particules quand tu tues un joueur d'une autre guilde.
+
+On les obtient de trois façons :
+
+- **Les succès** : chaque succès débloque son propre aura (26).
+- **Les quêtes** : des objectifs de jeu qui débloquent aura, traînée ou effet : contrats du jour accomplis (10, 50), monstres éliminés (250, 1 000), trajets en train (20, 25), appels à l'aide (5, 10), hordes repoussées (5, 10, 20), hordes lancées (3), joueurs tués (5, 25, 100).
+- **La boutique du serveur** : 15 cosmétiques de **3 000 à 15 000 pièces** (pièces personnelles, débitées une fois : clic pour acheter, deuxième clic pour confirmer). Impossible en plein combat.
+
+Le menu `/cosmetique` a un onglet par emplacement ; les cosmétiques verrouillés indiquent comment les obtenir (progression de la quête, prix). `/cosmetique off` retire tout. Il y a aussi des secrets à découvrir…
 
 ### 📰 Journal de guerre et succès
 
@@ -442,7 +454,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/merci <joueur>` | Offrir un point d'honneur (une fois par jour et par personne) |
 | `/parrain <joueur>` | Parrainer une recrue (`accepter` / `refuser` pour répondre) |
 | `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
-| `/cosmetique` | Équiper ses cosmétiques (un aura et un titre par succès) |
+| `/cosmetique` | Menu des cosmétiques (auras, traînées, effets de victoire) : à gagner ou à acheter |
 | `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
 
 ---

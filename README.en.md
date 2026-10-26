@@ -343,7 +343,19 @@ Land protections stay active. **Dealing damage or hitting the Nexus unmasks you*
 
 ### ✨ Cosmetics (`/cosmetique`)
 
-**Every achievement unlocks an aura** (particles around you, one per achievement) **and a title** (shown in chat before your name). The `/cosmetique` menu lists the 26 auras (top rows) and the 26 titles (bottom rows): click to equip or remove. One aura and one title at most are equipped at a time; `/cosmetique off` removes everything. There are also secrets to find…
+Three slots, one cosmetic equipped in each:
+
+- **Auras**: particles around you.
+- **Trails**: particles behind your steps.
+- **Victory effects**: a burst of particles when you kill a player from another guild.
+
+You get them in three ways:
+
+- **Achievements**: each achievement unlocks its own aura (26).
+- **Quests**: gameplay goals that unlock an aura, trail or effect: daily contracts completed (10, 50), monsters slain (250, 1,000), train trips (20, 25), calls for help (5, 10), hordes repelled (5, 10, 20), hordes launched (3), players killed (5, 25, 100).
+- **The server shop**: 15 cosmetics for **3,000 to 15,000 coins** (personal coins, paid once: click to buy, click again to confirm). Not possible during combat.
+
+The `/cosmetique` menu has one tab per slot; locked cosmetics say how to get them (quest progress, price). `/cosmetique off` removes everything. There are also secrets to find…
 
 ### 📰 War journal and achievements
 
@@ -443,7 +455,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/merci <player>` | Give an honor point (once a day per person) |
 | `/parrain <player>` | Mentor a recruit (`accepter` / `refuser` to answer) |
 | `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |
-| `/cosmetique` | Equip your cosmetics (one aura and one title per achievement) |
+| `/cosmetique` | Cosmetics menu (auras, trails, victory effects): earn them or buy them |
 | `/hub` | Go back to the hub (blocked during PvP combat) |
 
 ---

@@ -42,11 +42,6 @@ public class ChatFormatListener implements Listener, ChatRenderer {
          prefixBuilder.append("&8[&7Sans Guilde&8] ");
       }
 
-      String cosmeticTitle = disguise == null ? this.plugin.getCosmetics().titleOf(source.getUniqueId()) : null;
-      if (cosmeticTitle != null) {
-         prefixBuilder.append("&8[").append(cosmeticTitle).append("&8] ");
-      }
-
       AgeType age = this.plugin.getAgeManager().getPlayerAge(source);
       if (age == AgeType.SUPREMACY && disguise == null) {
          PlayerData data = this.plugin.getDataManager().getPlayerData(source.getUniqueId());

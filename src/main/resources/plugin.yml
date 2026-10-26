@@ -143,7 +143,7 @@ commands:
     usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
 
   cosmetique:
-    description: Équiper vos cosmétiques (un aura et un titre débloqués par succès)
+    description: Menu des cosmétiques (auras, traînées, effets de victoire) : à gagner ou à acheter
     aliases: [cosmetic, cosmetics]
     usage: /cosmetique [off]
 
