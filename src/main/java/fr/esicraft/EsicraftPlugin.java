@@ -113,6 +113,10 @@ public final class EsicraftPlugin extends JavaPlugin {
    private RansomManager ransom;
    private fr.esicraft.game.CourtManager court;
    private fr.esicraft.game.TruceManager truce;
+   private fr.esicraft.game.BettingManager betting;
+   private fr.esicraft.game.DuelManager duels;
+   private fr.esicraft.game.TavernManager tavern;
+   private fr.esicraft.nexus.NexusGamble nexusGamble;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -151,6 +155,10 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.ransom = new RansomManager(this);
       this.court = new fr.esicraft.game.CourtManager(this);
       this.truce = new fr.esicraft.game.TruceManager(this);
+      this.betting = new fr.esicraft.game.BettingManager(this);
+      this.duels = new fr.esicraft.game.DuelManager(this);
+      this.tavern = new fr.esicraft.game.TavernManager(this);
+      this.nexusGamble = new fr.esicraft.nexus.NexusGamble(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -170,6 +178,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.ransom.start();
       this.court.init();
       this.truce.start();
+      this.duels.init();
+      this.tavern.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -191,6 +201,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.cosmetics, this);
       pm.registerEvents(this.loans, this);
       pm.registerEvents(this.truce, this);
+      pm.registerEvents(this.duels, this);
+      pm.registerEvents(this.tavern, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -228,6 +240,14 @@ public final class EsicraftPlugin extends JavaPlugin {
          }
       } catch (RuntimeException e) {
          this.getLogger().warning("Sauvegarde des succès / contrats de guilde impossible : " + e.getMessage());
+      }
+
+      if (this.duels != null) {
+         this.duels.shutdown();
+      }
+
+      if (this.betting != null) {
+         this.betting.shutdown();
       }
 
       if (this.raidManager != null) {
@@ -284,6 +304,12 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("rancon")).setExecutor(this.ransom);
       Objects.requireNonNull(this.getCommand("rancon")).setTabCompleter(this.ransom);
       Objects.requireNonNull(this.getCommand("vote")).setExecutor(this.court);
+      Objects.requireNonNull(this.getCommand("taverne")).setExecutor(this.tavern);
+      Objects.requireNonNull(this.getCommand("taverne")).setTabCompleter(this.tavern);
+      Objects.requireNonNull(this.getCommand("duel")).setExecutor(this.duels);
+      Objects.requireNonNull(this.getCommand("duel")).setTabCompleter(this.duels);
+      Objects.requireNonNull(this.getCommand("pari")).setExecutor(this.betting);
+      Objects.requireNonNull(this.getCommand("pari")).setTabCompleter(this.betting);
       Objects.requireNonNull(this.getCommand("banque")).setExecutor(this.loans);
       Objects.requireNonNull(this.getCommand("banque")).setTabCompleter(this.loans);
       Objects.requireNonNull(this.getCommand("esicraft")).setExecutor(new EsicraftCommand(this));
@@ -401,6 +427,22 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.CourtManager getCourt() {
       return this.court;
+   }
+
+   public fr.esicraft.game.BettingManager getBetting() {
+      return this.betting;
+   }
+
+   public fr.esicraft.game.TavernManager getTavern() {
+      return this.tavern;
+   }
+
+   public fr.esicraft.nexus.NexusGamble getNexusGamble() {
+      return this.nexusGamble;
+   }
+
+   public fr.esicraft.game.DuelManager getDuels() {
+      return this.duels;
    }
 
    public fr.esicraft.game.TruceManager getTruce() {

@@ -72,6 +72,13 @@ public enum GuildSpecialization {
          "&c- Aucun coffre dans les claims",
          "&c- Nexus réduit à 2 500 PV max"
       )
+   ),
+   ATLANTEAN(
+      "&b🔱 Atlante",
+      Material.HEART_OF_THE_SEA,
+      "&7Peuple des profondeurs, maître des océans.",
+      List.of("&a+ Respiration aquatique & Vision nocturne dans l'eau", "&a+ Agilité aquatique & Grâce du dauphin", "&a+ Résistance UNIQUEMENT quand on est dans l'eau"),
+      List.of("&c- Nexus obligatoirement immergé dans l'eau", "&c- Lenteur hors de l'eau", "&c- Les membres sont désavantagés sur la terre ferme")
    );
 
    private final String displayName;

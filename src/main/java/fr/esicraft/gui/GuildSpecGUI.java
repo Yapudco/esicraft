@@ -35,9 +35,10 @@ public class GuildSpecGUI {
             GuildSpecialization.DRUIDIC_ENCLAVE,
             GuildSpecialization.MERCHANT_SYNDICATE,
             GuildSpecialization.ARCANE_CONCLAVE,
-            GuildSpecialization.LONE_RANGER
+            GuildSpecialization.LONE_RANGER,
+            GuildSpecialization.ATLANTEAN
          };
-         int[] slots = new int[]{19, 20, 21, 22, 23, 24};
+         int[] slots = new int[]{19, 20, 21, 22, 23, 24, 25};
 
          for (int i = 0; i < specs.length; i++) {
             GuildSpecialization spec = specs[i];

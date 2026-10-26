@@ -168,6 +168,31 @@ public class NexusManager {
       return g != null && g.hasNexus() && g.getNexus().isAlive();
    }
 
+   /** Le bloc (ou l'un de ses voisins directs) est-il dans l'eau ? Condition du Nexus des Atlantes. */
+   public static boolean isSubmerged(Location loc) {
+      if (loc == null || loc.getWorld() == null) {
+         return false;
+      }
+
+      Block b = loc.getBlock();
+      if (isWater(b)) {
+         return true;
+      }
+
+      for (org.bukkit.block.BlockFace face : new org.bukkit.block.BlockFace[]{org.bukkit.block.BlockFace.UP, org.bukkit.block.BlockFace.DOWN, org.bukkit.block.BlockFace.NORTH,
+         org.bukkit.block.BlockFace.SOUTH, org.bukkit.block.BlockFace.EAST, org.bukkit.block.BlockFace.WEST}) {
+         if (isWater(b.getRelative(face))) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   private static boolean isWater(Block b) {
+      return b.getType() == Material.WATER || b.getType() == Material.BUBBLE_COLUMN || b.getBlockData() instanceof Waterlogged w && w.isWaterlogged();
+   }
+
    public boolean placeNexus(Guild guild, Location location, Player player) {
       if (guild != null && location != null) {
          if (guild.hasNexus()) {
@@ -192,6 +217,12 @@ public class NexusManager {
             int cz = location.getBlockZ();
             int radius = 16;
             int radiusSq = radius * radius;
+            boolean aquatic = guild.getSpecialization() == GuildSpecialization.ATLANTEAN;
+            if (aquatic && !isSubmerged(location)) {
+               ChatUtil.sendMessage(player, "&c❌ Un Nexus Atlante doit être posé dans l'eau (au moins un bloc d'eau contre lui).");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               return false;
+            }
 
             for (int dx = -radius; dx <= radius; dx++) {
                for (int dy = -radius; dy <= radius; dy++) {
@@ -204,9 +235,8 @@ public class NexusManager {
                            boolean isForbidden = type == Material.OBSIDIAN
                               || type == Material.CRYING_OBSIDIAN
                               || type == Material.LAVA
-                              || type == Material.WATER
-                              || type == Material.BUBBLE_COLUMN;
-                           if (!isForbidden) {
+                              || !aquatic && (type == Material.WATER || type == Material.BUBBLE_COLUMN);
+                           if (!isForbidden && !aquatic) {
                               BlockData var19 = block.getBlockData();
                               if (var19 instanceof Waterlogged) {
                                  Waterlogged waterlogged = (Waterlogged)var19;

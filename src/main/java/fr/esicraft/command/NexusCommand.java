@@ -27,7 +27,10 @@ public class NexusCommand implements CommandExecutor {
          } else if (args.length <= 0 || !args[0].equalsIgnoreCase("place")) {
             Nexus nexus = guild.getNexus();
             if (nexus != null && nexus.isAlive()) {
-               if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
+               if (args.length > 0 && args[0].equalsIgnoreCase("gamble")) {
+                  this.plugin.getNexusGamble().attempt(player, guild);
+                  return true;
+               } else if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
                   ChatUtil.sendRaw(player, "&8&m----------------------------------------");
                   ChatUtil.sendRaw(player, "  &5&lCœur de Guilde (Nexus) :");
                   ChatUtil.sendRaw(

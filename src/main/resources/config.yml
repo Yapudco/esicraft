@@ -278,6 +278,30 @@ truce:
   start-minute: 0
   duration-minutes: 60
 
+# Duels d'honneur (/duel) et paris (/pari)
+duels:
+  enabled: true
+  min-stake: 0
+  max-stake: 10000
+  max-seconds: 300                       # Durée maximale d'un duel (match nul au-delà)
+  arena:
+    world: ""                            # Vide = premier monde normal
+    x: -2147483648                       # Valeur par défaut = au-dessus du point d'apparition du monde
+    y: 280
+    z: -2147483648
+betting:
+  enabled: true
+  window-seconds: 120                    # Durée pendant laquelle on peut parier après le début d'un raid / duel
+  tax-percent: 5.0                       # Taxe du serveur sur la cagnotte
+  min: 10
+  max: 5000
+
+# Tavernes (zones neutres, pile ou face)
+taverns:
+  max-per-guild: 2
+  coinflip:
+    win-chance: 0.47                     # 47 % de gagner : l'avantage va à la banque de la taverne
+
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
   enabled: true
@@ -296,6 +320,12 @@ nexus:
   siege-radius: 4                  # Un assaillant peut casser les blocs (hors conteneurs) à cette distance d'un Nexus vivant
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
+  gamble:                          # Roulette russe (/nexus gamble)
+    cooldown-hours: 24
+    win-max-hp: 1000
+    win-coins: 2000.0
+    lose-hp: 1500                  # Le Nexus survit toujours (1 PV minimum)
+    horde-size: 6
 
 economy:
   hourly-bounty-cap: 4000.0        # Plafond de primes de monstres par joueur et par heure (0 = aucun)

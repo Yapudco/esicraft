@@ -785,6 +785,11 @@ public class GuildManager {
                ChatUtil.sendMessage(player, "&cLa composition actuelle de votre guilde ne respecte pas les contraintes de cette spécialisation !");
                return false;
             } else {
+               if (spec == GuildSpecialization.ATLANTEAN && guild.hasNexus() && !fr.esicraft.nexus.NexusManager.isSubmerged(guild.getNexus().getLocation())) {
+                  ChatUtil.sendMessage(player, "&c❌ Les Atlantes exigent un Nexus immergé dans l'eau : le vôtre est à sec.");
+                  return false;
+               }
+
                if (spec == GuildSpecialization.LONE_RANGER) {
                   if (guild.getMembers().size() != 1) {
                      ChatUtil.sendMessage(player, "&c❌ La spécialisation Rôdeur Solitaire exige d'être strictement le seul membre de la guilde !");

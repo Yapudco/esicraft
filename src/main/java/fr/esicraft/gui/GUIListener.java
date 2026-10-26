@@ -101,6 +101,7 @@ public class GUIListener implements Listener {
                         case 22 -> GuildSpecialization.MERCHANT_SYNDICATE;
                         case 23 -> GuildSpecialization.ARCANE_CONCLAVE;
                         case 24 -> GuildSpecialization.LONE_RANGER;
+                        case 25 -> GuildSpecialization.ATLANTEAN;
                         default -> null;
                      };
                      if (targetSpec != null) {

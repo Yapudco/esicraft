@@ -39,6 +39,42 @@ public class RaceBuffTask extends BukkitRunnable {
    private final SpecializationRulesListener specializationRules;
 
    private int runs;
+   /** Joueurs auxquels les bonus aquatiques des Atlantes ont été appliqués (pour les retirer hors de l'eau). */
+   private final java.util.Set<java.util.UUID> atlanteans = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+   private static boolean inWater(Player p) {
+      return p.isInWater() || p.getEyeLocation().getBlock().getType() == Material.WATER;
+   }
+
+   private void clearAtlantean(Player p) {
+      for (PotionEffectType t : new PotionEffectType[]{PotionEffectType.WATER_BREATHING, PotionEffectType.NIGHT_VISION, PotionEffectType.DOLPHINS_GRACE, PotionEffectType.RESISTANCE}) {
+         p.removePotionEffect(t);
+      }
+
+      var attr = p.getAttribute(org.bukkit.attribute.Attribute.WATER_MOVEMENT_EFFICIENCY);
+      if (attr != null) {
+         attr.setBaseValue(0.0);
+      }
+   }
+
+   /** Atlantes : tous les atouts sous-marins dans l'eau (respiration, vision nocturne, agilité aquatique, dauphin, résistance) et Lenteur sur la terre ferme. */
+   private void atlantean(Player p) {
+      this.atlanteans.add(p.getUniqueId());
+      var attr = p.getAttribute(org.bukkit.attribute.Attribute.WATER_MOVEMENT_EFFICIENCY);
+      if (inWater(p)) {
+         buff(p, new PotionEffect(PotionEffectType.WATER_BREATHING, 240, 0, false, false, false));
+         buff(p, new PotionEffect(PotionEffectType.NIGHT_VISION, 260, 0, false, false, false));
+         buff(p, new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 240, 0, false, false, true));
+         buff(p, new PotionEffect(PotionEffectType.RESISTANCE, 240, 0, false, false, true));
+         p.removePotionEffect(PotionEffectType.SLOWNESS);
+         if (attr != null) {
+            attr.setBaseValue(1.0);
+         }
+      } else {
+         this.clearAtlantean(p);
+         buff(p, new PotionEffect(PotionEffectType.SLOWNESS, 60, 0, false, false, false));
+      }
+   }
 
    /**
     * Applique un effet seulement s'il manque ou s'il va s'épuiser : plus de paquet toutes les 2 secondes, et la durée dépasse 10 s,
@@ -131,6 +167,12 @@ public class RaceBuffTask extends BukkitRunnable {
          Guild playerGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          if (playerGuild != null && playerGuild.getSpecialization() == GuildSpecialization.LONE_RANGER) {
             buff(player, RANGER_SPEED);
+         }
+
+         if (playerGuild != null && playerGuild.getSpecialization() == GuildSpecialization.ATLANTEAN) {
+            this.atlantean(player);
+         } else if (this.atlanteans.remove(player.getUniqueId())) {
+            this.clearAtlantean(player);
          }
 
          if (chunkGuild != null && chunkGuild.isMember(player.getUniqueId())) {

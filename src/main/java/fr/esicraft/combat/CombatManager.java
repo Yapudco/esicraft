@@ -137,7 +137,7 @@ public class CombatManager implements Listener {
       }
 
       Player attacker = attackerOf(event.getDamager());
-      if (attacker == null || attacker.equals(victim) || this.sameGuild(attacker, victim)) {
+      if (attacker == null || attacker.equals(victim) || this.sameGuild(attacker, victim) || this.plugin.getDuels().inDuelWith(attacker, victim)) {
          return;
       }
 

@@ -594,6 +594,7 @@ public class RaidManager implements Listener {
       this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.RAID, attacker + " lance une horde (" + hordeName.replaceAll("§.", "") + ") sur " + targetGuild.getName() + ".",
          attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId());
       this.plugin.getChronicle().raid(attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId(), "launched");
+      this.plugin.getBetting().openRaid(attackerGuild, targetGuild);
       if (buyer != null) {
          this.plugin.getAchievements().grant(buyer.getUniqueId(), fr.esicraft.life.Achievement.RAIDER);
          this.plugin.getAchievements().addStat(buyer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_RAIDS, 1L);
@@ -875,6 +876,10 @@ public class RaidManager implements Listener {
       // Pas de victoire si une bonne part de la horde s'est volatilisée sans combat (chunk déchargé, vide, mob piégé).
       defended = defended && raid != null && raid.getVanished() * 4 <= Math.max(1, raid.getTotalMobs());
       if (raid != null) {
+         this.plugin.getBetting().settleRaid(raid.getTargetGuildId(), defended);
+      }
+
+      if (raid != null) {
          this.activeRaids.remove(raid.getId());
          this.guildIdsUnderRaid.remove(raid.getTargetGuildId());
 
@@ -972,6 +977,7 @@ public class RaidManager implements Listener {
 
    public void stopAllRaids() {
       for (ActiveRaid raid : this.activeRaids.values()) {
+         this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
          this.finishRaid(raid, false);
       }
 
@@ -986,6 +992,7 @@ public class RaidManager implements Listener {
       while (it.hasNext()) {
          ActiveRaid raid = it.next().getValue();
          if (raid.getTargetGuildId().equalsIgnoreCase(guildId) || raid.getAttackerGuildId() != null && raid.getAttackerGuildId().equalsIgnoreCase(guildId)) {
+            this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
             this.finishRaid(raid, false);
             it.remove();
             stopped = true;
