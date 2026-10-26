@@ -35,11 +35,16 @@ public class ChatFormatListener implements Listener, ChatRenderer {
       StringBuilder prefixBuilder = new StringBuilder();
       fr.esicraft.life.DisguiseManager.Disguise disguise = this.plugin.getDisguiseManager().get(source.getUniqueId());
       if (disguise != null) {
-         prefixBuilder.append("&8[&6").append(disguise.tag()).append("&8] ");
+         prefixBuilder.append(disguise.hasGuild() ? "&8[&6" + disguise.tag() + "&8] " : "&8[&7Sans Guilde&8] ");
       } else if (guild != null) {
          prefixBuilder.append(this.plugin.getSeasonManager().isChampion(guild.getId()) ? "&6👑 " : "").append("&8[&6").append(guild.getTag()).append("&8] ");
       } else {
          prefixBuilder.append("&8[&7Sans Guilde&8] ");
+      }
+
+      String cosmeticTitle = disguise == null ? this.plugin.getCosmetics().titleOf(source.getUniqueId()) : null;
+      if (cosmeticTitle != null) {
+         prefixBuilder.append("&8[").append(cosmeticTitle).append("&8] ");
       }
 
       AgeType age = this.plugin.getAgeManager().getPlayerAge(source);

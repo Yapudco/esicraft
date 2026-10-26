@@ -248,6 +248,10 @@ public final class EsicraftPlugin extends JavaPlugin {
          this.loans.shutdown();
       }
 
+      if (this.disguiseManager != null) {
+         this.disguiseManager.shutdown();
+      }
+
       if (this.dataManager != null) {
          this.dataManager.close();
       }
