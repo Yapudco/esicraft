@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (roulette)
+
+### Roulette russe du Nexus : un vrai 50/50
+- Les enjeux sont maintenant **symétriques** : **pile** = +1 000 PV max et +2 000 pièces ; **face** = -1 000 PV max, -1 500 PV, -2 000 pièces de la banque (dans la limite de son solde) et la horde de pillards. Le plafond de bonus et l'ancien malus asymétrique sont supprimés ; les PV max ne descendent jamais sous 1 000 et le Nexus survit à 1 PV. Délai de 72 h conservé.
+
 ## 30/10/2026 (Nexus mobile)
 
 ### Déplacer le Nexus après un changement de spécialisation
