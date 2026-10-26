@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,27 +42,18 @@ import org.jetbrains.annotations.NotNull;
  * Le PvP, les armes et les projectiles y sont désactivés ; on y joue à pile ou face contre la banque de la guilde propriétaire.
  */
 public class TavernManager implements CommandExecutor, TabCompleter, Listener {
-   private static final int[] BET_SLOTS = {10, 11, 12, 13, 14};
-   private static final int[] BET_VALUES = {10, 50, 100, 500, 1000};
-   private static final int SIDE_HEADS = 20;
-   private static final int SIDE_TAILS = 24;
-   private static final int COIN_SLOT = 16;
-
-   static final class TavernHolder extends BaseGUIHolder {
-      String guildId;
-      int betIndex = 1;
-      boolean busy;
-   }
-
    private final EsicraftPlugin plugin;
    private final Map<ChunkKey, String> taverns = new ConcurrentHashMap<>();
    private final Map<java.util.UUID, ChunkKey> lastChunk = new ConcurrentHashMap<>();
+   private TavernGames games;
 
    public TavernManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }
 
    public void init() {
+      this.games = new TavernGames(this.plugin);
+      Bukkit.getPluginManager().registerEvents(this.games, this.plugin);
       var db = this.plugin.getDataManager().getStorage();
       db.exec("CREATE TABLE IF NOT EXISTS taverns (world VARCHAR(64), cx INT, cz INT, guild_id VARCHAR(64), PRIMARY KEY (world, cx, cz));");
       for (Object[] row : db.select("SELECT world, cx, cz, guild_id FROM taverns;", 4)) {
@@ -124,7 +116,13 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
             if (owner == null) {
                ChatUtil.sendMessage(player, "&6🍺 Taverne : le Syndicat Marchand et l'Enclave Champêtre peuvent déclarer un chunk de leur territoire zone neutre avec &e/taverne declarer&6. Vous n'êtes dans aucune taverne ici.");
             } else {
-               this.openGame(player, owner);
+               String problem = this.problem(here);
+               Guild house = this.plugin.getGuildManager().getGuildById(owner);
+               if (problem != null) {
+                  ChatUtil.sendMessage(player, "&c🍺 Cette taverne n'est pas en état d'ouvrir ses jeux : " + problem);
+               } else if (house != null) {
+                  this.games.openMenu(player, house);
+               }
             }
          }
       }
@@ -166,10 +164,66 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
          return;
       }
 
+      String problem = this.problem(here);
+      if (problem != null) {
+         ChatUtil.sendMessage(player, "&c❌ Ce chunk ne ressemble pas encore à une taverne : " + problem);
+         return;
+      }
+
       this.taverns.put(here, guild.getId());
       this.plugin.getDataManager().getStorage().exec("INSERT OR REPLACE INTO taverns (world, cx, cz, guild_id) VALUES (?, ?, ?, ?);", here.getWorldName(), here.getX(), here.getZ(), guild.getId());
       this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.CHAMPION_TAVERN);
       ChatUtil.broadcastGuild(guild, "&6🍺 Une taverne (zone neutre) a été déclarée en &e" + here.getX() + "," + here.getZ() + "&6 : PvP et armes interdits, pile ou face avec &e/taverne&6 !");
+   }
+
+   /**
+    * Une taverne a besoin, dans son chunk, d'un coffre vide, d'un tonneau (barrel) et d'un toit au-dessus de l'un et de l'autre.
+    * Renvoie ce qui manque, ou null si tout est en ordre.
+    */
+   private String problem(ChunkKey key) {
+      World world = Bukkit.getWorld(key.getWorldName());
+      if (world == null || !world.isChunkLoaded(key.getX(), key.getZ())) {
+         return "chunk non chargé.";
+      }
+
+      boolean barrel = false;
+      boolean roofedBarrel = false;
+      boolean emptyChest = false;
+      boolean roofedChest = false;
+      for (org.bukkit.block.BlockState state : world.getChunkAt(key.getX(), key.getZ()).getTileEntities()) {
+         if (state instanceof org.bukkit.block.Barrel) {
+            barrel = true;
+            roofedBarrel |= roofed(state.getBlock());
+         } else if (state instanceof org.bukkit.block.Chest chest && chest.getBlockInventory().isEmpty()) {
+            emptyChest = true;
+            roofedChest |= roofed(state.getBlock());
+         }
+      }
+
+      if (!emptyChest) {
+         return "il faut un coffre vide dans le chunk.";
+      }
+
+      if (!barrel) {
+         return "il faut un tonneau (barrel) dans le chunk.";
+      }
+
+      if (!roofedChest || !roofedBarrel) {
+         return "le coffre et le tonneau doivent être couverts par un toit.";
+      }
+
+      return null;
+   }
+
+   /** Un bloc plein au-dessus (jusqu'à 12 blocs) fait office de toit. */
+   private static boolean roofed(org.bukkit.block.Block b) {
+      for (int dy = 1; dy <= 12 && b.getY() + dy < b.getWorld().getMaxHeight(); dy++) {
+         if (b.getRelative(0, dy, 0).getType().isOccluding()) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private void remove(Player player, ChunkKey here) {
@@ -234,131 +288,5 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
       } else if (was && !now) {
          ChatUtil.sendActionbar(p, "&7Vous quittez la taverne.");
       }
-   }
-
-   // ------------------------------------------------------------------ pile ou face
-
-   private void openGame(Player player, String ownerId) {
-      Guild owner = this.plugin.getGuildManager().getGuildById(ownerId);
-      if (owner == null) {
-         return;
-      }
-
-      TavernHolder holder = new TavernHolder();
-      holder.guildId = ownerId;
-      Inventory inv = Bukkit.createInventory(holder, 27, ChatUtil.component("&8&l🍺 Pile ou face — taverne de " + owner.getName()));
-      this.render(inv, holder, owner);
-      player.openInventory(inv);
-   }
-
-   private void render(Inventory inv, TavernHolder holder, Guild owner) {
-      ItemStack glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(" ").build();
-      for (int i = 0; i < 27; i++) {
-         inv.setItem(i, glass);
-      }
-
-      double winChance = Math.max(0.05, Math.min(0.95, this.plugin.getConfig().getDouble("taverns.coinflip.win-chance", 0.47)));
-      inv.setItem(4, new ItemBuilder(Material.BARREL).name("&6&lLa banque de la taverne").lore("&7Propriétaire : &e" + owner.getName(), "&7Fonds : &6" + (long)owner.getBankBalance() + " pièces",
-         "&7Chances de gagner : &e" + (int)Math.round(winChance * 100) + " %", "&7Gain : &amise doublée").build());
-      for (int i = 0; i < BET_SLOTS.length; i++) {
-         boolean selected = i == holder.betIndex;
-         inv.setItem(BET_SLOTS[i], new ItemBuilder(selected ? Material.GOLD_BLOCK : Material.GOLD_NUGGET).name((selected ? "&a▶ " : "&e") + BET_VALUES[i] + " pièces").lore("&7Cliquez pour miser ce montant.").build());
-      }
-
-      inv.setItem(COIN_SLOT, new ItemBuilder(Material.GOLD_INGOT).name("&6La pièce").lore("&7Choisissez un côté pour lancer.").build());
-      inv.setItem(SIDE_HEADS, new ItemBuilder(Material.PLAYER_HEAD).name("&e&lPILE").lore("&7Misez sur pile.").build());
-      inv.setItem(SIDE_TAILS, new ItemBuilder(Material.IRON_INGOT).name("&b&lFACE").lore("&7Misez sur face.").build());
-   }
-
-   @EventHandler(priority = EventPriority.HIGHEST)
-   public void onClick(InventoryClickEvent event) {
-      if (!(event.getWhoClicked() instanceof Player player) || !(event.getInventory().getHolder() instanceof TavernHolder holder)) {
-         return;
-      }
-
-      event.setCancelled(true);
-      if (event.getClickedInventory() != event.getView().getTopInventory() || holder.busy) {
-         return;
-      }
-
-      Guild owner = this.plugin.getGuildManager().getGuildById(holder.guildId);
-      if (owner == null || !this.isTavern(player.getLocation())) {
-         player.closeInventory();
-         return;
-      }
-
-      int slot = event.getRawSlot();
-      for (int i = 0; i < BET_SLOTS.length; i++) {
-         if (slot == BET_SLOTS[i]) {
-            holder.betIndex = i;
-            this.render(event.getInventory(), holder, owner);
-            ChatUtil.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 1.2F);
-            return;
-         }
-      }
-
-      if (slot == SIDE_HEADS || slot == SIDE_TAILS) {
-         this.flip(player, holder, owner, slot == SIDE_HEADS, event.getInventory());
-      }
-   }
-
-   private void flip(Player player, TavernHolder holder, Guild owner, boolean heads, Inventory inv) {
-      int bet = BET_VALUES[holder.betIndex];
-      if (this.plugin.getCombatManager().denySpending(player)) {
-         return;
-      }
-
-      if (owner.getBankBalance() < bet) {
-         ChatUtil.sendMessage(player, "&c❌ La banque de la taverne est trop pauvre pour couvrir cette mise.");
-         return;
-      }
-
-      PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
-      if (data == null || !data.removeCoins(bet)) {
-         ChatUtil.sendMessage(player, "&c❌ Vous n'avez pas assez de pièces.");
-         return;
-      }
-
-      this.plugin.getDataManager().savePlayer(data);
-      holder.busy = true;
-      double winChance = Math.max(0.05, Math.min(0.95, this.plugin.getConfig().getDouble("taverns.coinflip.win-chance", 0.47)));
-      boolean win = ThreadLocalRandom.current().nextDouble() < winChance;
-      java.util.UUID id = player.getUniqueId();
-      int[] frame = {0};
-      Bukkit.getScheduler().runTaskTimer(this.plugin, task -> {
-         frame[0]++;
-         if (frame[0] <= 10) {
-            inv.setItem(COIN_SLOT, new ItemBuilder(frame[0] % 2 == 0 ? Material.GOLD_INGOT : Material.IRON_INGOT).name("&6La pièce tourne…").build());
-            Player p = Bukkit.getPlayer(id);
-            if (p != null) {
-               ChatUtil.playSound(p, Sound.BLOCK_NOTE_BLOCK_CHIME, 0.6F, 0.8F + frame[0] * 0.08F);
-            }
-
-            return;
-         }
-
-         task.cancel();
-         holder.busy = false;
-         boolean landedHeads = win == heads;
-         inv.setItem(COIN_SLOT, new ItemBuilder(landedHeads ? Material.GOLD_INGOT : Material.IRON_INGOT).name(landedHeads ? "&e&lPILE !" : "&b&lFACE !").build());
-         if (win) {
-            boolean paid = owner.withdrawBank(bet);
-            this.plugin.getDataManager().creditPlayer(id, paid ? bet * 2.0 : bet);
-         } else {
-            owner.depositBank(bet);
-         }
-
-         this.plugin.getDataManager().saveGuild(owner);
-         Player p = Bukkit.getPlayer(id);
-         if (p != null) {
-            ChatUtil.sendMessage(p, win ? "&a🍺 " + (landedHeads ? "Pile" : "Face") + " ! Vous gagnez &6" + bet + " pièces&a." : "&c🍺 " + (landedHeads ? "Pile" : "Face") + "… la taverne empoche vos &6" + bet + " pièces&c.");
-            ChatUtil.playSound(p, win ? Sound.ENTITY_PLAYER_LEVELUP : Sound.ENTITY_VILLAGER_NO, 1.0F, win ? 1.5F : 1.0F);
-         }
-
-         if (inv.getViewers().size() > 0) {
-            this.render(inv, holder, owner);
-            inv.setItem(COIN_SLOT, new ItemBuilder(landedHeads ? Material.GOLD_INGOT : Material.IRON_INGOT).name(landedHeads ? "&e&lPILE !" : "&b&lFACE !").build());
-         }
-      }, 4L, 4L);
    }
 }

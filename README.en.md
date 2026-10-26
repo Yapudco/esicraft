@@ -448,7 +448,18 @@ With no decision, they are executed. Logging out while captive counts as dying. 
 
 ### 🍺 Taverns (`/taverne`)
 
-The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunks of their territory (never the Nexus chunk) as **neutral zones** with `/taverne declarer` (`/taverne retirer`). Inside, **PvP, ranged weapons and offensive potions are disabled**. `/taverne` opens a **coin flip** (click interface): bet 10 to 1,000 coins against the **owning guild's bank** (47% chance to win, stake doubled); the bank must be able to cover the bet. *Tavern keeper* achievement.
+The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunks of their territory (never the Nexus chunk) as **neutral zones** with `/taverne declarer` (`/taverne retirer`). The chunk must contain **an empty chest, a barrel and a roof** over both. Inside, **PvP, ranged weapons and offensive potions are disabled**.
+
+`/taverne` opens the games menu, all played against the **owning guild's bank** (the maximum bet adapts to what the bank can pay; 1,000 coins at most, `taverns.max-bet`):
+
+| Game | Rule |
+| :--- | :--- |
+| 🪙 **Coin flip** | 47% chance to double your bet |
+| 🍻 **The bar** | A drink (50 coins, or 5 / 10 at once) gives one draw: **0.0001%** enchanted golden apple, **1%** golden apple, **12%** 8 steaks, **12%** 16 baked potatoes, **50%** a *Kastell red pint* (nausea, 30 s), the rest a random suspicious stew |
+| 🎡 **Roulette** | European (0 to 36): red/black, even/odd, low/high ×2, dozens ×3, straight number ×36; 0 makes the house win |
+| 🎰 **Slot machine** | Three reels: 7-7-7 ×50, diamonds ×20, bells ×10, lemons ×6, cherries ×4; two cherries ×1.5; one cherry ×0.5 |
+
+Winnings come out of the tavern's bank, losses go into it. *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
 
 ### 📈 The stock exchange (`/bourse`)
 
