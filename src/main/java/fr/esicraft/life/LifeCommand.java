@@ -133,7 +133,7 @@ public class LifeCommand implements TabExecutor {
 
       DisguiseManager dm = this.plugin.getDisguiseManager();
       if (args.length == 0) {
-         ChatUtil.sendMessage(player, "&7Usage : &e/deguisement <guilde>&7 (se faire passer pour un de ses membres) ou &e/deguisement off");
+         ChatUtil.sendMessage(player, "&7Usage : &e/deguisement <guilde>&7 (se faire passer pour un de ses membres) · &e/deguisement <Pseudo>&7 (skin et pseudo de n'importe quel compte Minecraft) · &e/deguisement off");
          ChatUtil.sendRaw(player, "&7Prix : &6" + this.plugin.getConfig().getLong("life.disguise.cost", 750L) + " pièces &7· durée : &e"
             + this.plugin.getConfig().getLong("life.disguise.duration-seconds", 300L) / 60L + " min &7· infliger des dégâts vous démasque.");
          return;
@@ -149,16 +149,20 @@ public class LifeCommand implements TabExecutor {
          return;
       }
 
-      Guild target = this.plugin.getGuildManager().getGuildByName(String.join(" ", args));
-      String error = dm.disguise(player, target);
-      if (error != null) {
-         ChatUtil.sendMessage(player, error);
-         return;
-      }
+      dm.disguise(player, String.join(" ", args), error -> {
+         if (error != null) {
+            ChatUtil.sendMessage(player, error);
+            return;
+         }
 
-      DisguiseManager.Disguise d = dm.get(player.getUniqueId());
-      ChatUtil.sendMessage(player, "&5🎭 Vous voilà déguisé en &e" + d.fakeName() + " &8[&6" + d.tag() + "&8] &5! Les pièges de &e" + d.guildName()
-         + " &5vous ignorent. Attaquer quoi que ce soit vous démasque.");
+         DisguiseManager.Disguise d = dm.get(player.getUniqueId());
+         if (d.hasGuild()) {
+            ChatUtil.sendMessage(player, "&5🎭 Vous voilà déguisé en &e" + d.fakeName() + " &8[&6" + d.tag() + "&8] &5! Les pièges de &e" + d.guildName()
+               + " &5vous ignorent. Attaquer quoi que ce soit vous démasque.");
+         } else {
+            ChatUtil.sendMessage(player, "&5🎭 Vous voilà déguisé en &e" + d.fakeName() + " &5(skin et pseudo changés) ! Attaquer quoi que ce soit vous démasque.");
+         }
+      });
    }
 
    @Override

@@ -124,6 +124,7 @@ public class AchievementManager {
          ChatUtil.sendMessage(online, "&6🏅 Succès débloqué : &e" + a.getIcon() + " " + a.getTitle() + " &7— " + a.getDescription()
             + (rare ? " &d(rare : " + String.format(java.util.Locale.ROOT, "%.0f", pct) + " % des joueurs)" : ""));
          ChatUtil.playSound(online, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8F, 1.3F);
+         this.plugin.getCosmetics().onAchievement(online, a);
       }
 
       if (a.isNotable() || rare && count <= 3) {

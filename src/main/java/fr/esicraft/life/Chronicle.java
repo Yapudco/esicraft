@@ -151,6 +151,8 @@ public class Chronicle {
 
          this.db().exec("DELETE FROM guild_history WHERE ts < ?;", now - HISTORY_RETENTION_MS);
          this.db().exec("DELETE FROM journal WHERE id NOT IN (SELECT id FROM journal ORDER BY id DESC LIMIT 2000);");
+         this.db().exec("DELETE FROM raid_log WHERE ts < ?;", now - HISTORY_RETENTION_MS);
+         this.db().exec("DELETE FROM pvp_events WHERE ts < ?;", now - HISTORY_RETENTION_MS);
       }));
    }
 

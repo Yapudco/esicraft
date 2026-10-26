@@ -95,6 +95,7 @@ final class HtmlPages {
       .net{width:100%;max-width:560px;margin:0 auto;display:block;height:auto}.net text{fill:var(--tx);font-size:11px;font-weight:600;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}.net .tag{fill:#10131a;stroke:none;font-weight:800;font-size:10px}
       .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
       .net a:hover circle{stroke:var(--acc)}
+      .av.head{background-size:cover;background-position:center;background-repeat:no-repeat;image-rendering:pixelated;background-color:var(--card2)}[hidden]{display:none!important}
       .logoimg{width:36px;height:36px;border-radius:10px;image-rendering:pixelated;display:block}.nl.lang{margin-left:auto;font-weight:800;border:1px solid var(--line)}
       .gk:not(.on){opacity:.4;text-decoration:line-through}.fdl{display:grid;gap:10px}
       .fd summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none}.fd summary::-webkit-details-marker{display:none}.fd summary::before{content:'▸';color:var(--mut)}.fd[open] summary::before{content:'▾'}
@@ -187,6 +188,11 @@ final class HtmlPages {
       return avatar(label, seed, size, false);
    }
 
+   /** Avatar d'un joueur : sa tête (servie par {@code /head/<pseudo>}, jamais un service externe) ; visage de remplacement tant qu'elle n'est pas prête. */
+   static String playerAvatar(String name, String size) {
+      return "<span class=\"av head" + (size.isEmpty() ? "" : " " + size) + "\" style=\"background-image:url('/head/" + esc(name) + "')\" aria-hidden=\"true\"></span>";
+   }
+
    static String avatar(String label, String seed, String size, boolean two) {
       return "<span class=\"av" + (size.isEmpty() ? "" : " " + size) + "\" style=\"--h:" + hue(seed) + "\" aria-hidden=\"true\">" + initials(label, two) + "</span>";
    }
@@ -219,7 +225,7 @@ final class HtmlPages {
       String time = snap.generatedAt() == 0L ? "en cours de chargement…" : "mises à jour à " + TIME.format(Instant.ofEpochMilli(snap.generatedAt()));
       return "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
          + "<meta name=\"color-scheme\" content=\"dark light\"><meta name=\"description\" content=\"Guildes, joueurs et saison du serveur " + esc(serverName) + "\">"
-         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style><link rel=\"icon\" type=\"image/png\" href=\"/assets/logo.png\"><script src=\"/assets/app.js\" defer></script></head><body data-live=\"" + live + "\">"
+         + "<title>" + esc(title) + " · " + esc(serverName) + "</title><style>" + CSS + "</style><link rel=\"icon\" type=\"image/png\" href=\"/assets/logo.png\"><script src=\"/assets/app.js?v=" + ExtraPages.JS_VERSION + "\" defer></script></head><body data-live=\"" + live + "\">"
          + "<header><div class=\"w\"><nav><a class=\"brand\" href=\"/\"><img class=\"logoimg\" src=\"/assets/logo.png\" alt=\"\" width=\"36\" height=\"36\"><span class=\"bn\">" + esc(serverName) + "</span></a>"
          + navLink("/", "Accueil", "home", active) + navLink("/guildes", "Guildes", "guildes", active) + navLink("/joueurs", "Joueurs", "joueurs", active)
          + (raidActive ? "<a class=\"nl raidl" + ("raids".equals(active) ? " on" : "") + "\" href=\"/raids\">⚔ Raids</a>" : "")
@@ -272,7 +278,7 @@ final class HtmlPages {
       StringBuilder b = new StringBuilder("<div class=\"people\">");
       for (WebSnapshot.OnlineView p : s.online()) {
          b.append("<a class=\"person row\" href=\"/joueur/" + esc(p.name().toLowerCase(Locale.ROOT)) + "\">")
-            .append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(p.name())).append("</div><div class=\"s\">")
+            .append(playerAvatar(p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(p.name())).append("</div><div class=\"s\">")
             .append(esc(p.race())).append(" · ").append(p.guildName() != null ? esc(p.guildName()) : "sans guilde").append("</div></div>");
          if (p.coins() != null) {
             b.append("<span class=\"money\">").append(money(p.coins())).append("</span>");
@@ -326,7 +332,7 @@ final class HtmlPages {
          b.append("<h2>❤ Les plus honorables <small>/merci &lt;joueur&gt;</small></h2><div class=\"list\">");
          int hr = 1;
          for (WebExtra.ProfileView p : honorable) {
-            b.append("<a class=\"row\" href=\"").append(ExtraPages.profileLink(p.name())).append("\">").append(medal(hr++)).append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
+            b.append("<a class=\"row\" href=\"").append(ExtraPages.profileLink(p.name())).append("\">").append(medal(hr++)).append(playerAvatar(p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
                .append(esc(p.name())).append("</div><div class=\"bar\"><i style=\"width:").append(Math.max(3, p.reputation() * 100 / topRep)).append("%\"></i></div></div><div class=\"score\"><b>")
                .append(p.reputation()).append("</b><span class=\"mut\">honneur</span></div></a>");
          }
@@ -352,7 +358,7 @@ final class HtmlPages {
          int rank = 1;
          for (WebSnapshot.RichView r : s.rich()) {
             int pct = (int)Math.max(3L, Math.min(100L, Math.round(r.coins() * 100.0 / top)));
-            b.append("<a class=\"row\" href=\"/joueur/").append(esc(r.name().toLowerCase(Locale.ROOT))).append("\">").append(medal(rank++)).append(avatar(r.name(), r.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
+            b.append("<a class=\"row\" href=\"/joueur/").append(esc(r.name().toLowerCase(Locale.ROOT))).append("\">").append(medal(rank++)).append(playerAvatar(r.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
                .append(esc(r.name())).append("</div><div class=\"bar\"><i style=\"width:").append(pct).append("%\"></i></div></div><div class=\"score\"><b class=\"money\">")
                .append(money(r.coins())).append("</b><span class=\"mut\">pièces</span></div></a>");
          }
@@ -397,7 +403,7 @@ final class HtmlPages {
 
       b.append("<h2>👥 Membres <small>").append(g.members().size()).append("</small></h2><div class=\"people\">");
       for (WebSnapshot.MemberView m : g.members()) {
-         b.append("<a class=\"person row\" href=\"/joueur/").append(esc(m.name().toLowerCase(Locale.ROOT))).append("\">").append(avatar(m.name(), m.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(m.name()))
+         b.append("<a class=\"person row\" href=\"/joueur/").append(esc(m.name().toLowerCase(Locale.ROOT))).append("\">").append(playerAvatar(m.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">").append(esc(m.name()))
             .append("</div><div class=\"s\">").append(esc(m.role())).append(m.race() != null ? " · " + esc(m.race()) : "").append("</div></div>")
             .append(m.online() ? "<span class=\"on-dot\" title=\"En ligne\"></span>" : "<span class=\"off-dot\" title=\"Hors ligne\"></span>").append("</a>");
       }

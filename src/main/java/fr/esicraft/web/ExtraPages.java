@@ -1,6 +1,7 @@
 package fr.esicraft.web;
 
 import static fr.esicraft.web.HtmlPages.avatar;
+import static fr.esicraft.web.HtmlPages.playerAvatar;
 import static fr.esicraft.web.HtmlPages.empty;
 import static fr.esicraft.web.HtmlPages.esc;
 import static fr.esicraft.web.HtmlPages.hue;
@@ -443,7 +444,7 @@ final class ExtraPages {
       }
 
       focus.append("</select>");
-      b.append("<div class=\"card\"><div class=\"nettools\">").append(focus)
+      b.append("<div class=\"card\"><div class=\"nettools\" data-js hidden>").append(focus)
          .append("<span class=\"zb\"><button type=\"button\" class=\"chip\" data-z=\"out\" aria-label=\"Dézoomer\">−</button>")
          .append("<button type=\"button\" class=\"chip\" data-z=\"in\" aria-label=\"Zoomer\">+</button>")
          .append("<button type=\"button\" class=\"chip\" data-z=\"reset\">Recentrer</button></span></div>")
@@ -794,7 +795,7 @@ final class ExtraPages {
       svg.append("</svg></div>");
       StringBuilder b = new StringBuilder();
       if (onlyGuild == null && ids.size() > 1) {
-         b.append("<div class=\"legend\" style=\"margin:0 0 10px\"><button type=\"button\" class=\"chip\" data-all=\"hide\">Tout masquer</button><button type=\"button\" class=\"chip\" data-all=\"show\">Tout afficher</button>");
+         b.append("<div class=\"legend\" style=\"margin:0 0 10px\" data-js hidden><button type=\"button\" class=\"chip\" data-all=\"hide\">Tout masquer</button><button type=\"button\" class=\"chip\" data-all=\"show\">Tout afficher</button>");
          for (String id : ids) {
             b.append("<button type=\"button\" class=\"chip gk on\" data-gid=\"").append(esc(id)).append("\"><i class=\"sw\" style=\"background:").append(color(hue(id))).append("\"></i>")
                .append(esc(s.guild(id).name())).append("</button>");
@@ -903,7 +904,7 @@ final class ExtraPages {
 
       StringBuilder b = new StringBuilder("<h2>📇 Tous les joueurs <small>").append(x.profiles().size()).append("</small></h2><div class=\"people\">");
       for (WebExtra.ProfileView p : x.profiles()) {
-         b.append("<a class=\"person row\" href=\"").append(profileLink(p.name())).append("\">").append(avatar(p.name(), p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
+         b.append("<a class=\"person row\" href=\"").append(profileLink(p.name())).append("\">").append(playerAvatar(p.name(), "sm")).append("<div class=\"grow\"><div class=\"t\">")
             .append(esc(p.name())).append("</div><div class=\"s\">").append(esc(p.race())).append(" · ").append(p.guildName() != null ? esc(p.guildName()) : "sans guilde")
             .append("</div></div>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + "</span>" : "").append("<span class=\"chip\">🏅 ").append(p.achievements().size()).append("</span></a>");
       }
@@ -912,7 +913,7 @@ final class ExtraPages {
    }
 
    static String profile(WebSnapshot s, WebExtra.ProfileView p, WebExtra x) {
-      StringBuilder b = new StringBuilder("<section class=\"hero\"><div class=\"gh\">").append(avatar(p.name(), p.name(), "lg")).append("<div><h1>").append(esc(p.name()))
+      StringBuilder b = new StringBuilder("<section class=\"hero\"><div class=\"gh\">").append(playerAvatar(p.name(), "lg")).append("<div><h1>").append(esc(p.name()))
          .append("</h1><div class=\"chips\"><span class=\"chip acc\">").append(esc(p.race())).append("</span>");
       if (p.guildId() != null) {
          b.append("<a class=\"chip\" href=\"/guilde/").append(esc(p.guildId())).append("\">🏰 ").append(esc(p.guildName())).append(p.role() != null ? " · " + esc(p.role()) : "")
@@ -1070,6 +1071,9 @@ final class ExtraPages {
 
    // ------------------------------------------------------------------ script (mises à jour en direct, filtres, recherche)
 
+   /** Empreinte du script : l'adresse change à chaque mise à jour du plugin, donc aucun navigateur ni cache intermédiaire ne sert un ancien script. */
+   static final String JS_VERSION = Integer.toHexString(ExtraPages.APP_JS.hashCode());
+
    static final String APP_JS = """
       (function () {
         'use strict';
@@ -1108,6 +1112,7 @@ final class ExtraPages {
         }
         var fr = { off: {}, open: {} };
         function applyFr() {
+          document.querySelectorAll('[data-js]').forEach(function (e) { e.hidden = false; });
           document.querySelectorAll('.gk').forEach(function (b) { b.classList.toggle('on', !fr.off[b.getAttribute('data-gid')]); });
           document.querySelectorAll('.fg, .fd').forEach(function (e) {
             var id = e.getAttribute('data-gid');
@@ -1134,6 +1139,7 @@ final class ExtraPages {
         applyFr();
         var net = { z: 1, x: 0, y: 0, focus: '', off: {}, moved: false };
         function applyNet() {
+          document.querySelectorAll('[data-js]').forEach(function (e) { e.hidden = false; });
           var g = document.getElementById('netg');
           if (!g) { return; }
           g.setAttribute('transform', 'translate(' + net.x + ' ' + net.y + ') scale(' + net.z + ')');

@@ -2,6 +2,17 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 26/10/2026 (soir)
+
+### Nouveau
+- **Déguisement avec skin et pseudo** : le profil du joueur est remplacé (skin rafraîchi chez tous les joueurs, nom au-dessus de la tête et dans le tchat) puis restauré à la fin. `/deguisement <guilde>` prend le skin d'un membre et un pseudonyme inventé ; **`/deguisement <Pseudo>`** prend le skin et le pseudo de n'importe quel compte Minecraft (pas forcément du serveur), et l'identité de guilde de ce joueur s'il en a une. Les pièces ne sont débitées qu'une fois le skin trouvé.
+- **Cosmétiques par succès** : chaque succès débloque un aura (particules) et un titre (tchat), équipables dans le menu `/cosmetique`. L'aura secret du diamant est conservé.
+- **Site** : la tête de chaque joueur remplace la lettre (récupérée et mise en cache par le serveur, aucun appel externe depuis le navigateur).
+
+### Correctifs et optimisations
+- **Site** : le script est servi sous une adresse versionnée (`app.js?v=…`) : après une mise à jour du plugin, plus aucun navigateur ni cache intermédiaire (Cloudflare…) ne garde l'ancien script, ce qui pouvait figer la frise des Âges et les filtres du réseau diplomatique. Les boutons de filtre n'apparaissent que si le script tourne.
+- **Optimisations** : fiches de guilde et de joueur construites à la demande (au lieu de toutes les 15 s), pages anglaises traduites à la première demande, le Nexus ne force plus le chargement de son chunk toutes les 2 secondes, les explosions ne chargent plus de chunks, recherche du chunk d'un Nexus en O(1), hégémonie gardée 30 s, purge des vieux journaux de raids.
+
 ## 26/10/2026 (suite)
 
 ### Correctifs

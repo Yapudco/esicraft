@@ -16,9 +16,6 @@ final class WebI18n {
    private static final Pattern TOKEN = Pattern.compile(
       "(?s)<style>.*?</style>|<script[^>]*>.*?</script>|>([^<>]+)<|\\b(title|aria-label|placeholder|alt|content)=\"([^\"]*)\"|href=\"(/[^\"]*)\"");
 
-   /** Noms de guildes et de joueurs (déjà échappés en HTML) : jamais traduits, même s'ils contiennent un mot du dictionnaire. */
-   private static volatile java.util.List<String> protectedNames = java.util.List.of();
-
    private WebI18n() {
    }
 
@@ -26,17 +23,18 @@ final class WebI18n {
       return html.replace(MARKER, "<a class=\"nl lang\" data-lang=\"en\" href=\"?lang=en\" hreflang=\"en\" title=\"English\">EN</a>");
    }
 
+   /** {@code names} : noms de guildes et de joueurs (échappés en HTML), jamais traduits même s'ils contiennent un mot du dictionnaire. */
    static String english(String html, java.util.Collection<String> names) {
-      protectedNames = names.stream().filter(n -> n != null && n.length() >= 3).sorted((a, b) -> Integer.compare(b.length(), a.length())).toList();
+      java.util.List<String> protectedNames = names.stream().filter(n -> n != null && n.length() >= 3).sorted((a, b) -> Integer.compare(b.length(), a.length())).toList();
       String page = html.replace(MARKER, "<a class=\"nl lang\" data-lang=\"fr\" href=\"?lang=fr\" hreflang=\"fr\" title=\"Français\">FR</a>").replace("<html lang=\"fr\">", "<html lang=\"en\">");
       Matcher m = TOKEN.matcher(page);
       StringBuilder out = new StringBuilder(page.length() + 256);
       while (m.find()) {
          String rep;
          if (m.group(1) != null) {
-            rep = ">" + translate(m.group(1)) + "<";
+            rep = ">" + translate(m.group(1), protectedNames) + "<";
          } else if (m.group(3) != null) {
-            rep = m.group(2) + "=\"" + translate(m.group(3)) + "\"";
+            rep = m.group(2) + "=\"" + translate(m.group(3), protectedNames) + "\"";
          } else if (m.group(4) != null) {
             rep = "href=\"" + link(m.group(4)) + "\"";
          } else {
@@ -50,7 +48,7 @@ final class WebI18n {
       return out.toString();
    }
 
-   private static String translate(String text) {
+   private static String translate(String text, java.util.List<String> protectedNames) {
       if (text.isBlank()) {
          return text;
       }
@@ -66,7 +64,7 @@ final class WebI18n {
       }
 
       if (best != null) {
-         return translate(text.substring(0, bestAt)) + best + translate(text.substring(bestAt + best.length()));
+         return translate(text.substring(0, bestAt), protectedNames) + best + translate(text.substring(bestAt + best.length()), protectedNames);
       }
 
       return translateSegment(text);

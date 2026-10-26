@@ -41,6 +41,8 @@ public class NexusManager {
    private final Map<String, ArmorStand> holograms = new ConcurrentHashMap<>();
    private final Map<String, Guild> nexusLocationIndex = new ConcurrentHashMap<>();
    private final Set<String> activeNexusGuilds = ConcurrentHashMap.newKeySet();
+   /** Chunk du Nexus → guilde (recherche en O(1), sans charger de chunk). */
+   private final Map<ChunkKey, String> nexusChunks = new ConcurrentHashMap<>();
 
    public NexusManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -57,6 +59,8 @@ public class NexusManager {
          if (key != null) {
             this.nexusLocationIndex.put(key, guild);
             this.activeNexusGuilds.add(guild.getId());
+            Location nl = guild.getNexus().getLocation();
+            this.nexusChunks.put(new ChunkKey(nl.getWorld().getName(), nl.getBlockX() >> 4, nl.getBlockZ() >> 4), guild.getId());
          }
       }
    }
@@ -68,6 +72,11 @@ public class NexusManager {
             String key = locKey(guild.getNexus().getLocation());
             if (key != null) {
                this.nexusLocationIndex.remove(key);
+            }
+
+            Location nl = guild.getNexus().getLocation();
+            if (nl.getWorld() != null) {
+               this.nexusChunks.remove(new ChunkKey(nl.getWorld().getName(), nl.getBlockX() >> 4, nl.getBlockZ() >> 4));
             }
          }
       }
@@ -106,20 +115,13 @@ public class NexusManager {
    }
 
    public boolean isNexusChunk(ChunkKey key) {
-      if (key == null) {
-         return false;
-      } else {
-         for (Guild g : this.nexusLocationIndex.values()) {
-            if (g.hasNexus() && g.getNexus().getLocation() != null && g.getNexus().isAlive()) {
-               ChunkKey nexusChunk = ChunkKey.from(g.getNexus().getLocation().getChunk());
-               if (nexusChunk.equals(key)) {
-                  return true;
-               }
-            }
-         }
-
+      String guildId = key == null ? null : this.nexusChunks.get(key);
+      if (guildId == null) {
          return false;
       }
+
+      Guild g = this.plugin.getGuildManager().getGuildById(guildId);
+      return g != null && g.hasNexus() && g.getNexus().isAlive();
    }
 
    public boolean placeNexus(Guild guild, Location location, Player player) {
@@ -315,6 +317,7 @@ public class NexusManager {
    }
 
    public void clearIndex() {
+      this.nexusChunks.clear();
       this.nexusLocationIndex.clear();
       this.activeNexusGuilds.clear();
    }
@@ -698,7 +701,7 @@ public class NexusManager {
                   if (guildx != null && guildx.hasNexus()) {
                      Nexus nexus = guildx.getNexus();
                      Location loc = nexus.getLocation();
-                     if (loc != null && loc.getWorld() != null && loc.getChunk().isLoaded()) {
+                     if (loc != null && loc.getWorld() != null && loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
                         if (nexus.isAlive()) {
                            ArmorStand holo = NexusManager.this.holograms.get(guildId);
                            if (holo == null || !holo.isValid()) {

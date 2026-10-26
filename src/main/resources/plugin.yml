@@ -143,9 +143,9 @@ commands:
     usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
 
   cosmetique:
-    description: Activer ou cacher vos cosmétiques débloqués
+    description: Équiper vos cosmétiques (un aura et un titre débloqués par succès)
     aliases: [cosmetic, cosmetics]
-    usage: /cosmetique [on|off]
+    usage: /cosmetique [off]
 
 permissions:
   esicraft.user:
