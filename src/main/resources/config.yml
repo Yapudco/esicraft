@@ -253,13 +253,87 @@ events:
     top-diamonds: 3                      # Diamants du meilleur combattant (8 auparavant)
     top-star-chance: 0.2                 # Probabilité d'une Étoile du Nether (garantie auparavant)
     xp: 500                              # XP lâchée à la mort (2 000 auparavant)
+    hp-per-player: 300.0                 # PV du boss par joueur proche (rayon 150) au moment de l'apparition
+    min-hp: 400.0                        # PV minimum
+    max-hp: 1000.0                       # PV maximum (limite du jeu : 1024)
+    max-attack: 22.0                     # Dégâts de base maximum (8 + 2 par joueur)
+    countdown-seconds: 120               # Compte à rebours avant l'éveil (titre, cor, direction et distance)
+    race-bonus: 0.25                     # +25 % de dégâts du métier favori contre le boss de la semaine (Nain: Cendres, Rôdeur: Forêt, Forgeron: Glaces)
+    guild-bonus: 500.0                   # Pièces versées à la banque de la guilde du meilleur combattant (nom gravé sur le site)
+    heroic-chance: 0.5                   # Chance d'un boss héroïque, une fois la première victoire obtenue
+    heroic-hp-multiplier: 1.5
+    heroic-damage-multiplier: 1.3
+    heroic-pool-multiplier: 1.5
+    heroic-star-chance: 0.35
   blood-moon-extra-spawn-chance: 0.25   # Part des monstres naturels dupliqués pendant la Lune de sang (0.5 doublait les fermes à monstres)
   enabled: true
   min-interval-minutes: 1440   # 24 h minimum entre deux événements
   max-interval-minutes: 2880   # 48 h maximum : un événement tous les 1 à 2 jours
 
+# Trêve hebdomadaire : plus aucun PvP pendant la plage (heure locale du serveur)
+truce:
+  enabled: true
+  days: [FRIDAY, SATURDAY]
+  start-hour: 21
+  start-minute: 0
+  duration-minutes: 60
+
+# Duels d'honneur (/duel) et paris (/pari)
+duels:
+  enabled: true
+  min-stake: 0
+  max-stake: 10000
+  max-seconds: 300                       # Durée maximale d'un duel (match nul au-delà)
+  arena:
+    world: ""                            # Vide = premier monde normal
+    x: -2147483648                       # Valeur par défaut = au-dessus du point d'apparition du monde
+    y: 280
+    z: -2147483648
+betting:
+  enabled: true
+  window-seconds: 120                    # Durée pendant laquelle on peut parier après le début d'un raid / duel
+  tax-percent: 5.0                       # Taxe du serveur sur la cagnotte
+  min: 10
+  max: 5000
+
+# Tavernes (zones neutres, pile ou face)
+taverns:
+  max-per-guild: 2
+  coinflip:
+    win-chance: 0.47                     # 47 % de gagner : l'avantage va à la banque de la taverne
+
+# Guerres formelles (/siege)
+siege:
+  notice-hours: 24                       # Préavis minimal entre la déclaration et le début du siège
+  duration-minutes: 60
+  declaration-fee: 500.0                 # Frais déposés dans la banque de l'assaillant (perdus au profit du défenseur s'il tient bon)
+  damage-multiplier: 2.0                 # Dégâts au Nexus majorés pendant le siège (armes et pioches), même sans défenseur présent
+  win-damage-percent: 40.0               # Part des PV max du Nexus à infliger pour l'emporter si le Nexus ne tombe pas
+  loot-percent: 10.0                     # Part de la banque du vaincu pillée en cas de victoire
+  loot-cap: 3000.0
+  pair-cooldown-hours: 72
+
+# Bourse des guildes (/bourse)
+bourse:
+  enabled: true
+  min-age: 4                             # Âge minimal pour ouvrir le capital
+  total-shares: 1000
+  floor-price: 10.0                      # Cours = prix plancher + banque de la guilde / nombre de parts
+  max-public-percent: 49.0               # Part maximale du capital détenue par le public
+  max-shares-per-player: 100
+  buyback-ratio: 0.9                     # Une part revendue à la guilde est rachetée à 90 % du cours
+  dividend-minutes: 360                  # Période de calcul des dividendes
+  dividend-percent: 20.0                 # Part du bénéfice de la période (hausse de la banque) versée aux actionnaires
+
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
+  freight:                               # Trains de fret (Maj + clic sur une destination de /station)
+    min-age: 2                           # Âge minimal de la guilde pour transporter des objets
+    max-per-guild: 2                     # Convois simultanés par guilde
+    fare-multiplier: 5.0                 # Frais d'envoi = tarif de la gare d'arrivée x ce facteur
+    hits-to-loot: 25                     # Coups nécessaires pour piller un convoi sur son territoire (sans traité)
+    distance-limits: [1000, 3000, 5000, 10000]   # Distances (blocs) entre les gares
+    minutes: [4, 8, 12, 15, 20]          # Durée du trajet : <= 1000, <= 3000, <= 5000, <= 10000, au-delà
   enabled: true
   base-fare: 1.0              # Tarif de base d'un trajet (versé à la guilde de la gare d'arrivée)
   default-toll: 2.0           # Péage par défaut d'une guilde dont le territoire est traversé
@@ -276,6 +350,12 @@ nexus:
   siege-radius: 4                  # Un assaillant peut casser les blocs (hors conteneurs) à cette distance d'un Nexus vivant
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
+  gamble:                          # Roulette russe (/nexus gamble)
+    cooldown-hours: 24
+    win-max-hp: 1000
+    win-coins: 2000.0
+    lose-hp: 1500                  # Le Nexus survit toujours (1 PV minimum)
+    horde-size: 6
 
 economy:
   hourly-bounty-cap: 4000.0        # Plafond de primes de monstres par joueur et par heure (0 = aucun)
@@ -307,6 +387,8 @@ mentoring:
     first-claim-recruit: 100.0
 
 ransom:
+  cell:
+    rescue-actions: 15                   # Clics des alliés sur le bloc de la cellule pour délivrer un captif
   enabled: true
   seconds: 90                 # Durée de captivité
   default-percent: 15.0       # Rançon par défaut : % des pièces du captif

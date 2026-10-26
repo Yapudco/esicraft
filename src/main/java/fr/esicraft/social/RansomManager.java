@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -52,6 +53,11 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       final String captorGuildId;
       volatile double price;
       final long expiresAt;
+      /** Position d'origine et cellule du ravisseur (null sans cellule : le captif reste sur place). */
+      org.bukkit.Location origin;
+      org.bukkit.Location cell;
+      int rescue;
+      long lastRescue;
 
       Captive(UUID victim, UUID captor, String captorGuildId, double price, long expiresAt) {
          this.victim = victim;
@@ -66,6 +72,9 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    private final Map<UUID, Captive> captives = new ConcurrentHashMap<>();
    private final Map<UUID, Long> immuneUntil = new ConcurrentHashMap<>();
    private final Set<UUID> executing = ConcurrentHashMap.newKeySet();
+   /** Cellule de prison de chaque guilde (identifiant de guilde → bloc), déclarée avec /rancon cellule. */
+   private final Map<String, org.bukkit.Location> cells = new ConcurrentHashMap<>();
+   private boolean internalTp;
    /** « guilde ravisseuse>guilde de la victime » → fin du délai avant une nouvelle capture (contre les complices qui se relaient). */
    private final Map<String, Long> pairCooldown = new ConcurrentHashMap<>();
 
@@ -74,12 +83,22 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    }
 
    public void start() {
+      var db = this.plugin.getDataManager().getStorage();
+      db.exec("CREATE TABLE IF NOT EXISTS ransom_cells (guild_id VARCHAR(64) PRIMARY KEY, world VARCHAR(64), x INT, y INT, z INT);");
+      for (Object[] row : db.select("SELECT guild_id, world, x, y, z FROM ransom_cells;", 5)) {
+         World w = Bukkit.getWorld(String.valueOf(row[1]));
+         if (w != null) {
+            this.cells.put(String.valueOf(row[0]), new org.bukkit.Location(w, ((Number)row[2]).intValue(), ((Number)row[3]).intValue(), ((Number)row[4]).intValue()));
+         }
+      }
+
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::tick, 20L, 20L);
    }
 
    public void clear() {
       this.captives.clear();
       this.immuneUntil.clear();
+      this.cells.clear();
    }
 
    private boolean enabled() {
@@ -103,7 +122,8 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       }
 
       Player captor = shooter(event);
-      if (captor == null || captor.equals(victim) || this.captives.containsKey(victim.getUniqueId()) || this.executing.contains(victim.getUniqueId())) {
+      if (captor == null || captor.equals(victim) || this.captives.containsKey(victim.getUniqueId()) || this.executing.contains(victim.getUniqueId())
+         || this.plugin.getDuels().inDuelWith(captor, victim)) {
          return;
       }
 
@@ -149,7 +169,26 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       double max = this.plugin.getConfig().getDouble("ransom.max", 2000.0);
       double price = Math.max(min, Math.min(max, Math.floor(coins * this.plugin.getConfig().getDouble("ransom.default-percent", 15.0) / 100.0)));
       long seconds = this.plugin.getConfig().getLong("ransom.seconds", 90L);
-      this.captives.put(victim.getUniqueId(), new Captive(victim.getUniqueId(), captor.getUniqueId(), captorGuild.getId(), price, System.currentTimeMillis() + seconds * 1000L));
+      Captive captive = new Captive(victim.getUniqueId(), captor.getUniqueId(), captorGuild.getId(), price, System.currentTimeMillis() + seconds * 1000L);
+      org.bukkit.Location cell = this.cells.get(captorGuild.getId());
+      if (cell != null && cell.getWorld() != null && captorGuild.isClaimed(fr.esicraft.util.ChunkKey.from(cell.getChunk()))) {
+         captive.origin = victim.getLocation().clone();
+         captive.cell = cell.clone().add(0.5, 1.0, 0.5);
+      }
+
+      this.captives.put(victim.getUniqueId(), captive);
+      if (captive.cell != null) {
+         this.internalTp = true;
+         try {
+            victim.teleport(captive.cell);
+         } finally {
+            this.internalTp = false;
+         }
+
+         ChatUtil.sendMessage(victim, "&c⛓ Vous êtes enfermé dans la cellule de &6" + captorGuild.getName() + "&c : vos alliés peuvent vous libérer en agissant sur le bloc de la cellule !");
+         ChatUtil.broadcastGuild(victimGuild, "&c⛓ " + victim.getName() + " est enfermé dans la cellule de &6" + captorGuild.getName() + " &c(" + cell.getBlockX() + ", " + cell.getBlockY() + ", " + cell.getBlockZ()
+            + ") — interagissez avec le bloc de la cellule " + this.plugin.getConfig().getInt("ransom.cell.rescue-actions", 15) + " fois pour le délivrer !");
+      }
       victim.setHealth(Math.min(victim.getMaxHealth(), 4.0));
       victim.setFireTicks(0);
       victim.setGlowing(true);
@@ -235,9 +274,95 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
 
    @EventHandler(ignoreCancelled = true)
    public void onTeleport(PlayerTeleportEvent event) {
-      if (this.captives.containsKey(event.getPlayer().getUniqueId())) {
+      if (!this.internalTp && this.captives.containsKey(event.getPlayer().getUniqueId())) {
          event.setCancelled(true);
       }
+   }
+
+   /** Sauvetage : un allié du captif agit sur le bloc de la cellule (clic) assez de fois pour le délivrer. */
+   @EventHandler(priority = EventPriority.HIGHEST)
+   public void onCellInteract(PlayerInteractEvent event) {
+      if (this.captives.isEmpty() || event.getClickedBlock() == null || event.getAction() == org.bukkit.event.block.Action.PHYSICAL) {
+         return;
+      }
+
+      org.bukkit.block.Block b = event.getClickedBlock();
+      for (Captive c : new ArrayList<>(this.captives.values())) {
+         if (c.cell == null || c.cell.getWorld() != b.getWorld() || c.cell.getBlockX() != b.getX() || c.cell.getBlockY() - 1 != b.getY() || c.cell.getBlockZ() != b.getZ()) {
+            continue;
+         }
+
+         Player rescuer = event.getPlayer();
+         if (this.captives.containsKey(rescuer.getUniqueId()) || c.victim.equals(rescuer.getUniqueId())) {
+            return;
+         }
+
+         Guild mine = this.plugin.getGuildManager().getGuildByPlayer(rescuer.getUniqueId());
+         Guild victimGuild = this.plugin.getGuildManager().getGuildByPlayer(c.victim);
+         boolean ally = mine != null && victimGuild != null && (mine.getId().equals(victimGuild.getId()) || this.plugin.getTreatyManager().areFriends(mine.getId(), victimGuild.getId()));
+         if (!ally) {
+            return;
+         }
+
+         event.setCancelled(true);
+         long now = System.currentTimeMillis();
+         if (now - c.lastRescue > 10000L) {
+            c.rescue = 0;
+         }
+
+         if (now - c.lastRescue < 250L) {
+            return;
+         }
+
+         c.lastRescue = now;
+         c.rescue++;
+         int need = Math.max(1, this.plugin.getConfig().getInt("ransom.cell.rescue-actions", 15));
+         b.getWorld().playSound(b.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, 1.0F, 1.5F);
+         b.getWorld().spawnParticle(org.bukkit.Particle.CRIT, b.getLocation().add(0.5, 1.2, 0.5), 8, 0.3, 0.3, 0.3, 0.1);
+         if (c.rescue >= need) {
+            this.free(c, false, "délivré par " + rescuer.getName());
+            ChatUtil.broadcast("&a⛓ &e" + rescuer.getName() + " a délivré &e" + Bukkit.getOfflinePlayer(c.victim).getName() + " &ade la cellule !");
+         } else {
+            ChatUtil.sendActionbar(rescuer, "&a⛓ Évasion : &e" + c.rescue + "&7/&e" + need);
+         }
+
+         return;
+      }
+   }
+
+   private void teleportBack(Captive c, Player victim) {
+      if (victim != null && c.origin != null && c.origin.getWorld() != null && !victim.isDead()) {
+         this.internalTp = true;
+         try {
+            victim.teleport(c.origin);
+         } finally {
+            this.internalTp = false;
+         }
+      }
+   }
+
+   private void setCell(Player player, Guild guild) {
+      if (!guild.hasRoleAtLeast(player.getUniqueId(), fr.esicraft.guild.GuildRole.OFFICER)) {
+         ChatUtil.sendMessage(player, "&c❌ Réservé aux officiers.");
+         return;
+      }
+
+      org.bukkit.block.Block target = player.getTargetBlockExact(6);
+      if (target == null || target.getType().isAir()) {
+         ChatUtil.sendMessage(player, "&c❌ Visez (à moins de 6 blocs) le bloc qui servira de cellule : le prisonnier apparaîtra juste au-dessus.");
+         return;
+      }
+
+      if (!guild.isClaimed(fr.esicraft.util.ChunkKey.from(target.getChunk()))) {
+         ChatUtil.sendMessage(player, "&c❌ Le bloc doit se trouver sur le territoire de votre guilde.");
+         return;
+      }
+
+      org.bukkit.Location loc = target.getLocation();
+      this.cells.put(guild.getId(), loc);
+      this.plugin.getDataManager().getStorage().exec("INSERT OR REPLACE INTO ransom_cells (guild_id, world, x, y, z) VALUES (?, ?, ?, ?, ?);",
+         guild.getId(), loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+      ChatUtil.sendMessage(player, "&a⛓ Cellule de prison définie en &e" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ() + "&a : vos captifs y seront enfermés. Veillez à la fermer (barreaux, murs) !");
    }
 
    @EventHandler(ignoreCancelled = true)
@@ -304,6 +429,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    private void free(Captive c, boolean paid, String reason) {
       Player victim = Bukkit.getPlayer(c.victim);
       this.release(c, victim);
+      this.teleportBack(c, victim);
       if (paid) {
          this.immuneUntil.put(c.victim, System.currentTimeMillis() + this.plugin.getConfig().getLong("ransom.immunity-minutes", 10L) * 60000L);
       }
@@ -385,6 +511,21 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
                + " &7- &e/rancon prix <montant>&7, &e/rancon liberer&7, &e/rancon executer");
          } else {
             ChatUtil.sendMessage(player, "&7Aucun prisonnier. Un ennemi qui devrait mourir au combat est capturé : vous fixez sa rançon, ou vous l'exécutez.");
+         }
+
+         return true;
+      }
+
+      if (sub.equals("cellule") || sub.equals("cell")) {
+         Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+         if (guild == null) {
+            ChatUtil.sendMessage(player, "&c❌ Vous n'avez pas de guilde.");
+         } else if (args.length > 1 && (args[1].equalsIgnoreCase("retirer") || args[1].equalsIgnoreCase("supprimer"))) {
+            this.cells.remove(guild.getId());
+            this.plugin.getDataManager().getStorage().exec("DELETE FROM ransom_cells WHERE guild_id = ?;", guild.getId());
+            ChatUtil.sendMessage(player, "&7Cellule de prison supprimée : les captifs restent désormais sur place.");
+         } else {
+            this.setCell(player, guild);
          }
 
          return true;
@@ -477,7 +618,7 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
       List<String> out = new ArrayList<>();
       if (args.length == 1) {
-         for (String s : List.of("payer", "prix", "liberer", "executer")) {
+         for (String s : List.of("payer", "prix", "liberer", "executer", "cellule")) {
             if (s.startsWith(args[0].toLowerCase(Locale.ROOT))) {
                out.add(s);
             }

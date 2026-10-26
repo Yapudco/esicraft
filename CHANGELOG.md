@@ -2,6 +2,41 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 29/10/2026
+
+### Boss mondial refondu
+- **Un boss différent chaque semaine** (Seigneur des Cendres, Gardien de la Forêt, Reine des Glaces), avec un bonus de +25 % de dégâts pour un métier (Nain, Rôdeur, Forgeron).
+- **PV et dégâts adaptés** au nombre de joueurs proches à l'éveil (300 PV par joueur, 400 à 1 000 PV).
+- **Trois phases** (gardes spectraux à 75 %, onde de choc à 50 %, enragement à 25 %) avec une barre qui change de couleur, et **attaques télégraphiées** (cercle de particules pendant 3 s avant chaque coup de zone).
+- **Mode héroïque** après la première victoire du serveur ; **bonus de 500 pièces pour la guilde** du meilleur combattant, nom gravé au **Panthéon** du site.
+- **Compte à rebours de 2 minutes** avec titre plein écran, cor, distance et direction depuis chaque joueur.
+
+### Tribunal des guildes et trêve
+- `/vote` : chaque lundi, les guildes élisent une règle pour la semaine (taxe de passage, bonus de construction, marché libre, chasse ouverte, trêve prolongée).
+- **Trêve hebdomadaire** : une heure sans PvP le vendredi et le samedi à 21 h (`truce.*`).
+
+### Combats, jeux et économie
+- **Duels d'honneur** (`/duel`) en arène neutre, inventaire sauvegardé, mise, sans conséquence diplomatique ; **paris** (`/pari`) sur les raids et les duels (taxe de 5 %).
+- **Tavernes** (zones neutres, sans PvP ni armes) pour le Syndicat Marchand et l'Enclave Champêtre, avec un **pile ou face** en interface.
+- **Roulette russe du Nexus** (`/nexus gamble`).
+- **Guerres formelles** (`/siege`) : étendard de siège, préavis de 24 h, créneau, Nexus attaquable à la pioche ou à l'arme lourde.
+- **Bourse des guildes** (`/bourse`, Âge 4) : parts, dividendes sur les bénéfices.
+- **Rançon** : cellule de prison de la guilde (`/rancon cellule`) ; les alliés peuvent délivrer le captif en agissant sur le bloc.
+- Nouvelle spécialisation **Atlante** (Nexus immergé, atouts aquatiques dans l'eau, Lenteur hors de l'eau).
+
+### Nexus et rails
+- **Arbre technologique du Nexus** : expérience (hordes repoussées, ressources sacrifiées avec `/nexus sacrifice`), 13 défenses à débloquer **définitivement** en sacrifiant des objets ; nouvelles défenses (tirs de shulker, warden, évocateur, gardien, gardien ancien, blaze, ghast, essaim d'abeilles) qui exigent d'avoir tué le mob dans le chunk du Nexus (le golem aussi). Les pièges achetés et consommés disparaissent.
+- **Train de fret** : wagonnet à coffre autonome (54 emplacements, Âge 2) qui suit les rails de gare en gare (4 à 20 min selon la distance), pillable sur le territoire d'une guilde sans traité.
+
+### Site et succès
+- **Élections hebdomadaires en ligne** (`/votes`) avec revendication du pseudo par un code tapé dans le chat et un cookie ; page **Panthéon** (boss, sièges, Tribunal, titres).
+- **Succès de superficie** (16 à 2 048 chunks) et neuf nouveaux succès difficiles.
+- `/game reset` efface aussi toutes ces nouveautés.
+
+### À savoir
+- Les nouveaux messages de jeu ne sont pas tous traduits par `/english` ; le site (hors scripts) l'est par le dictionnaire.
+- Non testé sur un serveur réel : la compilation est vérifiée, pas le comportement en jeu.
+
 ## 28/10/2026 (golem)
 
 ### Correctif

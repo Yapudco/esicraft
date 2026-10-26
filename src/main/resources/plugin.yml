@@ -136,11 +136,34 @@ commands:
   rancon:
     description: Gérer un prisonnier capturé en combat (rançon, libération, exécution)
     aliases: [ransom]
-    usage: /rancon [payer|prix <montant>|liberer|executer]
+    usage: /rancon [payer|prix <montant>|liberer|executer|cellule]
   banque:
     description: Banque de guilde (prêts entre guildes, dettes, coffre commun)
     aliases: [bank, pret]
     usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
+
+  vote:
+    description: "Tribunal des guildes - voter la règle de la semaine (le lundi)"
+    aliases: [tribunal]
+    usage: /vote [numéro]
+  duel:
+    description: "Duel d'honneur dans une arène neutre (mise optionnelle)"
+    usage: /duel <joueur> [mise] | /duel accepter | /duel refuser
+  pari:
+    description: "Parier sur un raid ou un duel"
+    aliases: [bet]
+    usage: /pari <camp> <montant>
+  bourse:
+    description: "Actions de guilde - acheter, vendre, ouvrir son capital"
+    aliases: [actions]
+    usage: /bourse [liste|ouvrir|fermer|acheter|vendre|portefeuille]
+  taverne:
+    description: "Zone neutre - déclarer une taverne, jouer au pile ou face"
+    aliases: [tavern]
+    usage: /taverne [declarer|retirer|jeu]
+  siege:
+    description: "Guerre formelle - déclarer un siège avec 24 h de préavis"
+    usage: /siege [declarer <guilde> <jour> <heure>|liste|annuler]
 
   cosmetique:
     description: "Menu des cosmétiques (auras, traînées, effets de victoire) : à gagner ou à acheter"

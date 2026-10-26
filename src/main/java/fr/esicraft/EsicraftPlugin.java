@@ -111,6 +111,16 @@ public final class EsicraftPlugin extends JavaPlugin {
    private ReputationManager reputation;
    private MentorManager mentors;
    private RansomManager ransom;
+   private fr.esicraft.game.CourtManager court;
+   private fr.esicraft.game.TruceManager truce;
+   private fr.esicraft.game.BettingManager betting;
+   private fr.esicraft.game.DuelManager duels;
+   private fr.esicraft.game.TavernManager tavern;
+   private fr.esicraft.nexus.NexusGamble nexusGamble;
+   private fr.esicraft.nexus.NexusTech nexusTech;
+   private fr.esicraft.rail.FreightManager freight;
+   private fr.esicraft.game.SiegeManager siege;
+   private fr.esicraft.game.BourseManager bourse;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -147,6 +157,15 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation = new ReputationManager(this);
       this.mentors = new MentorManager(this);
       this.ransom = new RansomManager(this);
+      this.court = new fr.esicraft.game.CourtManager(this);
+      this.truce = new fr.esicraft.game.TruceManager(this);
+      this.betting = new fr.esicraft.game.BettingManager(this);
+      this.duels = new fr.esicraft.game.DuelManager(this);
+      this.tavern = new fr.esicraft.game.TavernManager(this);
+      this.nexusGamble = new fr.esicraft.nexus.NexusGamble(this);
+      this.nexusTech = new fr.esicraft.nexus.NexusTech(this);
+      this.siege = new fr.esicraft.game.SiegeManager(this);
+      this.bourse = new fr.esicraft.game.BourseManager(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -164,10 +183,19 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation.init();
       this.mentors.init();
       this.ransom.start();
+      this.court.init();
+      this.truce.start();
+      this.duels.init();
+      this.tavern.init();
+      this.nexusTech.init();
+      this.siege.init();
+      this.bourse.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
       this.railManager.load();
+      this.freight = new fr.esicraft.rail.FreightManager(this, this.railManager);
+      this.freight.init();
       this.treatyManager.load();
       this.webServer = new WebServer(this);
       this.webServer.start();
@@ -184,6 +212,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.ransom, this);
       pm.registerEvents(this.cosmetics, this);
       pm.registerEvents(this.loans, this);
+      pm.registerEvents(this.truce, this);
+      pm.registerEvents(this.duels, this);
+      pm.registerEvents(this.tavern, this);
+      pm.registerEvents(this.nexusTech, this);
+      pm.registerEvents(this.siege, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -195,6 +228,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new AlliedProtectionListener(this), this);
       pm.registerEvents(this.eventManager, this);
       pm.registerEvents(new RailListener(this), this);
+      pm.registerEvents(this.freight, this);
       pm.registerEvents(new RailGuiListener(this), this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
@@ -221,6 +255,18 @@ public final class EsicraftPlugin extends JavaPlugin {
          }
       } catch (RuntimeException e) {
          this.getLogger().warning("Sauvegarde des succès / contrats de guilde impossible : " + e.getMessage());
+      }
+
+      if (this.freight != null) {
+         this.freight.shutdown();
+      }
+
+      if (this.duels != null) {
+         this.duels.shutdown();
+      }
+
+      if (this.betting != null) {
+         this.betting.shutdown();
       }
 
       if (this.raidManager != null) {
@@ -276,6 +322,17 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("parrain")).setTabCompleter(this.mentors);
       Objects.requireNonNull(this.getCommand("rancon")).setExecutor(this.ransom);
       Objects.requireNonNull(this.getCommand("rancon")).setTabCompleter(this.ransom);
+      Objects.requireNonNull(this.getCommand("vote")).setExecutor(this.court);
+      Objects.requireNonNull(this.getCommand("taverne")).setExecutor(this.tavern);
+      Objects.requireNonNull(this.getCommand("taverne")).setTabCompleter(this.tavern);
+      Objects.requireNonNull(this.getCommand("siege")).setExecutor(this.siege);
+      Objects.requireNonNull(this.getCommand("siege")).setTabCompleter(this.siege);
+      Objects.requireNonNull(this.getCommand("bourse")).setExecutor(this.bourse);
+      Objects.requireNonNull(this.getCommand("bourse")).setTabCompleter(this.bourse);
+      Objects.requireNonNull(this.getCommand("duel")).setExecutor(this.duels);
+      Objects.requireNonNull(this.getCommand("duel")).setTabCompleter(this.duels);
+      Objects.requireNonNull(this.getCommand("pari")).setExecutor(this.betting);
+      Objects.requireNonNull(this.getCommand("pari")).setTabCompleter(this.betting);
       Objects.requireNonNull(this.getCommand("banque")).setExecutor(this.loans);
       Objects.requireNonNull(this.getCommand("banque")).setTabCompleter(this.loans);
       Objects.requireNonNull(this.getCommand("esicraft")).setExecutor(new EsicraftCommand(this));
@@ -389,6 +446,46 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public MentorManager getMentors() {
       return this.mentors;
+   }
+
+   public fr.esicraft.game.CourtManager getCourt() {
+      return this.court;
+   }
+
+   public fr.esicraft.game.BettingManager getBetting() {
+      return this.betting;
+   }
+
+   public fr.esicraft.game.TavernManager getTavern() {
+      return this.tavern;
+   }
+
+   public fr.esicraft.game.BourseManager getBourse() {
+      return this.bourse;
+   }
+
+   public fr.esicraft.game.SiegeManager getSiege() {
+      return this.siege;
+   }
+
+   public fr.esicraft.rail.FreightManager getFreight() {
+      return this.freight;
+   }
+
+   public fr.esicraft.nexus.NexusTech getNexusTech() {
+      return this.nexusTech;
+   }
+
+   public fr.esicraft.nexus.NexusGamble getNexusGamble() {
+      return this.nexusGamble;
+   }
+
+   public fr.esicraft.game.DuelManager getDuels() {
+      return this.duels;
+   }
+
+   public fr.esicraft.game.TruceManager getTruce() {
+      return this.truce;
    }
 
    public RansomManager getRansom() {

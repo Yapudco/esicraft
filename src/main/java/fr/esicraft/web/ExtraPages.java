@@ -922,7 +922,7 @@ final class ExtraPages {
          b.append("<span class=\"chip\">Sans guilde</span>");
       }
 
-      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + " honneur</span>" : "").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section>");
+      b.append("<span class=\"chip\">").append(esc(p.age())).append("</span>").append(p.reputation() > 0 ? "<span class=\"chip bad\">❤ " + p.reputation() + " honneur</span>" : "").append(p.online() ? "<span class=\"chip ok\">● en ligne</span>" : "").append("</div></div></div></section><p style=\"margin-top:10px\"><a class=\"nl\" href=\"/votes?claim=").append(esc(p.name())).append("\">🗳 C'est vous ? Revendiquer ce pseudo pour voter</a></p>");
       b.append("<div class=\"grid\" style=\"margin-top:16px\">").append(stat("🏅", p.achievements().size() + " / " + x.achievements().size(), "Succès")).append(stat("❤", String.valueOf(p.reputation()), "Réputation"));
       if (p.coins() != null) {
          b.append(stat("💰", money(p.coins()), "Pièces"));
@@ -998,9 +998,9 @@ final class ExtraPages {
       b.append(gs("specialisations", "🌟 Spécialisations", "<p>Choisies par le chef dans <b>/guild spec</b> : Légion Guerrière (combat), Industrie Souterraine (minage), Enclave Champêtre (nature), "
          + "Syndicat Marchand (commerce), Conclave Arcanique (magie), Rôdeur Solitaire (seul). Chacune donne des bonus et impose une composition de métiers. "
          + "Après le premier choix, on ne peut en changer qu'à l'arrivée d'un nouveau joueur.</p>"));
-      b.append(gs("nexus", "💎 Le Nexus et ses pièges", "<p>Le cœur de la guilde : s'il est détruit, la guilde perd ses terres et sa banque. Pas d'eau, de lave ni d'obsidienne à moins de 16 blocs. "
-         + "Une pomme dorée jetée dessus le soigne (+500 PV, +2 500 si enchantée, 30 s entre deux soins).</p><p>Pièges (<b>/nexus traps</b>, payés par la banque, consommés à la fin de la prochaine horde) : "
-         + "Brasier (250), Toile (200), Foudre (350), Brume toxique (300), Golem gardien (500).</p>"));
+      b.append(gs("nexus", "💎 Le Nexus et ses défenses", "<p>Le cœur de la guilde : s'il est détruit, la guilde perd ses terres et sa banque. Pas d'eau, de lave ni d'obsidienne à moins de 16 blocs. "
+         + "Une pomme dorée jetée dessus le soigne (+500 PV, +2 500 si enchantée, 30 s entre deux soins).</p><p>Défenses (arbre technologique <b>/nexus</b> : sacrifiez des objets pour gagner de l'XP, puis débloquez des défenses permanentes) : "
+         + "Brasier, Toile, Foudre, Brume toxique, Golem gardien, puis les tirs de blaze, de gardien, d'évocateur, de shulker, de ghast, de warden, du gardien ancien et l'essaim d'abeilles.</p>"));
       b.append(gs("raids", "⚔ Les raids", "<p>Dans <b>/ah</b>, le crâne de Wither : choisissez une horde (ou composez-la, 60 monstres max) et une cible ; la banque de guilde paie. "
          + "Officiers et chef seulement. <b>Un défenseur doit être connecté et sur ses terres.</b> La cible est ensuite protégée 30 minutes (2 minutes pour une guilde en hégémonie, trop riche).</p>"
          + "<p>Si le Nexus tombe : territoire et banque passent au vainqueur, les vaincus choisissent de le rejoindre ou de partir.</p>"));

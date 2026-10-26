@@ -594,6 +594,7 @@ public class RaidManager implements Listener {
       this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.RAID, attacker + " lance une horde (" + hordeName.replaceAll("§.", "") + ") sur " + targetGuild.getName() + ".",
          attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId());
       this.plugin.getChronicle().raid(attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId(), "launched");
+      this.plugin.getBetting().openRaid(attackerGuild, targetGuild);
       if (buyer != null) {
          this.plugin.getAchievements().grant(buyer.getUniqueId(), fr.esicraft.life.Achievement.RAIDER);
          this.plugin.getAchievements().addStat(buyer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_RAIDS, 1L);
@@ -875,6 +876,10 @@ public class RaidManager implements Listener {
       // Pas de victoire si une bonne part de la horde s'est volatilisée sans combat (chunk déchargé, vide, mob piégé).
       defended = defended && raid != null && raid.getVanished() * 4 <= Math.max(1, raid.getTotalMobs());
       if (raid != null) {
+         this.plugin.getBetting().settleRaid(raid.getTargetGuildId(), defended);
+      }
+
+      if (raid != null) {
          this.activeRaids.remove(raid.getId());
          this.guildIdsUnderRaid.remove(raid.getTargetGuildId());
 
@@ -891,9 +896,7 @@ public class RaidManager implements Listener {
 
          Guild targetGuild = this.plugin.getGuildManager().getGuildById(raid.getTargetGuildId());
          if (targetGuild != null && targetGuild.hasNexus()) {
-            boolean hadTraps = !targetGuild.getNexus().getActiveTraps().isEmpty();
-            this.plugin.getNexusManager().removeGuardians(targetGuild, targetGuild.getNexus().getLocation());
-            targetGuild.getNexus().clearTraps();
+            // Les défenses de l'arbre technologique sont permanentes : elles ne sont plus consommées par la bataille.
             this.plugin.getDataManager().saveGuild(targetGuild);
             if (defended) {
                String pairKey = raid.getAttackerGuildId() + ">" + targetGuild.getId() + "|" + java.time.LocalDate.now().toEpochDay();
@@ -908,6 +911,7 @@ public class RaidManager implements Listener {
 
                this.plugin.getChronicle().raid(raid.getAttackerGuildId(), targetGuild.getId(), "repelled");
                this.plugin.getHelpCalls().onRepelled(targetGuild);
+               this.plugin.getNexusTech().onRaidRepelled(targetGuild);
                for (UUID memberUuid : targetGuild.getMembers().keySet()) {
                   Player defender = Bukkit.getPlayer(memberUuid);
                   if (defender != null && targetGuild.isClaimed(ChunkKey.from(defender.getLocation().getChunk()))) {
@@ -922,12 +926,6 @@ public class RaidManager implements Listener {
             for (UUID memberUuid : targetGuild.getMembers().keySet()) {
                Player p = Bukkit.getPlayer(memberUuid);
                if (p != null && p.isOnline()) {
-                  if (hadTraps) {
-                     ChatUtil.sendMessage(
-                        p, "&6&l[Nexus] &e⚔️ Vos pièges de Nexus ont été consommés lors de cette bataille ! N'oubliez pas de les réarmer via &6/nexus&e."
-                     );
-                  }
-
                   ChatUtil.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
                }
             }
@@ -972,6 +970,7 @@ public class RaidManager implements Listener {
 
    public void stopAllRaids() {
       for (ActiveRaid raid : this.activeRaids.values()) {
+         this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
          this.finishRaid(raid, false);
       }
 
@@ -986,6 +985,7 @@ public class RaidManager implements Listener {
       while (it.hasNext()) {
          ActiveRaid raid = it.next().getValue();
          if (raid.getTargetGuildId().equalsIgnoreCase(guildId) || raid.getAttackerGuildId() != null && raid.getAttackerGuildId().equalsIgnoreCase(guildId)) {
+            this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
             this.finishRaid(raid, false);
             it.remove();
             stopped = true;

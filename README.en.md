@@ -139,13 +139,14 @@ The leader picks a specialization in `/guild spec`. It gives bonuses to the whol
 | 💰 **Merchant Syndicate** (*Syndicat Marchand*, trade) | Only guild allowed to trade with villagers before Age 4 · +20% on monster bounties (10% of which goes to the bank) · no Auction House tax | No Arcanist · raids 30% more expensive · no combat bonuses · Nexus -20% health |
 | 🔮 **Arcane Conclave** (*Conclave Arcanique*, magic) | Nexus +25% health · enchanting and anvil cost half the XP · potions one level higher · boosted enchantments (IV becomes V, V becomes VI) · the Nexus fires a beam at the nearest attacker (1 heart every 2 s) · -50% magic damage | -2 hearts of health · land 50% more expensive · max 1 Blacksmith and 1 Dwarf · boosted enchantments are lost if you change specialization |
 | 🏹 **Lone Ranger** (*Rôdeur Solitaire*, solo) | Permanent Speed I · Netherite armor and enchanting from Age 3 | A single member, a Ranger who has never been in another guild · no chests on their land · Nexus capped at 2,500 HP |
+| 🔱 **Atlantean** (*Atlante*, ocean) | **While in water**: water breathing, night vision, aquatic agility, dolphin's grace and Resistance | **Nexus must be submerged** (at least one water block against it; water around it is then allowed) · **Slowness out of the water** |
 
 > [!IMPORTANT]
 > The first choice is immediate. After that, a guild can only change specialization **when a new player** (who has never been in the guild) joins.
 
 ---
 
-## 💎 5. The Nexus and its traps
+## 💎 5. The Nexus and its defenses
 
 The **Nexus** is the heart of your guild. You place it on your land with `/guild nexus place` (only once: you can't place it again to reset its health to 100%). **If it's destroyed, your guild loses everything** (see [raids](#️-6-raids-monster-hordes)).
 
@@ -159,17 +160,33 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 **Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid or within 2 minutes of a player attack.
 
-### Traps (`/nexus traps`)
+### The Nexus tech tree (`/nexus`)
 
-Paid from the guild bank, they stay armed (even after a restart) until the **end of the next horde**; you then have to buy them again. They target monsters and **intruders** standing on your land, never members, treaty allies, or players in creative/spectator mode.
+The Nexus gains **experience** for every horde repelled (+200) and when you **sacrifice resources** to it (`/nexus sacrifice`, item in hand, within 10 blocks: coal, iron, gold, diamond, emerald, netherite, ender pearl, blaze rod…; capped at 3,000 XP a day). It climbs from level 1 to level 6 (0, 300, 900, 2,000, 4,500, 9,000 XP).
 
-| Trap | Price | Effect |
-| :--- | :--- | :--- |
-| 🔥 Infernal Blaze | 250 | Within 8 blocks: 1 heart of damage every 2 s plus burning |
-| 🕸️ Binding Web | 200 | Slowness II within 10 blocks |
-| ⚡ Retaliation Lightning | 350 | Strikes anyone who hits the Nexus: 4 hearts, at most one bolt every 5 s per player |
-| 🧪 Toxic Mist | 300 | Poison I within 8 blocks (poison never kills, it only weakens) |
-| 🤖 Guardian Automaton | 500 | An iron golem attacks enemies; rebuilt 5 min after it dies |
+Instead of buying disposable traps, officers **unlock** defenses in `/nexus` (the tech tree): you need the required level, the "parent" defense already unlocked, **items to sacrifice** taken from your inventory and, for the "living" defenses, to have **brought the matching mob into the Nexus chunk and killed it there**. An unlocked defense is **permanent** (hordes no longer consume it); Underground Industry pays half the items. They target monsters and **intruders**, never members, treaty allies or players in creative/spectator mode.
+
+| Defense | Lvl | Requirements | Effect |
+| :--- | :---: | :--- | :--- |
+| 🔥 Infernal Blaze | 1 | 64 coal, 16 flint | Within 8 blocks: 1 heart of damage every 2 s plus burning |
+| 🕸️ Binding Web | 1 | 128 string, 16 slime balls | Slowness II within 10 blocks |
+| ⚡ Retaliation Lightning | 2 | Blaze · 96 copper, 64 redstone | Strikes anyone who hits the Nexus (4 hearts, one bolt every 5 s per player) |
+| 🤖 Guardian Automaton | 2 | **Kill an iron golem in the chunk** · 8 iron blocks, 32 redstone | An iron golem attacks enemies; rebuilt 5 min after it dies |
+| 🧪 Toxic Mist | 2 | Web · 48 spider eyes, 16 slime | Poison I within 8 blocks (never kills) |
+| 🔥 Blaze Shot | 3 | Blaze · **kill a blaze** · 24 blaze rods, 32 gold | Up to 3 fireballs every 5 s |
+| 🐡 Guardian Shot | 3 | Lightning · **kill a guardian** · 64 shards + 32 crystals | Water beam (damage + slowness) every 4 s |
+| 🐝 Bee Swarm | 3 | Mist · **kill a bee** · 32 honeycombs, 8 honey bottles | Up to 6 enraged bees stinging enemies |
+| 🪄 Evoker Shot | 4 | Golem · **kill an evoker** · 64 emeralds, 1 totem | Magic fangs: 6 area damage every 9 s |
+| 🟪 Shulker Shot | 4 | Guardian · **kill a shulker** · 8 shells, 16 pearls | Homing projectile + levitation every 6 s |
+| 👻 Ghast Shot | 5 | Blaze · **kill a ghast** · 8 tears, 128 gunpowder | Area fireball (8 damage, breaks no blocks) every 14 s |
+| 👁 Warden Shot | 5 | Evoker · **kill a warden** · 8 echo shards, 4 catalysts | Sonic boom: 10 damage and knockback every 15 s |
+| 🌊 Elder's Curse | 6 | Guardian · **kill an elder guardian** · 128 prismarine bricks, 8 nautilus shells | Mining Fatigue III and damage to all nearby enemies every 25 s |
+
+Unlocking everything earns the *Archi-technician* achievement. Settings: `nexus.tech.*` (cost, damage, XP).
+
+### 🎰 Nexus Russian roulette (`/nexus gamble`)
+
+The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per 24 h, impossible during a raid): **50%** the Nexus gains **+1,000 max HP** and **2,000 coins** go to the bank; **50%** it loses **1,500 HP** (it always survives at 1 HP) and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
 
 ---
 
@@ -297,6 +314,8 @@ The rail network lets you **teleport from station to station**, as long as a **c
 - **Travel**: near a station (a `[Gare]` sign), type `/station` and pick your destination.
 - **Price**: 1 coin for the guild owning the arrival station, plus the **toll** of every guild whose land you cross. Your own guild and its allies don't charge you.
 - **Managing your network** (`/rail`, officers): set your toll (**Merchant Syndicate guilds only**; other guilds never charge), and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
+- **📦 Freight train** (Age 2 minimum, officers): **Shift + click** a destination in the `/station` menu to open a **54-slot chest**. Close it, then click **[ENVOYER]** in chat (fee: arrival fare ×5): a **chest minecart** leaves on its own and follows the rails, **slowly** (**4 min** under 1,000 blocks, **8 min** up to 3,000, **12 min** up to 5,000, **15 min** up to 10,000, **20 min** beyond). It isn't a real minecart: its position is computed from the clock, it is only visible near players and survives restarts. On arrival, items useful for the next Age are **donated automatically** if the station is yours; the rest is collected with `/station fret recuperer` at that station. Two convoys per guild at most.
+- **🏹 Attacking a convoy**: when a convoy crosses the territory of a guild with **no treaty** with the sender, its members hit it (**25 hits**) to **loot** it: the loot spills on the rails. Both guilds are warned at each border crossed. *Convoy looter* and *Freight king* achievements.
 - **Building a station**: an officer places a sign with `[Gare]` on line 1 and the station name on line 2, within 2 blocks of a rail. Requires Age 2, 500 coins from the bank, and no more than 6 stations per guild.
 
 ---
@@ -310,7 +329,26 @@ The rail network lets you **teleport from station to station**, as long as a **c
 | 🌑 Blood Moon | 10 min | More monsters, bounties ×2 |
 | ☄ Meteor Shower | 3 min | Ore blocks fall from the sky near players |
 | 🧙 Black Market | 5 min | A merchant offers 3 randomly picked rare items, **32 to 128 diamonds** each. **Each offer is locked after a single purchase** and each player can only buy **one thing** |
-| ☠ World Boss | 15 min | The *Lord of Ashes*: 1,000 coins shared by damage dealt (at least 10% of the damage, 400 coins max per player), and for the top fighter 3 diamonds + a 20% chance of a Nether Star |
+| ☠ World Boss | 15 min | A **different boss every week** (see below): 1,000 coins shared by damage dealt (at least 10% of the damage, 400 coins max per player), and for the top fighter 3 diamonds + a 20% chance of a Nether Star |
+
+### ☠ The world boss in detail
+
+- **One boss a week**: *Lord of Ashes* (forge, +25% damage from **Dwarves**), *Forest Guardian* (woodland beast, +25% from **Rangers**) or *Ice Queen* (+25% from **Blacksmiths**).
+- **Countdown**: **2 minutes** before it wakes, a full-screen title and a **horn** warn everyone; the message gives the **distance and direction** from your position, not a rough area. Reminder 30 s before.
+- **Scaled difficulty**: HP = **300 per player** within 150 blocks when it wakes (400 to 1,000 HP), damage 8 + 2 per player.
+- **Three phases** (the bar changes color): at **75%** it summons **spectral guards**, at **50%** it casts a **shockwave** (an 11-block circle that throws you), at **25%** it **enrages** (faster, stronger, more frequent attacks).
+- **Telegraphed attacks**: before every area hit, a **particle circle** appears on the ground for **3 seconds**: get out!
+- **Heroic mode**: after the server's first victory, the boss is heroic one time in two (HP ×1.5, damage ×1.3, prize pool ×1.5, more diamonds); *Heroic legend* achievement.
+- **Guild bonus**: the top fighter's guild receives **500 coins** in its bank, and its name is engraved in the website's **Pantheon**.
+- Settings: `events.boss.*`.
+
+### ⚖ Guild Court (`/vote`)
+
+Every **Monday**, guild members vote with `/vote` (clickable list) on a **rule for the following week** (Tuesday to Monday). Each guild weighs one vote (its choice = the option most voted by its members); ties are broken by number of voters. Rules: **Toll tax** (rail tolls ×2), **Building bonus** (claims -25%), **Free market** (no Auction House tax), **Open hunt** (monster bounties +25%), **Extended truce** (see below). The verdict is announced and written in the journal.
+
+### 🕊 Weekly truce
+
+On **Friday and Saturday at 9 pm**, **one hour with no PvP** (hits, arrows, harmful potions) for everyone; honor duels are exempt. Adjustable in `truce.*` (days, time, length). With the "Extended truce" rule it also starts on Thursday and lasts twice as long.
 
 ### Seasons
 
@@ -361,6 +399,8 @@ The `/cosmetique` menu has one tab per slot; locked cosmetics say how to get the
 
 ### 📰 War journal and achievements
 
+*New hard achievements*: **land area** (16, 32, 64, 128, 256, 512, 1,024 and 2,048 claimed chunks), Heroic legend, Weapons master (10 duels), All or nothing, Archi-technician, Siege master, Shareholder, Freight king, Convoy looter, Tavern keeper.
+
 `/journal` sums up the latest big events (raids, conquests, treaties, betrayals, Ages, events). `/succes` lists your **26 achievements** (first profession, conqueror, traitor, master spy, four seasons…) and the share of players who have them. An achievement held by fewer than 10 % of players is **rare** and announced in the journal.
 
 ### ⚔ PvP combat
@@ -394,6 +434,34 @@ A blow that would **kill** a player from another guild **captures** them instead
 
 With no decision, they are executed. Logging out while captive counts as dying. After release, they can't be captured again for 10 minutes.
 
+**Prison cell**: an officer aims at a block on their territory and types `/rancon cellule` (`/rancon cellule retirer`). The captive is then **teleported** there during the ransom (and brought back to their capture point afterwards). Their allies (same guild or treaty) can **free** them by acting 15 times on the cell block (right or left click); remember to close the cell!
+
+### 🗡 Honor duels and bets (`/duel`, `/pari`)
+
+- `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world; their **inventory, health and position are saved** then returned at the end (even after a crash, when they reconnect).
+- **Nobody dies**: the deciding blow ends the fight. The winner takes the opponent's stake. A duel **triggers no rivalry, betrayal, capture or combat tag**, and is not stopped by the truce. 5 minutes at most (draw after that, stakes returned); quitting = losing.
+- `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 5,000 coins) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded.
+
+### 🍺 Taverns (`/taverne`)
+
+The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunks of their territory (never the Nexus chunk) as **neutral zones** with `/taverne declarer` (`/taverne retirer`). Inside, **PvP, ranged weapons and offensive potions are disabled**. `/taverne` opens a **coin flip** (click interface): bet 10 to 1,000 coins against the **owning guild's bank** (47% chance to win, stake doubled); the bank must be able to cover the bet. *Tavern keeper* achievement.
+
+### 📈 The stock exchange (`/bourse`)
+
+From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1,000 shares). **Outside** players buy shares (`/bourse acheter <guild> <shares>`, price = 10 + bank ÷ 1,000; 100 shares per player, 49% of the capital at most) and sell them back to the guild at 90% of the price. Every 6 hours, **20% of the guild's profit** (rise of its bank: sales, raid bounties, donations) is paid to shareholders **pro rata to their shares**. `/bourse` lists listed guilds, `/bourse portefeuille` your shares. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement.
+
+### ⚔ Formal wars: sieges (`/siege`)
+
+An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk next to theirs) with `/siege declarer <guild> <day> <hour>` (e.g. `samedi 21`): **24 hours' notice**, 500 coins fee from the bank, a one-hour slot that can't overlap the truce, impossible under a treaty. The target can **cancel the siege by destroying the banner** before the time (and keeps the fee). During the slot, members of the besieging guild can **tear down the enemy Nexus with pickaxes or heavy weapons**: damage ×2, even with no defender present, without buying a horde. **Victory** if the Nexus falls or 40% of its max HP is dealt: 10% of the loser's bank (3,000 max) is looted. Otherwise the defender keeps the fee. `/siege liste` shows sieges, `/siege annuler` gives up (half the fee refunded). History in the website Pantheon. *Siege master* achievement.
+
+### 🔱 Atlanteans
+
+The **Atlantean** specialization (see the table above) requires a Nexus **in the water**: place it against a water block (water around it is then allowed for this specialization). Members get all the underwater perks **while in water** and suffer **Slowness I on dry land**.
+
+### 🗳 Website elections and Pantheon
+
+Every week the community elects on the website (`/votes`) the most **clueless**, the **biggest**, the **funniest** and the most **annoying** player. To vote: click "Revendiquer ce pseudo" (on your profile or the votes page); the site shows a **code** (`ESI-XXXX`) to **type in the game chat** with that account (the message isn't broadcast); a **cookie** (random token, HttpOnly, 90 days) then recognizes your browser. One vote per category, changeable, never for yourself. The week's winners are announced in chat and shown in the **Pantheon** (`/pantheon`), along with slain bosses, sieges and the Court rule.
+
 ### ⚖ Balance: revenge and catch-up
 
 - **Revenge**: the guild that loses a raid gets **24 h of hordes at -50%** against its victor.
@@ -417,6 +485,8 @@ The server has a public website: **`http://<server-address>/`**, which updates i
 | Diplomacy (*Diplomatie*) | Network of alliances, pacts, vassalages and rivalries, rivalry heat map |
 | Museum (*Musée*) | Guild trophies, every achievement with its rarity, latest unlocks |
 | Ages (*Âges*) | Timeline on a real time axis (guilds can be hidden one by one) and each guild's requirements for the next Age |
+| Pantheon (*Panthéon*) | Slain bosses (with the guild engraved), sieges, Court rule, week's titles |
+| Votes | Weekly elections (claim your username with a code typed in chat) |
 | Guide | All the rules, with a search box |
 
 Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
@@ -437,7 +507,8 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/guild info [name]` | Guild details |
 | `/guild claim` · `/guild unclaim` · `/guild claim show` | Claim · give up a chunk · show borders |
 | `/guild spec` | Pick the specialization |
-| `/guild nexus place` · `/nexus traps` | Place the Nexus · buy traps |
+| `/guild nexus place` · `/nexus` | Place the Nexus · defense tech tree |
+| `/nexus sacrifice` · `/nexus gamble` | Sacrifice a resource to the Nexus · Russian roulette (leader) |
 | `/guild annex <join\|decline>` | After a defeat: join the winner or leave |
 | `/guild bank <amount>` | Deposit into the guild bank |
 | `/age` | Age progression and donations |
@@ -459,6 +530,14 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |
 | `/cosmetique` | Cosmetics menu (auras, trails, victory effects): earn them or buy them |
 | `/hub` | Go back to the hub (blocked during PvP combat) |
+| `/vote [number]` | Guild Court: vote the week's rule (Mondays) |
+| `/duel <player> [stake]` · `/duel accepter\|refuser` | Honor duel in a neutral arena |
+| `/pari <side> <amount>` | Bet on a raid or a duel (spectators) |
+| `/taverne [declarer\|retirer]` | Neutral zone and coin flip |
+| `/bourse [ouvrir\|acheter\|vendre\|portefeuille]` | Guild shares (Age 4) |
+| `/siege [declarer <guild> <day> <hour>\|liste\|annuler]` | Formal war |
+| `/rancon cellule` | Designate your guild's prison cell |
+| `/station fret [confirmer\|annuler\|recuperer]` | Freight train |
 
 ---
 

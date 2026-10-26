@@ -1,7 +1,6 @@
 package fr.esicraft.command;
 
 import fr.esicraft.EsicraftPlugin;
-import fr.esicraft.gui.NexusTrapGUI;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.guild.GuildRole;
 import fr.esicraft.nexus.Nexus;
@@ -27,7 +26,13 @@ public class NexusCommand implements CommandExecutor {
          } else if (args.length <= 0 || !args[0].equalsIgnoreCase("place")) {
             Nexus nexus = guild.getNexus();
             if (nexus != null && nexus.isAlive()) {
-               if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
+               if (args.length > 0 && args[0].equalsIgnoreCase("gamble")) {
+                  this.plugin.getNexusGamble().attempt(player, guild);
+                  return true;
+               } else if (args.length > 0 && args[0].equalsIgnoreCase("sacrifice")) {
+                  this.plugin.getNexusTech().sacrifice(player, guild);
+                  return true;
+               } else if (args.length > 0 && args[0].equalsIgnoreCase("info")) {
                   ChatUtil.sendRaw(player, "&8&m----------------------------------------");
                   ChatUtil.sendRaw(player, "  &5&lCœur de Guilde (Nexus) :");
                   ChatUtil.sendRaw(
@@ -50,11 +55,11 @@ public class NexusCommand implements CommandExecutor {
                         )
                   );
                   ChatUtil.sendRaw(player, "  &7Spécialisation : " + guild.getSpecialization().getDisplayName());
-                  ChatUtil.sendRaw(player, "  &7Pièges armés : &a" + nexus.getActiveTraps().size() + " / 5 actifs");
+                  ChatUtil.sendRaw(player, "  &7Niveau du Nexus : &d" + this.plugin.getNexusTech().level(guild.getId()) + " &7(" + this.plugin.getNexusTech().xp(guild.getId()) + " XP) — défenses débloquées : &a" + this.plugin.getNexusTech().unlockedCount(guild) + " / " + fr.esicraft.nexus.NexusTech.totalNodes());
                   ChatUtil.sendRaw(player, "&8&m----------------------------------------");
                   return true;
                } else {
-                  NexusTrapGUI.open(player, this.plugin);
+                  this.plugin.getNexusTech().openGui(player);
                   return true;
                }
             } else {

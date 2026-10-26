@@ -30,6 +30,7 @@ public class AchievementManager {
    public static final String STAT_TRIPS = "trips";
    public static final String STAT_HELPS = "helps";
    public static final String STAT_SEASONS = "seasons_seen";
+   public static final String STAT_DUELS = "duels_won";
 
    private final EsicraftPlugin plugin;
    private final Map<UUID, Map<Achievement, Long>> unlocked = new ConcurrentHashMap<>();

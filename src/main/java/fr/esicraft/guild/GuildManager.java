@@ -196,6 +196,8 @@ public class GuildManager {
          this.guildsById.remove(guild.getId());
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
+         this.plugin.getBourse().onGuildDisbanded(guild.getId());
+         this.plugin.getNexusTech().onGuildDisbanded(guild.getId());
          for (UUID memberUuid : guild.getMembers().keySet()) {
             Player online = Bukkit.getPlayer(memberUuid);
             if (online != null) {
@@ -442,6 +444,9 @@ public class GuildManager {
          }
 
          cost *= this.plugin.getSynergy().claimCostMultiplier(guild);
+         if (this.plugin.getCourt() != null && this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.BUILD_BONUS)) {
+            cost *= 0.75;
+         }
 
          return cost;
       }
@@ -616,6 +621,7 @@ public class GuildManager {
                   double nextCost = this.calculateNextClaimCost(guild);
                   ChatUtil.sendMessage(player, "&a✔ Chunk revendiqué avec succès pour votre guilde ! (&7X: " + chunk.getX() + ", Z: " + chunk.getZ() + "&a)");
                   this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.FIRST_CLAIM);
+                  this.grantClaimAchievements(guild);
                   ChatUtil.sendMessage(
                      player,
                      "&7• Coût prélevé (Banque) : &6"
@@ -638,6 +644,21 @@ public class GuildManager {
          }
       } else {
          return false;
+      }
+   }
+
+   /** Succès de superficie : 16, 32, 64 … 2048 chunks, accordés à tous les membres de la guilde. */
+   private void grantClaimAchievements(Guild guild) {
+      int size = guild.getClaimedChunks().size();
+      for (fr.esicraft.life.Achievement a : fr.esicraft.life.Achievement.values()) {
+         if (a.name().startsWith("CLAIMS_")) {
+            try {
+               if (size >= Integer.parseInt(a.name().substring(7))) {
+                  this.plugin.getAchievements().grantGuild(guild, a, false);
+               }
+            } catch (NumberFormatException ignored) {
+            }
+         }
       }
    }
 
@@ -782,6 +803,11 @@ public class GuildManager {
                ChatUtil.sendMessage(player, "&cLa composition actuelle de votre guilde ne respecte pas les contraintes de cette spécialisation !");
                return false;
             } else {
+               if (spec == GuildSpecialization.ATLANTEAN && guild.hasNexus() && !fr.esicraft.nexus.NexusManager.isSubmerged(guild.getNexus().getLocation())) {
+                  ChatUtil.sendMessage(player, "&c❌ Les Atlantes exigent un Nexus immergé dans l'eau : le vôtre est à sec.");
+                  return false;
+               }
+
                if (spec == GuildSpecialization.LONE_RANGER) {
                   if (guild.getMembers().size() != 1) {
                      ChatUtil.sendMessage(player, "&c❌ La spécialisation Rôdeur Solitaire exige d'être strictement le seul membre de la guilde !");

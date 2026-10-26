@@ -77,7 +77,7 @@ public class AlliedProtectionListener implements Listener {
       }
 
       Player attacker = fr.esicraft.combat.CombatManager.attackerOf(event.getDamager());
-      if (attacker != null && !attacker.equals(victim) && this.plugin.getTreatyManager().blocksRecruitAggression(
+      if (attacker != null && !attacker.equals(victim) && !this.plugin.getDuels().inDuelWith(attacker, victim) && this.plugin.getTreatyManager().blocksRecruitAggression(
          this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId()), attacker)) {
          event.setCancelled(true);
          fr.esicraft.util.ChatUtil.sendActionbar(attacker, "&c❌ Une recrue ne peut pas attaquer une guilde liée à la sienne par un traité.");
@@ -97,7 +97,7 @@ public class AlliedProtectionListener implements Listener {
          attacker = p;
       }
 
-      if (attacker == null || attacker.equals(victim)) {
+      if (attacker == null || attacker.equals(victim) || this.plugin.getDuels().inDuelWith(attacker, victim)) {
          return;
       }
 
@@ -118,7 +118,7 @@ public class AlliedProtectionListener implements Listener {
          attacker = p;
       }
 
-      if (attacker == null || attacker.equals(victim)) {
+      if (attacker == null || attacker.equals(victim) || this.plugin.getDuels().inDuelWith(attacker, victim)) {
          return;
       }
 

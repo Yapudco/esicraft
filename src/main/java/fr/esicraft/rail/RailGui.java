@@ -120,6 +120,7 @@ public final class RailGui {
       lore.add("");
       lore.add("&eTotal : &6" + String.format(Locale.ROOT, "%.2f", quote.total()) + " pièces");
       lore.add("&a▶ Clic pour voyager");
+      lore.add("&6🚂 Maj + clic : envoyer un convoi de fret (Âge 2)");
       return new ItemBuilder(Material.MINECART).name("&e" + dest.getName()).lore(lore).build();
    }
 

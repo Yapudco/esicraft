@@ -11,7 +11,6 @@ import fr.esicraft.gui.holder.GuildMainHolder;
 import fr.esicraft.gui.holder.GuildSpecHolder;
 import fr.esicraft.gui.holder.MarketMainHolder;
 import fr.esicraft.gui.holder.MercenaryHordeHolder;
-import fr.esicraft.gui.holder.NexusTrapHolder;
 import fr.esicraft.gui.holder.RaceSelectHolder;
 import fr.esicraft.gui.holder.RaceShowHolder;
 import fr.esicraft.gui.holder.RaidTargetHolder;
@@ -85,7 +84,7 @@ public class GUIListener implements Listener {
                   if (slot == 20) {
                      GuildSpecGUI.open(player, this.plugin);
                   } else if (slot == 22) {
-                     NexusTrapGUI.open(player, this.plugin);
+                     this.plugin.getNexusTech().openGui(player);
                   } else if (slot == 31) {
                      this.plugin.getClaimVisualizerManager().toggleVisualizer(player);
                      player.closeInventory();
@@ -101,6 +100,7 @@ public class GUIListener implements Listener {
                         case 22 -> GuildSpecialization.MERCHANT_SYNDICATE;
                         case 23 -> GuildSpecialization.ARCANE_CONCLAVE;
                         case 24 -> GuildSpecialization.LONE_RANGER;
+                        case 25 -> GuildSpecialization.ATLANTEAN;
                         default -> null;
                      };
                      if (targetSpec != null) {
@@ -275,82 +275,6 @@ public class GUIListener implements Listener {
                      }
                   }
                } else if (!(holder instanceof AnnexationChoiceHolder)) {
-                  if (holder instanceof NexusTrapHolder) {
-                     Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
-                     if (guild == null || !guild.hasNexus()) {
-                        return;
-                     }
-
-                     if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
-                        ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent acheter des pièges de Nexus.");
-                        ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
-                        return;
-                     }
-
-                     Nexus nexus = guild.getNexus();
-
-                     NexusTrapType targetTrap = switch (slot) {
-                        case 11 -> NexusTrapType.INFERNAL_FLAMES;
-                        case 12 -> NexusTrapType.SLOWDOWN_WEB;
-                        case 13 -> NexusTrapType.LIGHTNING_STRIKE;
-                        case 14 -> NexusTrapType.POISON_MIST;
-                        case 15 -> NexusTrapType.GUARDIAN_GOLEM;
-                        default -> null;
-                     };
-                     if (targetTrap != null) {
-                        if (nexus.hasTrap(targetTrap)) {
-                           ChatUtil.sendMessage(player, "&aCe piège est déjà armé pour la prochaine horde !");
-                           ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_YES, 1.0F, 1.0F);
-                           return;
-                        }
-
-                        double cost = targetTrap.getBaseCost();
-                        if (guild.getSpecialization() == GuildSpecialization.UNDERGROUND_INDUSTRY) {
-                           cost *= 0.5;
-                        }
-
-                        cost *= this.plugin.getSynergy().trapCostMultiplier(guild);
-
-                        PlayerData pData = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
-                        boolean paid = false;
-                        if (this.plugin.getGuildManager().officerMaySpend(guild, player, cost) && guild.withdrawBank(cost)) {
-                           paid = true;
-                           ChatUtil.sendMessage(player, "&aCoût de &6" + String.format("%.2f", cost) + " pièces &adébité de la banque de guilde.");
-                        } else {
-                           if (pData == null || !(pData.getCoins() >= cost)) {
-                              ChatUtil.sendMessage(
-                                 player,
-                                 "&cSolde insuffisant dans la banque de guilde et sur votre compte (&6" + String.format("%.2f", cost) + " pièces requises&c)."
-                              );
-                              ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
-                              return;
-                           }
-
-                           if (this.plugin.getCombatManager().denySpending(player)) {
-                              return;
-                           }
-
-                           pData.removeCoins(cost);
-                           this.plugin.getDataManager().savePlayer(pData);
-                           paid = true;
-                           ChatUtil.sendMessage(player, "&aCoût de &6" + String.format("%.2f", cost) + " pièces &adébité de votre solde personnel.");
-                        }
-
-                        if (paid) {
-                           nexus.addTrap(targetTrap);
-                           if (targetTrap == NexusTrapType.GUARDIAN_GOLEM && nexus.getLocation() != null && nexus.getLocation().getWorld() != null) {
-                              this.plugin.getNexusManager().removeGuardians(guild, nexus.getLocation());
-                              this.plugin.getNexusManager().spawnGuardian(guild, nexus.getLocation());
-                           }
-
-                           this.plugin.getDataManager().saveGuild(guild);
-                           ChatUtil.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-                           ChatUtil.sendActionbar(player, "&a✨ Piège " + targetTrap.getDisplayName() + " &aarmé pour la prochaine horde !");
-                           NexusTrapGUI.open(player, this.plugin);
-                        }
-                     }
-                  }
-
                   if (holder instanceof RaceShowHolder showHolder) {
                      if (slot == 45) {
                         if (showHolder.getPage() > 1) {

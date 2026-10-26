@@ -51,6 +51,12 @@ public class RailGuiListener implements Listener {
          int index = holder.page * RailGui.PAGE_SIZE + slot;
          if (index < holder.trips.size()) {
             RailSearch.Reached trip = holder.trips.get(index);
+            if (event.isShiftClick()) {
+               player.closeInventory();
+               this.plugin.getFreight().openLoading(player, holder.result, trip);
+               return;
+            }
+
             player.closeInventory();
             Double shown = holder.shown.get(trip);
             this.plugin.getRailManager().travel(player, trip, shown == null ? -1.0 : shown);

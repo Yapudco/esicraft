@@ -27,7 +27,24 @@ public enum Achievement {
    SPY("🕵", "Maître espion", "Se déguiser en membre d'une autre guilde", false),
    SAVIOR("🆘", "Sauveur", "Répondre à l'appel à l'aide d'un allié et repousser la horde", false),
    FOUR_SEASONS("🍂", "Quatre saisons", "Jouer pendant les quatre saisons naturelles", false),
-   CHAMPION("🏆", "Champion", "Gagner une saison avec sa guilde", true);
+   CHAMPION("🏆", "Champion", "Gagner une saison avec sa guilde", true),
+   CLAIMS_16("🗺", "Arpenteur", "Posséder 16 chunks revendiqués avec sa guilde", false),
+   CLAIMS_32("🗺", "Cartographe", "Posséder 32 chunks revendiqués avec sa guilde", false),
+   CLAIMS_64("🗺", "Bâtisseur de frontières", "Posséder 64 chunks revendiqués avec sa guilde", false),
+   CLAIMS_128("🗺", "Seigneur foncier", "Posséder 128 chunks revendiqués avec sa guilde", true),
+   CLAIMS_256("🗺", "Baron des terres", "Posséder 256 chunks revendiqués avec sa guilde", true),
+   CLAIMS_512("🗺", "Duc des provinces", "Posséder 512 chunks revendiqués avec sa guilde", true),
+   CLAIMS_1024("🗺", "Empereur des horizons", "Posséder 1024 chunks revendiqués avec sa guilde", true),
+   CLAIMS_2048("🗺", "Maître du monde", "Posséder 2048 chunks revendiqués avec sa guilde", true),
+   HEROIC_SLAYER("☠", "Légende héroïque", "Être le meilleur combattant contre un boss héroïque", true),
+   DUEL_MASTER("🗡", "Maître d'armes", "Remporter 10 duels d'honneur", false),
+   NEXUS_GAMBLER("🎰", "Tout pour le tout", "Gagner la roulette russe du Nexus", true),
+   TECH_MASTER("🔬", "Archi-technicien", "Débloquer toutes les défenses de l'arbre technologique du Nexus", true),
+   SIEGE_VICTOR("🏴", "Maître du siège", "Remporter une guerre formelle (siège)", true),
+   SHAREHOLDER("📈", "Actionnaire", "Posséder des parts d'une guilde cotée en bourse", false),
+   FREIGHT_RUNNER("🚂", "Roi du fret", "Livrer un train de fret à destination", false),
+   CONVOY_RAIDER("🏹", "Pilleur de convois", "Piller le train de fret d'une autre guilde", true),
+   CHAMPION_TAVERN("🍺", "Tavernier", "Déclarer une taverne (zone neutre)", false);
 
    private final String icon;
    private final String title;

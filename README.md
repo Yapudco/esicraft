@@ -136,13 +136,14 @@ Le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à 
 | 💰 **Syndicat Marchand** (commerce) | Seule guilde à pouvoir commercer avec les villageois avant l'Âge 4 · +20 % sur les primes de monstres (dont 10 % versés à la banque) · aucune taxe à l'Hôtel des Ventes | Aucun Arcaniste · raids 30 % plus chers · pas de bonus de combat · Nexus -20 % de vie |
 | 🔮 **Conclave Arcanique** (magie) | Nexus +25 % de vie · enchantements et enclume 2× moins chers en XP · potions d'un niveau au-dessus · enchantements boostés (IV devient V, V devient VI) · le Nexus tire un rayon sur l'attaquant le plus proche (1 cœur toutes les 2 s) · -50 % de dégâts magiques | -2 cœurs de vie · terres 50 % plus chères · 1 Forgeron et 1 Nain maximum · les enchantements boostés sont perdus si on change de spécialisation |
 | 🏹 **Rôdeur Solitaire** (seul) | Vitesse I permanente · armures en Netherite et enchantements dès l'Âge 3 | Un seul membre, Rôdeur, qui n'a jamais été dans une autre guilde · aucun coffre sur ses terres · Nexus limité à 2 500 PV |
+| 🔱 **Atlante** (océan) | **Dans l'eau** : respiration aquatique, vision nocturne, agilité aquatique, grâce du dauphin et Résistance | **Nexus obligatoirement immergé** (au moins un bloc d'eau contre lui ; l'eau est alors autorisée autour) · **Lenteur hors de l'eau** |
 
 > [!IMPORTANT]
 > Le premier choix est immédiat. Ensuite, on ne peut changer de spécialisation **que lorsqu'un nouveau joueur** (jamais passé par la guilde) la rejoint.
 
 ---
 
-## 💎 5. Le Nexus et ses pièges
+## 💎 5. Le Nexus et ses défenses
 
 Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/guild nexus place` (une seule fois : impossible de le reposer pour remettre sa vie à 100 %). **S'il est détruit, ta guilde perd tout** (voir [les raids](#️-6-les-raids-hordes-de-monstres)).
 
@@ -156,17 +157,33 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 **Le soigner** : un membre jette une **pomme dorée** dessus (ou fait un clic droit avec) : +500 PV, ou +2 500 PV avec une pomme dorée enchantée. Il faut attendre 30 secondes entre deux soins, et c'est impossible pendant un raid ou dans les 2 minutes qui suivent une attaque de joueurs.
 
-### Les pièges (`/nexus traps`)
+### L'arbre technologique du Nexus (`/nexus`)
 
-Payés par la banque de guilde, ils restent armés (même après un redémarrage) jusqu'à la **fin de la prochaine horde** : il faut ensuite les racheter. Ils visent les monstres et les **intrus** présents sur vos terres, jamais les membres, les alliés (traité), ni les joueurs en créatif ou spectateur.
+Le Nexus gagne de l'**expérience** à chaque horde repoussée (+200) et quand on lui **sacrifie des ressources** (`/nexus sacrifice`, objet en main, à moins de 10 blocs : charbon, fer, or, diamant, émeraude, netherite, perle d'Ender, bâton de blaze… ; plafond de 3 000 XP par jour). Il monte ainsi du niveau 1 au niveau 6 (0, 300, 900, 2 000, 4 500, 9 000 XP).
 
-| Piège | Prix | Effet |
-| :--- | :--- | :--- |
-| 🔥 Brasier Infernal | 250 | À moins de 8 blocs : 1 cœur de dégâts toutes les 2 s et brûlure |
-| 🕸️ Toile d'Entravement | 200 | Lenteur II à moins de 10 blocs |
-| ⚡ Foudre de Riposte | 350 | Foudroie quiconque frappe le Nexus : 4 cœurs, au plus un éclair toutes les 5 s par joueur |
-| 🧪 Brume Toxique | 300 | Poison I à moins de 8 blocs (le poison ne tue jamais, il affaiblit) |
-| 🤖 Automate Gardien | 500 | Un golem de fer attaque les ennemis ; il est reconstruit 5 min après sa mort |
+Au lieu d'acheter des pièges jetables, les officiers **débloquent** les défenses dans `/nexus` (l'arbre technologique) : il faut le niveau requis, la défense « parente » déjà débloquée, des **objets à sacrifier** pris dans l'inventaire, et, pour les défenses « vivantes », avoir **ramené puis tué le mob correspondant dans le chunk du Nexus**. Une défense débloquée est **permanente** (elle n'est plus consommée par les hordes) ; l'Industrie Souterraine paie moitié moins d'objets. Elles visent les monstres et les **intrus**, jamais les membres, les alliés (traité) ni les joueurs en créatif ou spectateur.
+
+| Défense | Niv. | Prérequis | Effet |
+| :--- | :---: | :--- | :--- |
+| 🔥 Brasier Infernal | 1 | 64 charbon, 16 silex | À moins de 8 blocs : 1 cœur de dégâts toutes les 2 s et brûlure |
+| 🕸️ Toile d'Entravement | 1 | 128 ficelles, 16 boules de slime | Lenteur II à moins de 10 blocs |
+| ⚡ Foudre de Riposte | 2 | Brasier · 96 cuivre, 64 redstone | Foudroie quiconque frappe le Nexus (4 cœurs, un éclair toutes les 5 s par joueur) |
+| 🤖 Automate Gardien | 2 | **Tuer un golem de fer dans le chunk** · 8 blocs de fer, 32 redstone | Un golem de fer attaque les ennemis ; reconstruit 5 min après sa mort |
+| 🧪 Brume Toxique | 2 | Toile · 48 yeux d'araignée, 16 slime | Poison I à moins de 8 blocs (il ne tue jamais) |
+| 🔥 Tir de Blaze | 3 | Brasier · **tuer un blaze** · 24 bâtons de blaze, 32 or | Jusqu'à 3 boules de feu toutes les 5 s |
+| 🐡 Tir de Gardien | 3 | Foudre · **tuer un gardien** · 64 éclats + 32 cristaux de prismarine | Rayon aquatique (dégâts + lenteur) toutes les 4 s |
+| 🐝 Essaim d'abeilles | 3 | Brume · **tuer une abeille** · 32 rayons de miel, 8 fioles de miel | Jusqu'à 6 abeilles enragées qui piquent les ennemis |
+| 🪄 Tir d'Évocateur | 4 | Golem · **tuer un évocateur** · 64 émeraudes, 1 totem | Crocs magiques : 6 dégâts de zone toutes les 9 s |
+| 🟪 Tir de Shulker | 4 | Gardien · **tuer un shulker** · 8 carapaces, 16 perles | Projectile guidé + lévitation toutes les 6 s |
+| 👻 Tir de Ghast | 5 | Blaze · **tuer un ghast** · 8 larmes, 128 poudres à canon | Boule de feu de zone (8 dégâts, sans casser de blocs) toutes les 14 s |
+| 👁 Tir du Warden | 5 | Évocateur · **tuer un warden** · 8 éclats d'écho, 4 catalyseurs | Onde sonique : 10 dégâts et repoussée toutes les 15 s |
+| 🌊 Malédiction de l'Ancien | 6 | Gardien · **tuer un gardien ancien** · 128 briques de prismarine, 8 coquilles de nautile | Fatigue de minage III et dégâts à tous les ennemis proches toutes les 25 s |
+
+Tout débloquer rapporte le succès *Archi-technicien*. Réglages : `nexus.tech.*` (coût, dégâts, XP).
+
+### 🎰 Roulette russe du Nexus (`/nexus gamble`)
+
+Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par 24 h, impossible pendant un raid) : **50 %** le Nexus gagne **+1 000 PV max** et **2 000 pièces** vont à la banque ; **50 %** il perd **1 500 PV** (il survit toujours à 1 PV) et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
 
 ---
 
@@ -294,6 +311,8 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 - **Voyager** : près d'une gare (panneau `[Gare]`), tape `/station` et choisis ta destination.
 - **Prix** : 1 pièce pour la guilde de la gare d'arrivée, plus le **péage** de chaque guilde dont tu traverses les terres. Ta propre guilde et ses alliés ne font pas payer.
 - **Gérer son réseau** (`/rail`, officiers) : fixer son péage (**réservé aux guildes Syndicat Marchand** ; les autres guildes ne font jamais payer), et pour chaque autre guilde choisir **Normale**, **Alliée** (gratuit) ou **Bannie** (les lignes qui passent chez vous lui sont coupées).
+- **📦 Train de fret** (Âge 2 minimum, officiers) : **Maj + clic** sur une destination du menu `/station` ouvre un **coffre de 54 emplacements**. Fermez-le, puis cliquez sur **[ENVOYER]** dans le chat (frais : tarif d'arrivée ×5) : un **wagonnet à coffre** part tout seul et suit le tracé des rails, **lentement** (**4 min** sous 1 000 blocs, **8 min** jusqu'à 3 000, **12 min** jusqu'à 5 000, **15 min** jusqu'à 10 000, **20 min** au-delà). Ce n'est pas un vrai wagonnet : sa position est calculée à partir de l'heure, il n'est visible que près des joueurs et survit aux redémarrages. À l'arrivée, les objets utiles à l'Âge suivant sont **donnés automatiquement** si la gare est à vous ; le reste se récupère avec `/station fret recuperer` dans la gare. Deux convois par guilde au plus.
+- **🏹 Attaquer un convoi** : quand un convoi traverse le territoire d'une guilde **sans traité** avec l'expéditeur, ses membres le frappent (**25 coups**) pour le **piller** : le butin tombe sur les rails. Les deux guildes sont prévenues à chaque frontière franchie. Succès *Pilleur de convois* et *Roi du fret*.
 - **Construire une gare** : un officier pose un panneau avec `[Gare]` sur la 1re ligne et le nom de la gare sur la 2e, à moins de 2 blocs d'un rail. Il faut être à l'Âge 2, payer 500 pièces avec la banque, et pas plus de 6 gares par guilde.
 
 ---
@@ -307,7 +326,26 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 | 🌑 Lune de sang | 10 min | Plus de monstres, primes ×2 |
 | ☄ Pluie de météorites | 3 min | Des blocs de minerai tombent du ciel près des joueurs |
 | 🧙 Marché noir | 5 min | Un marchand propose 3 objets rares tirés au hasard, de **32 à 128 diamants** chacun. **Chaque offre est verrouillée après un seul achat** et chaque joueur ne peut acheter qu'**une seule chose** |
-| ☠ Boss mondial | 15 min | Le *Seigneur des Cendres* : 1 000 pièces partagées selon les dégâts (au moins 10 % des dégâts, 400 pièces max par joueur), et pour le meilleur 3 diamants + 20 % de chance d'une Étoile du Nether |
+| ☠ Boss mondial | 15 min | Un **boss différent chaque semaine** (voir ci-dessous) : 1 000 pièces partagées selon les dégâts (au moins 10 % des dégâts, 400 pièces max par joueur), et pour le meilleur 3 diamants + 20 % de chance d'une Étoile du Nether |
+
+### ☠ Le boss mondial en détail
+
+- **Un boss par semaine** : *Seigneur des Cendres* (forge, +25 % de dégâts des **Nains**), *Gardien de la Forêt* (bête sylvestre, +25 % des **Rôdeurs**) ou *Reine des Glaces* (+25 % des **Forgerons**).
+- **Compte à rebours** : **2 minutes** avant l'éveil, un titre plein écran et un **cor** préviennent tout le monde ; le message donne la **distance et la direction** depuis votre position, pas une zone approximative. Rappel 30 s avant.
+- **Difficulté adaptée** : PV = **300 par joueur** à moins de 150 blocs au moment de l'éveil (400 à 1 000 PV), dégâts de 8 + 2 par joueur.
+- **Trois phases** (barre de couleur différente) : à **75 %** il invoque des **gardes spectraux**, à **50 %** il lance une **onde de choc** (cercle de 11 blocs qui projette), à **25 %** il **s'enrage** (plus rapide, plus fort, attaques plus fréquentes).
+- **Attaques télégraphiées** : avant chaque coup de zone, un **cercle de particules** apparaît au sol pendant **3 secondes** : sortez-en !
+- **Mode héroïque** : dès la première victoire du serveur, le boss est héroïque une fois sur deux (PV ×1,5, dégâts ×1,3, cagnotte ×1,5, plus de diamants) ; succès *Légende héroïque*.
+- **Bonus de guilde** : la guilde du meilleur combattant reçoit **500 pièces** dans sa banque, et son nom est gravé au **Panthéon** du site.
+- Réglages : `events.boss.*`.
+
+### ⚖ Tribunal des guildes (`/vote`)
+
+Chaque **lundi**, les membres de guilde votent avec `/vote` (liste cliquable) une **règle pour la semaine suivante** (du mardi au lundi). Chaque guilde pèse une voix (son choix = l'option la plus votée par ses membres), l'égalité se départage au nombre de votants. Règles : **Taxe de passage** (péages ferroviaires ×2), **Bonus de construction** (claims -25 %), **Marché libre** (aucune taxe à l'Hôtel des Ventes), **Chasse ouverte** (primes de monstres +25 %), **Trêve prolongée** (voir ci-dessous). Le verdict est annoncé et inscrit au journal.
+
+### 🕊 Trêve hebdomadaire
+
+Le **vendredi et le samedi à 21 h**, **une heure sans PvP** (coups, flèches, potions néfastes) pour tout le monde ; les duels d'honneur en sont exemptés. Réglable dans `truce.*` (jours, heure, durée). Avec la règle « Trêve prolongée », elle commence aussi le jeudi et dure deux fois plus longtemps.
 
 ### Saisons
 
@@ -358,6 +396,8 @@ Le menu `/cosmetique` a un onglet par emplacement ; les cosmétiques verrouillé
 
 ### 📰 Journal de guerre et succès
 
+*Nouveaux succès difficiles* : **superficie** (16, 32, 64, 128, 256, 512, 1 024 et 2 048 chunks revendiqués), Légende héroïque, Maître d'armes (10 duels), Tout pour le tout, Archi-technicien, Maître du siège, Actionnaire, Roi du fret, Pilleur de convois, Tavernier.
+
 `/journal` résume les derniers grands faits (raids, conquêtes, traités, trahisons, Âges, événements). `/succes` liste tes **26 succès** (premier métier, conquérant, traître, maître espion, quatre saisons…) et le pourcentage de joueurs qui les ont. Un succès obtenu par moins de 10 % des joueurs est **rare** et annoncé dans le journal.
 
 ### ⚔ Combat PvP
@@ -391,6 +431,34 @@ Un coup qui devrait **tuer** un joueur d'une autre guilde le **capture** à la p
 
 Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mourir. Après une libération, il ne peut pas être recapturé pendant 10 minutes.
 
+**Cellule de prison** : un officier vise un bloc de son territoire et tape `/rancon cellule` (`/rancon cellule retirer`). Le captif y est alors **téléporté** pendant la rançon (puis ramené à son point de capture). Ses alliés (même guilde ou traité) peuvent le **délivrer** en agissant 15 fois sur le bloc de la cellule (clic droit ou gauche) ; pensez à fermer la cellule !
+
+### 🗡 Duels d'honneur et paris (`/duel`, `/pari`)
+
+- `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin (même après un plantage, à la reconnexion).
+- **Personne ne meurt** : le coup décisif met fin au combat. Le vainqueur remporte la mise de l'adversaire. Un duel **ne déclenche ni rivalité, ni trahison, ni capture, ni marque de combat**, et n'est pas stoppé par la trêve. Maximum 5 minutes (match nul au-delà, mises rendues) ; abandonner = perdre.
+- `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 5 000 pièces) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé.
+
+### 🍺 Tavernes (`/taverne`)
+
+Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 2 chunks de leur territoire (jamais celui du Nexus) **zones neutres** avec `/taverne declarer` (`/taverne retirer`). Dedans, le **PvP, les armes de tir et les potions offensives sont désactivés**. `/taverne` ouvre un **pile ou face** (interface à cliquer) : on mise 10 à 1 000 pièces contre la **banque de la guilde propriétaire** (47 % de chances de gagner, mise doublée) ; la banque doit pouvoir couvrir la mise. Succès *Tavernier*.
+
+### 📈 La bourse (`/bourse`)
+
+À partir de l'**Âge 4**, le chef peut **ouvrir le capital** de sa guilde (`/bourse ouvrir`, 1 000 parts). Les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, cours = 10 + banque ÷ 1 000 ; 100 parts par joueur, 49 % du capital au plus) et les revendent à la guilde à 90 % du cours. Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de sa banque : ventes, primes de raids, dons) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` liste les guildes cotées, `/bourse portefeuille` vos actions. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*.
+
+### ⚔ Guerres formelles : les sièges (`/siege`)
+
+Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde rivale (dans un chunk voisin du sien) avec `/siege declarer <guilde> <jour> <heure>` (ex. `samedi 21`) : **24 heures de préavis**, 500 pièces de frais pris dans la banque, créneau d'une heure qui ne peut pas chevaucher la trêve, impossible sous traité. La cible peut **annuler le siège en détruisant l'Étendard** avant l'heure dite (elle empoche les frais). Pendant le créneau, les membres de la guilde assiégeante peuvent **démolir le Nexus ennemi à la pioche ou à l'arme lourde** : dégâts ×2, même sans défenseur présent, sans acheter de horde. **Victoire** si le Nexus tombe ou si 40 % de ses PV max sont infligés : 10 % de la banque du vaincu (3 000 maximum) sont pillés. Sinon le défenseur garde les frais. `/siege liste` montre les sièges, `/siege annuler` renonce (moitié des frais rendue). Historique au Panthéon du site. Succès *Maître du siège*.
+
+### 🔱 Atlantes
+
+La spécialisation **Atlante** (voir la table ci-dessus) exige un Nexus **dans l'eau** : posez-le contre un bloc d'eau (l'eau autour est alors autorisée pour cette spécialisation). Les membres ont tous les avantages sous-marins **dans l'eau** et subissent **Lenteur I sur la terre ferme**.
+
+### 🗳 Élections du site et Panthéon
+
+Chaque semaine, la communauté élit sur le site (`/votes`) le plus **débile**, le plus **gros**, le plus **drôle** et le plus **chiant**. Pour voter : cliquez « Revendiquer ce pseudo » (sur votre profil ou sur la page des votes), le site affiche un **code** (`ESI-XXXX`) à **taper dans le chat du jeu** avec ce compte (le message n'est pas diffusé) ; un **cookie** (jeton aléatoire, HttpOnly, 90 jours) reconnaît ensuite votre navigateur. Un vote par catégorie, modifiable, jamais pour soi. Les vainqueurs de la semaine sont proclamés dans le chat et affichés au **Panthéon** (`/pantheon`), avec les boss terrassés, les sièges et la règle du Tribunal.
+
 ### ⚖ Équilibre : revanche et rattrapage
 
 - **Revanche** : la guilde qui perd un raid obtient **24 h de hordes à -50 %** contre son vainqueur.
@@ -414,6 +482,8 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à 
 | Diplomatie | Réseau des alliances, pactes, vassalités et rivalités, carte des rivalités |
 | Musée | Trophées des guildes, tous les succès avec leur rareté, derniers débloqués |
 | Âges | Frise sur un vrai axe de temps (guildes masquables une à une) et prérequis du prochain Âge de chaque guilde |
+| Panthéon | Boss terrassés (avec la guilde gravée), sièges, règle du Tribunal, titres de la semaine |
+| Votes | Élections hebdomadaires (revendication du pseudo par code dans le chat) |
 | Guide | Toutes les règles, avec une recherche |
 
 Le logo du serveur s'affiche dans l'en-tête. Le site existe aussi **en anglais** : bouton **EN** / **FR** en haut à droite, ou `?lang=en` à la fin de l'adresse (le choix est retenu par le navigateur). Il réutilise le dictionnaire de `/english` (`lang/en.tsv`). Les profils affichent la **réputation** ❤, et chaque joueur y est représenté par **sa tête** (récupérée et mise en cache par le serveur).
@@ -436,7 +506,8 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/guild info [nom]` | Fiche d'une guilde |
 | `/guild claim` · `/guild unclaim` · `/guild claim show` | Prendre · abandonner un chunk · voir les bordures |
 | `/guild spec` | Choisir la spécialisation |
-| `/guild nexus place` · `/nexus traps` | Poser le Nexus · acheter des pièges |
+| `/guild nexus place` · `/nexus` | Poser le Nexus · arbre technologique des défenses |
+| `/nexus sacrifice` · `/nexus gamble` | Sacrifier une ressource au Nexus · roulette russe (chef) |
 | `/guild annex <join\|decline>` | Après une défaite : rejoindre le vainqueur ou partir |
 | `/guild bank <montant>` | Déposer dans la banque de guilde |
 | `/age` | Progression des Âges et dons |
@@ -458,6 +529,14 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
 | `/cosmetique` | Menu des cosmétiques (auras, traînées, effets de victoire) : à gagner ou à acheter |
 | `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
+| `/vote [numéro]` | Tribunal des guildes : voter la règle de la semaine (le lundi) |
+| `/duel <joueur> [mise]` · `/duel accepter\|refuser` | Duel d'honneur dans une arène neutre |
+| `/pari <camp> <montant>` | Parier sur un raid ou un duel (spectateurs) |
+| `/taverne [declarer\|retirer]` | Zone neutre et pile ou face |
+| `/bourse [ouvrir\|acheter\|vendre\|portefeuille]` | Actions de guilde (Âge 4) |
+| `/siege [declarer <guilde> <jour> <heure>\|liste\|annuler]` | Guerre formelle |
+| `/rancon cellule` | Désigner la cellule de prison de sa guilde |
+| `/station fret [confirmer\|annuler\|recuperer]` | Train de fret |
 
 ---
 

@@ -37,7 +37,7 @@ public final class RailSearch extends BukkitRunnable {
    private static final int NODES_PER_TICK = 1500;
    private static final long TIMEOUT_MS = 45000L;
 
-   public record Reached(Station station, int steps, Set<ChunkKey> chunks) {
+   public record Reached(Station station, int steps, Set<ChunkKey> chunks, long[] path) {
    }
 
    public record Result(Station origin, String travelerGuildId, long finishedAt, List<Reached> reached, boolean truncated, Set<String> blockedBy) {
@@ -77,15 +77,15 @@ public final class RailSearch extends BukkitRunnable {
       return ((long)(x & 0x3FFFFFF) << 38) | ((long)(z & 0x3FFFFFF) << 12) | (long)((y + 2048) & 0xFFF);
    }
 
-   private static int unpackX(long p) {
+   public static int unpackX(long p) {
       return (int)(p >> 38);
    }
 
-   private static int unpackZ(long p) {
+   public static int unpackZ(long p) {
       return (int)((p >> 12) & 0x3FFFFFFL) << 6 >> 6;
    }
 
-   private static int unpackY(long p) {
+   public static int unpackY(long p) {
       return (int)(p & 0xFFFL) - 2048;
    }
 
@@ -232,16 +232,22 @@ public final class RailSearch extends BukkitRunnable {
          }
 
          Set<ChunkKey> chunks = new HashSet<>();
-         int steps = 0;
+         List<Long> reversed = new ArrayList<>();
          long cursor = station.railKey();
          while (cursor != -1L) {
             chunks.add(new ChunkKey(this.world.getName(), unpackX(cursor) >> 4, unpackZ(cursor) >> 4));
-            steps++;
+            reversed.add(cursor);
             Long next = this.parent.get(cursor);
             cursor = next == null ? -1L : next;
          }
 
-         reached.add(new Reached(station, steps, chunks));
+         // Tracé de la gare de départ à la gare d'arrivée (utilisé par les convois de fret).
+         long[] path = new long[reversed.size()];
+         for (int i = 0; i < path.length; i++) {
+            path[i] = reversed.get(path.length - 1 - i);
+         }
+
+         reached.add(new Reached(station, reversed.size(), chunks, path));
       }
 
       for (long key : this.ticketed) {

@@ -65,12 +65,6 @@ public class EventManager implements Listener {
    }
 
    public static final String TRADER_TAG = "esicraft_blackmarket";
-   private static final String BOSS_TAG = "esicraft_worldboss";
-   /** Cagnotte de pièces du boss (events.boss.coin-pool), à partager selon les dégâts infligés. */
-   private double bossPool() {
-      return Math.max(0.0, this.plugin.getConfig().getDouble("events.boss.coin-pool", 1000.0));
-   }
-
    private final EsicraftPlugin plugin;
    private Type active;
    private long endsAt;
@@ -78,20 +72,25 @@ public class EventManager implements Listener {
    private BossBar bar;
    private BukkitTask ticker;
    private BukkitTask scheduler;
-   private LivingEntity boss;
+   private final WorldBoss worldBoss;
    private Entity trader;
    /** Joueurs qui ont déjà fait leur unique échange avec le marchand de l'événement en cours. */
    private final java.util.Set<UUID> tradedPlayers = java.util.concurrent.ConcurrentHashMap.newKeySet();
-   private final Map<UUID, Double> bossDamage = new HashMap<>();
    private boolean cloning;
 
    public EventManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
+      this.worldBoss = new WorldBoss(plugin, this);
+   }
+
+   public WorldBoss getWorldBoss() {
+      return this.worldBoss;
    }
 
    private static final String NEXT_EVENT_KEY = "event_next_at";
 
    public void start() {
+      this.worldBoss.init();
       // L'échéance est conservée en base : redémarrer le serveur ne remet pas le compteur à zéro (ni ne déclenche un événement de plus).
       long saved = 0L;
       for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, NEXT_EVENT_KEY)) {
@@ -135,7 +134,8 @@ public class EventManager implements Listener {
    }
 
    public double getBountyMultiplier() {
-      return this.active == Type.BLOOD_MOON ? 2.0 : 1.0;
+      double mult = this.active == Type.BLOOD_MOON ? 2.0 : 1.0;
+      return this.plugin.getCourt().is(fr.esicraft.game.CourtManager.Rule.BOUNTY_BOOM) ? mult * 1.25 : mult;
    }
 
    public long getRemainingSeconds() {
@@ -189,18 +189,13 @@ public class EventManager implements Listener {
          this.ticker = null;
       }
 
-      if (this.boss != null && this.boss.isValid()) {
-         this.boss.remove();
-      }
-
+      this.worldBoss.cleanup();
       if (this.trader != null && this.trader.isValid()) {
          this.trader.remove();
       }
 
-      this.boss = null;
       this.trader = null;
       this.tradedPlayers.clear();
-      this.bossDamage.clear();
       if (this.bar != null) {
          this.bar.removeAll();
          this.bar = null;
@@ -234,12 +229,45 @@ public class EventManager implements Listener {
       }
    }
 
+   void setEndsAt(long ms) {
+      this.endsAt = ms;
+   }
+
+   void openBar(String title, BarColor color) {
+      this.createBar(title, color);
+   }
+
+   void setBar(String title, BarColor color) {
+      if (this.bar != null) {
+         this.bar.setTitle(ChatUtil.color(title));
+         this.bar.setColor(color);
+      }
+   }
+
+   void setBarTitle(String title) {
+      if (this.bar != null) {
+         this.bar.setTitle(ChatUtil.color(title));
+      }
+   }
+
+   void setBarColor(BarColor color) {
+      if (this.bar != null) {
+         this.bar.setColor(color);
+      }
+   }
+
+   void setBarProgress(double progress) {
+      if (this.bar != null) {
+         this.bar.setProgress(Math.max(0.0, Math.min(1.0, progress)));
+      }
+   }
+
    private void createBar(String title, BarColor color) {
       this.bar = Bukkit.createBossBar(ChatUtil.color(title), color, BarStyle.SEGMENTED_10);
       this.bar.setProgress(1.0);
    }
 
-   private void runTicker(int periodTicks, Runnable perTick) {
+   void runTicker(int periodTicks, Runnable perTick) {
       this.ticker = Bukkit.getScheduler().runTaskTimer(this.plugin, () -> {
          if (this.active == null) {
             return;
@@ -260,7 +288,7 @@ public class EventManager implements Listener {
          case BLOOD_MOON -> ChatUtil.broadcast("&7🌑 La Lune de Sang s'efface… l'aube revient.");
          case METEOR_SHOWER -> ChatUtil.broadcast("&7☄ La pluie de météorites est terminée. Fouillez les cratères restants !");
          case BLACK_MARKET -> ChatUtil.broadcast("&7🧙 Le Marchand du Marché Noir a plié bagage et disparu dans la nuit.");
-         case WORLD_BOSS -> ChatUtil.broadcast("&7☠ Le Seigneur des Cendres s'est évanoui dans les flammes… personne ne l'a terrassé.");
+         case WORLD_BOSS -> this.worldBoss.onTimeout();
       }
 
       this.stop();
@@ -274,7 +302,7 @@ public class EventManager implements Listener {
    }
 
    /** Cherche un point en surface, hors territoire de guilde, à 30-90 blocs d'un joueur (chunk déjà chargé). */
-   private Location findSurfaceNear(Player around, int minDist, int maxDist) {
+   Location findSurfaceNear(Player around, int minDist, int maxDist) {
       World world = around.getWorld();
       if (world.getEnvironment() != World.Environment.NORMAL) {
          return null;
@@ -480,10 +508,11 @@ public class EventManager implements Listener {
    @EventHandler
    public void onEntitiesLoad(EntitiesLoadEvent event) {
       for (Entity entity : event.getEntities()) {
-         if ((entity.getScoreboardTags().contains(TRADER_TAG) || entity.getScoreboardTags().contains(BOSS_TAG))
-            && entity != this.trader && entity != this.boss) {
+         if (entity.getScoreboardTags().contains(TRADER_TAG) && entity != this.trader) {
             entity.remove();
          }
+
+         this.worldBoss.clearOrphans(entity);
       }
    }
 
@@ -495,134 +524,7 @@ public class EventManager implements Listener {
          loc = this.findSurfaceNear(players.get(ThreadLocalRandom.current().nextInt(players.size())), 40, 90);
       }
 
-      if (loc == null) {
-         return false;
-      }
-
-      WitherSkeleton skeleton = (WitherSkeleton)loc.getWorld().spawnEntity(loc, EntityType.WITHER_SKELETON);
-      skeleton.customName(ChatUtil.component("&4&l☠ Seigneur des Cendres"));
-      skeleton.setCustomNameVisible(true);
-      skeleton.setPersistent(true);
-      skeleton.setRemoveWhenFarAway(false);
-      skeleton.setGlowing(true);
-      skeleton.addScoreboardTag(BOSS_TAG);
-      this.setAttribute(skeleton, Attribute.MAX_HEALTH, 800.0);
-      skeleton.setHealth(800.0);
-      this.setAttribute(skeleton, Attribute.ATTACK_DAMAGE, 14.0);
-      this.setAttribute(skeleton, Attribute.MOVEMENT_SPEED, 0.30);
-      this.setAttribute(skeleton, Attribute.FOLLOW_RANGE, 48.0);
-      skeleton.getEquipment().setItemInMainHand(new ItemStack(Material.NETHERITE_SWORD));
-      skeleton.getEquipment().setItemInMainHandDropChance(0.0F);
-      this.boss = skeleton;
-      this.bossDamage.clear();
-      this.endsAt = System.currentTimeMillis() + 15 * 60000L;
-      this.createBar("&4&l☠ SEIGNEUR DES CENDRES &c— " + rough(loc), BarColor.RED);
-      ChatUtil.broadcast("&4&l☠ LE SEIGNEUR DES CENDRES S'EST ÉVEILLÉ près de &c" + rough(loc) + " &4! &7Alliez-vous pour le terrasser en 15 minutes : &6" + String.format("%.0f", this.bossPool()) + " pièces &7à se partager entre ceux qui infligent au moins " + this.plugin.getConfig().getInt("events.boss.min-share-percent", 10) + " % des dégâts !");
-      this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.EVENT, "Le Seigneur des Cendres s'est éveillé : 15 minutes pour le terrasser.");
-      this.runTicker(20, () -> {
-         if (this.boss == null || !this.boss.isValid()) {
-            return;
-         }
-
-         double max = this.boss.getAttribute(Attribute.MAX_HEALTH).getValue();
-         this.bar.setProgress(Math.max(0.0, Math.min(1.0, this.boss.getHealth() / max)));
-      });
-      return true;
-   }
-
-   private void setAttribute(LivingEntity entity, Attribute attribute, double value) {
-      AttributeInstance instance = entity.getAttribute(attribute);
-      if (instance != null) {
-         instance.setBaseValue(value);
-      }
-   }
-
-   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-   public void onBossDamaged(EntityDamageByEntityEvent event) {
-      if (this.boss == null || event.getEntity() != this.boss) {
-         return;
-      }
-
-      Entity damager = event.getDamager();
-      if (damager instanceof Projectile projectile && projectile.getShooter() instanceof Entity shooter) {
-         damager = shooter;
-      }
-
-      if (damager instanceof Player player) {
-         // Seuls les PV réellement retirés comptent (pas l'excédent du coup fatal).
-         double dealt = this.boss instanceof org.bukkit.entity.LivingEntity living ? Math.min(event.getFinalDamage(), Math.max(0.0, living.getHealth())) : event.getFinalDamage();
-         this.bossDamage.merge(player.getUniqueId(), dealt, Double::sum);
-      }
-   }
-
-   @EventHandler(priority = EventPriority.MONITOR)
-   public void onBossDeath(EntityDeathEvent event) {
-      if (this.boss == null || event.getEntity() != this.boss) {
-         return;
-      }
-
-      event.getDrops().clear();
-      event.setDroppedExp(Math.max(0, this.plugin.getConfig().getInt("events.boss.xp", 500)));
-      double total = this.bossDamage.values().stream().mapToDouble(Double::doubleValue).sum();
-      UUID top = this.bossDamage.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
-      ChatUtil.broadcast("&6&l☠ LE SEIGNEUR DES CENDRES EST TOMBÉ ! &eHonneur aux combattants :");
-      if (total > 0) {
-         // Seuls ceux qui ont réellement participé (au moins X % des dégâts) touchent la cagnotte : un coup en passant ne rapporte plus rien,
-         // et personne ne peut empocher plus de events.boss.max-per-player pièces.
-         double minShare = Math.max(0.0, this.plugin.getConfig().getInt("events.boss.min-share-percent", 10) / 100.0);
-         double cap = Math.max(0.0, this.plugin.getConfig().getDouble("events.boss.max-per-player", 400.0));
-         List<Map.Entry<UUID, Double>> sorted = new ArrayList<>();
-         double qualifiedTotal = 0.0;
-         for (Map.Entry<UUID, Double> entry : this.bossDamage.entrySet()) {
-            if (entry.getValue() / total >= minShare) {
-               sorted.add(entry);
-               qualifiedTotal += entry.getValue();
-            }
-         }
-
-         sorted.sort(Map.Entry.<UUID, Double>comparingByValue().reversed());
-         int shown = 0;
-         for (Map.Entry<UUID, Double> entry : sorted) {
-            double reward = Math.min(cap, Math.round(this.bossPool() * entry.getValue() / qualifiedTotal));
-            this.plugin.getDataManager().creditPlayer(entry.getKey(), reward);
-            if (shown++ < 5) {
-               Player p = Bukkit.getPlayer(entry.getKey());
-               String name = p != null ? p.getName() : Bukkit.getOfflinePlayer(entry.getKey()).getName();
-               ChatUtil.broadcast("  &f" + name + " &8» &c" + String.format("%.0f", entry.getValue()) + " dégâts &8(&6+" + String.format("%.0f", reward) + " pièces&8)");
-            }
-         }
-      }
-
-      if (top != null) {
-         Player topPlayer = Bukkit.getPlayer(top);
-         String topName = topPlayer != null ? topPlayer.getName() : Bukkit.getOfflinePlayer(top).getName();
-         // Butin modeste : quelques diamants, et une Étoile du Nether seulement avec une faible probabilité (events.boss.*).
-         int diamonds = Math.max(0, this.plugin.getConfig().getInt("events.boss.top-diamonds", 3));
-         boolean star = ThreadLocalRandom.current().nextDouble() < this.plugin.getConfig().getDouble("events.boss.top-star-chance", 0.2);
-         List<ItemStack> lootList = new ArrayList<>();
-         if (diamonds > 0) {
-            lootList.add(new ItemStack(Material.DIAMOND, diamonds));
-         }
-
-         if (star) {
-            lootList.add(new ItemStack(Material.NETHER_STAR, 1));
-         }
-
-         // Le butin va directement dans l'inventaire du meilleur combattant (sinon n'importe qui le ramasse au sol) ; le surplus est réservé à son nom.
-         if (topPlayer != null) {
-            for (ItemStack left : topPlayer.getInventory().addItem(lootList.toArray(new ItemStack[0])).values()) {
-               topPlayer.getWorld().dropItem(topPlayer.getLocation(), left, dropped -> dropped.setOwner(top));
-            }
-         } else {
-            event.getDrops().addAll(lootList);
-         }
-
-         ChatUtil.broadcast("&7Le plus grand pourfendeur, &e" + topName + "&7, empoche " + (diamonds > 0 ? "&b" + diamonds + " diamants" : "") + (star ? (diamonds > 0 ? " &7et une " : "une ") + "&fÉtoile du Nether" : "") + "&7 !");
-         this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.EVENT, "☠ Le Seigneur des Cendres a été terrassé (meilleur combattant : " + topName + ").", null, null);
-         this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.SLAYER);
-      }
-
-      Bukkit.getScheduler().runTask(this.plugin, this::stop);
+      return loc != null && this.worldBoss.start(players, loc);
    }
 
    @EventHandler

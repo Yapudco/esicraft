@@ -230,7 +230,7 @@ final class HtmlPages {
          + navLink("/", "Accueil", "home", active) + navLink("/guildes", "Guildes", "guildes", active) + navLink("/joueurs", "Joueurs", "joueurs", active)
          + (raidActive ? "<a class=\"nl raidl" + ("raids".equals(active) ? " on" : "") + "\" href=\"/raids\">⚔ Raids</a>" : "")
          + navLink("/journal", "Journal", "journal", active) + navLink("/diplomatie", "Diplomatie", "diplomatie", active) + navLink("/musee", "Musée", "musee", active)
-         + navLink("/ages", "Âges", "ages", active) + navLink("/guide", "Guide", "guide", active)
+         + navLink("/ages", "Âges", "ages", active) + navLink("/pantheon", "Panthéon", "pantheon", active) + navLink("/votes", "Votes", "votes", active) + navLink("/guide", "Guide", "guide", active)
          + "<!--LANG--></nav></div></header><main class=\"w\">" + body
          + "<footer><span id=\"stamp\">Données " + esc(time) + "</span>" + (live > 0 ? " · mise à jour automatique" : "")
          + " · <a class=\"money\" href=\"/api/stats.json\">API JSON</a></footer></main></body></html>";
