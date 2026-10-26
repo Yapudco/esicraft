@@ -313,7 +313,7 @@ public class GUIListener implements Listener {
 
                         PlayerData pData = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
                         boolean paid = false;
-                        if (guild.withdrawBank(cost)) {
+                        if (this.plugin.getGuildManager().officerMaySpend(guild, player, cost) && guild.withdrawBank(cost)) {
                            paid = true;
                            ChatUtil.sendMessage(player, "&aCoût de &6" + String.format("%.2f", cost) + " pièces &adébité de la banque de guilde.");
                         } else {

@@ -309,8 +309,8 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
-                  ChatUtil.sendMessage(player, "&cSeuls les officiers et chefs peuvent unclaim.");
+               if (!guild.getLeaderUuid().equals(player.getUniqueId())) {
+                  ChatUtil.sendMessage(player, "&cSeul le chef de guilde peut abandonner un chunk.");
                   return true;
                }
 

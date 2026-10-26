@@ -182,7 +182,11 @@ ages:
       DEAD_BUSH: 1
 
 # Paramètres des Guildes et Claims
+claims:
+  enemy-buffer-chunks: 1          # Distance minimale (en chunks) entre un nouveau claim et le territoire d'une guilde sans traité avec la nôtre
+
 guilds:
+  officer-daily-spend-cap: 3000.0   # Dépenses quotidiennes maximales d'un officier (claims, pièges) ; le chef n'a pas de limite (0 = aucune)
   creation-cost: 500.0 # Monnaie
   max-members-default: 10
   max-claims-default: 16
@@ -248,6 +252,7 @@ rivalry:
   half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours
 
 nexus:
+  siege-radius: 4                  # Un assaillant peut casser les blocs (hors conteneurs) à cette distance d'un Nexus vivant
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
 

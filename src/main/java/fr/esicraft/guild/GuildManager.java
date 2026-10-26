@@ -426,6 +426,48 @@ public class GuildManager {
       }
    }
 
+   /** Un chunk d'une autre guilde (sans traité avec la nôtre) se trouve-t-il dans le tampon de {@code claims.enemy-buffer-chunks} chunks ? Évite l'encerclement. */
+   private boolean hasEnemyNeighbor(Guild guild, ChunkKey key) {
+      int buffer = Math.max(0, this.plugin.getConfig().getInt("claims.enemy-buffer-chunks", 1));
+      for (int dx = -buffer; dx <= buffer; dx++) {
+         for (int dz = -buffer; dz <= buffer; dz++) {
+            Guild other = this.chunkClaims.get(new ChunkKey(key.getWorldName(), key.getX() + dx, key.getZ() + dz));
+            if (other != null && !other.getId().equals(guild.getId()) && this.plugin.getTreatyManager().between(guild.getId(), other.getId()) == null) {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   private final java.util.Map<String, Double> officerSpend = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /** Plafond quotidien de dépenses (claims, pièges) d'un officier ; le chef de guilde n'a pas de limite. */
+   public boolean officerMaySpend(Guild guild, Player player, double amount) {
+      if (guild.getLeaderUuid().equals(player.getUniqueId())) {
+         return true;
+      }
+
+      double cap = this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0);
+      if (cap <= 0.0) {
+         return true;
+      }
+
+      long day = java.time.LocalDate.now().toEpochDay();
+      String key = guild.getId() + "|" + player.getUniqueId() + "|" + day;
+      synchronized (this.officerSpend) {
+         this.officerSpend.keySet().removeIf(k -> !k.endsWith("|" + day));
+         double current = this.officerSpend.getOrDefault(key, 0.0);
+         if (current + amount > cap) {
+            return false;
+         }
+
+         this.officerSpend.put(key, current + amount);
+         return true;
+      }
+   }
+
    public boolean isAdjacentToGuildClaims(Guild guild, ChunkKey chunkKey) {
       if (guild != null && chunkKey != null) {
          if (guild.getClaimedChunks().isEmpty()) {
@@ -435,9 +477,10 @@ public class GuildManager {
             int x = chunkKey.getX();
             int z = chunkKey.getZ();
 
+            // Adjacence orthogonale uniquement (pas de « serpents » en diagonale) pour les NOUVEAUX claims.
             for (int dx = -1; dx <= 1; dx++) {
                for (int dz = -1; dz <= 1; dz++) {
-                  if (dx != 0 || dz != 0) {
+                  if ((dx == 0) != (dz == 0)) {
                      ChunkKey neighbor = new ChunkKey(world, x + dx, z + dz);
                      Guild neighborOwner = this.chunkClaims.get(neighbor);
                      if (neighborOwner != null && neighborOwner.getId().equals(guild.getId())) {
@@ -474,6 +517,11 @@ public class GuildManager {
          Guild existing = this.chunkClaims.get(chunkKey);
          if (existing != null) {
             ChatUtil.sendMessage(player, "&cCe chunk est déjà revendiqué par la guilde &e" + existing.getName() + " &c!");
+            return false;
+         } else if (this.hasEnemyNeighbor(guild, chunkKey)) {
+            ChatUtil.sendMessage(player, "&c❌ Trop près d'un territoire ennemi : laissez au moins &e" + this.plugin.getConfig().getInt("claims.enemy-buffer-chunks", 1)
+               + " chunk &cde distance (sauf avec une guilde liée par un traité).");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             return false;
          } else if (this.plugin.getLoans().hasOverdue(guild.getId())) {
             ChatUtil.sendMessage(player, "&c❌ Votre guilde a une dette impayée : plus aucune revendication tant qu'elle n'est pas remboursée (&e/banque dettes&c).");
@@ -531,6 +579,11 @@ public class GuildManager {
                         + "&c)."
                   );
                   ChatUtil.sendMessage(player, "&7Déposez de l'argent dans la banque de guilde avec &e/guild bank <montant>&7.");
+                  ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+                  return false;
+               } else if (!this.officerMaySpend(guild, player, claimCost)) {
+                  ChatUtil.sendMessage(player, "&c❌ Plafond quotidien de dépenses des officiers atteint (&e" + this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0)
+                     + " pièces&c) : seul le chef de guilde peut dépenser davantage aujourd'hui.");
                   ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                   return false;
                } else {
