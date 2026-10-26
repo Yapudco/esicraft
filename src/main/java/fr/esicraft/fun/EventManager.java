@@ -80,6 +80,8 @@ public class EventManager implements Listener {
    private BukkitTask scheduler;
    private LivingEntity boss;
    private Entity trader;
+   /** Joueurs qui ont déjà fait leur unique échange avec le marchand de l'événement en cours. */
+   private final java.util.Set<UUID> tradedPlayers = java.util.concurrent.ConcurrentHashMap.newKeySet();
    private final Map<UUID, Double> bossDamage = new HashMap<>();
    private boolean cloning;
 
@@ -197,6 +199,7 @@ public class EventManager implements Listener {
 
       this.boss = null;
       this.trader = null;
+      this.tradedPlayers.clear();
       this.bossDamage.clear();
       if (this.bar != null) {
          this.bar.removeAll();
@@ -412,6 +415,7 @@ public class EventManager implements Listener {
       npc.setRemoveWhenFarAway(false);
       npc.setGlowing(true);
       npc.addScoreboardTag(TRADER_TAG);
+      this.tradedPlayers.clear();
       npc.setRecipes(this.blackMarketRecipes());
       this.trader = npc;
       this.endsAt = System.currentTimeMillis() + 5 * 60000L;
@@ -422,22 +426,54 @@ public class EventManager implements Listener {
       return true;
    }
 
+   /**
+    * Offres du Marché noir : très chères (de 32 à 128 diamants) et <b>verrouillées après un seul achat</b> (un exemplaire de chaque offre,
+    * pour tout le serveur). Seules {@code events.black-market.offers} offres tirées au hasard sont proposées à chaque apparition.
+    */
    private List<MerchantRecipe> blackMarketRecipes() {
-      List<MerchantRecipe> recipes = new ArrayList<>();
-      recipes.add(this.recipe(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1), 24, 1));
-      recipes.add(this.recipe(new ItemStack(Material.TOTEM_OF_UNDYING, 1), 14, 2));
-      recipes.add(this.recipe(new ItemStack(Material.SHULKER_SHELL, 2), 8, 4));
-      recipes.add(this.recipe(new ItemStack(Material.MUSIC_DISC_PIGSTEP, 1), 16, 1));
-      recipes.add(this.recipe(new ItemStack(Material.GOAT_HORN, 1), 10, 2));
-      recipes.add(this.recipe(new ItemStack(Material.ELYTRA, 1), 40, 1));
-      return recipes;
+      List<MerchantRecipe> all = new ArrayList<>();
+      all.add(this.recipe(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1), 96, 0, null));
+      all.add(this.recipe(new ItemStack(Material.TOTEM_OF_UNDYING, 1), 48, 0, null));
+      all.add(this.recipe(new ItemStack(Material.SHULKER_SHELL, 2), 32, 0, null));
+      all.add(this.recipe(new ItemStack(Material.MUSIC_DISC_PIGSTEP, 1), 64, 0, null));
+      all.add(this.recipe(new ItemStack(Material.GOAT_HORN, 1), 40, 0, null));
+      all.add(this.recipe(new ItemStack(Material.ELYTRA, 1), 64, 2, Material.NETHERITE_INGOT));
+      java.util.Collections.shuffle(all);
+      int offers = Math.max(1, Math.min(all.size(), this.plugin.getConfig().getInt("events.black-market.offers", 3)));
+      return new ArrayList<>(all.subList(0, offers));
    }
 
-   private MerchantRecipe recipe(ItemStack result, int diamonds, int maxUses) {
-      MerchantRecipe r = new MerchantRecipe(result, maxUses);
-      r.addIngredient(new ItemStack(Material.DIAMOND, diamonds));
+   private MerchantRecipe recipe(ItemStack result, int diamonds, int extraAmount, Material extra) {
+      double mult = Math.max(0.1, this.plugin.getConfig().getDouble("events.black-market.price-multiplier", 1.0));
+      int total = Math.max(1, (int)Math.round(diamonds * mult));
+      MerchantRecipe r = new MerchantRecipe(result, 1);
+      // Deux emplacements d'ingrédients de 64 au plus : le prix en diamants peut les occuper tous les deux.
+      r.addIngredient(new ItemStack(Material.DIAMOND, Math.min(64, total)));
+      if (total > 64) {
+         r.addIngredient(new ItemStack(Material.DIAMOND, Math.min(64, total - 64)));
+      } else if (extra != null && extraAmount > 0) {
+         r.addIngredient(new ItemStack(extra, extraAmount));
+      }
+
       r.setExperienceReward(false);
+      r.setIgnoreDiscounts(true);
       return r;
+   }
+
+   /** Un seul échange par joueur et par apparition du marchand (en plus du verrouillage de chaque offre après un achat). */
+   @EventHandler(ignoreCancelled = true)
+   public void onBlackMarketTrade(io.papermc.paper.event.player.PlayerTradeEvent event) {
+      if (!(event.getVillager() instanceof WanderingTrader npc) || !npc.getScoreboardTags().contains(TRADER_TAG)) {
+         return;
+      }
+
+      if (!this.tradedPlayers.add(event.getPlayer().getUniqueId())) {
+         event.setCancelled(true);
+         ChatUtil.sendMessage(event.getPlayer(), "&5🧙 &7« Un seul achat par client, voyageur. Laissez-en aux autres. »");
+         return;
+      }
+
+      ChatUtil.sendMessage(event.getPlayer(), "&5🧙 &7« Marché conclu. Cette offre est désormais épuisée, et vous n'achèterez plus rien ici. »");
    }
 
    /** Supprime les marchands et boss orphelins après un redémarrage (les événements ne survivent pas à l'arrêt). */

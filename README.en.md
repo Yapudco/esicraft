@@ -309,7 +309,7 @@ The rail network lets you **teleport from station to station**, as long as a **c
 | :--- | :--- | :--- |
 | 🌑 Blood Moon | 10 min | More monsters, bounties ×2 |
 | ☄ Meteor Shower | 3 min | Ore blocks fall from the sky near players |
-| 🧙 Black Market | 5 min | A merchant sells rare items for diamonds, to everyone |
+| 🧙 Black Market | 5 min | A merchant offers 3 randomly picked rare items, **32 to 128 diamonds** each. **Each offer is locked after a single purchase** and each player can only buy **one thing** |
 | ☠ World Boss | 15 min | The *Lord of Ashes*: 1,000 coins shared by damage dealt (at least 10% of the damage, 400 coins max per player), and for the top fighter 3 diamonds + a 20% chance of a Nether Star |
 
 ### Seasons
