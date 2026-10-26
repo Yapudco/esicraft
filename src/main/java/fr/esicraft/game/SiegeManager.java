@@ -279,16 +279,17 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
          return;
       }
 
-      Guild target = this.plugin.getGuildManager().getGuildByName(args[1]);
+      // Le nom de la guilde cible peut contenir des espaces : le jour et l'heure sont les deux derniers mots.
+      Guild target = this.plugin.getGuildManager().getGuildByName(String.join(" ", java.util.Arrays.copyOfRange(args, 1, args.length - 2)));
       if (target == null || target.getId().equals(mine.getId())) {
          ChatUtil.sendMessage(player, "&c❌ Guilde cible introuvable.");
          return;
       }
 
-      DayOfWeek day = parseDay(args[2]);
+      DayOfWeek day = parseDay(args[args.length - 2]);
       int hour;
       try {
-         hour = Integer.parseInt(args[3].toLowerCase(Locale.ROOT).replace("h", "").split(":")[0]);
+         hour = Integer.parseInt(args[args.length - 1].toLowerCase(Locale.ROOT).replace("h", "").split(":")[0]);
       } catch (NumberFormatException e) {
          hour = -1;
       }

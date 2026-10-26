@@ -122,7 +122,8 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       }
 
       Player captor = shooter(event);
-      if (captor == null || captor.equals(victim) || this.captives.containsKey(victim.getUniqueId()) || this.executing.contains(victim.getUniqueId())) {
+      if (captor == null || captor.equals(victim) || this.captives.containsKey(victim.getUniqueId()) || this.executing.contains(victim.getUniqueId())
+         || this.plugin.getDuels().inDuelWith(captor, victim)) {
          return;
       }
 
