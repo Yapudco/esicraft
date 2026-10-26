@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (duels)
+
+### Équipement de duel
+- Les deux duellistes reçoivent le même équipement : armure en fer complète, épée et hache en fer, bouclier, arc, 16 flèches, 64 steaks et 1 potion de soin instantané. Leur inventaire d'origine est toujours sauvegardé puis rendu.
+
 ## 30/10/2026 (fret)
 
 ### Train de fret : plusieurs doubles coffres, livraisons publiques
