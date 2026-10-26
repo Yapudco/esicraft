@@ -153,7 +153,7 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 **Health points**: the Nexus's HP is shown above it (hologram), including after a server restart or a reconnection.
 
-**Who is spared**: the guardian golem and traps never target guild members or members of a guild bound by a treaty (alliance, non-aggression pact or vassalage).
+**Who is spared**: the guardian golem and traps never target guild members (the golem doesn't turn on them even if they hit it) or members of a guild bound by a treaty (alliance, non-aggression pact or vassalage).
 
 **The Nexus must be visible**: a hit only counts if the attacker can see it (range and line of sight are checked). The Nexus only exists in the Overworld.
 

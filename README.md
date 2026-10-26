@@ -150,7 +150,7 @@ Le **Nexus** est le cœur de ta guilde. On le pose dans son territoire avec `/gu
 
 **Points de vie** : les PV du Nexus s'affichent au-dessus de lui (hologramme), y compris après un redémarrage du serveur ou une reconnexion.
 
-**Qui est épargné** : le golem gardien et les pièges ne visent jamais les membres de la guilde ni ceux d'une guilde liée par un traité (alliance, pacte de non-agression ou vassalité).
+**Qui est épargné** : le golem gardien et les pièges ne visent jamais les membres de la guilde (le golem ne se retourne pas contre eux même s'ils le frappent) ni ceux d'une guilde liée par un traité (alliance, pacte de non-agression ou vassalité).
 
 **Le Nexus doit être visible** : un coup n'est compté que si l'assaillant le voit (portée et ligne de vue vérifiées). Le Nexus n'existe que dans l'Overworld.
 
