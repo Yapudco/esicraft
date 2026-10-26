@@ -111,6 +111,10 @@ public class RailManager {
       this.async(() -> this.plugin.getDataManager().getStorage().exec("DELETE FROM stations WHERE id = ?;", s.getId()));
    }
 
+   public Station stationById(String id) {
+      return id == null ? null : this.stations.get(id);
+   }
+
    public Station stationAtSign(org.bukkit.block.Block block) {
       return this.bySign.get(block.getWorld().getName() + ":" + RailSearch.pack(block.getX(), block.getY(), block.getZ()));
    }

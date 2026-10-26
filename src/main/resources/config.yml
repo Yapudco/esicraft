@@ -304,6 +304,13 @@ taverns:
 
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
+  freight:                               # Trains de fret (Maj + clic sur une destination de /station)
+    min-age: 2                           # Âge minimal de la guilde pour transporter des objets
+    max-per-guild: 2                     # Convois simultanés par guilde
+    fare-multiplier: 5.0                 # Frais d'envoi = tarif de la gare d'arrivée x ce facteur
+    hits-to-loot: 25                     # Coups nécessaires pour piller un convoi sur son territoire (sans traité)
+    distance-limits: [1000, 3000, 5000, 10000]   # Distances (blocs) entre les gares
+    minutes: [4, 8, 12, 15, 20]          # Durée du trajet : <= 1000, <= 3000, <= 5000, <= 10000, au-delà
   enabled: true
   base-fare: 1.0              # Tarif de base d'un trajet (versé à la guilde de la gare d'arrivée)
   default-toll: 2.0           # Péage par défaut d'une guilde dont le territoire est traversé

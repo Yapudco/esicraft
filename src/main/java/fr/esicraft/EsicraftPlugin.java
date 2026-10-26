@@ -118,6 +118,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.game.TavernManager tavern;
    private fr.esicraft.nexus.NexusGamble nexusGamble;
    private fr.esicraft.nexus.NexusTech nexusTech;
+   private fr.esicraft.rail.FreightManager freight;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -187,6 +188,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.guildManager.initCaches();
       this.disguiseManager.init();
       this.railManager.load();
+      this.freight = new fr.esicraft.rail.FreightManager(this, this.railManager);
+      this.freight.init();
       this.treatyManager.load();
       this.webServer = new WebServer(this);
       this.webServer.start();
@@ -218,6 +221,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(new AlliedProtectionListener(this), this);
       pm.registerEvents(this.eventManager, this);
       pm.registerEvents(new RailListener(this), this);
+      pm.registerEvents(this.freight, this);
       pm.registerEvents(new RailGuiListener(this), this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
@@ -244,6 +248,10 @@ public final class EsicraftPlugin extends JavaPlugin {
          }
       } catch (RuntimeException e) {
          this.getLogger().warning("Sauvegarde des succès / contrats de guilde impossible : " + e.getMessage());
+      }
+
+      if (this.freight != null) {
+         this.freight.shutdown();
       }
 
       if (this.duels != null) {
@@ -439,6 +447,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.TavernManager getTavern() {
       return this.tavern;
+   }
+
+   public fr.esicraft.rail.FreightManager getFreight() {
+      return this.freight;
    }
 
    public fr.esicraft.nexus.NexusTech getNexusTech() {

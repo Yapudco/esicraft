@@ -33,6 +33,18 @@ public class StationCommand implements CommandExecutor {
          return true;
       }
 
+      if (args.length > 0 && args[0].equalsIgnoreCase("fret")) {
+         String sub = args.length > 1 ? args[1].toLowerCase() : "";
+         switch (sub) {
+            case "confirmer" -> this.plugin.getFreight().confirm(player);
+            case "annuler" -> this.plugin.getFreight().cancel(player);
+            case "recuperer", "récupérer" -> this.plugin.getFreight().openBox(player);
+            default -> ChatUtil.sendMessage(player, "&6🚂 Fret : Maj + clic sur une destination dans &e/station &6pour charger un wagonnet (Âge 2 minimum). &e/station fret recuperer &6récupère les livraisons de la gare.");
+         }
+
+         return true;
+      }
+
       RailManager rails = this.plugin.getRailManager();
       Station origin = rails.nearestStation(player.getLocation(), RADIUS);
       if (origin == null) {

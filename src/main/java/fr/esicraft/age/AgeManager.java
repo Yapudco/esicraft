@@ -202,6 +202,37 @@ public class AgeManager {
       }
    }
 
+   /** Don automatique d'un convoi de fret arrivé à une gare de la guilde : renvoie ce qui n'a pas été absorbé (null si tout l'a été). */
+   public ItemStack donateFreight(Guild guild, ItemStack item) {
+      AgeType next = guild.getCurrentAge().getNextAge();
+      if (next == null || item == null || item.getType().isAir() || item.hasItemMeta() || item.getType() == Material.NETHERITE_HOE) {
+         return item;
+      }
+
+      Map<Material, Integer> reqs = this.getRequirementsForGuild(guild, next);
+      Integer required = reqs.get(item.getType());
+      if (required == null) {
+         return item;
+      }
+
+      int needed = required - guild.getDonatedAmount(item.getType());
+      int give = Math.min(item.getAmount(), needed);
+      if (give <= 0) {
+         return item;
+      }
+
+      guild.addDonation(item.getType(), give);
+      this.plugin.getDataManager().saveGuild(guild);
+      this.checkGuildProgression(guild);
+      if (give >= item.getAmount()) {
+         return null;
+      }
+
+      ItemStack rest = item.clone();
+      rest.setAmount(item.getAmount() - give);
+      return rest;
+   }
+
    public void checkGuildProgression(Guild guild) {
       if (guild != null) {
          AgeType nextAge = guild.getCurrentAge().getNextAge();
