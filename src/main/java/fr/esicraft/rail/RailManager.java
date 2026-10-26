@@ -104,6 +104,28 @@ public class RailManager {
       return s;
    }
 
+   /** Une guilde dissoute perd ses gares, son péage et ses relations ferroviaires. */
+   public void purgeGuild(String guildId) {
+      for (Station s : new ArrayList<>(this.stations.values())) {
+         if (s.getGuildId().equals(guildId)) {
+            this.removeStation(s);
+         }
+      }
+
+      this.tolls.remove(guildId);
+      this.relations.remove(guildId);
+      for (Map<String, Relation> m : this.relations.values()) {
+         m.remove(guildId);
+      }
+
+      this.cache.clear();
+      this.async(() -> {
+         var db = this.plugin.getDataManager().getStorage();
+         db.exec("DELETE FROM rail_policy WHERE guild_id = ?;", guildId);
+         db.exec("DELETE FROM rail_relations WHERE owner_id = ? OR other_id = ?;", guildId, guildId);
+      });
+   }
+
    public void removeStation(Station s) {
       this.stations.remove(s.getId());
       this.bySign.remove(s.signKey());

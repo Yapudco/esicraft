@@ -450,7 +450,13 @@ public class WebServer {
          v[1] += r.kills();
       }
 
-      List<WebExtra.EdgeView> edges = new ArrayList<>(c.treatyEdges());
+      List<WebExtra.EdgeView> edges = new ArrayList<>();
+      for (WebExtra.EdgeView e : c.treatyEdges()) {
+         if (snap.guild(e.a()) != null && snap.guild(e.b()) != null) {
+            edges.add(e);
+         }
+      }
+
       for (var e : pairs.entrySet()) {
          String[] ids = e.getKey().split("\\|", 2);
          int raids = e.getValue()[0];

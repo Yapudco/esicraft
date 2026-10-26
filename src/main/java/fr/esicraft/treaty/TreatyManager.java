@@ -80,6 +80,17 @@ public class TreatyManager {
       this.byPair.put(pairKey(t.getAId(), t.getBId()), t);
    }
 
+   /** Une guilde dissoute n'a plus ni traité, ni proposition, ni préavis : ils disparaissent sans indemnité (et du site). */
+   public void purgeGuild(String guildId) {
+      for (Treaty t : this.treatiesOf(guildId)) {
+         this.unindex(t);
+      }
+
+      this.proposals.removeIf(p -> p.fromId().equals(guildId) || p.toId().equals(guildId));
+      this.grace.keySet().removeIf(k -> k.startsWith(guildId + ">") || k.endsWith(">" + guildId));
+      this.async(() -> this.plugin.getDataManager().getStorage().exec("DELETE FROM treaty_grace WHERE breaker_id = ? OR victim_id = ?;", guildId, guildId));
+   }
+
    private void unindex(Treaty t) {
       this.treaties.remove(t.getId());
       this.byPair.remove(pairKey(t.getAId(), t.getBId()));
