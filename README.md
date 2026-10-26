@@ -306,7 +306,7 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 | :--- | :--- | :--- |
 | 🌑 Lune de sang | 10 min | Plus de monstres, primes ×2 |
 | ☄ Pluie de météorites | 3 min | Des blocs de minerai tombent du ciel près des joueurs |
-| 🧙 Marché noir | 5 min | Un marchand vend des objets rares contre des diamants, à tout le monde |
+| 🧙 Marché noir | 5 min | Un marchand propose 3 objets rares tirés au hasard, de **32 à 128 diamants** chacun. **Chaque offre est verrouillée après un seul achat** et chaque joueur ne peut acheter qu'**une seule chose** |
 | ☠ Boss mondial | 15 min | Le *Seigneur des Cendres* : 1 000 pièces partagées selon les dégâts (au moins 10 % des dégâts, 400 pièces max par joueur), et pour le meilleur 3 diamants + 20 % de chance d'une Étoile du Nether |
 
 ### Saisons

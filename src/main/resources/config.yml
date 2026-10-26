@@ -240,6 +240,9 @@ races:
 
 # Événements serveur aléatoires (Lune de Sang, Météorites, Marché Noir, Boss Mondial)
 events:
+  black-market:                          # Marchand du Marché noir
+    offers: 3                            # Nombre d'offres tirées au hasard à chaque apparition (6 possibles)
+    price-multiplier: 1.0                # Multiplie le prix en diamants (de 32 à 128 diamants à 1.0)
   boss:                                  # Boss mondial (Seigneur des Cendres)
     coin-pool: 1000.0                    # Cagnotte de pièces partagée selon les dégâts (3 000 auparavant)
     min-share-percent: 10                # Part minimale des dégâts pour toucher la cagnotte

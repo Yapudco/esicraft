@@ -2,6 +2,14 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/10/2026 (marché noir)
+
+### Marchand du Marché noir : bien plus dur
+- **Chaque offre est verrouillée après un seul achat** (un exemplaire pour tout le serveur), et **chaque joueur ne peut faire qu'un seul échange** par apparition.
+- **Prix multipliés** : pomme dorée enchantée 96 diamants (24 avant), totem 48 (14), 2 coquilles de shulker 32 (8), disque Pigstep 64 (16), corne de chèvre 40 (10), élytres 64 diamants + 2 lingots de Netherite (40 diamants). Pas de réduction de prix.
+- **Seulement 3 offres** tirées au hasard parmi les 6 à chaque apparition.
+- Réglable avec `events.black-market.offers` et `events.black-market.price-multiplier`.
+
 ## 27/10/2026
 
 ### Boss mondial (Seigneur des Cendres) : butin réduit
