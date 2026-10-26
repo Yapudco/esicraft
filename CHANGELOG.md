@@ -2,6 +2,15 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 26/10/2026 (nuit)
+
+### Cosmétiques
+- **Titres supprimés** : plus de titre devant le nom dans le tchat.
+- **Trois emplacements** : aura (autour de soi), **traînée** (derrière ses pas) et **effet de victoire** (quand on tue un joueur d'une autre guilde). Un cosmétique équipé par emplacement.
+- **Quêtes** : 15 cosmétiques se gagnent avec des objectifs de jeu (contrats du jour, monstres éliminés, trajets en train, appels à l'aide, hordes repoussées ou lancées, joueurs tués).
+- **Boutique du serveur** : 15 cosmétiques de 3 000 à 15 000 pièces personnelles (clic puis clic de confirmation, impossible en combat ; prix réglable avec `cosmetics.price-multiplier`).
+- Menu `/cosmetique` à onglets et pages, avec la progression des quêtes et les prix.
+
 ## 26/10/2026 (soir)
 
 ### Nouveau

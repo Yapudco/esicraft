@@ -279,6 +279,9 @@ catchup:
 reputation:
   enabled: true
 
+cosmetics:
+  price-multiplier: 1.0         # Multiplie les prix de la boutique de cosmétiques (3 000 à 15 000 pièces)
+
 mentoring:
   enabled: true
   mentor-min-hours: 5         # Temps de jeu minimal du parrain
