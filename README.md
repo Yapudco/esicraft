@@ -181,6 +181,10 @@ Au lieu d'acheter des pièges jetables, les officiers **débloquent** les défen
 
 Tout débloquer rapporte le succès *Archi-technicien*. Les **hordes minuscules ne rapportent rien** : repousser une horde de moins de 12 monstres ne donne ni XP de Nexus, ni points de saison, ni succès. Pendant un raid, seuls les monstres de la horde et le TNT allumé par la guilde attaquante détruisent la base (pas un tiers). Le Nexus doit rester **atteignable** : on ne peut pas le poser sous plus de 3 blocs pleins de roche (le siège ne casse qu'à 4 blocs de lui). Réglages : `nexus.tech.*` (coût, dégâts, XP).
 
+### 🚚 Déplacer le Nexus (`/nexus move`)
+
+Chaque **changement de spécialisation** offre à la guilde le droit de **déplacer son Nexus une fois**, dans les 7 jours : un officier se tient à l'endroit voulu (dans le territoire de la guilde) et tape `/nexus move`. Les règles de pose s'appliquent (zone de sécurité, Atlantes dans l'eau, Nexus atteignable). La vie et les défenses sont conservées ; impossible pendant un raid, un siège ou dans les 5 minutes qui suivent une attaque.
+
 ### 🎰 Roulette russe du Nexus (`/nexus gamble`)
 
 Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid) : **50 %** le Nexus gagne **+1 000 PV max** (bonus cumulé plafonné à **3 000**) et **2 000 pièces** vont à la banque ; **50 %** il perd **1 500 PV** (il survit toujours à 1 PV) et **500 PV max** du bonus de roulette, la banque perd **1 000 pièces**, et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.

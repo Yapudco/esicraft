@@ -315,6 +315,109 @@ public class NexusManager {
       }
    }
 
+   // ------------------------------------------------------------------ déplacement du Nexus après un changement de spécialisation
+
+   private final Map<String, Long> relocationUntil = new java.util.concurrent.ConcurrentHashMap<>();
+
+   public void loadRelocations() {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'nexusmove:%';", 2)) {
+         try {
+            this.relocationUntil.put(String.valueOf(row[0]).substring(10), Long.parseLong(String.valueOf(row[1])));
+         } catch (NumberFormatException ignored) {
+         }
+      }
+   }
+
+   public void clearRelocations() {
+      this.relocationUntil.clear();
+   }
+
+   public boolean canRelocate(Guild guild) {
+      Long until = guild == null ? null : this.relocationUntil.get(guild.getId());
+      return until != null && until > System.currentTimeMillis();
+   }
+
+   /** Un changement de spécialisation ouvre un droit (limité dans le temps) de déplacer le Nexus avec /nexus move. */
+   public void grantRelocation(Guild guild) {
+      if (guild == null || !guild.hasNexus()) {
+         return;
+      }
+
+      long days = Math.max(1L, this.plugin.getConfig().getLong("nexus.relocation-days", 7L));
+      long until = System.currentTimeMillis() + days * 86400000L;
+      this.relocationUntil.put(guild.getId(), until);
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+         "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "nexusmove:" + guild.getId(), String.valueOf(until)));
+      ChatUtil.broadcastGuild(guild, "&5💎 Changement de spécialisation : vous pouvez &edéplacer votre Nexus&5 une fois, pendant &e" + days + " jours&5, avec &e/nexus move &5(à l'endroit où vous vous tenez, dans votre territoire).");
+   }
+
+   /** Déplace le Nexus (même vie, mêmes défenses) à la position du joueur ; en cas de refus, l'ancien Nexus est remis en place. */
+   public void relocateNexus(Guild guild, Player player) {
+      if (!this.canRelocate(guild)) {
+         ChatUtil.sendMessage(player, "&c❌ Votre guilde n'a pas le droit de déplacer son Nexus : il faut d'abord changer de spécialisation (droit valable " + this.plugin.getConfig().getLong("nexus.relocation-days", 7L) + " jours).");
+         return;
+      }
+
+      if (!guild.hasRoleAtLeast(player.getUniqueId(), fr.esicraft.guild.GuildRole.OFFICER)) {
+         ChatUtil.sendMessage(player, "&c❌ Seuls les chefs et officiers peuvent déplacer le Nexus.");
+         return;
+      }
+
+      Nexus old = guild.getNexus();
+      if (old == null || !old.isAlive() || old.getLocation() == null) {
+         ChatUtil.sendMessage(player, "&c❌ Votre guilde n'a pas de Nexus actif.");
+         return;
+      }
+
+      if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getSiege().isEngaged(guild) || this.wasNexusRecentlyAttacked(guild, 300000L)) {
+         ChatUtil.sendMessage(player, "&c❌ Impossible pendant un raid, un siège ou dans les 5 minutes qui suivent une attaque.");
+         return;
+      }
+
+      Location target = player.getLocation().getBlock().getLocation();
+      Location previous = old.getLocation();
+      if (target.getWorld() == previous.getWorld() && target.getBlockX() == previous.getBlockX() && target.getBlockY() == previous.getBlockY() && target.getBlockZ() == previous.getBlockZ()) {
+         ChatUtil.sendMessage(player, "&cLe Nexus est déjà ici.");
+         return;
+      }
+
+      int health = old.getCurrentHealth();
+      java.util.Set<NexusTrapType> traps = java.util.EnumSet.noneOf(NexusTrapType.class);
+      traps.addAll(old.getActiveTraps());
+      this.removeGuardians(guild, previous);
+      this.removeNexus(guild);
+      boolean placed = this.placeNexus(guild, target, player);
+      if (!placed) {
+         // Refus : l'ancien Nexus revient tel quel.
+         guild.setNexus(old);
+         this.indexGuildNexus(guild);
+         previous.getBlock().setType(Material.CRYING_OBSIDIAN);
+         this.updateHologram(guild);
+         if (old.hasTrap(NexusTrapType.GUARDIAN_GOLEM)) {
+            this.spawnGuardian(guild, previous);
+         }
+
+         this.plugin.getDataManager().saveGuild(guild);
+         return;
+      }
+
+      Nexus fresh = guild.getNexus();
+      fresh.setCurrentHealth(Math.min(fresh.getMaxHealth(), health));
+      for (NexusTrapType t : traps) {
+         fresh.addTrap(t);
+      }
+
+      if (fresh.hasTrap(NexusTrapType.GUARDIAN_GOLEM)) {
+         this.spawnGuardian(guild, fresh.getLocation());
+      }
+
+      this.relocationUntil.remove(guild.getId());
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec("DELETE FROM kv WHERE k = ?;", "nexusmove:" + guild.getId()));
+      this.plugin.getDataManager().saveGuild(guild);
+      this.updateHologram(guild);
+      ChatUtil.broadcastGuild(guild, "&5💎 Le Nexus a été déplacé par &e" + player.getName() + "&5 (vie et défenses conservées).");
+   }
+
    public void removeNexus(Guild guild) {
       if (guild != null) {
          this.unindexGuildNexus(guild);

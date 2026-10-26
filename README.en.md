@@ -184,6 +184,10 @@ Instead of buying disposable traps, officers **unlock** defenses in `/nexus` (th
 
 Unlocking everything earns the *Archi-technician* achievement. **Tiny hordes earn nothing**: repelling a horde of fewer than 12 monsters gives no Nexus XP, season points or achievement. During a raid, only the horde's monsters and TNT lit by the attacking guild destroy the base (not a third party). The Nexus must stay **reachable**: it can't be placed under more than 3 solid blocks of rock (sieges only break within 4 blocks of it). Settings: `nexus.tech.*` (cost, damage, XP).
 
+### 🚚 Moving the Nexus (`/nexus move`)
+
+Every **specialization change** gives the guild the right to **move its Nexus once**, within 7 days: an officer stands where they want it (inside the guild's territory) and types `/nexus move`. Placement rules apply (safety zone, Atlanteans in water, reachable Nexus). Health and defenses are kept; impossible during a raid, a siege or within 5 minutes of an attack.
+
 ### 🎰 Nexus Russian roulette (`/nexus gamble`)
 
 The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid): **50%** the Nexus gains **+1,000 max HP** (cumulative bonus capped at **3,000**) and **2,000 coins** go to the bank; **50%** it loses **1,500 HP** (it always survives at 1 HP) and **500 max HP** of the roulette bonus, the bank loses **1,000 coins**, and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.

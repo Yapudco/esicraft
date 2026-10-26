@@ -174,6 +174,11 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
       return null;
    }
 
+   /** La guilde est-elle engagée dans un siège déclaré ou en cours ? */
+   public boolean isEngaged(Guild guild) {
+      return this.pendingOrActiveOf(guild) != null;
+   }
+
    public boolean isBesieged(Guild defender) {
       for (Siege s : this.sieges.values()) {
          if (s.state == State.ACTIVE && s.defenderId.equals(defender.getId())) {
