@@ -142,6 +142,11 @@ commands:
     aliases: [bank, pret]
     usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
 
+  cosmetique:
+    description: Activer ou cacher vos cosmétiques débloqués
+    aliases: [cosmetic, cosmetics]
+    usage: /cosmetique [on|off]
+
 permissions:
   esicraft.user:
     description: Permission de base pour utiliser les fonctionnalités de jeu

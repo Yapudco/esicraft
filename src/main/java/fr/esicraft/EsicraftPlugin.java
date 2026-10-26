@@ -54,6 +54,7 @@ import fr.esicraft.economy.LoanManager;
 import fr.esicraft.social.MentorManager;
 import fr.esicraft.social.RansomManager;
 import fr.esicraft.social.ReputationManager;
+import fr.esicraft.life.CosmeticManager;
 import fr.esicraft.life.DisguiseManager;
 import fr.esicraft.life.GuildContractManager;
 import fr.esicraft.life.GuildSynergy;
@@ -103,6 +104,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private DisguiseManager disguiseManager;
    private CombatManager combatManager;
    private AgeDimensionListener ageDimension;
+   private CosmeticManager cosmetics;
    private BalanceManager balance;
    private LoanManager loans;
    private ReputationManager reputation;
@@ -144,6 +146,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation = new ReputationManager(this);
       this.mentors = new MentorManager(this);
       this.ransom = new RansomManager(this);
+      this.cosmetics = new CosmeticManager(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
@@ -159,6 +162,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.reputation.init();
       this.mentors.init();
       this.ransom.start();
+      this.cosmetics.init();
       this.disguiseManager.init();
       this.railManager.load();
       this.treatyManager.load();
@@ -175,6 +179,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.disguiseManager, this);
       pm.registerEvents(this.combatManager, this);
       pm.registerEvents(this.ransom, this);
+      pm.registerEvents(this.cosmetics, this);
       pm.registerEvents(this.loans, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
@@ -251,6 +256,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    }
 
    private void registerCommands() {
+      Objects.requireNonNull(this.getCommand("cosmetique")).setExecutor(this.cosmetics);
       Objects.requireNonNull(this.getCommand("merci")).setExecutor(this.reputation);
       Objects.requireNonNull(this.getCommand("merci")).setTabCompleter(this.reputation);
       Objects.requireNonNull(this.getCommand("parrain")).setExecutor(this.mentors);
@@ -333,6 +339,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public HelpCallManager getHelpCalls() {
       return this.helpCalls;
+   }
+
+   public CosmeticManager getCosmetics() {
+      return this.cosmetics;
    }
 
    public AgeDimensionListener getAgeDimension() {

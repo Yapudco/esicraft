@@ -2,6 +2,24 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 26/10/2026
+
+### Correctifs de sécurité (audit)
+- **Duplication d'objets** : le butin doublé de l'Enclave Druidique ne vaut plus que pour les animaux d'élevage (plus d'ânes, mulets, lamas, chevaux, renards) ; le coffre commun s'enregistre dans l'ordre (un seul thread) et toutes les 30 s ; les annonces de l'Hôtel des Ventes aussi (annuler tout de suite ne laisse plus d'annonce fantôme) ; `/merci` est atomique.
+- **Création d'argent** : la prime d'`/aide` est prélevée sur la banque de la guilde défendue (plus créée) ; les primes de monstres ne comptent que pour les apparitions naturelles (ni spawner, ni œuf, ni raid, ni Lune de sang) avec un plafond de 4 000 pièces par heure ; la récompense de l'Âge de Suprématie n'est donnée qu'une fois par guilde ; le parrainage exige du temps de jeu, une connexion différente et au plus 3 jalons payés par jour ; les points « repoussé » sont plafonnés par couple de guildes ; les contrats de guilde demandent 3 membres.
+- **Comptes** : une seconde connexion ne remet plus le solde en arrière (le compte en mémoire n'est plus écrasé) ; les dépenses (train, rançon, déguisement, métier, fondation) sont enregistrées tout de suite ; un dépôt en banque de guilde est enregistré avec le compte du joueur dans une seule transaction ; un compte qui n'a pas pu se charger refuse la connexion au lieu de planter.
+- **Combat** : le kick n'exempte plus de la sanction ; commandes d'évasion et d'argent bloquées en combat ; TNT, loups apprivoisés, potions et nuages comptent comme des coups (et démasquent un déguisé).
+- **Rançon** : le totem ne protège plus de l'exécution ; un captif ne peut ni lâcher d'objets, ni ouvrir de coffres, ni se téléporter ; pas de capture entre guildes liées par traité ni deux fois de suite entre les mêmes guildes ; l'immunité n'existe qu'après paiement ; `/rancon` gère plusieurs prisonniers (nom en dernier argument).
+- **Raids et Nexus** : durée maximale de 25 minutes ; un chunk déchargé ne fait plus compter la horde comme repoussée ; apparition des monstres sur un sol solide ; Nexus réservé à l'Overworld ; sans défenseur le Nexus encaisse 25 % des dégâts (plus d'immunité) ; ligne de vue et portée vérifiées ; pas de soin juste après une attaque de joueurs ; pas de départ ni d'expulsion en plein raid.
+- **Claims** : entités protégées (cadres, supports d'armure, minecarts, chevaux, laisses) ; dispensers (tous seaux, boules de feu, TNT) ; zone de siège autour du Nexus (cassable par l'assaillant, et pas de Nexus muré) ; adjacence par côté ; tampon d'un chunk contre l'encerclement ; seul le chef abandonne un chunk ; plafond quotidien de dépenses des officiers.
+- **Âges et métiers** : le bloc Crafter respecte l'Âge de la guilde propriétaire ; l'équipement verrouillé ne peut plus frapper ni miner ; `DIAMOND_BLOCK` n'est plus verrouillé ; quitter ou être expulsé de sa guilde expulse du Nether / de l'End si l'Âge manque ; le pic de membres de l'Âge est conservé au redémarrage ; changer de spécialisation demande un nouveau membre ayant 2 h de jeu et 7 jours d'intervalle ; les potions de niveau II jetées par un allié et les balises n'affectent plus l'Industrie Souterraine.
+- **Prêts et diplomatie** : pas de dissolution avec une dette en cours ; un prêt est plafonné à 1 500 pièces par chunk de l'emprunteur ; prélèvement forcé sur la banque d'une dette en retard ; coffre commun fermé aux recrues ; l'indemnité de rupture et le tribut impayés faute de fonds deviennent une dette ; une recrue ne peut pas saboter un pacte (son coup est annulé) ; le prix du train est vérifié au clic.
+- **Déguisement et site** : pseudonyme inventé (plus de faux nom d'un vrai joueur) ; messages de mort sans le vrai nom ; l'espion n'apparaît plus « en ligne » dans sa vraie guilde ; défenseurs d'un raid masqués par défaut ; `/guild info` cache les PV du Nexus d'une autre guilde ; limite de requêtes par plage IPv6 /64, proxy inverse déclaré, plus de remise à zéro globale ; serveur HTTP plus tolérant aux clients lents.
+- **Divers** : `/money set` refuse les montants négatifs ; boss mondial (dégâts réels, butin dans l'inventaire du meilleur) ; Lune de sang (+25 % au lieu de +50 %) ; contrats (redstone espacée, enchantements de niveau 2 minimum).
+
+### Nouveau
+- Un cosmétique secret à découvrir, activable avec `/cosmetique`.
+
 ## 25/10/2026 (fin de nuit)
 
 ### Nouvelles mécaniques

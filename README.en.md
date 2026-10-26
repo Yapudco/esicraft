@@ -88,7 +88,9 @@ From Age 5, Netherite is available to everyone.
 
 Land is counted in **chunks** (16 × 16 block squares). With `/guild claim`, an officer claims the chunk they're standing in.
 
-- **All chunks must touch each other.** Only the first one can go anywhere. You also can't give up a chunk (`/guild unclaim`) if that would split the territory in two, or if it holds the Nexus.
+- **All chunks must touch** along a **side** (not diagonally: no more "snakes"). Only the first one can go anywhere. Only the **leader** can give up a chunk (`/guild unclaim`), and not if that would split the territory in two, or if it holds the Nexus.
+- **Anti-encirclement buffer**: a new chunk must stay at least **1 chunk** away from the territory of a guild with no treaty with yours.
+- **Officer cap**: an officer spends at most **3,000 coins per day** from the bank (claims, traps); the leader has no limit.
 - **Price**: paid from the guild bank. The first chunk costs 100 coins, then each new chunk costs 25 more than the previous one (100, 125, 150, 175…).
 - **Maximum size by Age**:
 
@@ -105,6 +107,10 @@ On another guild's land you **can't break or place blocks**, or open its chests,
 Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **Chorus Fruit** to teleport in, **End Crystals**, **pistons**, **lava, water and fire** coming from outside, block destruction by Withers, Endermen and Ravagers, and **projectiles** hitting animals, item frames and armor stands.
 
 **Lava and water**: a liquid never crosses from one territory to another (even during a raid), dispensers cannot pour any into a neighbour's land, and a **lava** bucket cannot be emptied within 5 blocks of a player who is neither in your guild nor your ally.
+
+**Protected entities**: item frames, armor stands, minecarts (chest ones too), horses, donkeys, animals and leashes can't be hit, ridden or opened by a stranger. Explosions damage no block of a territory, and dispensers can't pour buckets, fire charges or TNT in from outside.
+
+**Siege zone**: so that a Nexus stays reachable, an attacker can break blocks (except chests and containers) within **4 blocks** of a living Nexus, and members can't place a solid block within **2 blocks** of it (no walled-in Nexus).
 
 The other protections only drop during a raid against that guild, and for **30 minutes** after its Nexus is destroyed if there's no annexation.
 
@@ -149,7 +155,9 @@ The **Nexus** is the heart of your guild. You place it on your land with `/guild
 
 **Who is spared**: the guardian golem and traps never target guild members or members of a guild bound by a treaty (alliance, non-aggression pact or vassalage).
 
-**Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid.
+**The Nexus must be visible**: a hit only counts if the attacker can see it (range and line of sight are checked). The Nexus only exists in the Overworld.
+
+**Healing it**: a member throws a **golden apple** on it (or right-clicks it with one): +500 HP, or +2,500 HP with an enchanted golden apple. You must wait 30 seconds between two heals, and it's impossible during a raid or within 2 minutes of a player attack.
 
 ### Traps (`/nexus traps`)
 
@@ -180,7 +188,8 @@ Options: **sappers** that blow up walls and dry out the water and lava around th
 ### Conditions
 
 - Only **officers and the leader** can launch a raid.
-- **At least one defender must be online and on their own land**, otherwise the raid is refused.
+- **With no defender** online and on their land, a raid is still possible but the Nexus only takes **25%** of the damage.
+- **Maximum duration**: 25 minutes; after that the raid ends with no win or loss (a trapped monster no longer makes a guild untouchable). If a large part of the horde vanishes without fighting (unloaded chunk…), the win isn't credited.
 - After a raid, the target guild is **protected for 30 minutes**.
 - You can't attack a guild you have a **treaty** with (see [Diplomacy](#-9-diplomacy-and-travel)).
 
@@ -330,6 +339,10 @@ For **750 coins** you pose for **5 minutes** as a member of that guild: their na
 
 `/journal` sums up the latest big events (raids, conquests, treaties, betrayals, Ages, events). `/succes` lists your **26 achievements** (first profession, conqueror, traitor, master spy, four seasons…) and the share of players who have them. An achievement held by fewer than 10 % of players is **rare** and announced in the journal.
 
+### ⚔ PvP combat
+
+Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…) or being hit puts you "in combat" for 15 seconds. During that time **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… are blocked**, command teleports too, and **logging out is punished by death** (kicks included; only a server shutdown is excused).
+
 ### 🏦 Guild bank: loans and shared chest (`/banque`)
 
 Between two guilds **bound by a treaty** (alliance, pact or vassalage):
@@ -420,6 +433,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/merci <player>` | Give an honor point (once a day per person) |
 | `/parrain <player>` | Mentor a recruit (`accepter` / `refuser` to answer) |
 | `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |
+| `/cosmetique` | Show or hide your unlocked cosmetics |
 | `/hub` | Go back to the hub (blocked during PvP combat) |
 
 ---
