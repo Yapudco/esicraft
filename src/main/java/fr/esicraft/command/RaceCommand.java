@@ -25,7 +25,7 @@ public class RaceCommand implements CommandExecutor, TabCompleter {
       if (args.length >= 1 && args[0].equalsIgnoreCase("show")) {
          if (sender instanceof Player player) {
             if (args.length >= 2) {
-               Player target = Bukkit.getPlayer(args[1]);
+               Player target = fr.esicraft.util.PlayerLookup.find(args[1]);
                if (target == null) {
                   ChatUtil.sendMessage(player, "&cJoueur &e" + args[1] + " &cintrouvable ou hors-ligne.");
                   return true;
@@ -46,7 +46,7 @@ public class RaceCommand implements CommandExecutor, TabCompleter {
             ChatUtil.sendMessage(sender, "&cPermission insuffisante.");
             return true;
          } else {
-            Player target = Bukkit.getPlayer(args[1]);
+            Player target = fr.esicraft.util.PlayerLookup.find(args[1]);
             if (target == null) {
                ChatUtil.sendMessage(sender, "&cJoueur introuvable.");
                return true;

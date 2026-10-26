@@ -344,6 +344,17 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
          return;
       }
 
+      if (occupant != null && !occupant.getId().equals(mine.getId())) {
+         ChatUtil.sendMessage(player, "&c❌ Cet emplacement appartient à une guilde tierce : plantez l'étendard en terrain libre ou sur votre territoire.");
+         return;
+      }
+
+      Block banner = here.getBlock();
+      if (!banner.getType().isAir() || !banner.getRelative(org.bukkit.block.BlockFace.DOWN).getType().isSolid()) {
+         ChatUtil.sendMessage(player, "&c❌ L'étendard se plante dans un espace libre, sur un sol solide (aucun bloc existant n'est remplacé).");
+         return;
+      }
+
       LocalDateTime now = LocalDateTime.now();
       LocalDateTime when = now.toLocalDate().atTime(hour, 0);
       while (when.getDayOfWeek() != day || when.isBefore(now.plusHours(Math.max(1, this.plugin.getConfig().getLong("siege.notice-hours", 24L))))) {
@@ -361,11 +372,6 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
       if (fee > 0.0 && (!this.plugin.getGuildManager().officerMaySpend(mine, player, fee) || !mine.withdrawBank(fee))) {
          ChatUtil.sendMessage(player, "&c❌ La banque de votre guilde doit contenir &6" + (long)fee + " pièces &c(frais de déclaration de guerre).");
          return;
-      }
-
-      Block banner = here.getBlock();
-      if (!banner.getType().isAir()) {
-         banner = banner.getRelative(org.bukkit.block.BlockFace.UP);
       }
 
       banner.setType(Material.RED_BANNER);
