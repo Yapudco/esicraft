@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 26/10/2026 (suite)
+
+### Correctifs
+- **Hégémonie économique** : la richesse d'une guilde compte désormais sa banque **plus les pièces de tous ses membres** (connectés ou non). Déplacer l'argent de la banque vers les poches, ou l'inverse, ne fait plus échapper à l'hégémonie.
+- **Combat** : impossible de dépenser ou de transférer ses pièces en plein combat (achat à l'Hôtel des Ventes, `/pay`, dépôt en banque, fondation de guilde, changement de métier, déguisement, piège payé de sa poche). Le paiement d'une rançon reste possible.
+
 ## 26/10/2026
 
 ### Correctifs de sécurité (audit)

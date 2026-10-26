@@ -183,6 +183,17 @@ public class DataManager {
       }
    }
 
+   /** Pièces d'un joueur, connecté ou non (en mémoire s'il est en ligne, sinon lues en base). */
+   public double getPlayerCoins(UUID uuid) {
+      PlayerData online = this.players.get(uuid);
+      if (online != null) {
+         return online.getCoins();
+      }
+
+      var rows = this.storage.select("SELECT coins FROM players WHERE uuid = ?;", 1, uuid.toString());
+      return !rows.isEmpty() && rows.get(0)[0] instanceof Number n ? n.doubleValue() : 0.0;
+   }
+
    public SQLiteStorage getStorage() {
       return this.storage;
    }

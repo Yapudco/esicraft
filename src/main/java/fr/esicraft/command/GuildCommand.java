@@ -362,6 +362,10 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
+               if (this.plugin.getCombatManager().denySpending(player)) {
+                  return true;
+               }
+
                if (args.length < 2) {
                   ChatUtil.sendMessage(player, "&eSolde de la banque de guilde : &6" + String.format("%.2f", guild.getBankBalance()) + " pièces.");
                   return true;

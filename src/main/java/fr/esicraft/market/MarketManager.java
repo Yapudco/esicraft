@@ -89,6 +89,10 @@ public class MarketManager {
    }
 
    public boolean buyListing(Player buyer, String listingId) {
+      if (buyer != null && this.plugin.getCombatManager().denySpending(buyer)) {
+         return false;
+      }
+
       if (buyer != null && listingId != null) {
          MarketListing listing = this.listings.remove(listingId);
          if (listing == null) {

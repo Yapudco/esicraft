@@ -63,6 +63,17 @@ public class CombatManager implements Listener {
       return this.enabled() && until != null && until > System.currentTimeMillis();
    }
 
+   /** Vrai (avec message) si le joueur est en combat : il ne peut pas dépenser ni transférer ses pièces (pas de bourse vidée avant de mourir). */
+   public boolean denySpending(Player player) {
+      if (!this.isInCombat(player)) {
+         return false;
+      }
+
+      ChatUtil.sendMessage(player, "&c❌ Vous ne pouvez pas dépenser ni transférer vos pièces en plein combat (&e" + this.remainingSeconds(player) + " s&c).");
+      ChatUtil.playSound(player, org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+      return true;
+   }
+
    public long remainingSeconds(Player player) {
       Long until = this.taggedUntil.get(player.getUniqueId());
       return until == null ? 0L : Math.max(0L, (until - System.currentTimeMillis() + 999L) / 1000L);

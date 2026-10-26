@@ -201,7 +201,7 @@ Options: **sappers** that blow up walls and dry out the water and lava around th
 
 ### ⭐ Guilds that get too rich become targets
 
-A guild gets **Economic Hegemony** status if at least half of its members are in the top 5 richest players (`/baltop`), or if its bank holds more than 30% of all the money on the server. Raids against it cost **half price** and its post-raid protection only lasts **2 minutes**. It's marked with a ⭐ in the target menu.
+A guild gets **Economic Hegemony** status if at least half of its members are in the top 5 richest players (`/baltop`), or if its **bank plus its members' coins** hold more than 30% of all the money on the server. Raids against it cost **half price** and its post-raid protection only lasts **2 minutes**. It's marked with a ⭐ in the target menu.
 
 ---
 
@@ -341,7 +341,7 @@ For **750 coins** you pose for **5 minutes** as a member of that guild: their na
 
 ### ⚔ PvP combat
 
-Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…) or being hit puts you "in combat" for 15 seconds. During that time **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… are blocked**, command teleports too, and **logging out is punished by death** (kicks included; only a server shutdown is excused).
+Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…) or being hit puts you "in combat" for 15 seconds. During that time **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… are blocked**, command teleports too, and **logging out is punished by death** (kicks included; only a server shutdown is excused). Spending or transferring coins is also impossible (purchases, `/pay`, bank, profession, disguise); only paying a ransom is allowed.
 
 ### 🏦 Guild bank: loans and shared chest (`/banque`)
 
