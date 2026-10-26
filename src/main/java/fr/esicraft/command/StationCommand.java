@@ -38,7 +38,16 @@ public class StationCommand implements CommandExecutor {
          switch (sub) {
             case "confirmer" -> this.plugin.getFreight().confirm(player);
             case "annuler" -> this.plugin.getFreight().cancel(player);
-            case "recuperer", "récupérer" -> this.plugin.getFreight().openBox(player);
+            case "ajouter" -> this.plugin.getFreight().addChest(player);
+            case "recuperer", "récupérer" -> {
+               int page = 1;
+               try {
+                  page = args.length > 2 ? Integer.parseInt(args[2]) : 1;
+               } catch (NumberFormatException ignored) {
+               }
+
+               this.plugin.getFreight().openBox(player, page);
+            }
             default -> ChatUtil.sendMessage(player, "&6🚂 Fret : Maj + clic sur une destination dans &e/station &6pour charger un wagonnet (Âge 2 minimum). &e/station fret recuperer &6récupère les livraisons de la gare.");
          }
 

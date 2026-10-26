@@ -82,15 +82,34 @@ public class FreightManager implements Listener {
       }
    }
 
+   /** Chargement en cours d'un joueur : les objets de tous les coffres déjà remplis, en attente d'envoi. */
    private static final class Pending {
       final RailSearch.Reached trip;
-      final ItemStack[] cargo;
-      final long expires;
+      ItemStack[] cargo = new ItemStack[0];
+      /** Coffres ouverts (vides ou non) et coffres contenant des objets. */
+      int opened;
+      int filled;
+      long expires;
 
-      Pending(RailSearch.Reached trip, ItemStack[] cargo, long expires) {
+      Pending(RailSearch.Reached trip, long expires) {
          this.trip = trip;
-         this.cargo = cargo;
          this.expires = expires;
+      }
+
+      void add(ItemStack[] chest) {
+         List<ItemStack> all = new ArrayList<>(java.util.Arrays.asList(this.cargo));
+         boolean any = false;
+         for (ItemStack it : chest) {
+            if (it != null && !it.getType().isAir()) {
+               all.add(it);
+               any = true;
+            }
+         }
+
+         this.cargo = all.toArray(new ItemStack[0]);
+         if (any) {
+            this.filled++;
+         }
       }
    }
 
@@ -106,7 +125,6 @@ public class FreightManager implements Listener {
    }
 
    static final class BoxHolder implements InventoryHolder {
-      String guildId;
       String stationId;
 
       @Override
@@ -120,8 +138,18 @@ public class FreightManager implements Listener {
    private final Map<String, Convoy> convoys = new ConcurrentHashMap<>();
    private final Map<UUID, Convoy> byCart = new ConcurrentHashMap<>();
    private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
-   /** Une seule boîte de livraison en mémoire par (guilde, gare) : tous les officiers qui l'ouvrent partagent le même inventaire, donc rien ne se duplique. */
-   private final Map<String, Inventory> boxes = new ConcurrentHashMap<>();
+   /** Boîte de livraison d'une gare : plusieurs coffres (pages) de 54 emplacements, visibles de tous les joueurs présents à la gare. */
+   private static final class Box {
+      final String stationId;
+      final List<Inventory> pages = new ArrayList<>();
+
+      Box(String stationId) {
+         this.stationId = stationId;
+      }
+   }
+
+   /** Une seule boîte par gare en mémoire : tout le monde partage les mêmes inventaires, donc rien ne se duplique. */
+   private final Map<String, Box> boxes = new ConcurrentHashMap<>();
    /** Toutes les écritures passent par ce fil unique : leur ordre est garanti. */
    private final java.util.concurrent.ExecutorService io = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
       Thread t = new Thread(r, "esicraft-freight-io");
@@ -198,9 +226,8 @@ public class FreightManager implements Listener {
          this.despawn(c);
       }
 
-      for (Map.Entry<String, Inventory> e : this.boxes.entrySet()) {
-         String[] k = e.getKey().split("\\|", 2);
-         this.saveBox(k[0], k[1], e.getValue().getContents());
+      for (Box b : this.boxes.values()) {
+         this.saveBox(b);
       }
 
       this.io.shutdown();
@@ -292,11 +319,52 @@ public class FreightManager implements Listener {
          return;
       }
 
+      Pending old = this.pending.remove(player.getUniqueId());
+      if (old != null) {
+         this.giveBack(player, old.cargo);
+      }
+
+      Pending fresh = new Pending(trip, System.currentTimeMillis() + 180000L);
+      this.pending.put(player.getUniqueId(), fresh);
+      ChatUtil.sendMessage(player, "&6🚂 Votre guilde peut envoyer jusqu'à &e" + this.maxChests(guild) + " double(s) coffre(s) &6par convoi (Âge " + guild.getCurrentAge().getLevel() + "). Placez les objets, puis fermez le coffre.");
+      this.openChest(player, fresh);
+   }
+
+   /** Nombre de doubles coffres d'un convoi selon l'Âge de la guilde (2 : 1, 3 : 2, 4 : 3, 5 : 5, 6 : 10). */
+   public int maxChests(Guild guild) {
+      List<Integer> table = this.plugin.getConfig().getIntegerList("rail.freight.chests-by-age");
+      if (table.size() < 5) {
+         table = List.of(1, 2, 3, 5, 10);
+      }
+
+      int index = Math.max(0, Math.min(table.size() - 1, guild.getCurrentAge().getLevel() - 2));
+      return Math.max(1, table.get(index));
+   }
+
+   private void openChest(Player player, Pending p) {
+      p.opened++;
+      p.expires = System.currentTimeMillis() + 180000L;
       LoadHolder holder = new LoadHolder();
-      holder.trip = trip;
-      Inventory inv = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l🚂 Fret vers " + trip.station().getName()));
+      holder.trip = p.trip;
+      Inventory inv = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l🚂 Fret vers " + p.trip.station().getName() + " &7(coffre " + p.opened + ")"));
       player.openInventory(inv);
-      ChatUtil.sendMessage(player, "&6🚂 Placez les objets à expédier (jusqu'à 54 emplacements), puis fermez le coffre pour confirmer.");
+   }
+
+   /** /station fret ajouter : ouvre un double coffre supplémentaire dans la limite de l'Âge. */
+   public void addChest(Player player) {
+      Pending p = this.pending.get(player.getUniqueId());
+      Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+      if (p == null || guild == null || p.expires < System.currentTimeMillis()) {
+         ChatUtil.sendMessage(player, "&c❌ Aucun chargement en cours (Maj + clic sur une destination dans /station).");
+         return;
+      }
+
+      if (p.opened >= this.maxChests(guild)) {
+         ChatUtil.sendMessage(player, "&c❌ Limite atteinte : votre Âge autorise " + this.maxChests(guild) + " double(s) coffre(s) par convoi.");
+         return;
+      }
+
+      this.openChest(player, p);
    }
 
    @EventHandler
@@ -307,27 +375,36 @@ public class FreightManager implements Listener {
 
       if (event.getInventory().getHolder() instanceof LoadHolder holder && !holder.done) {
          holder.done = true;
-         ItemStack[] cargo = event.getInventory().getContents();
-         boolean empty = true;
-         for (ItemStack it : cargo) {
-            if (it != null && !it.getType().isAir()) {
-               empty = false;
-            }
-         }
-
-         if (empty) {
+         Pending p = this.pending.get(player.getUniqueId());
+         Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+         if (p == null || guild == null) {
+            this.giveBack(player, event.getInventory().getContents());
             return;
          }
 
-         this.pending.put(player.getUniqueId(), new Pending(holder.trip, cargo, System.currentTimeMillis() + 60000L));
+         p.add(event.getInventory().getContents());
+         p.expires = System.currentTimeMillis() + 180000L;
+         if (p.filled == 0) {
+            this.pending.remove(player.getUniqueId());
+            return;
+         }
+
          RailManager.Quote q = this.rails.quote(player, holder.trip);
-         double fee = q == null ? 0.0 : q.fare() * this.plugin.getConfig().getDouble("rail.freight.fare-multiplier", 5.0);
-         player.sendMessage(Component.text("🚂 Envoi vers " + holder.trip.station().getName() + " — frais : " + String.format(Locale.ROOT, "%.2f", fee) + " pièces. ", NamedTextColor.GOLD)
+         double fee = q == null ? 0.0 : q.fare() * this.plugin.getConfig().getDouble("rail.freight.fare-multiplier", 5.0) * p.filled;
+         Component line = Component.text("🚂 " + p.filled + " coffre(s) vers " + holder.trip.station().getName() + " — frais : " + String.format(Locale.ROOT, "%.2f", fee) + " pièces. ", NamedTextColor.GOLD);
+         if (p.opened < this.maxChests(guild)) {
+            line = line.append(Component.text("[+ COFFRE " + p.opened + "/" + this.maxChests(guild) + "]", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/station fret ajouter"))).append(Component.text("  "));
+         }
+
+         player.sendMessage(line
             .append(Component.text("[ENVOYER]", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/station fret confirmer")))
             .append(Component.text("  "))
             .append(Component.text("[ANNULER]", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/station fret annuler"))));
       } else if (event.getInventory().getHolder() instanceof BoxHolder box) {
-         this.saveBox(box.guildId, box.stationId, event.getInventory().getContents());
+         Box b = this.boxes.get(box.stationId);
+         if (b != null) {
+            this.saveBox(b);
+         }
       }
    }
 
@@ -364,7 +441,7 @@ public class FreightManager implements Listener {
       }
 
       RailManager.Quote q = this.rails.quote(player, p.trip);
-      double fee = q == null ? 0.0 : q.fare() * this.plugin.getConfig().getDouble("rail.freight.fare-multiplier", 5.0);
+      double fee = q == null ? 0.0 : q.fare() * this.plugin.getConfig().getDouble("rail.freight.fare-multiplier", 5.0) * Math.max(1, p.filled);
       if (q == null) {
          this.giveBack(player, p.cargo);
          ChatUtil.sendMessage(player, "&c❌ Une guilde traversée vous interdit désormais le passage. Objets rendus.");
@@ -420,87 +497,155 @@ public class FreightManager implements Listener {
 
    // ------------------------------------------------------------------ livraisons
 
-   private static String boxKey(String guildId, String stationId) {
-      return guildId + "|" + stationId;
-   }
+   private static final String PUBLIC = "*";
+   private static final int MAX_PAGES = 30;
 
-   private void saveBox(String guildId, String stationId, ItemStack[] items) {
-      String data = encodeItems(items);
+   private void saveBox(Box box) {
+      List<ItemStack> all = new ArrayList<>();
+      for (Inventory page : box.pages) {
+         for (ItemStack it : page.getContents()) {
+            if (it != null && !it.getType().isAir()) {
+               all.add(it);
+            }
+         }
+      }
+
+      String data = encodeItems(all.toArray(new ItemStack[0]));
+      String station = box.stationId;
       this.async(() -> this.plugin.getDataManager().getStorage().exec(
-         "INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?) ON CONFLICT(guild_id, station_id) DO UPDATE SET cargo = excluded.cargo;", guildId, stationId, data));
+         "INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?) ON CONFLICT(guild_id, station_id) DO UPDATE SET cargo = excluded.cargo;", PUBLIC, station, data));
    }
 
-   private ItemStack[] readBox(String guildId, String stationId) {
-      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT cargo FROM freight_boxes WHERE guild_id = ? AND station_id = ?;", 1, guildId, stationId)) {
+   /** Contenu de la gare (toutes les anciennes lignes par guilde sont fusionnées en une seule boîte publique). */
+   private List<ItemStack> readBox(String stationId) {
+      var db = this.plugin.getDataManager().getStorage();
+      List<ItemStack> all = new ArrayList<>();
+      var rows = db.select("SELECT guild_id, cargo FROM freight_boxes WHERE station_id = ?;", 2, stationId);
+      boolean migrate = rows.size() > 1 || !rows.isEmpty() && !PUBLIC.equals(String.valueOf(rows.get(0)[0]));
+      for (Object[] row : rows) {
          try {
-            return decodeItems(String.valueOf(row[0]));
+            for (ItemStack it : decodeItems(String.valueOf(row[1]))) {
+               if (it != null && !it.getType().isAir()) {
+                  all.add(it);
+               }
+            }
          } catch (RuntimeException ignored) {
          }
       }
 
-      return new ItemStack[0];
+      if (migrate) {
+         String data = encodeItems(all.toArray(new ItemStack[0]));
+         db.runInTransaction(() -> {
+            db.exec("DELETE FROM freight_boxes WHERE station_id = ?;", stationId);
+            db.exec("INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?);", PUBLIC, stationId, data);
+         });
+      }
+
+      return all;
    }
 
-   /** Donne la boîte partagée (chargée en tâche de fond à la première utilisation) à l'action, sur le thread principal. */
-   private void withBox(String guildId, String stationId, java.util.function.Consumer<Inventory> action) {
-      String key = boxKey(guildId, stationId);
-      Inventory ready = this.boxes.get(key);
+   private Inventory newPage(Box box) {
+      BoxHolder holder = new BoxHolder();
+      holder.stationId = box.stationId;
+      Station st = this.rails.stationById(box.stationId);
+      Inventory page = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l📦 Livraisons — " + (st != null ? st.getName() : "gare") + " &7(coffre " + (box.pages.size() + 1) + ")"));
+      box.pages.add(page);
+      return page;
+   }
+
+   /** Range un objet dans la boîte (nouveaux coffres au besoin) ; renvoie ce qui ne tient plus (au-delà de 30 coffres). */
+   private ItemStack addToBox(Box box, ItemStack item) {
+      ItemStack rest = item;
+      for (Inventory page : box.pages) {
+         java.util.Collection<ItemStack> left = page.addItem(rest).values();
+         if (left.isEmpty()) {
+            return null;
+         }
+
+         rest = left.iterator().next();
+      }
+
+      while (box.pages.size() < MAX_PAGES) {
+         java.util.Collection<ItemStack> left = this.newPage(box).addItem(rest).values();
+         if (left.isEmpty()) {
+            return null;
+         }
+
+         rest = left.iterator().next();
+      }
+
+      return rest;
+   }
+
+   /** Donne la boîte partagée de la gare (chargée en tâche de fond à la première utilisation) à l'action, sur le thread principal. */
+   private void withBox(String stationId, java.util.function.Consumer<Box> action) {
+      Box ready = this.boxes.get(stationId);
       if (ready != null) {
          action.accept(ready);
          return;
       }
 
       this.async(() -> {
-         ItemStack[] items = this.readBox(guildId, stationId);
+         List<ItemStack> items = this.readBox(stationId);
          Bukkit.getScheduler().runTask(this.plugin, () -> {
-            Inventory inv = this.boxes.computeIfAbsent(key, k -> {
-               BoxHolder holder = new BoxHolder();
-               holder.guildId = guildId;
-               holder.stationId = stationId;
-               Station st = this.rails.stationById(stationId);
-               Inventory created = Bukkit.createInventory(holder, 54, ChatUtil.component("&8&l📦 Livraisons — " + (st != null ? st.getName() : "gare")));
+            Box box = this.boxes.computeIfAbsent(stationId, k -> {
+               Box created = new Box(k);
+               this.newPage(created);
                for (ItemStack it : items) {
-                  if (it != null && !it.getType().isAir()) {
-                     created.addItem(it);
-                  }
+                  this.addToBox(created, it);
                }
 
                return created;
             });
-            action.accept(inv);
+            action.accept(box);
          });
       });
    }
 
-   /** /station fret recuperer : ouvre les marchandises livrées à la gare où se tient l'officier. */
-   public void openBox(Player player) {
-      Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+   /** /station fret recuperer [coffre] : tout joueur présent à la gare peut prendre les marchandises livrées (le fret sert aussi d'échange entre guildes). */
+   public void openBox(Player player, int pageNumber) {
       Station station = this.rails.nearestStation(player.getLocation(), 8.0);
-      if (guild == null || station == null) {
-         ChatUtil.sendMessage(player, "&c🚉 Tenez-vous dans une gare (à moins de 8 blocs d'un panneau [Gare]) pour récupérer vos livraisons.");
+      if (station == null) {
+         ChatUtil.sendMessage(player, "&c🚉 Tenez-vous dans une gare (à moins de 8 blocs d'un panneau [Gare]) pour récupérer les livraisons.");
          return;
       }
 
-      if (!guild.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
-         ChatUtil.sendMessage(player, "&c❌ Réservé aux officiers.");
-         return;
-      }
+      this.withBox(station.getId(), box -> {
+         if (!player.isOnline()) {
+            return;
+         }
 
-      this.withBox(guild.getId(), station.getId(), inv -> {
-         if (player.isOnline()) {
-            player.openInventory(inv);
+         int index = Math.max(0, Math.min(box.pages.size() - 1, pageNumber - 1));
+         player.openInventory(box.pages.get(index));
+         if (box.pages.size() > 1) {
+            ChatUtil.sendMessage(player, "&6📦 Coffre &e" + (index + 1) + "&6/&e" + box.pages.size() + "&6 — les autres : &e/station fret recuperer <numéro>&6.");
          }
       });
    }
 
    /** Supprime la ligne du convoi (et enregistre la boîte du même coup, dans une seule transaction : un plantage ne livre jamais deux fois). */
-   private void finishRow(String convoyId, String boxGuild, String boxStation, ItemStack[] boxItems) {
-      String data = boxItems == null ? null : encodeItems(boxItems);
+   private void finishRow(String convoyId, Box box) {
+      String station = box == null ? null : box.stationId;
+      String data = null;
+      if (box != null) {
+         List<ItemStack> all = new ArrayList<>();
+         for (Inventory page : box.pages) {
+            for (ItemStack it : page.getContents()) {
+               if (it != null && !it.getType().isAir()) {
+                  all.add(it);
+               }
+            }
+         }
+
+         data = encodeItems(all.toArray(new ItemStack[0]));
+      }
+
+      String boxData = data;
       this.async(() -> {
          var db = this.plugin.getDataManager().getStorage();
          db.runInTransaction(() -> {
-            if (data != null) {
-               db.exec("INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?) ON CONFLICT(guild_id, station_id) DO UPDATE SET cargo = excluded.cargo;", boxGuild, boxStation, data);
+            if (boxData != null) {
+               db.exec("INSERT INTO freight_boxes (guild_id, station_id, cargo) VALUES (?, ?, ?) ON CONFLICT(guild_id, station_id) DO UPDATE SET cargo = excluded.cargo;", PUBLIC, station, boxData);
             }
 
             db.exec("DELETE FROM freight_convoys WHERE id = ?;", convoyId);
@@ -534,27 +679,42 @@ public class FreightManager implements Listener {
 
       int donatedFinal = donated;
       boolean hasLeftovers = !leftovers.isEmpty();
-      if (dest != null && hasLeftovers) {
-         World w = Bukkit.getWorld(dest.getWorld());
-         this.withBox(c.guildId, dest.getId(), inv -> {
+      // Si la gare d'arrivée a disparu, le fret retourne à la gare de départ.
+      Station target = dest != null ? dest : this.rails.stationById(c.fromStation);
+      if (target != null && hasLeftovers) {
+         World w = Bukkit.getWorld(target.getWorld());
+         this.withBox(target.getId(), box -> {
             for (ItemStack it : leftovers) {
-               for (ItemStack overflow : inv.addItem(it).values()) {
-                  if (w != null) {
-                     w.dropItemNaturally(new Location(w, dest.getRailX() + 0.5, dest.getRailY() + 1.0, dest.getRailZ() + 0.5), overflow);
-                  }
+               ItemStack overflow = this.addToBox(box, it);
+               if (overflow != null && w != null) {
+                  w.dropItemNaturally(new Location(w, target.getRailX() + 0.5, target.getRailY() + 1.0, target.getRailZ() + 0.5), overflow);
                }
             }
 
-            this.finishRow(c.id, c.guildId, dest.getId(), inv.getContents());
+            this.finishRow(c.id, box);
          });
       } else {
-         this.finishRow(c.id, null, null, null);
+         this.finishRow(c.id, null);
       }
 
+      String where = target != null ? target.getName() : "destination";
       if (guild != null && !silent) {
-         ChatUtil.broadcastGuild(guild, "&a🚂 Le convoi de fret est arrivé à &e" + (dest != null ? dest.getName() : "destination") + "&a !"
-            + (donatedFinal > 0 ? " &7" + donatedFinal + " objet(s) ont été offerts automatiquement à la progression d'Âge." : "") + (hasLeftovers ? " &7Récupérez le reste avec &e/station fret recuperer&7 dans cette gare." : ""));
+         ChatUtil.broadcastGuild(guild, "&a🚂 Le convoi de fret est arrivé à &e" + where + "&a !"
+            + (donatedFinal > 0 ? " &7" + donatedFinal + " objet(s) ont été offerts automatiquement à la progression d'Âge." : ""));
          this.plugin.getAchievements().grantGuild(guild, fr.esicraft.life.Achievement.FREIGHT_RUNNER, true);
+      }
+
+      if (hasLeftovers && target != null) {
+         Guild stationGuild = this.rails.guildOf(target);
+         String sender = guild != null ? guild.getName() : c.senderName;
+         String msg = "&6📦 Un convoi de fret de &e" + sender + " &6est arrivé à la gare &e" + target.getName() + " &6: &e/station fret recuperer &6(ouvert à tous les joueurs présents à la gare).";
+         if (stationGuild != null) {
+            ChatUtil.broadcastGuild(stationGuild, msg);
+         }
+
+         if (guild != null && (stationGuild == null || !stationGuild.getId().equals(guild.getId()))) {
+            ChatUtil.broadcastGuild(guild, "&7📦 Les marchandises sont à la disposition de tout joueur présent à la gare &e" + target.getName() + "&7.");
+         }
       }
    }
 
@@ -734,7 +894,7 @@ public class FreightManager implements Listener {
    private void loot(Convoy c, Player attacker, Guild looters, Location loc) {
       this.convoys.remove(c.id);
       this.despawn(c);
-      this.finishRow(c.id, null, null, null);
+      this.finishRow(c.id, null);
       for (ItemStack it : c.cargo) {
          if (it != null && !it.getType().isAir()) {
             loc.getWorld().dropItemNaturally(loc, it);

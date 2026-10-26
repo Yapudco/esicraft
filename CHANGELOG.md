@@ -2,6 +2,13 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (fret)
+
+### Train de fret : plusieurs doubles coffres, livraisons publiques
+- Un convoi peut transporter **plusieurs doubles coffres** selon l'Âge de la guilde : **Âge 2 : 1, Âge 3 : 2, Âge 4 : 3, Âge 5 : 5, Âge 6 : 10** (`rail.freight.chests-by-age`). Après chaque coffre, des boutons cliquables proposent **[+ COFFRE]**, **[ENVOYER]** ou **[ANNULER]** ; les frais sont comptés par coffre rempli.
+- Les marchandises arrivent dans la **boîte de la gare d'arrivée, ouverte à tous les joueurs présents** (`/station fret recuperer [numéro]`, jusqu'à 30 coffres de 54 emplacements) : le fret sert d'**échange entre guildes**. La guilde propriétaire de la gare est prévenue. Si la gare d'arrivée a disparu, le fret revient à la gare de départ. Les anciennes boîtes par guilde sont fusionnées.
+- À savoir : n'importe qui à la gare peut tout prendre, y compris sur une gare de sa propre guilde.
+
 ## 30/10/2026
 
 ### Correctif : coffre de fret
