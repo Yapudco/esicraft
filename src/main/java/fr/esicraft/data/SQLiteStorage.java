@@ -699,7 +699,7 @@ public class SQLiteStorage {
             // Données gardées en clé/valeur : cosmétiques (équipés, achetés, secrets), délais de spécialisation, pics de membres, saison et championne.
             // Seules les préférences de langue des joueurs survivent à un reset.
             statement.executeUpdate("DELETE FROM kv WHERE k LIKE 'cosmetic%' OR k LIKE 'cos_aura:%' OR k LIKE 'cos_trail:%' OR k LIKE 'cos_burst:%' OR k LIKE 'cos_buy:%' OR k LIKE 'cos_title:%'"
-               + " OR k LIKE 'speccd:%' OR k LIKE 'peak:%' OR k = 'season' OR k = 'season_champion' OR k LIKE 'court_%' OR k = 'boss_wins' OR k LIKE 'gamble:%';");
+               + " OR k LIKE 'speccd:%' OR k LIKE 'peak:%' OR k = 'season' OR k = 'season_champion' OR k LIKE 'court_%' OR k = 'boss_wins' OR k LIKE 'gamble:%' OR k LIKE 'gamble_bonus:%' OR k LIKE 'nexusmove:%';");
             statement.executeUpdate("DELETE FROM stations;");
             statement.executeUpdate("DELETE FROM rail_policy;");
             statement.executeUpdate("DELETE FROM rail_relations;");

@@ -272,6 +272,7 @@ public class DataManager {
       this.plugin.getTavern().clear();
       this.plugin.getNexusTech().clear();
       this.plugin.getNexusGamble().clear();
+      this.plugin.getNexusManager().clearRelocations();
       this.plugin.getFreight().clear();
       this.plugin.getSiege().clear();
       this.plugin.getBourse().clear();

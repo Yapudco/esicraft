@@ -804,8 +804,7 @@ public class GuildManager {
                return false;
             } else {
                if (spec == GuildSpecialization.ATLANTEAN && guild.hasNexus() && !fr.esicraft.nexus.NexusManager.isSubmerged(guild.getNexus().getLocation())) {
-                  ChatUtil.sendMessage(player, "&c❌ Les Atlantes exigent un Nexus immergé dans l'eau : le vôtre est à sec.");
-                  return false;
+                  ChatUtil.sendMessage(player, "&e⚠ Votre Nexus est à sec : déplacez-le dans l'eau avec &6/nexus move &e(droit offert par ce changement), sinon les Atlantes n'ont aucun bonus.");
                }
 
                if (spec == GuildSpecialization.LONE_RANGER) {
@@ -829,8 +828,13 @@ public class GuildManager {
                }
 
                GuildSpecialization oldSpec = guild.getSpecialization();
+               GuildSpecialization oldSpecBefore = oldSpec;
                guild.setSpecialization(spec);
                guild.setCanChangeSpecialization(false);
+               if (oldSpecBefore != spec) {
+                  this.plugin.getNexusManager().grantRelocation(guild);
+               }
+
                String cdKey = "speccd:" + guild.getId();
                this.specChangedAt.put(guild.getId(), System.currentTimeMillis());
                Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage()

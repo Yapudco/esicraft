@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (Nexus mobile)
+
+### Déplacer le Nexus après un changement de spécialisation
+- Chaque **changement de spécialisation** donne à la guilde le droit de **déplacer son Nexus une fois**, pendant 7 jours (`nexus.relocation-days`), avec **`/nexus move`** (officiers, là où l'on se tient, dans le territoire de la guilde). Les règles de pose s'appliquent (Atlantes : dans l'eau, Nexus accessible…). On peut désormais passer Atlante avec un Nexus à sec, puis le déplacer dans l'eau ; sans Nexus immergé, les Atlantes n'ont aucun bonus. La **vie et les défenses sont conservées** ; impossible pendant un raid, un siège ou 5 minutes après une attaque. En cas de refus, l'ancien Nexus reste en place.
+
 ## 30/10/2026 (Atlantes)
 
 ### Eau autour du Nexus

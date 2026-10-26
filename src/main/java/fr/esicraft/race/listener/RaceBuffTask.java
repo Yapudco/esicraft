@@ -58,10 +58,11 @@ public class RaceBuffTask extends BukkitRunnable {
    }
 
    /** Atlantes : tous les atouts sous-marins dans l'eau (respiration, vision nocturne, agilité aquatique, dauphin, résistance) et Lenteur sur la terre ferme. */
-   private void atlantean(Player p) {
+   private void atlantean(Player p, Guild guild) {
       this.atlanteans.add(p.getUniqueId());
+      boolean wetNexus = guild.hasNexus() && fr.esicraft.nexus.NexusManager.isSubmerged(guild.getNexus().getLocation());
       var attr = p.getAttribute(org.bukkit.attribute.Attribute.WATER_MOVEMENT_EFFICIENCY);
-      if (inWater(p)) {
+      if (wetNexus && inWater(p)) {
          buff(p, new PotionEffect(PotionEffectType.WATER_BREATHING, 240, 0, false, false, false));
          buff(p, new PotionEffect(PotionEffectType.NIGHT_VISION, 260, 0, false, false, false));
          buff(p, new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 240, 0, false, false, true));
@@ -170,7 +171,7 @@ public class RaceBuffTask extends BukkitRunnable {
          }
 
          if (playerGuild != null && playerGuild.getSpecialization() == GuildSpecialization.ATLANTEAN) {
-            this.atlantean(player);
+            this.atlantean(player, playerGuild);
          } else if (this.atlanteans.remove(player.getUniqueId())) {
             this.clearAtlantean(player);
          }

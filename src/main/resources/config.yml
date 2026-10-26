@@ -360,6 +360,7 @@ nexus:
   siege-radius: 4                  # Un assaillant peut casser les blocs (hors conteneurs) à cette distance d'un Nexus vivant
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
+  relocation-days: 7               # Durée du droit de déplacer le Nexus (/nexus move) après un changement de spécialisation
   gamble:                          # Roulette russe (/nexus gamble)
     cooldown-hours: 72
     win-max-hp: 1000
