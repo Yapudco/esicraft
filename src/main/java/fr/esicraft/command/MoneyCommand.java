@@ -145,6 +145,11 @@ public class MoneyCommand implements CommandExecutor {
 
                            try {
                               double amountxx = Double.parseDouble(args[2].replace(',', '.'));
+                              if (amountxx < 0.0 || Double.isNaN(amountxx) || Double.isInfinite(amountxx)) {
+                                 ChatUtil.sendMessage(sender, "&cLe montant doit être positif.");
+                                 return true;
+                              }
+
                               data.setCoins(amountxx);
                               this.plugin.getDataManager().savePlayer(data);
                               ChatUtil.sendMessage(

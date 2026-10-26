@@ -52,7 +52,7 @@ public class MarketManager {
             ChatUtil.sendMessage(player, "&cVotre inventaire est plein : libérez de la place pour récupérer l'objet.");
             return false;
          } else if (this.listings.remove(listingId, listing)) {
-            this.plugin.getDataManager().deleteMarketListingSync(listingId);
+            this.plugin.getDataManager().deleteMarketListing(listingId);
             player.getInventory().addItem(new ItemStack[]{listing.getItemStack()});
             ChatUtil.sendMessage(player, "&aAnnonce annulée : l'objet a été rendu à votre inventaire.");
             ChatUtil.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F);

@@ -33,6 +33,8 @@ public class ContractListener implements Listener {
 
    private final EsicraftPlugin plugin;
    private final PlacedBlockTracker placedTracker;
+   /** Délai minimal entre deux redstones comptées (poser puis casser en boucle ne rapporte plus). */
+   private final java.util.Map<java.util.UUID, Long> lastRedstone = new java.util.concurrent.ConcurrentHashMap<>();
    // L'état « bloc posé par un joueur » est lu AVANT que le listener de métiers ne le retire (HIGHEST), puis exploité au MONITOR.
    private BlockBreakEvent lastBreak;
    private boolean lastBreakWasPlaced;
@@ -71,6 +73,13 @@ public class ContractListener implements Listener {
       Block block = event.getBlockPlaced();
       if (REDSTONE_PARTS.contains(block.getType())) {
          long packed = ((long)block.getX() & 0x3FFFFFFL) << 38 | ((long)block.getZ() & 0x3FFFFFFL) << 12 | ((long)(block.getY() + 2048) & 0xFFFL);
+         long nowMs = System.currentTimeMillis();
+         Long last = this.lastRedstone.get(event.getPlayer().getUniqueId());
+         if (last != null && nowMs - last < 2000L) {
+            return;
+         }
+
+         this.lastRedstone.put(event.getPlayer().getUniqueId(), nowMs);
          if (this.plugin.getContractManager().markPositionOnce(event.getPlayer(), packed)) {
             this.plugin.getContractManager().addProgress(event.getPlayer(), ContractType.BUILD_REDSTONE, 1);
          }
@@ -108,7 +117,9 @@ public class ContractListener implements Listener {
 
    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
    public void onEnchant(EnchantItemEvent event) {
-      this.plugin.getContractManager().addProgress(event.getEnchanter(), ContractType.ENCHANT, 1);
+      if (event.getExpLevelCost() >= 2) {
+         this.plugin.getContractManager().addProgress(event.getEnchanter(), ContractType.ENCHANT, 1);
+      }
    }
 
    @EventHandler

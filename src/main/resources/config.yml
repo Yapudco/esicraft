@@ -240,6 +240,7 @@ races:
 
 # Événements serveur aléatoires (Lune de Sang, Météorites, Marché Noir, Boss Mondial)
 events:
+  blood-moon-extra-spawn-chance: 0.25   # Part des monstres naturels dupliqués pendant la Lune de sang (0.5 doublait les fermes à monstres)
   enabled: true
   min-interval-minutes: 1440   # 24 h minimum entre deux événements
   max-interval-minutes: 2880   # 48 h maximum : un événement tous les 1 à 2 jours
@@ -338,6 +339,9 @@ web:
   show-guild-banks: true
   show-balances: true          # Pièces des joueurs en ligne + classement des plus riches
   show-nexus-health: false     # Les PV du Nexus aideraient les attaquants : masqué par défaut
+  show-raid-defenders: false   # Le nombre de défenseurs présents pendant un raid aiderait à choisir le bon moment : masqué par défaut
+  trust-proxy-header: false    # Derrière un proxy inverse : lire X-Forwarded-For (seulement si l'adresse du proxy est dans trusted-proxies)
+  trusted-proxies: ["127.0.0.1", "0:0:0:0:0:0:0:1"]
   rate-limit:                  # Anti-flood par adresse IP (au-delà : réponse 429)
     requests: 60
     window-seconds: 10
