@@ -278,6 +278,11 @@ truce:
   start-minute: 0
   duration-minutes: 60
 
+# Tribunal des guildes (/vote)
+court:
+  min-guild-days: 3                      # Ancienneté minimale d'une guilde pour peser au scrutin
+  min-members: 2
+
 # Duels d'honneur (/duel) et paris (/pari)
 duels:
   enabled: true
@@ -294,7 +299,8 @@ betting:
   window-seconds: 120                    # Durée pendant laquelle on peut parier après le début d'un raid / duel
   tax-percent: 5.0                       # Taxe du serveur sur la cagnotte
   min: 10
-  max: 5000
+  max: 1000
+  min-account-days: 3                    # Ancienneté minimale du compte pour parier
 
 # Tavernes (zones neutres, pile ou face)
 taverns:
@@ -323,7 +329,9 @@ bourse:
   max-shares-per-player: 100
   buyback-ratio: 0.9                     # Une part revendue à la guilde est rachetée à 90 % du cours
   dividend-minutes: 360                  # Période de calcul des dividendes
-  dividend-percent: 20.0                 # Part du bénéfice de la période (hausse de la banque) versée aux actionnaires
+  dividend-percent: 20.0                 # Part du bénéfice de la période (hausse des capitaux propres : banque moins dettes nettes) versée aux actionnaires
+  min-hold-hours: 24                     # Délai minimal avant de revendre des parts
+  max-gain-ratio: 1.5                    # Une revente ne rapporte jamais plus de 1,5 fois le prix payé
 
 # Réseau ferroviaire inter-guildes (/station, /rail, panneaux [Gare])
 rail:
@@ -351,10 +359,13 @@ nexus:
   undefended-damage-factor: 0.25   # Part des dégâts infligés au Nexus quand aucun défenseur n'est présent (1.0 = pleins dégâts, 0 = immunité)
   heal-block-seconds: 120          # Pas de soin du Nexus après une attaque de joueurs
   gamble:                          # Roulette russe (/nexus gamble)
-    cooldown-hours: 24
+    cooldown-hours: 72
     win-max-hp: 1000
     win-coins: 2000.0
+    max-bonus-hp: 3000             # Bonus de PV max cumulé au plus par la roulette
     lose-hp: 1500                  # Le Nexus survit toujours (1 PV minimum)
+    lose-max-hp: 500               # PV max repris (du bonus de roulette uniquement)
+    lose-coins: 1000.0             # Pièces retirées de la banque en cas de défaite
     horde-size: 6
 
 economy:
@@ -430,7 +441,7 @@ treaties:
 # Site web public en lecture seule (guildes, joueurs, saison) — aucune coordonnée n'est jamais exposée
 web:
   enabled: true
-  port: 80                     # Linux : un port < 1024 demande root ou setcap ; sinon mettre 8080
+  port: 8080                   # Linux : un port < 1024 (80) demande root ou setcap ; 8080 fonctionne sans droits particuliers
   bind: "0.0.0.0"
   server-name: "Esicraft"
   refresh-seconds: 30          # Rafraîchissement du site (15 auparavant) : le coût est lisible dans le thread principal
@@ -438,6 +449,11 @@ web:
   show-balances: true          # Pièces des joueurs en ligne + classement des plus riches
   show-nexus-health: false     # Les PV du Nexus aideraient les attaquants : masqué par défaut
   show-raid-defenders: false   # Le nombre de défenseurs présents pendant un raid aiderait à choisir le bon moment : masqué par défaut
+  votes:                       # Élections hebdomadaires du site (/votes)
+    enabled: true
+    min-account-days: 2        # Ancienneté minimale du compte pour voter
+    session-days: 90           # Durée du cookie de reconnaissance
+    categories: ["debile|🤪 Le joueur le plus débile", "gros|🍔 Le joueur le plus gros", "drole|😂 Le joueur le plus drôle", "chiant|😤 Le joueur le plus chiant"]
   trust-proxy-header: false    # Derrière un proxy inverse : lire X-Forwarded-For (seulement si l'adresse du proxy est dans trusted-proxies)
   trusted-proxies: ["127.0.0.1", "0:0:0:0:0:0:0:1"]
   rate-limit:                  # Anti-flood par adresse IP (au-delà : réponse 429)

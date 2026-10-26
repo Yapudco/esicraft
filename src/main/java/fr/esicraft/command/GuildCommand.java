@@ -95,7 +95,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               Player target = Bukkit.getPlayer(args[1]);
+               Player target = fr.esicraft.util.PlayerLookup.find(args[1]);
                if (target == null) {
                   ChatUtil.sendMessage(player, "&cJoueur introuvable ou hors-ligne.");
                   return true;
@@ -267,7 +267,7 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                   return true;
                }
 
-               Player target = Bukkit.getPlayer(args[1]);
+               Player target = fr.esicraft.util.PlayerLookup.find(args[1]);
                if (target == null || !target.isOnline()) {
                   ChatUtil.sendMessage(player, "&cJoueur introuvable ou hors ligne.");
                   return true;

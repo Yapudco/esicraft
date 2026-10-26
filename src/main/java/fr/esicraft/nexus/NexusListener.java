@@ -181,6 +181,8 @@ public class NexusListener implements Listener {
                if (attacker.getGameMode() != GameMode.CREATIVE) {
                   if (!this.plugin.isNexusDestructionEnabled()) {
                      ChatUtil.sendActionbar(attacker, "&c\ud83d\udee1️ La destruction des Nexus est temporairement désactivée par un admin (/pvp) !");
+                  } else if (this.plugin.getTruce().denyHostile(attacker)) {
+                     return;
                   } else if (guild.isMember(attacker.getUniqueId())) {
                      ChatUtil.sendActionbar(attacker, "&cVous ne pouvez pas attaquer le Nexus de votre propre guilde !");
                   } else {

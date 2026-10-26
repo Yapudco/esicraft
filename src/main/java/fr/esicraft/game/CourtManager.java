@@ -185,13 +185,20 @@ public class CourtManager implements CommandExecutor {
       }
    }
 
+   /** Une guilde ne pèse au scrutin que si elle est établie : Nexus actif, au moins N membres et M jours d'existence (contre les guildes jetables). */
+   private boolean eligible(Guild g) {
+      long minAge = this.plugin.getConfig().getLong("court.min-guild-days", 3L) * 86400000L;
+      return g.hasNexus() && g.getNexus().isAlive() && g.getMembers().size() >= Math.max(1, this.plugin.getConfig().getInt("court.min-members", 2))
+         && System.currentTimeMillis() - g.getCreatedAt() >= minAge;
+   }
+
    private Rule tally() {
       // Choix de chaque guilde = règle la plus votée par ses membres.
       Map<String, Map<Rule, Integer>> perGuild = new HashMap<>();
       Map<Rule, Integer> voters = new HashMap<>();
       for (Map.Entry<UUID, Rule> e : this.votes.entrySet()) {
          Guild g = this.plugin.getGuildManager().getGuildByPlayer(e.getKey());
-         if (g == null) {
+         if (g == null || !eligible(g)) {
             continue;
          }
 
@@ -273,6 +280,12 @@ public class CourtManager implements CommandExecutor {
       Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
       if (guild == null) {
          ChatUtil.sendMessage(player, "&c❌ Seuls les membres d'une guilde peuvent voter.");
+         return true;
+      }
+
+      if (!this.eligible(guild)) {
+         ChatUtil.sendMessage(player, "&c❌ Votre guilde est trop récente pour peser au Tribunal (Nexus actif, " + this.plugin.getConfig().getInt("court.min-members", 2) + " membres et "
+            + this.plugin.getConfig().getLong("court.min-guild-days", 3L) + " jours d'existence).");
          return true;
       }
 

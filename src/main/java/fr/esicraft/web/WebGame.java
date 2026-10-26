@@ -15,7 +15,11 @@ final class WebGame {
    private WebGame() {
    }
 
-   static String votes() {
+   static String votes(boolean enabled) {
+      if (!enabled) {
+         return "<section class=\"hero\"><h1>🗳 Élections de la semaine</h1><p>Les élections du site sont désactivées sur ce serveur.</p></section>";
+      }
+
       return "<section class=\"hero\"><h1>🗳 Élections de la semaine</h1><p>Chaque semaine, la communauté élit le plus débile, le plus gros, le plus drôle et le plus chiant. "
          + "Revendiquez votre pseudo avec un code à taper dans le chat du jeu, puis votez : votre navigateur vous reconnaît ensuite grâce à un cookie.</p></section>"
          + "<div id=\"va\" class=\"card\" style=\"margin-top:16px\"><p class=\"empty\">Chargement des élections… (JavaScript requis)</p></div>"
@@ -90,12 +94,12 @@ final class WebGame {
           loading: 'Loading…', claimTitle: 'Claim your username', claimHelp: 'Enter your Minecraft username. You will get a code to type in the game chat — that links this browser to your account.',
           username: 'Minecraft username', claim: 'Claim', code: 'Type this code in the Minecraft chat (within 10 minutes):', waiting: 'Waiting for you to type the code in the game…',
           hello: 'Signed in as', logout: 'Sign out', vote: 'Vote', pick: '— choose a player —', mine: 'Your vote:', nobody: 'No vote yet.', titles: 'Last week\\'s titles',
-          error: 'Something went wrong.', votes: 'vote(s)', saved: 'Vote saved!'
+          error: 'Something went wrong.', votes: 'vote(s)', saved: 'Vote saved!', confirm: 'Now confirm the link in the game chat ([CONFIRMER]).'
         } : {
           loading: 'Chargement…', claimTitle: 'Revendiquez votre pseudo', claimHelp: 'Saisissez votre pseudo Minecraft. Un code vous sera donné : tapez-le dans le chat du jeu pour lier ce navigateur à votre compte.',
           username: 'Pseudo Minecraft', claim: 'Revendiquer', code: 'Tapez ce code dans le chat de Minecraft (dans les 10 minutes) :', waiting: 'En attente du code dans le jeu…',
           hello: 'Connecté en tant que', logout: 'Se déconnecter', vote: 'Voter', pick: '— choisir un joueur —', mine: 'Votre vote :', nobody: 'Aucun vote pour le moment.', titles: 'Titres de la semaine dernière',
-          error: 'Une erreur est survenue.', votes: 'vote(s)', saved: 'Vote enregistré !'
+          error: 'Une erreur est survenue.', votes: 'vote(s)', saved: 'Vote enregistré !', confirm: 'Confirmez maintenant la liaison dans le chat du jeu ([CONFIRMER]).'
         };
         function el(tag, cls, text) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (text != null) { e.textContent = text; } return e; }
         function api(path, body) {
@@ -126,7 +130,10 @@ final class WebGame {
               out.appendChild(el('p', 'empty', T.waiting));
               if (poll) { clearInterval(poll); }
               poll = setInterval(function () {
-                api('/api/claim/status').then(function (s) { if (s.j.linked) { clearInterval(poll); poll = null; load(); } });
+                api('/api/claim/status').then(function (s) {
+                  if (s.j.linked) { clearInterval(poll); poll = null; load(); }
+                  else if (s.j.confirm) { while (out.firstChild) { out.removeChild(out.firstChild); } out.appendChild(el('p', null, T.confirm)); }
+                });
               }, 3000);
             });
           });

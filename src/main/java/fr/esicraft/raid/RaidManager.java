@@ -156,6 +156,12 @@ public class RaidManager implements Listener {
             }
 
             return false;
+         } else if (!this.adminLaunch && this.plugin.getTruce().isTruce() && !this.plugin.bypassCooldowns(buyer)) {
+            if (buyer != null) {
+               ChatUtil.sendMessage(buyer, "&a🕊 Trêve : aucune horde ne peut être lancée pour l'instant.");
+            }
+
+            return false;
          } else if (!this.isDefenderInClaim(targetGuild)) {
             if (buyer != null) {
                ChatUtil.sendMessage(buyer, "&c❌ Impossible de lancer cette horde : aucun membre de la guilde ciblée n'est présent sur son territoire claimé !");
@@ -602,6 +608,16 @@ public class RaidManager implements Listener {
    }
 
    /** Raids en cours (lecture seule), pour le site web. */
+   public ActiveRaid raidAgainst(String targetGuildId) {
+      for (ActiveRaid r : this.activeRaids.values()) {
+         if (r.getTargetGuildId().equals(targetGuildId)) {
+            return r;
+         }
+      }
+
+      return null;
+   }
+
    public java.util.Collection<ActiveRaid> getActiveRaids() {
       return java.util.List.copyOf(this.activeRaids.values());
    }
@@ -901,8 +917,12 @@ public class RaidManager implements Listener {
             if (defended) {
                String pairKey = raid.getAttackerGuildId() + ">" + targetGuild.getId() + "|" + java.time.LocalDate.now().toEpochDay();
                int credited = this.repelCredits.merge(pairKey, 1, Integer::sum);
-               if (credited <= this.plugin.getConfig().getInt("raids.max-credited-repels-per-pair-per-day", 2)) {
+               // Une horde minuscule (complice qui lance un zombie) ne rapporte ni points de saison, ni XP de Nexus, ni succès.
+               boolean worthy = raid.getTotalMobs() >= this.plugin.getConfig().getInt("raids.min-mobs-for-rewards", 12)
+                  && credited <= this.plugin.getConfig().getInt("raids.max-credited-repels-per-pair-per-day", 2);
+               if (worthy) {
                   this.plugin.getSeasonManager().recordRepelled(targetGuild);
+                  this.plugin.getNexusTech().onRaidRepelled(targetGuild);
                }
 
                if (this.repelCredits.size() > 500) {
@@ -911,10 +931,9 @@ public class RaidManager implements Listener {
 
                this.plugin.getChronicle().raid(raid.getAttackerGuildId(), targetGuild.getId(), "repelled");
                this.plugin.getHelpCalls().onRepelled(targetGuild);
-               this.plugin.getNexusTech().onRaidRepelled(targetGuild);
                for (UUID memberUuid : targetGuild.getMembers().keySet()) {
                   Player defender = Bukkit.getPlayer(memberUuid);
-                  if (defender != null && targetGuild.isClaimed(ChunkKey.from(defender.getLocation().getChunk()))) {
+                  if (worthy && defender != null && targetGuild.isClaimed(ChunkKey.from(defender.getLocation().getChunk()))) {
                      this.plugin.getAchievements().grant(memberUuid, fr.esicraft.life.Achievement.DEFENDER);
                      this.plugin.getAchievements().addStat(memberUuid, fr.esicraft.life.AchievementManager.STAT_DEFENSES, 1L);
                   }

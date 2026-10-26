@@ -182,17 +182,16 @@ public class DisguiseManager implements Listener {
             return;
          }
 
+         // On ne peut pas usurper le pseudo d'un joueur de ce serveur (en ligne ou non) : annonces, journal et commandes ciblant son nom seraient détournés.
+         // Pour imiter une guilde, utilisez /deguisement <guilde>.
+         if (!this.plugin.getDataManager().getStorage().select("SELECT 1 FROM players WHERE lower(name) = lower(?) LIMIT 1;", 1, arg).isEmpty()) {
+            done.accept("&cCe pseudo appartient à un joueur de ce serveur : déguisez-vous plutôt en sa guilde (&e/deguisement <guilde>&c) ou en un compte étranger au serveur.");
+            return;
+         }
+
          skinName = arg;
          fakeName = arg;
          identity = null;
-         OfflinePlayer known = Bukkit.getOfflinePlayerIfCached(arg);
-         if (known != null) {
-            Guild g = this.plugin.getGuildManager().getGuildByPlayer(known.getUniqueId());
-            if (g != null && !g.isMember(uuid)) {
-               identity = g;
-               fakeName = known.getName() != null ? known.getName() : arg;
-            }
-         }
       } else {
          done.accept("&cGuilde ou pseudo Minecraft introuvable : &e" + arg);
          return;

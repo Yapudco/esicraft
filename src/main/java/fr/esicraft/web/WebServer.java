@@ -52,6 +52,8 @@ public class WebServer {
    private volatile WebI18n.NameIndex protectedIndex = WebI18n.NameIndex.of(java.util.List.of());
    private final Map<String, Page> pagesEn = new ConcurrentHashMap<>();
    private volatile String rawNotFound = "";
+   /** Page 404 anglaise : traduite une fois par instantané (et non à chaque requête de chemin inventé). */
+   private volatile Page enNotFound;
    private final HeadService heads;
    private WebVotes votes;
    private static final java.util.Set<String> VOTE_GET = java.util.Set.of("/api/me", "/api/votes", "/api/claim/status");
@@ -130,7 +132,7 @@ public class WebServer {
          return;
       }
 
-      int port = this.plugin.getConfig().getInt("web.port", 80);
+      int port = this.plugin.getConfig().getInt("web.port", 8080);
       String bind = this.plugin.getConfig().getString("web.bind", "0.0.0.0");
       this.rateLimit = Math.max(5, this.plugin.getConfig().getInt("web.rate-limit.requests", 60));
       this.rateWindowMs = Math.max(1L, this.plugin.getConfig().getLong("web.rate-limit.window-seconds", 10L)) * 1000L;
@@ -566,7 +568,7 @@ public class WebServer {
       map.put("/evolution", html(200, HtmlPages.page(name, "guildes", "Courbes d'évolution", ExtraPages.evolution(s, x), s, live, raid)));
       map.put("/ages", html(200, HtmlPages.page(name, "ages", "Frise des Âges", ExtraPages.ages(s, x), s, live, raid)));
       map.put("/guide", html(200, HtmlPages.page(name, "guide", "Guide du joueur", ExtraPages.guide(name), s, 0, raid)));
-      map.put("/votes", html(200, HtmlPages.page(name, "votes", "Élections de la semaine", WebGame.votes(), s, 0, raid)));
+      map.put("/votes", html(200, HtmlPages.page(name, "votes", "Élections de la semaine", WebGame.votes(this.votes == null || this.votes.enabled()), s, 0, raid)));
       map.put("/pantheon", html(200, HtmlPages.page(name, "pantheon", "Panthéon", WebGame.pantheon(this.plugin), s, 0, raid)));
       map.put("/assets/votes.js", new Page(200, JS, WebGame.VOTES_JS.getBytes(StandardCharsets.UTF_8)));
       map.put("/api/stats.json", new Page(200, JSON, HtmlPages.statsJson(s).getBytes(StandardCharsets.UTF_8)));
@@ -591,6 +593,24 @@ public class WebServer {
       for (WebExtra.ProfileView p : x.profiles()) {
          names.add(HtmlPages.esc(p.name()));
       }
+
+      java.util.List<String> knownHeads = new java.util.ArrayList<>();
+      for (WebExtra.ProfileView p : x.profiles()) {
+         knownHeads.add(p.name());
+      }
+
+      for (WebSnapshot.GuildView g : s.guilds()) {
+         for (WebSnapshot.MemberView m : g.members()) {
+            knownHeads.add(m.name());
+         }
+      }
+
+      for (WebSnapshot.OnlineView o : s.online()) {
+         knownHeads.add(o.name());
+      }
+
+      this.heads.setKnown(knownHeads);
+      this.enNotFound = null;
 
       for (WebSnapshot.OnlineView o : s.online()) {
          names.add(HtmlPages.esc(o.name()));
@@ -653,7 +673,24 @@ public class WebServer {
    }
 
    private Page englishNotFound() {
-      return html(404, WebI18n.english(this.rawNotFound, this.protectedIndex));
+      Page cached = this.enNotFound;
+      if (cached == null) {
+         cached = html(404, WebI18n.english(this.rawNotFound, this.protectedIndex));
+         this.enNotFound = cached;
+      }
+
+      return cached;
+   }
+
+   public WebVotes getVotes() {
+      return this.votes;
+   }
+
+   /** Vrai si la requête vient d'un proxy inverse déclaré de confiance (seul cas où X-Forwarded-* est cru). */
+   private boolean fromTrustedProxy(HttpExchange ex) {
+      InetSocketAddress remote = ex.getRemoteAddress();
+      String ip = remote != null && remote.getAddress() != null ? remote.getAddress().getHostAddress() : "?";
+      return this.plugin.getConfig().getBoolean("web.trust-proxy-header", false) && this.plugin.getConfig().getStringList("web.trusted-proxies").contains(ip);
    }
 
    private static Page html(int status, String body) {
@@ -757,7 +794,7 @@ public class WebServer {
          }
 
          if (this.votes != null && rawPath != null && rawPath.startsWith("/api/") && (method.equals("POST") || method.equals("GET") && VOTE_GET.contains(rawPath))) {
-            WebVotes.Resp r = this.votes.handle(ex, method, rawPath, ip);
+            WebVotes.Resp r = this.votes.handle(ex, method, rawPath, ip, this.fromTrustedProxy(ex));
             if (r != null) {
                var rh = ex.getResponseHeaders();
                rh.set("Cache-Control", "no-store");

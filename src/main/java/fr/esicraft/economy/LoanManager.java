@@ -192,6 +192,24 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       ChatUtil.broadcastGuild(lender, "&e💰 &6" + borrower.getName() + " &evous doit &6" + money(loan.owed) + " pièces &e(banque insuffisante) : dette enregistrée.");
    }
 
+   /** Dette nette d'une guilde : ce qu'elle doit moins ce qu'on lui doit (prêts non remboursés). Sert à ne pas confondre un emprunt avec un bénéfice. */
+   public double netDebt(String guildId) {
+      double net = 0.0;
+      for (Loan l : this.loans.values()) {
+         if (l.owed <= 0.01) {
+            continue;
+         }
+
+         if (l.borrowerId.equals(guildId)) {
+            net += l.owed;
+         } else if (l.lenderId.equals(guildId)) {
+            net -= l.owed;
+         }
+      }
+
+      return net;
+   }
+
    public boolean hasOverdue(String borrowerId) {
       for (Loan l : this.loans.values()) {
          if (l.borrowerId.equals(borrowerId) && OVERDUE.equals(l.status)) {

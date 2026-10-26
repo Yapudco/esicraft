@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -32,10 +34,10 @@ public class BettingManager implements CommandExecutor, TabCompleter {
       final String[] sides;
       final String[][] aliases;
       final long closesAt;
-      final Predicate<UUID> excluded;
+      final Predicate<Player> excluded;
       final List<Map<UUID, Double>> stakes = new ArrayList<>();
 
-      Pool(String key, String title, String[] sides, String[][] aliases, long closesAt, Predicate<UUID> excluded) {
+      Pool(String key, String title, String[] sides, String[][] aliases, long closesAt, Predicate<Player> excluded) {
          this.key = key;
          this.title = title;
          this.sides = sides;
@@ -65,7 +67,7 @@ public class BettingManager implements CommandExecutor, TabCompleter {
 
    // ------------------------------------------------------------------ ouverture / règlement
 
-   private void open(String key, String title, String[] sides, String[][] aliases, Predicate<UUID> excluded) {
+   private void open(String key, String title, String[] sides, String[][] aliases, Predicate<Player> excluded) {
       if (!this.plugin.getConfig().getBoolean("betting.enabled", true)) {
          return;
       }
@@ -84,7 +86,47 @@ public class BettingManager implements CommandExecutor, TabCompleter {
       String d = target.getName();
       this.open("raid:" + target.getId(), "Raid de &c" + a + " &7contre &a" + d, new String[]{"attaquante", "defensive"},
          new String[][]{{"attaquante", "attaquant", "attaque", a.toLowerCase(Locale.ROOT)}, {"defensive", "defense", "défensive", "défense", d.toLowerCase(Locale.ROOT)}},
-         id -> attacker.isMember(id) || target.isMember(id));
+         bettor -> this.conflict(bettor, List.of(attacker, target), () -> {
+            List<Player> people = new ArrayList<>();
+            for (Guild g : List.of(attacker, target)) {
+               for (UUID m : g.getMembers().keySet()) {
+                  Player p = Bukkit.getPlayer(m);
+                  if (p != null) {
+                     people.add(p);
+                  }
+               }
+            }
+
+            return people;
+         }));
+   }
+
+   /**
+    * Un parieur est écarté s'il est impliqué : membre d'une guilde concernée ou liée à elle par un traité (complices), même adresse IP qu'un
+    * participant en ligne (comptes multiples sur une même machine), ou compte trop récent (comptes jetables).
+    */
+   private boolean conflict(Player bettor, List<Guild> guilds, Supplier<List<Player>> people) {
+      Guild mine = this.plugin.getGuildManager().getGuildByPlayer(bettor.getUniqueId());
+      if (mine != null) {
+         for (Guild g : guilds) {
+            if (g.getId().equals(mine.getId()) || this.plugin.getTreatyManager().between(g.getId(), mine.getId()) != null) {
+               return true;
+            }
+         }
+      }
+
+      String ip = ipOf(bettor);
+      for (Player p : people.get()) {
+         if (p.equals(bettor) || ip != null && ip.equals(ipOf(p))) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   private static String ipOf(Player p) {
+      return p.getAddress() != null && p.getAddress().getAddress() != null ? p.getAddress().getAddress().getHostAddress() : null;
    }
 
    public void settleRaid(String targetGuildId, boolean defended) {
@@ -98,7 +140,19 @@ public class BettingManager implements CommandExecutor, TabCompleter {
    /** Un duel est lancé : on parie sur l'un des deux duellistes. */
    public void openDuel(String duelId, Player a, Player b) {
       this.open("duel:" + duelId, "Duel &e" + a.getName() + " &7contre &e" + b.getName(), new String[]{a.getName(), b.getName()},
-         new String[][]{{a.getName().toLowerCase(Locale.ROOT)}, {b.getName().toLowerCase(Locale.ROOT)}}, id -> id.equals(a.getUniqueId()) || id.equals(b.getUniqueId()));
+         new String[][]{{a.getName().toLowerCase(Locale.ROOT)}, {b.getName().toLowerCase(Locale.ROOT)}}, bettor -> this.conflict(bettor, duelGuilds(a, b), () -> List.of(a, b)));
+   }
+
+   private List<Guild> duelGuilds(Player a, Player b) {
+      List<Guild> guilds = new ArrayList<>();
+      for (Player p : List.of(a, b)) {
+         Guild g = this.plugin.getGuildManager().getGuildByPlayer(p.getUniqueId());
+         if (g != null) {
+            guilds.add(g);
+         }
+      }
+
+      return guilds;
    }
 
    public void settleDuel(String duelId, int winnerIndex) {
@@ -256,13 +310,20 @@ public class BettingManager implements CommandExecutor, TabCompleter {
          return true;
       }
 
-      if (found.excluded.test(player.getUniqueId())) {
-         ChatUtil.sendMessage(player, "&c❌ Vous êtes impliqué dans ce conflit : seuls les spectateurs peuvent parier.");
+      if (found.excluded.test(player)) {
+         ChatUtil.sendMessage(player, "&c❌ Vous êtes lié à ce conflit (guilde concernée ou alliée, même adresse qu'un participant) : seuls les vrais spectateurs peuvent parier.");
+         return true;
+      }
+
+      long minAgeMs = this.plugin.getConfig().getLong("betting.min-account-days", 3L) * 86400000L;
+      long first = player.getFirstPlayed();
+      if (!this.plugin.bypassCooldowns(player) && first > 0L && System.currentTimeMillis() - first < minAgeMs) {
+         ChatUtil.sendMessage(player, "&c❌ Votre compte est trop récent pour parier (&e" + this.plugin.getConfig().getLong("betting.min-account-days", 3L) + " jours&c d'ancienneté).");
          return true;
       }
 
       double min = Math.max(1.0, this.plugin.getConfig().getDouble("betting.min", 10.0));
-      double max = Math.max(min, this.plugin.getConfig().getDouble("betting.max", 5000.0));
+      double max = Math.max(min, this.plugin.getConfig().getDouble("betting.max", 1000.0));
       if (Double.isNaN(amount) || Double.isInfinite(amount) || amount < min || amount > max) {
          ChatUtil.sendMessage(player, "&c❌ La mise doit être comprise entre &e" + (long)min + " &cet &e" + (long)max + " &cpièces.");
          return true;

@@ -84,7 +84,7 @@ public class EsicraftAdminCommand implements CommandExecutor {
                   return true;
                }
 
-               Player target = Bukkit.getPlayer(args[1]);
+               Player target = fr.esicraft.util.PlayerLookup.find(args[1]);
                if (target == null) {
                   ChatUtil.sendMessage(sender, "&cJoueur introuvable.");
                   return true;

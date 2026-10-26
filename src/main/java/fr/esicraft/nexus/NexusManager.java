@@ -275,6 +275,21 @@ public class NexusManager {
                }
             }
 
+            // Un Nexus doit rester atteignable : pas plus de 3 blocs pleins au-dessus de lui (le siège ne casse qu'à nexus.siege-radius blocs).
+            int cover = 0;
+            for (int dy = 1; dy <= 48 && cy + dy < world.getMaxHeight(); dy++) {
+               if (world.getBlockAt(cx, cy + dy, cz).getType().isOccluding()) {
+                  cover++;
+               }
+            }
+
+            if (cover > Math.max(0, this.plugin.getConfig().getInt("nexus.siege-radius", 4) - 1)) {
+               ChatUtil.sendMessage(player, "&c❌ Nexus trop enterré (" + cover + " blocs pleins au-dessus) : un assaillant ne pourrait pas l'atteindre. Posez-le à moins de "
+                  + Math.max(0, this.plugin.getConfig().getInt("nexus.siege-radius", 4) - 1) + " blocs de couverture.");
+               ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+               return false;
+            }
+
             int maxHealth = this.plugin.getConfig().getInt("guilds.nexus.base-health", 5000);
             if (guild.getSpecialization() == GuildSpecialization.MERCHANT_SYNDICATE) {
                maxHealth = (int)((double)maxHealth * 0.8);

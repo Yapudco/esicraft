@@ -9,6 +9,8 @@ import fr.esicraft.util.ChatUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
@@ -20,28 +22,37 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Élections hebdomadaires en ligne : chaque semaine, les joueurs votent pour le plus débile, le plus gros, le plus drôle et le plus chiant.
- * Pour voter, un visiteur revendique son pseudo : le site lui donne un code à taper dans le chat du jeu ; il est alors reconnu par un cookie
- * (jeton aléatoire, HttpOnly) et vote au nom du joueur. Les titres de la semaine écoulée sont proclamés dans le chat et gravés sur le site.
+ * Élections hebdomadaires en ligne (désactivables, catégories réglables dans {@code web.votes.*}). Pour voter, un visiteur revendique son pseudo :
+ * le site lui donne un code à taper dans le chat du jeu, <b>le joueur doit ensuite confirmer</b> (avec l'adresse approximative du demandeur, contre
+ * l'hameçonnage), et le navigateur est reconnu par un cookie (jeton aléatoire, HttpOnly). Un joueur peut refuser d'être candidat ({@code /webvote optout}).
  */
-public class WebVotes implements Listener {
+public class WebVotes implements Listener, CommandExecutor {
    public record Resp(int status, String json, String setCookie) {
    }
 
-   private record Pending(String token, UUID uuid, String name, long expires) {
+   private record Pending(String token, UUID uuid, String name, long expires, String ipHint) {
    }
 
    public static final String COOKIE = "esi_sid";
-   private static final String[][] CATEGORIES = {
+   private static final String[][] DEFAULT_CATEGORIES = {
       {"debile", "🤪 Le joueur le plus débile"}, {"gros", "🍔 Le joueur le plus gros"}, {"drole", "😂 Le joueur le plus drôle"}, {"chiant", "😤 Le joueur le plus chiant"}};
+   private static volatile String[][] categories = DEFAULT_CATEGORIES;
    private static final String CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
    private static final SecureRandom RANDOM = new SecureRandom();
    private static final Gson GSON = new Gson();
@@ -50,17 +61,32 @@ public class WebVotes implements Listener {
    private final Map<String, UUID> sessions = new ConcurrentHashMap<>();
    private final Map<String, Pending> pendingByCode = new ConcurrentHashMap<>();
    private final Map<String, String> codeByToken = new ConcurrentHashMap<>();
+   /** Code tapé en jeu, en attente de la confirmation du joueur (joueur → demande). */
+   private final Map<UUID, Pending> awaitingConfirm = new ConcurrentHashMap<>();
    private final Map<String, long[]> claimRate = new ConcurrentHashMap<>();
+   private final java.util.Set<UUID> optedOut = ConcurrentHashMap.newKeySet();
+   /** Instantané partagé (classements, candidats, titres) gardé quelques secondes : l'API n'est pas authentifiée et ne doit pas multiplier les requêtes. */
+   private volatile List<Map<String, Object>> cachedCats;
+   private volatile long cachedCatsAt;
+   private volatile List<String> cachedCandidates;
+   private volatile long cachedCandidatesAt;
 
    public WebVotes(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }
 
+   public boolean enabled() {
+      return this.plugin.getConfig().getBoolean("web.votes.enabled", true);
+   }
+
    public void init() {
       var db = this.plugin.getDataManager().getStorage();
       db.exec("CREATE TABLE IF NOT EXISTS web_sessions (token VARCHAR(64) PRIMARY KEY, uuid VARCHAR(36), created BIGINT);");
-      db.exec("CREATE TABLE IF NOT EXISTS web_votes (week VARCHAR(10), cat VARCHAR(16), voter VARCHAR(36), target VARCHAR(36), PRIMARY KEY (week, cat, voter));");
+      db.exec("CREATE TABLE IF NOT EXISTS web_ballots (week VARCHAR(10), cat VARCHAR(16), voter VARCHAR(36), target VARCHAR(36), iphash VARCHAR(20), PRIMARY KEY (week, cat, voter));");
+      db.exec("CREATE INDEX IF NOT EXISTS idx_ballots_target ON web_ballots (week, cat, target);");
+      db.exec("DROP TABLE IF EXISTS web_votes;");
       db.exec("CREATE TABLE IF NOT EXISTS web_titles (week VARCHAR(10), cat VARCHAR(16), winner VARCHAR(36), winner_name VARCHAR(40), votes INT, PRIMARY KEY (week, cat));");
+      db.exec("CREATE TABLE IF NOT EXISTS web_optout (uuid VARCHAR(36) PRIMARY KEY);");
       long ttl = this.sessionTtlMs();
       db.exec("DELETE FROM web_sessions WHERE created < ?;", System.currentTimeMillis() - ttl);
       for (Object[] row : db.select("SELECT token, uuid FROM web_sessions;", 2)) {
@@ -70,6 +96,22 @@ public class WebVotes implements Listener {
          }
       }
 
+      for (Object[] row : db.select("SELECT uuid FROM web_optout;", 1)) {
+         try {
+            this.optedOut.add(UUID.fromString(String.valueOf(row[0])));
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
+      List<String[]> cats = new ArrayList<>();
+      for (String s : this.plugin.getConfig().getStringList("web.votes.categories")) {
+         String[] parts = s.split("\\|", 2);
+         if (parts.length == 2 && parts[0].matches("[a-z0-9]{1,16}") && !parts[1].isBlank()) {
+            cats.add(new String[]{parts[0], parts[1].trim()});
+         }
+      }
+
+      categories = cats.isEmpty() ? DEFAULT_CATEGORIES : cats.toArray(new String[0][]);
       Bukkit.getPluginManager().registerEvents(this, this.plugin);
       Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::rollover, 600L, 6000L);
    }
@@ -77,6 +119,8 @@ public class WebVotes implements Listener {
    public void clear() {
       this.pendingByCode.clear();
       this.codeByToken.clear();
+      this.awaitingConfirm.clear();
+      this.cachedCats = null;
    }
 
    private long sessionTtlMs() {
@@ -92,7 +136,7 @@ public class WebVotes implements Listener {
    }
 
    public static String labelOf(String cat) {
-      for (String[] c : CATEGORIES) {
+      for (String[] c : categories) {
          if (c[0].equals(cat)) {
             return c[1];
          }
@@ -101,7 +145,7 @@ public class WebVotes implements Listener {
       return cat;
    }
 
-   // ------------------------------------------------------------------ revendication du pseudo par le chat
+   // ------------------------------------------------------------------ revendication du pseudo : code dans le chat, puis confirmation en jeu
 
    @EventHandler(priority = EventPriority.LOWEST)
    public void onChat(AsyncChatEvent event) {
@@ -125,15 +169,76 @@ public class WebVotes implements Listener {
          return;
       }
 
-      // Le code ne s'affiche pas dans le chat public.
+      // Le code ne s'affiche pas dans le chat public ; le joueur doit encore confirmer en connaissance de cause.
       event.setCancelled(true);
       this.pendingByCode.remove(text);
       this.codeByToken.remove(p.token(), text);
-      this.sessions.put(p.token(), p.uuid());
-      long now = System.currentTimeMillis();
-      this.plugin.getDataManager().getStorage().exec("INSERT OR REPLACE INTO web_sessions (token, uuid, created) VALUES (?, ?, ?);", p.token(), p.uuid().toString(), now);
+      this.awaitingConfirm.put(p.uuid(), p);
       Player player = event.getPlayer();
-      Bukkit.getScheduler().runTask(this.plugin, () -> ChatUtil.sendMessage(player, "&a✔ Votre navigateur est lié à votre compte &e" + player.getName() + "&a : vous pouvez voter sur le site !"));
+      Bukkit.getScheduler().runTask(this.plugin, () -> {
+         ChatUtil.sendMessage(player, "&6🗳 Une demande de liaison du site web a été faite pour votre compte depuis &e" + p.ipHint() + "&6. &cSi vous ne l'avez PAS faite vous-même (quelqu'un vous a demandé de taper un code), refusez !");
+         player.sendMessage(Component.text("   ", NamedTextColor.GRAY)
+            .append(Component.text("[CONFIRMER]", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/webvote confirmer")))
+            .append(Component.text("   "))
+            .append(Component.text("[REFUSER]", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/webvote refuser"))));
+      });
+   }
+
+   @EventHandler
+   public void onQuit(PlayerQuitEvent event) {
+      this.awaitingConfirm.remove(event.getPlayer().getUniqueId());
+   }
+
+   public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+      if (!(sender instanceof Player player)) {
+         sender.sendMessage(ChatUtil.color("&cSeul un joueur peut exécuter cette commande."));
+         return true;
+      }
+
+      String sub = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
+      switch (sub) {
+         case "confirmer", "confirm" -> {
+            Pending p = this.awaitingConfirm.remove(player.getUniqueId());
+            if (p == null || p.expires() + 600000L < System.currentTimeMillis()) {
+               ChatUtil.sendMessage(player, "&cAucune demande de liaison en attente.");
+               return true;
+            }
+
+            this.sessions.put(p.token(), p.uuid());
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+               "INSERT OR REPLACE INTO web_sessions (token, uuid, created) VALUES (?, ?, ?);", p.token(), p.uuid().toString(), System.currentTimeMillis()));
+            ChatUtil.sendMessage(player, "&a✔ Votre navigateur est lié à votre compte &e" + player.getName() + "&a : vous pouvez voter sur le site !");
+         }
+         case "refuser", "deny" -> {
+            ChatUtil.sendMessage(player, this.awaitingConfirm.remove(player.getUniqueId()) != null ? "&7Demande de liaison refusée." : "&cAucune demande en attente.");
+         }
+         case "optout" -> this.setOptOut(player, true);
+         case "optin" -> this.setOptOut(player, false);
+         default -> ChatUtil.sendMessage(player, "&6🗳 &e/webvote optout &7: ne plus apparaître dans les élections du site · &e/webvote optin &7: y revenir.");
+      }
+
+      return true;
+   }
+
+   private void setOptOut(Player player, boolean out) {
+      UUID id = player.getUniqueId();
+      if (out) {
+         this.optedOut.add(id);
+      } else {
+         this.optedOut.remove(id);
+      }
+
+      this.cachedCandidates = null;
+      this.cachedCats = null;
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+         var db = this.plugin.getDataManager().getStorage();
+         if (out) {
+            db.exec("INSERT OR IGNORE INTO web_optout (uuid) VALUES (?);", id.toString());
+         } else {
+            db.exec("DELETE FROM web_optout WHERE uuid = ?;", id.toString());
+         }
+      });
+      ChatUtil.sendMessage(player, out ? "&7Vous n'apparaissez plus dans les élections du site (ni comme candidat, ni dans les classements)." : "&aVous pouvez de nouveau être élu(e) sur le site.");
    }
 
    // ------------------------------------------------------------------ API HTTP
@@ -195,6 +300,30 @@ public class WebVotes implements Listener {
       }
    }
 
+   private static String hashIp(String ip) {
+      try {
+         byte[] d = MessageDigest.getInstance("SHA-256").digest(("esicraft-votes|" + ip).getBytes(StandardCharsets.UTF_8));
+         StringBuilder sb = new StringBuilder();
+         for (int i = 0; i < 8; i++) {
+            sb.append(String.format("%02x", d[i]));
+         }
+
+         return sb.toString();
+      } catch (NoSuchAlgorithmException e) {
+         return Integer.toHexString(ip.hashCode());
+      }
+   }
+
+   /** Adresse approximative affichée au joueur qui confirme (les derniers octets sont masqués). */
+   private static String maskIp(String clientKey) {
+      if (clientKey.startsWith("v6:")) {
+         return clientKey.substring(3, Math.min(clientKey.length(), 11)) + ":…";
+      }
+
+      String[] p = clientKey.split("\\.");
+      return p.length == 4 ? p[0] + "." + p[1] + ".x.x" : "adresse inconnue";
+   }
+
    private String nameOf(UUID uuid) {
       var rows = this.plugin.getDataManager().getStorage().select("SELECT name FROM players WHERE uuid = ?;", 1, uuid.toString());
       return rows.isEmpty() ? "?" : String.valueOf(rows.get(0)[0]);
@@ -210,8 +339,12 @@ public class WebVotes implements Listener {
    }
 
    /** Traite /api/me, /api/votes, /api/claim/*, /api/vote et /api/logout ; renvoie null si le chemin n'est pas un chemin d'élection. */
-   public Resp handle(HttpExchange ex, String method, String path, String ip) throws IOException {
-      boolean https = "https".equalsIgnoreCase(ex.getRequestHeaders().getFirst("X-Forwarded-Proto"));
+   public Resp handle(HttpExchange ex, String method, String path, String ip, boolean trustedProxy) throws IOException {
+      boolean https = trustedProxy && "https".equalsIgnoreCase(ex.getRequestHeaders().getFirst("X-Forwarded-Proto"));
+      if (!this.enabled()) {
+         return error(403, "Les élections sont désactivées.");
+      }
+
       String token = tokenOf(ex);
       UUID me = token == null ? null : this.sessions.get(token);
       boolean post = method.equals("POST");
@@ -246,6 +379,8 @@ public class WebVotes implements Listener {
                   m.put("code", code);
                   m.put("player", p.name());
                   m.put("seconds", (p.expires() - System.currentTimeMillis()) / 1000L);
+               } else if (token != null && this.awaitingConfirm.values().stream().anyMatch(a -> a.token().equals(token))) {
+                  m.put("confirm", true);
                }
             }
 
@@ -274,7 +409,7 @@ public class WebVotes implements Listener {
 
             String code = "ESI-" + randomCode(4);
             long expires = System.currentTimeMillis() + 10L * 60000L;
-            this.pendingByCode.put(code, new Pending(t, UUID.fromString(String.valueOf(player[0])), String.valueOf(player[1]), expires));
+            this.pendingByCode.put(code, new Pending(t, UUID.fromString(String.valueOf(player[0])), String.valueOf(player[1]), expires, maskIp(ip)));
             this.codeByToken.put(t, code);
             if (this.pendingByCode.size() > 2000) {
                long now = System.currentTimeMillis();
@@ -300,7 +435,7 @@ public class WebVotes implements Listener {
             String cat = body != null && body.has("cat") ? body.get("cat").getAsString() : "";
             Object[] target = body == null ? null : this.findPlayer(body.has("target") ? body.get("target").getAsString() : null);
             boolean validCat = false;
-            for (String[] c : CATEGORIES) {
+            for (String[] c : categories) {
                validCat |= c[0].equals(cat);
             }
 
@@ -308,11 +443,31 @@ public class WebVotes implements Listener {
                return error(400, "Vote invalide.");
             }
 
-            if (String.valueOf(target[0]).equals(me.toString())) {
+            UUID targetId = UUID.fromString(String.valueOf(target[0]));
+            if (targetId.equals(me)) {
                return error(400, "On ne vote pas pour soi-même !");
             }
 
-            this.plugin.getDataManager().getStorage().exec("INSERT OR REPLACE INTO web_votes (week, cat, voter, target) VALUES (?, ?, ?, ?);", currentWeek(), cat, me.toString(), String.valueOf(target[0]));
+            if (this.optedOut.contains(targetId)) {
+               return error(400, "Ce joueur ne souhaite pas apparaître dans les élections.");
+            }
+
+            long minAge = this.plugin.getConfig().getLong("web.votes.min-account-days", 2L) * 86400000L;
+            long first = Bukkit.getOfflinePlayer(me).getFirstPlayed();
+            if (first > 0L && System.currentTimeMillis() - first < minAge) {
+               return error(403, "Votre compte est trop récent pour voter.");
+            }
+
+            String week = currentWeek();
+            String iphash = hashIp(ip);
+            var db = this.plugin.getDataManager().getStorage();
+            // Un seul compte par connexion et par catégorie : empêche de bourrer l'urne avec des comptes jetables.
+            if (!db.select("SELECT 1 FROM web_ballots WHERE week = ? AND cat = ? AND iphash = ? AND voter <> ? LIMIT 1;", 1, week, cat, iphash, me.toString()).isEmpty()) {
+               return error(403, "Un autre compte a déjà voté dans cette catégorie depuis cette connexion.");
+            }
+
+            db.exec("INSERT OR REPLACE INTO web_ballots (week, cat, voter, target, iphash) VALUES (?, ?, ?, ?, ?);", week, cat, me.toString(), targetId.toString(), iphash);
+            this.cachedCats = null;
             return json(200, this.snapshot(me));
          }
          case "/api/logout" -> {
@@ -358,41 +513,82 @@ public class WebVotes implements Listener {
 
    // ------------------------------------------------------------------ données
 
-   private Map<String, Object> snapshot(UUID me) {
-      var db = this.plugin.getDataManager().getStorage();
-      String week = currentWeek();
-      Map<String, Object> out = new LinkedHashMap<>();
-      out.put("week", week);
-      out.put("player", me == null ? null : this.nameOf(me));
-      List<Map<String, Object>> cats = new ArrayList<>();
-      Map<String, String> mine = new HashMap<>();
-      if (me != null) {
-         for (Object[] row : db.select("SELECT v.cat, p.name FROM web_votes v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.voter = ?;", 2, week, me.toString())) {
-            mine.put(String.valueOf(row[0]), String.valueOf(row[1]));
-         }
+   private List<Map<String, Object>> sharedCategories() {
+      long now = System.currentTimeMillis();
+      List<Map<String, Object>> cats = this.cachedCats;
+      if (cats != null && now - this.cachedCatsAt < 8000L) {
+         return cats;
       }
 
-      for (String[] c : CATEGORIES) {
+      var db = this.plugin.getDataManager().getStorage();
+      String week = currentWeek();
+      List<Map<String, Object>> built = new ArrayList<>();
+      for (String[] c : categories) {
          Map<String, Object> cat = new LinkedHashMap<>();
          cat.put("key", c[0]);
          cat.put("label", c[1]);
          List<Map<String, Object>> top = new ArrayList<>();
-         for (Object[] row : db.select("SELECT p.name, COUNT(*) AS n FROM web_votes v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.cat = ? GROUP BY v.target ORDER BY n DESC, p.name LIMIT 5;", 2, week, c[0])) {
-            top.add(Map.of("name", String.valueOf(row[0]), "votes", ((Number)row[1]).intValue()));
+         for (Object[] row : db.select("SELECT p.name, p.uuid, COUNT(*) AS n FROM web_ballots v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.cat = ? GROUP BY v.target ORDER BY n DESC, p.name LIMIT 8;", 3, week, c[0])) {
+            if (!this.optedOut.contains(UUID.fromString(String.valueOf(row[1]))) && top.size() < 5) {
+               Map<String, Object> t = new LinkedHashMap<>();
+               t.put("name", String.valueOf(row[0]));
+               t.put("votes", ((Number)row[2]).intValue());
+               top.add(t);
+            }
          }
 
          cat.put("top", top);
-         cat.put("mine", mine.get(c[0]));
+         built.add(cat);
+      }
+
+      this.cachedCats = built;
+      this.cachedCatsAt = now;
+      return built;
+   }
+
+   private List<String> candidates() {
+      long now = System.currentTimeMillis();
+      List<String> names = this.cachedCandidates;
+      if (names != null && now - this.cachedCandidatesAt < 60000L) {
+         return names;
+      }
+
+      List<String> list = new ArrayList<>();
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT name, uuid FROM players WHERE name IS NOT NULL ORDER BY lower(name) LIMIT 700;", 2)) {
+         try {
+            if (!this.optedOut.contains(UUID.fromString(String.valueOf(row[1]))) && list.size() < 600) {
+               list.add(String.valueOf(row[0]));
+            }
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
+      this.cachedCandidates = list;
+      this.cachedCandidatesAt = now;
+      return list;
+   }
+
+   private Map<String, Object> snapshot(UUID me) {
+      String week = currentWeek();
+      Map<String, Object> out = new LinkedHashMap<>();
+      out.put("week", week);
+      out.put("player", me == null ? null : this.nameOf(me));
+      Map<String, String> mine = new HashMap<>();
+      if (me != null) {
+         for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT v.cat, p.name FROM web_ballots v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.voter = ?;", 2, week, me.toString())) {
+            mine.put(String.valueOf(row[0]), String.valueOf(row[1]));
+         }
+      }
+
+      List<Map<String, Object>> cats = new ArrayList<>();
+      for (Map<String, Object> shared : this.sharedCategories()) {
+         Map<String, Object> cat = new LinkedHashMap<>(shared);
+         cat.put("mine", mine.get(String.valueOf(shared.get("key"))));
          cats.add(cat);
       }
 
       out.put("categories", cats);
-      List<String> names = new ArrayList<>();
-      for (Object[] row : db.select("SELECT name FROM players WHERE name IS NOT NULL ORDER BY lower(name) LIMIT 600;", 1)) {
-         names.add(String.valueOf(row[0]));
-      }
-
-      out.put("candidates", names);
+      out.put("candidates", this.candidates());
       out.put("titles", this.lastTitles());
       return out;
    }
@@ -424,7 +620,7 @@ public class WebVotes implements Listener {
       try {
          var db = this.plugin.getDataManager().getStorage();
          String current = currentWeek();
-         var weeks = db.select("SELECT DISTINCT week FROM web_votes WHERE week < ? ORDER BY week;", 1, current);
+         var weeks = db.select("SELECT DISTINCT week FROM web_ballots WHERE week < ? ORDER BY week;", 1, current);
          for (Object[] w : weeks) {
             String week = String.valueOf(w[0]);
             if (!db.select("SELECT 1 FROM web_titles WHERE week = ? LIMIT 1;", 1, week).isEmpty()) {
@@ -432,12 +628,15 @@ public class WebVotes implements Listener {
             }
 
             List<String> lines = new ArrayList<>();
-            for (String[] c : CATEGORIES) {
-               var best = db.select("SELECT p.uuid, p.name, COUNT(*) AS n FROM web_votes v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.cat = ? GROUP BY v.target ORDER BY n DESC, p.name LIMIT 1;", 3, week, c[0]);
-               if (!best.isEmpty()) {
-                  Object[] r = best.get(0);
+            for (String[] c : categories) {
+               for (Object[] r : db.select("SELECT p.uuid, p.name, COUNT(*) AS n FROM web_ballots v JOIN players p ON p.uuid = v.target WHERE v.week = ? AND v.cat = ? GROUP BY v.target ORDER BY n DESC, p.name LIMIT 5;", 3, week, c[0])) {
+                  if (this.optedOut.contains(UUID.fromString(String.valueOf(r[0])))) {
+                     continue;
+                  }
+
                   db.exec("INSERT OR REPLACE INTO web_titles (week, cat, winner, winner_name, votes) VALUES (?, ?, ?, ?, ?);", week, c[0], String.valueOf(r[0]), String.valueOf(r[1]), ((Number)r[2]).intValue());
                   lines.add(c[1] + " : &e" + r[1] + " &7(" + r[2] + " vote(s))");
+                  break;
                }
             }
 

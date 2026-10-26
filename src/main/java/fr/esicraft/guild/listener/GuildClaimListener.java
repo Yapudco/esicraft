@@ -595,11 +595,31 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onEntityExplode(EntityExplodeEvent event) {
+      org.bukkit.entity.Entity source = event.getEntity();
       event.blockList().removeIf(block -> {
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
          Guild guild = this.protectedGuildAt(chunkKey);
-         return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
+         return guild != null && !this.explosionAllowed(source, guild);
       });
+   }
+
+   /** Pendant un raid, seuls les monstres de la horde et le TNT allumé par un joueur de la guilde attaquante peuvent détruire la base : pas un tiers. */
+   private boolean explosionAllowed(org.bukkit.entity.Entity source, Guild defender) {
+      fr.esicraft.raid.ActiveRaid raid = this.plugin.getRaidManager().raidAgainst(defender.getId());
+      if (raid == null || source == null) {
+         return false;
+      }
+
+      if (source.getScoreboardTags().contains("esicraft_raid_mob")) {
+         return true;
+      }
+
+      if (source instanceof org.bukkit.entity.TNTPrimed tnt && tnt.getSource() instanceof Player igniter) {
+         Guild g = this.plugin.getGuildManager().getGuildByPlayer(igniter.getUniqueId());
+         return g != null && g.getId().equals(raid.getAttackerGuildId());
+      }
+
+      return false;
    }
 
    @EventHandler(
@@ -609,8 +629,7 @@ public class GuildClaimListener implements Listener {
    public void onBlockExplode(BlockExplodeEvent event) {
       event.blockList().removeIf(block -> {
          ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
-         Guild guild = this.protectedGuildAt(chunkKey);
-         return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
+         return this.protectedGuildAt(chunkKey) != null;
       });
    }
 
