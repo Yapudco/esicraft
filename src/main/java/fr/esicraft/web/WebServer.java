@@ -47,8 +47,12 @@ public class WebServer {
 
    private final EsicraftPlugin plugin;
    private volatile Map<String, Page> pages = Map.of();
-   private volatile Map<String, Page> pagesEn = Map.of();
-   private volatile Page notFoundEn = new Page(404, "text/plain; charset=utf-8", "Not found".getBytes(StandardCharsets.UTF_8));
+   /** HTML brut (français, avec marqueur de langue) : la version anglaise n'est traduite qu'à la première demande puis gardée jusqu'au prochain instantané. */
+   private volatile Map<String, String> rawPages = Map.of();
+   private volatile java.util.List<String> protectedNames = java.util.List.of();
+   private final Map<String, Page> pagesEn = new ConcurrentHashMap<>();
+   private volatile String rawNotFound = "";
+   private final HeadService heads;
    private static final byte[] LOGO = loadLogo();
    private volatile Page notFound = new Page(404, "text/plain; charset=utf-8", "Introuvable".getBytes(StandardCharsets.UTF_8));
    private final Map<String, long[]> hits = new ConcurrentHashMap<>();
@@ -62,6 +66,7 @@ public class WebServer {
 
    public WebServer(EsicraftPlugin plugin) {
       this.plugin = plugin;
+      this.heads = new HeadService(plugin);
    }
 
    public void start() {
@@ -134,6 +139,8 @@ public class WebServer {
       if (this.pool != null) {
          this.pool.shutdownNow();
       }
+
+      this.heads.shutdown();
    }
 
    // ------------------------------------------------------------------ capture (thread principal) puis rendu (asynchrone)
@@ -511,24 +518,62 @@ public class WebServer {
 
       // Chaque page HTML existe en français (par défaut) et en anglais (?lang=en, dictionnaire de /english).
       Map<String, Page> french = new HashMap<>();
-      Map<String, Page> english = new HashMap<>();
+      Map<String, String> raws = new HashMap<>();
       for (Map.Entry<String, Page> e : map.entrySet()) {
          Page p = e.getValue();
          if (p.type().equals(HTML)) {
             String raw = new String(p.body(), StandardCharsets.UTF_8);
+            raws.put(e.getKey(), raw);
             french.put(e.getKey(), html(p.status(), WebI18n.french(raw)));
-            english.put(e.getKey(), html(p.status(), WebI18n.english(raw, names)));
          } else {
             french.put(e.getKey(), p);
-            english.put(e.getKey(), p);
          }
       }
 
       String missing = HtmlPages.page(name, "", "Introuvable", HtmlPages.notFound(), s, 0, raid);
       this.notFound = html(404, WebI18n.french(missing));
-      this.notFoundEn = html(404, WebI18n.english(missing, names));
-      this.pagesEn = Map.copyOf(english);
+      this.rawNotFound = missing;
+      this.protectedNames = java.util.List.copyOf(names);
+      this.rawPages = Map.copyOf(raws);
+      this.pagesEn.clear();
       this.pages = Map.copyOf(french);
+
+      // Têtes des joueurs : récupérées en tâche de fond, jamais pendant une requête.
+      java.util.List<String> headNames = new java.util.ArrayList<>();
+      for (WebSnapshot.OnlineView o : s.online()) {
+         headNames.add(o.name());
+      }
+
+      for (WebExtra.ProfileView p : x.profiles()) {
+         headNames.add(p.name());
+      }
+
+      this.heads.prefetch(headNames);
+   }
+
+   private Page englishPage(String path) {
+      Page cached = this.pagesEn.get(path);
+      if (cached != null) {
+         return cached;
+      }
+
+      Page fr = this.pages.get(path);
+      String raw = this.rawPages.get(path);
+      if (fr == null) {
+         return null;
+      }
+
+      if (raw == null) {
+         return fr;
+      }
+
+      Page en = html(fr.status(), WebI18n.english(raw, this.protectedNames));
+      this.pagesEn.putIfAbsent(path, en);
+      return en;
+   }
+
+   private Page englishNotFound() {
+      return html(404, WebI18n.english(this.rawNotFound, this.protectedNames));
    }
 
    private static Page html(int status, String body) {
@@ -643,14 +688,31 @@ public class WebServer {
             path = path.toLowerCase(java.util.Locale.ROOT);
          }
 
+         if (path.startsWith("/head/")) {
+            String who = path.substring(6);
+            if (who.endsWith(".png")) {
+               who = who.substring(0, who.length() - 4);
+            }
+
+            if (!HeadService.NAME.matcher(who).matches()) {
+               this.send(ex, this.notFound, method.equals("HEAD"));
+               return;
+            }
+
+            HeadService.Head head = this.heads.get(who);
+            ex.getResponseHeaders().set("Cache-Control", head.real() ? "public, max-age=600" : "public, max-age=20");
+            this.send(ex, new Page(200, "image/png", head.png()), method.equals("HEAD"));
+            return;
+         }
+
          String query = ex.getRequestURI().getRawQuery();
          boolean english = query != null && query.contains("lang=en");
-         Page page = (english ? this.pagesEn : this.pages).get(path);
+         Page page = english ? this.englishPage(path) : this.pages.get(path);
          if (page != null && page.type().equals(JSON)) {
             ex.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
          }
 
-         this.send(ex, page != null ? page : english ? this.notFoundEn : this.notFound, method.equals("HEAD"));
+         this.send(ex, page != null ? page : english ? this.englishNotFound() : this.notFound, method.equals("HEAD"));
       } catch (IOException e) {
          // client parti en cours de route : rien à faire
       } catch (RuntimeException e) {
@@ -673,7 +735,9 @@ public class WebServer {
       h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
       h.set("Cross-Origin-Opener-Policy", "same-origin");
       h.set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-      h.set("Cache-Control", page.status() != 200 ? "no-store" : page.type().equals(JS) ? "public, max-age=300" : page.type().startsWith("image/") ? "public, max-age=3600" : "public, max-age=10");
+      if (!h.containsKey("Cache-Control")) {
+         h.set("Cache-Control", page.status() != 200 ? "no-store" : page.type().equals(JS) ? "public, max-age=3600, immutable" : page.type().startsWith("image/") ? "public, max-age=3600" : "public, max-age=10");
+      }
       if (head) {
          ex.sendResponseHeaders(page.status(), -1);
          return;
