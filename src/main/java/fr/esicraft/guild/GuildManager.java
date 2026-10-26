@@ -757,7 +757,7 @@ public class GuildManager {
    public boolean setSpecialization(Guild guild, GuildSpecialization spec, Player player) {
       if (guild != null && spec != null && guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec) {
          long left = this.specCooldownLeftMs(guild);
-         if (left > 0L) {
+         if (left > 0L && !this.plugin.bypassCooldowns(player)) {
             ChatUtil.sendMessage(player, "&c❌ La guilde a changé de spécialisation récemment : encore &e" + fr.esicraft.treaty.TreatyManager.formatDuration(left) + "&c d'attente.");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
             return false;

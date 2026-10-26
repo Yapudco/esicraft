@@ -239,6 +239,9 @@ races:
   change-cooldown-hours: 24 # Délai minimum entre deux changements de métier (hors première sélection et admin)
 
 # Événements serveur aléatoires (Lune de Sang, Météorites, Marché Noir, Boss Mondial)
+admin:
+  ops-bypass-cooldowns: true            # Les opérateurs (op) ne sont soumis à aucun délai d'attente (déguisement, appel à l'aide, raids, soin du Nexus, métier, spécialisation, train, /merci, primes PvP)
+
 events:
   black-market:                          # Marchand du Marché noir
     offers: 3                            # Nombre d'offres tirées au hasard à chaque apparition (6 possibles)

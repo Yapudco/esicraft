@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 28/10/2026
+
+### Opérateurs sans délai d'attente
+- Les joueurs **op** ne sont plus soumis aux délais d'attente : déguisement, appel à l'aide, protection d'une guilde après un raid (quand l'op lance la horde), soin du Nexus (délai de 30 s et blocage après une attaque), changement de métier, délai entre deux changements de spécialisation, recherche de lignes de train, `/merci` (une fois par jour et par personne, plafond quotidien) et délai anti-farm des primes PvP.
+- Réglable avec `admin.ops-bypass-cooldowns` dans `config.yml` (`true` par défaut).
+
 ## 27/10/2026 (skins hors ligne)
 
 ### Correctif : déguisement et têtes sur un serveur hors ligne (Velocity, BungeeCord)

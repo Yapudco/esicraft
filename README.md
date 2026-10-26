@@ -506,6 +506,10 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/game reset` | Remettre **tout** le jeu à zéro : guildes, Nexus, fortunes, succès, statistiques, contrats, réputation, parrainages, cosmétiques, journal, courbes, Âges, saison, prêts et site web (seules les préférences de langue sont gardées) |
 | `/race set <joueur> <race>` | Changer le métier d'un joueur |
 
+### Opérateurs et délais d'attente
+
+Les **opérateurs** (`op`) ne sont soumis à **aucun délai d'attente** : déguisement (30 min), appel à l'aide (10 min), protection d'une guilde après un raid, soin du Nexus (30 s et blocage après une attaque), changement de métier (24 h), changement de spécialisation (7 jours), recherche de lignes de train, `/merci` (une fois par jour et par personne) et délai anti-farm des primes PvP. Réglage : `admin.ops-bypass-cooldowns` (`true` par défaut).
+
 ### Anti-triche intégré
 
 - Les bonus de minage ne s'appliquent jamais sur un bloc posé par un joueur, ni sur les terres d'une autre guilde.

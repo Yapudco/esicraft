@@ -126,13 +126,14 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       long day = LocalDate.now().toEpochDay();
       int perDay = this.plugin.getConfig().getInt("reputation.max-thanks-per-day", 5);
       String giverDay = giver + "|" + day;
-      if (this.givenToday.getOrDefault(giverDay, 0) >= perDay) {
+      boolean bypass = this.plugin.bypassCooldowns(player);
+      if (!bypass && this.givenToday.getOrDefault(giverDay, 0) >= perDay) {
          ChatUtil.sendMessage(player, "&c❌ Vous avez déjà remercié &e" + perDay + " &cjoueurs aujourd'hui. Revenez demain !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          return true;
       }
 
-      if (!this.thankedToday.add(giver + "|" + receiver + "|" + day)) {
+      if (!this.thankedToday.add(giver + "|" + receiver + "|" + day) && !bypass) {
          ChatUtil.sendMessage(player, "&c❌ Vous avez déjà remercié &e" + target.getName() + " &caujourd'hui. Revenez demain !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          return true;
