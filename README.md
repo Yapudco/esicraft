@@ -328,9 +328,19 @@ Le monde change de saison **toutes les deux semaines** (réglable) :
 
 Pendant un raid ou une attaque de ton Nexus, `/aide` prévient tes **alliés** (alliance ou vassalité). Chaque allié qui rejoint tes terres avant la fin de la horde gagne **250 pièces** si elle est repoussée (6 alliés au plus). Un appel toutes les 10 minutes.
 
-### 🎭 Le déguisement (`/deguisement <guilde>`)
+### 🎭 Le déguisement (`/deguisement`)
 
-Pour **750 pièces**, tu te fais passer pendant **5 minutes** pour un membre de cette guilde : son nom et son étiquette apparaissent dans le tchat et la liste des joueurs, ton nom au-dessus de la tête est masqué. Ses pièges et son golem t'ignorent, mais ses protections de territoire restent actives. **Infliger des dégâts ou frapper le Nexus te démasque**, et la guilde est prévenue. Un déguisement toutes les 30 minutes ; `/deguisement off` pour l'enlever.
+Pour **750 pièces**, tu changes de **skin et de pseudo** pendant **5 minutes** (le skin est rafraîchi chez tous les joueurs, et rendu à la fin) :
+
+- `/deguisement <guilde>` : tu te fais passer pour un membre de cette guilde (skin d'un de ses membres, pseudonyme inventé, étiquette de guilde dans le tchat et la liste). Ses pièges et son golem t'ignorent.
+- `/deguisement <Pseudo>` : tu prends le skin et le pseudo de **n'importe quel compte Minecraft**, même hors du serveur (`/deguisement aypierre_`). Si ce joueur est membre d'une autre guilde du serveur, tu empruntes aussi son identité de guilde. Impossible si ce joueur est connecté.
+- `/deguisement off` : retire le déguisement (nom et skin d'origine rendus).
+
+Les protections de territoire restent actives. **Infliger des dégâts ou frapper le Nexus te démasque**, et la guilde imitée est prévenue. Un déguisement toutes les 30 minutes ; les pièces ne sont débitées que si le skin a bien été trouvé. Les messages de mort ne révèlent pas ton vrai nom.
+
+### ✨ Les cosmétiques (`/cosmetique`)
+
+**Chaque succès débloque un aura** (des particules autour de toi, une par succès) **et un titre** (affiché dans le tchat devant ton nom). Le menu `/cosmetique` liste les 26 auras (rangée du haut) et les 26 titres (en bas) : clic pour équiper ou retirer. Un aura et un titre au plus sont équipés à la fois ; `/cosmetique off` retire tout. Il y a aussi des secrets à découvrir…
 
 ### 📰 Journal de guerre et succès
 
@@ -392,7 +402,7 @@ Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à 
 | Âges | Frise sur un vrai axe de temps (guildes masquables une à une) et prérequis du prochain Âge de chaque guilde |
 | Guide | Toutes les règles, avec une recherche |
 
-Le logo du serveur s'affiche dans l'en-tête. Le site existe aussi **en anglais** : bouton **EN** / **FR** en haut à droite, ou `?lang=en` à la fin de l'adresse (le choix est retenu par le navigateur). Il réutilise le dictionnaire de `/english` (`lang/en.tsv`). Les profils affichent la **réputation** ❤.
+Le logo du serveur s'affiche dans l'en-tête. Le site existe aussi **en anglais** : bouton **EN** / **FR** en haut à droite, ou `?lang=en` à la fin de l'adresse (le choix est retenu par le navigateur). Il réutilise le dictionnaire de `/english` (`lang/en.tsv`). Les profils affichent la **réputation** ❤, et chaque joueur y est représenté par **sa tête** (récupérée et mise en cache par le serveur).
 
 Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/raids.json`.
 
@@ -420,7 +430,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/ah` · `/ah sell <prix>` | Hôtel des Ventes et raids · vendre l'objet en main |
 | `/contrat` | Contrats du jour et contrat de guilde |
 | `/aide` | Appeler ses alliés à l'aide pendant une attaque |
-| `/deguisement <guilde>` · `/deguisement off` | Se déguiser en membre d'une autre guilde · enlever le déguisement |
+| `/deguisement <guilde ou Pseudo>` · `/deguisement off` | Changer de skin et de pseudo (guilde ou n'importe quel compte Minecraft) · retirer le déguisement |
 | `/climat` | Saison naturelle en cours |
 | `/journal` · `/succes [joueur]` | Journal de guerre · succès |
 | `/traite` · `/traite liste` | Traités entre guildes |
@@ -432,7 +442,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/merci <joueur>` | Offrir un point d'honneur (une fois par jour et par personne) |
 | `/parrain <joueur>` | Parrainer une recrue (`accepter` / `refuser` pour répondre) |
 | `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
-| `/cosmetique` | Activer ou cacher ses cosmétiques débloqués |
+| `/cosmetique` | Équiper ses cosmétiques (un aura et un titre par succès) |
 | `/hub` | Retourner au hub (bloqué pendant un combat PvP) |
 
 ---

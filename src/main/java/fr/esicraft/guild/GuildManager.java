@@ -1209,7 +1209,26 @@ public class GuildManager {
       return this.pendingAnnexationChoices.get(playerUuid);
    }
 
+   private final java.util.Map<String, long[]> hegemonyCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /** Résultat gardé 30 s par guilde : le calcul lit le classement et les comptes de tous les membres (base de données). */
    public boolean isEconomicHegemony(Guild targetGuild) {
+      if (targetGuild == null) {
+         return false;
+      }
+
+      long now = System.currentTimeMillis();
+      long[] cached = this.hegemonyCache.get(targetGuild.getId());
+      if (cached != null && now - cached[0] < 30000L) {
+         return cached[1] == 1L;
+      }
+
+      boolean result = this.computeEconomicHegemony(targetGuild);
+      this.hegemonyCache.put(targetGuild.getId(), new long[]{now, result ? 1L : 0L});
+      return result;
+   }
+
+   private boolean computeEconomicHegemony(Guild targetGuild) {
       if (targetGuild == null) {
          return false;
       } else {

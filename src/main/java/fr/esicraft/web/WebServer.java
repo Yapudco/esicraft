@@ -53,6 +53,60 @@ public class WebServer {
    private final Map<String, Page> pagesEn = new ConcurrentHashMap<>();
    private volatile String rawNotFound = "";
    private final HeadService heads;
+
+   /** Données du dernier instantané, pour construire à la demande les fiches de guilde et de joueur. */
+   private record Ctx(String name, WebSnapshot s, WebExtra x, int live, boolean raid) {
+   }
+
+   private volatile Ctx ctx;
+   private final Map<String, String> lazyRaw = new ConcurrentHashMap<>();
+   private final Map<String, Page> lazyFr = new ConcurrentHashMap<>();
+
+   private String buildLazy(Ctx c, String path) {
+      if (path.startsWith("/guilde/")) {
+         WebSnapshot.GuildView g = c.s().guild(path.substring(8));
+         return g == null ? null : HtmlPages.page(c.name(), "guildes", g.name(), HtmlPages.guild(g) + ExtraPages.guildExtra(c.s(), g, c.x())
+            + "<p style=\"margin-top:26px\"><a class=\"nl\" href=\"/guildes\">← Toutes les guildes</a></p>", c.s(), c.live(), c.raid());
+      }
+
+      if (path.startsWith("/joueur/")) {
+         WebExtra.ProfileView p = c.x().profile(path.substring(8));
+         return p == null ? null : HtmlPages.page(c.name(), "joueurs", p.name(), ExtraPages.profile(c.s(), p, c.x()), c.s(), c.live(), c.raid());
+      }
+
+      return null;
+   }
+
+   private String rawHtml(String path) {
+      String r = this.rawPages.get(path);
+      if (r != null) {
+         return r;
+      }
+
+      Ctx c = this.ctx;
+      return c == null ? null : this.lazyRaw.computeIfAbsent(path, p -> this.buildLazy(c, p));
+   }
+
+   private Page frenchPage(String path) {
+      Page p = this.pages.get(path);
+      if (p != null) {
+         return p;
+      }
+
+      Page cached = this.lazyFr.get(path);
+      if (cached != null) {
+         return cached;
+      }
+
+      String raw = this.rawHtml(path);
+      if (raw == null) {
+         return null;
+      }
+
+      Page built = html(200, WebI18n.french(raw));
+      this.lazyFr.putIfAbsent(path, built);
+      return built;
+   }
    private static final byte[] LOGO = loadLogo();
    private volatile Page notFound = new Page(404, "text/plain; charset=utf-8", "Introuvable".getBytes(StandardCharsets.UTF_8));
    private final Map<String, long[]> hits = new ConcurrentHashMap<>();
@@ -489,14 +543,10 @@ public class WebServer {
       map.put("/api/journal.json", new Page(200, JSON, ExtraPages.journalJson(x).getBytes(StandardCharsets.UTF_8)));
       map.put("/api/raids.json", new Page(200, JSON, ExtraPages.raidsJson(x).getBytes(StandardCharsets.UTF_8)));
       map.put("/assets/app.js", new Page(200, JS, ExtraPages.APP_JS.getBytes(StandardCharsets.UTF_8)));
-      for (WebSnapshot.GuildView g : s.guilds()) {
-         map.put("/guilde/" + g.id(), html(200, HtmlPages.page(name, "guildes", g.name(), HtmlPages.guild(g) + ExtraPages.guildExtra(s, g, x)
-            + "<p style=\"margin-top:26px\"><a class=\"nl\" href=\"/guildes\">← Toutes les guildes</a></p>", s, live, raid)));
-      }
-
-      for (WebExtra.ProfileView p : x.profiles()) {
-         map.put("/joueur/" + p.key(), html(200, HtmlPages.page(name, "joueurs", p.name(), ExtraPages.profile(s, p, x), s, live, raid)));
-      }
+      // Les fiches de guilde et de joueur (des centaines de pages) ne sont plus rendues à chaque instantané : elles sont construites à la première demande.
+      this.ctx = new Ctx(name, s, x, live, raid);
+      this.lazyRaw.clear();
+      this.lazyFr.clear();
 
       if (LOGO.length > 0) {
          map.put("/assets/logo.png", new Page(200, "image/png", LOGO));
@@ -557,8 +607,8 @@ public class WebServer {
          return cached;
       }
 
-      Page fr = this.pages.get(path);
-      String raw = this.rawPages.get(path);
+      Page fr = this.frenchPage(path);
+      String raw = fr == null ? null : this.rawHtml(path);
       if (fr == null) {
          return null;
       }
@@ -707,7 +757,7 @@ public class WebServer {
 
          String query = ex.getRequestURI().getRawQuery();
          boolean english = query != null && query.contains("lang=en");
-         Page page = english ? this.englishPage(path) : this.pages.get(path);
+         Page page = english ? this.englishPage(path) : this.frenchPage(path);
          if (page != null && page.type().equals(JSON)) {
             ex.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
          }

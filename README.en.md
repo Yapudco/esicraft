@@ -331,9 +331,19 @@ The world changes season **every two weeks** (configurable):
 
 During a raid or an attack on your Nexus, `/aide` warns your **allies** (alliance or vassalage). Each ally who reaches your land before the horde ends earns **250 coins** if it is repelled (6 allies max). One call every 10 minutes.
 
-### 🎭 Disguise (`/deguisement <guild>`)
+### 🎭 Disguise (`/deguisement`)
 
-For **750 coins** you pose for **5 minutes** as a member of that guild: their name and tag show in chat and the player list, and the name above your head is hidden. Their traps and golem ignore you, but their land protections still apply. **Dealing damage or hitting the Nexus unmasks you**, and the guild is warned. One disguise every 30 minutes; `/deguisement off` removes it.
+For **750 coins** you change **skin and name** for **5 minutes** (the skin is refreshed for everyone, and restored at the end):
+
+- `/deguisement <guild>`: pose as a member of that guild (skin of one of its members, made-up pseudonym, guild tag in chat and the list). Its traps and golem ignore you.
+- `/deguisement <Name>`: take the skin and name of **any Minecraft account**, even one that isn't on the server (`/deguisement aypierre_`). If that player belongs to another guild on the server, you also borrow its guild identity. Not possible while that player is online.
+- `/deguisement off`: remove the disguise (original name and skin restored).
+
+Land protections stay active. **Dealing damage or hitting the Nexus unmasks you**, and the imitated guild is warned. One disguise every 30 minutes; coins are only charged if the skin was actually found. Death messages never reveal your real name.
+
+### ✨ Cosmetics (`/cosmetique`)
+
+**Every achievement unlocks an aura** (particles around you, one per achievement) **and a title** (shown in chat before your name). The `/cosmetique` menu lists the 26 auras (top rows) and the 26 titles (bottom rows): click to equip or remove. One aura and one title at most are equipped at a time; `/cosmetique off` removes everything. There are also secrets to find…
 
 ### 📰 War journal and achievements
 
@@ -421,7 +431,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/ah` · `/ah sell <price>` | Auction House and raids · sell the item in your hand |
 | `/contrat` | Daily contracts and guild contract |
 | `/aide` | Call your allies for help during an attack |
-| `/deguisement <guild>` · `/deguisement off` | Disguise as a member of another guild · remove the disguise |
+| `/deguisement <guild or Name>` · `/deguisement off` | Change skin and name (guild or any Minecraft account) · remove the disguise |
 | `/climat` | Current natural season |
 | `/journal` · `/succes [player]` | War journal · achievements |
 | `/traite` · `/traite liste` | Guild treaties |
@@ -433,7 +443,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/merci <player>` | Give an honor point (once a day per person) |
 | `/parrain <player>` | Mentor a recruit (`accepter` / `refuser` to answer) |
 | `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |
-| `/cosmetique` | Show or hide your unlocked cosmetics |
+| `/cosmetique` | Equip your cosmetics (one aura and one title per achievement) |
 | `/hub` | Go back to the hub (blocked during PvP combat) |
 
 ---

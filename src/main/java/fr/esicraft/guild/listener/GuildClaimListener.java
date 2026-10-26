@@ -596,7 +596,7 @@ public class GuildClaimListener implements Listener {
    )
    public void onEntityExplode(EntityExplodeEvent event) {
       event.blockList().removeIf(block -> {
-         ChunkKey chunkKey = ChunkKey.from(block.getChunk());
+         ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
          Guild guild = this.protectedGuildAt(chunkKey);
          return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
       });
@@ -608,7 +608,7 @@ public class GuildClaimListener implements Listener {
    )
    public void onBlockExplode(BlockExplodeEvent event) {
       event.blockList().removeIf(block -> {
-         ChunkKey chunkKey = ChunkKey.from(block.getChunk());
+         ChunkKey chunkKey = new ChunkKey(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
          Guild guild = this.protectedGuildAt(chunkKey);
          return guild != null && !this.plugin.getRaidManager().isGuildUnderRaid(guild.getId());
       });
