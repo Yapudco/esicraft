@@ -167,6 +167,31 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
 
    // ------------------------------------------------------------------ requêtes
 
+   /** Vrai si la guilde doit encore de l'argent (elle ne peut alors pas se dissoudre pour effacer sa dette). */
+   public boolean hasDebt(String borrowerId) {
+      for (Loan l : this.loans.values()) {
+         if (l.borrowerId.equals(borrowerId) && l.owed > 0.01) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /** Dette imposée (indemnité de rupture ou tribut impayé faute de fonds) : le créancier la récupère comme un prêt arrivé à échéance dans {@code days} jours. */
+   public void addForcedDebt(Guild lender, Guild borrower, double amount, int days) {
+      if (lender == null || borrower == null || amount < 1.0 || lender.getId().equals(borrower.getId())) {
+         return;
+      }
+
+      long now = System.currentTimeMillis();
+      Loan loan = new Loan(UUID.randomUUID().toString(), lender.getId(), borrower.getId(), Math.ceil(amount), Math.ceil(amount), now, now + days * 86400000L, ACTIVE, 0L);
+      this.loans.put(loan.id, loan);
+      this.persist(loan);
+      ChatUtil.broadcastGuild(borrower, "&c⚠ Fonds insuffisants : une dette de &e" + money(loan.owed) + " pièces &cenvers &6" + lender.getName() + " &cest enregistrée (à payer sous " + days + " jours, &e/banque dettes&c).");
+      ChatUtil.broadcastGuild(lender, "&e💰 &6" + borrower.getName() + " &evous doit &6" + money(loan.owed) + " pièces &e(banque insuffisante) : dette enregistrée.");
+   }
+
    public boolean hasOverdue(String borrowerId) {
       for (Loan l : this.loans.values()) {
          if (l.borrowerId.equals(borrowerId) && OVERDUE.equals(l.status)) {
@@ -252,6 +277,23 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
                + this.plugin.getConfig().getLong("loans.seizure-hours", 24L) + " h ! &e/banque rembourser " + lender.getName());
             ChatUtil.broadcastGuild(lender, "&e⚠ &6" + borrower.getName() + " &en'a pas remboursé son prêt à temps : ses territoires sont désormais saisissables.");
             this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.CONTRACT, borrower.getName() + " ne rembourse pas sa dette envers " + lender.getName() + ".", lender.getId(), borrower.getId());
+         } else if (OVERDUE.equals(l.status) && now - l.lastSeizure >= seizureMs / 4L && borrower.getBankBalance() >= 1.0) {
+            // Prélèvement forcé sur la banque de l'emprunteur : vider sa banque ne suffit pas à échapper à la dette.
+            double take = Math.min(l.owed, Math.floor(borrower.getBankBalance()));
+            if (take >= 1.0 && borrower.withdrawBank(take)) {
+               lender.depositBank(take);
+               l.owed = Math.max(0.0, l.owed - take);
+               this.plugin.getDataManager().saveGuild(borrower);
+               this.plugin.getDataManager().saveGuild(lender);
+               ChatUtil.broadcastGuild(borrower, "&4💸 &cPrélèvement forcé de &e" + money(take) + " pièces &csur votre banque (dette envers &6" + lender.getName() + "&c).");
+               ChatUtil.broadcastGuild(lender, "&a💰 Prélèvement forcé : &e+" + money(take) + " pièces &asur la banque de &6" + borrower.getName() + "&a.");
+               if (l.owed <= 0.01) {
+                  this.settle(l, "soldée par prélèvement");
+                  continue;
+               }
+
+               this.persist(l);
+            }
          } else if (OVERDUE.equals(l.status) && now - l.lastSeizure >= seizureMs) {
             ChunkKey seized = this.plugin.getGuildManager().seizeOneChunk(borrower);
             l.lastSeizure = now;
@@ -353,6 +395,9 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          ChatUtil.sendMessage(p, "&c❌ Montant entre &e" + money(min) + " &cet &e" + money(max) + "&c.");
       } else if (lender.getBankBalance() < amount) {
          ChatUtil.sendMessage(p, "&c❌ La banque de votre guilde ne contient pas &e" + money(amount) + " &cpièces.");
+      } else if (amount > this.plugin.getConfig().getDouble("loans.max-per-claim", 1500.0) * borrower.getClaimedChunks().size()) {
+         ChatUtil.sendMessage(p, "&c❌ Cette guilde ne peut pas garantir un tel prêt : au plus &e" + money(this.plugin.getConfig().getDouble("loans.max-per-claim", 1500.0))
+            + " &cpièces par chunk revendiqué (&e" + money(this.plugin.getConfig().getDouble("loans.max-per-claim", 1500.0) * borrower.getClaimedChunks().size()) + " &cici).");
       } else if (this.hasOverdue(borrower.getId())) {
          ChatUtil.sendMessage(p, "&c❌ &6" + borrower.getName() + " &caccuse déjà un retard de paiement.");
       } else if (this.debtOf(borrower.getId()) + amount > this.plugin.getConfig().getDouble("loans.max-total-debt", 30000.0)) {
@@ -539,6 +584,11 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       Treaty t = this.plugin.getTreatyManager().between(guild.getId(), other.getId());
       if (t == null) {
          ChatUtil.sendMessage(p, "&c❌ Il faut un traité avec &6" + other.getName() + " &cpour partager un coffre.");
+         return;
+      }
+
+      if (!guild.hasRoleAtLeast(p.getUniqueId(), GuildRole.MEMBER)) {
+         ChatUtil.sendMessage(p, "&c❌ Le coffre commun est réservé aux membres confirmés (pas aux recrues).");
          return;
       }
 

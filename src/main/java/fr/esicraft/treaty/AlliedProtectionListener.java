@@ -70,9 +70,23 @@ public class AlliedProtectionListener implements Listener {
    }
 
    /** Un coup réellement porté à un joueur d'une guilde sous pacte de non-agression rompt le pacte (trahison + rivalité). */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onRecruitAggression(EntityDamageByEntityEvent event) {
+      if (!(event.getEntity() instanceof Player victim)) {
+         return;
+      }
+
+      Player attacker = fr.esicraft.combat.CombatManager.attackerOf(event.getDamager());
+      if (attacker != null && !attacker.equals(victim) && this.plugin.getTreatyManager().blocksRecruitAggression(
+         this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId()), attacker)) {
+         event.setCancelled(true);
+         fr.esicraft.util.ChatUtil.sendActionbar(attacker, "&c❌ Une recrue ne peut pas attaquer une guilde liée à la sienne par un traité.");
+      }
+   }
+
    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
    public void onPactAggression(EntityDamageByEntityEvent event) {
-      if (!(event.getEntity() instanceof Player victim)) {
+      if (!(event.getEntity() instanceof Player victim) || event.getFinalDamage() <= 0.0) {
          return;
       }
 

@@ -52,7 +52,8 @@ public class RailGuiListener implements Listener {
          if (index < holder.trips.size()) {
             RailSearch.Reached trip = holder.trips.get(index);
             player.closeInventory();
-            this.plugin.getRailManager().travel(player, trip);
+            Double shown = holder.shown.get(trip);
+            this.plugin.getRailManager().travel(player, trip, shown == null ? -1.0 : shown);
          }
       }
    }

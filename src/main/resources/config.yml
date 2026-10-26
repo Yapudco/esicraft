@@ -189,6 +189,7 @@ claims:
   enemy-buffer-chunks: 1          # Distance minimale (en chunks) entre un nouveau claim et le territoire d'une guilde sans traité avec la nôtre
 
 guilds:
+  contract-min-members: 3           # Les contrats de guilde ne rapportent qu'aux guildes d'au moins N membres
   spec-change-min-hours: 2          # Temps de jeu minimal d'un nouveau membre pour débloquer un changement de spécialisation
   spec-change-cooldown-days: 7      # Délai minimal entre deux changements de spécialisation
   officer-daily-spend-cap: 3000.0   # Dépenses quotidiennes maximales d'un officier (claims, pièges) ; le chef n'a pas de limite (0 = aucune)
@@ -207,6 +208,7 @@ guilds:
 
 # Contrats de Hordes de Monstres (Achat à l'Hôtel des Ventes)
 raids:
+  max-credited-repels-per-pair-per-day: 2   # Victoires comptées au classement par couple attaquant/cible et par jour
   max-minutes: 25               # Durée maximale d'un raid (mob piégé) ; au-delà il s'achève sans victoire ni défaite
   cooldown-minutes-between-raids: 30
   max-custom-horde-units: 60 # Plafond de monstres d'une horde personnalisée (anti-crash serveur)
@@ -305,6 +307,7 @@ loans:
   min: 100.0
   max: 20000.0
   max-total-debt: 30000.0
+  max-per-claim: 1500.0       # Un prêt ne dépasse pas cette somme par chunk revendiqué de l'emprunteur (garantie territoriale)
   seizure-hours: 24           # Dette en retard : un chunk saisi toutes les N heures
   seizure-value: 300.0        # Montant de dette effacé par chunk saisi
 
@@ -321,6 +324,7 @@ treaties:
   pact-days: 7                 # Durée d'un pacte de non-agression
   vassal-tribute-percent: 5.0  # % de la banque du vassal versé chaque jour au suzerain
   break-indemnity: 500.0       # Indemnité versée à l'ex-partenaire en cas de rupture (plafonnée à la banque)
+  vassal-min-tribute: 50.0     # Tribut quotidien minimal : si la banque du vassal est vide, le manque devient une dette
   break-grace-minutes: 30      # Préavis avant que le traître puisse attaquer sa victime
   protect-allies-pvp: true     # Pas de dégâts entre joueurs alliés / suzerain-vassal
 

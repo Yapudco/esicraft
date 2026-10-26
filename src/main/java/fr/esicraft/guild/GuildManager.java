@@ -147,6 +147,15 @@ public class GuildManager {
 
    /** Vérifie qu'un joueur peut dissoudre sa guilde (pas en plein raid / attaque de Nexus). */
    public boolean canDisbandNow(Guild guild, Player player) {
+      if (guild != null && this.plugin.getLoans().hasDebt(guild.getId())) {
+         if (player != null) {
+            ChatUtil.sendMessage(player, "&c❌ Impossible de dissoudre la guilde : elle a une dette en cours (&e/banque dettes&c).");
+            ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         }
+
+         return false;
+      }
+
       if (guild != null && guild.hasNexus()) {
          if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getNexusManager().wasNexusRecentlyAttacked(guild, 600000L)) {
             if (player != null) {

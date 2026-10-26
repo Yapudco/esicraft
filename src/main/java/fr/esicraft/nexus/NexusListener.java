@@ -208,6 +208,11 @@ public class NexusListener implements Listener {
                            ItemStack weapon = attacker.getInventory().getItemInMainHand();
                            int damage = Math.max(1, (int)Math.round(this.getWeaponDamage(weapon.getType()) * factor));
                            this.plugin.getDisguiseManager().reveal(attacker, true);
+                           if (this.plugin.getTreatyManager().blocksRecruitAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), guild, attacker)) {
+                              ChatUtil.sendActionbar(attacker, "&c❌ Une recrue ne peut pas attaquer le Nexus d'une guilde liée à la sienne par un traité.");
+                              return;
+                           }
+
                            this.plugin.getTreatyManager().onAggression(this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), guild, attacker);
                            this.plugin.getNexusManager().damageNexus(guild, damage, attacker.getName(), this.plugin.getGuildManager().getGuildByPlayer(attacker.getUniqueId()), attacker);
                            ChatUtil.sendActionbar(attacker, "&c⚔️ Vous avez infligé &e" + damage + " dégâts &cau Nexus ennemi !");

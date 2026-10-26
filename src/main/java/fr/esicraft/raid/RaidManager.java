@@ -60,6 +60,8 @@ public class RaidManager implements Listener {
    private final Map<UUID, Location> lastMobPositions = new ConcurrentHashMap<>();
    private final Map<UUID, Integer> mobStuckCounters = new ConcurrentHashMap<>();
    private final Map<UUID, Location> mobLastKnown = new ConcurrentHashMap<>();
+   /** « attaquant>cible|jour » → victoires créditées au classement : les auto-raids entre complices ne rapportent qu'un nombre limité de points. */
+   private final Map<String, Integer> repelCredits = new ConcurrentHashMap<>();
    private final Map<UUID, Integer> mobMisses = new ConcurrentHashMap<>();
 
    public RaidManager(EsicraftPlugin plugin) {
@@ -888,7 +890,16 @@ public class RaidManager implements Listener {
             targetGuild.getNexus().clearTraps();
             this.plugin.getDataManager().saveGuild(targetGuild);
             if (defended) {
-               this.plugin.getSeasonManager().recordRepelled(targetGuild);
+               String pairKey = raid.getAttackerGuildId() + ">" + targetGuild.getId() + "|" + java.time.LocalDate.now().toEpochDay();
+               int credited = this.repelCredits.merge(pairKey, 1, Integer::sum);
+               if (credited <= this.plugin.getConfig().getInt("raids.max-credited-repels-per-pair-per-day", 2)) {
+                  this.plugin.getSeasonManager().recordRepelled(targetGuild);
+               }
+
+               if (this.repelCredits.size() > 500) {
+                  this.repelCredits.keySet().removeIf(k -> !k.endsWith("|" + java.time.LocalDate.now().toEpochDay()));
+               }
+
                this.plugin.getChronicle().raid(raid.getAttackerGuildId(), targetGuild.getId(), "repelled");
                this.plugin.getHelpCalls().onRepelled(targetGuild);
                for (UUID memberUuid : targetGuild.getMembers().keySet()) {
