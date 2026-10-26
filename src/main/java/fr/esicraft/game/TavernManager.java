@@ -168,6 +168,7 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
 
       this.taverns.put(here, guild.getId());
       this.plugin.getDataManager().getStorage().exec("INSERT OR REPLACE INTO taverns (world, cx, cz, guild_id) VALUES (?, ?, ?, ?);", here.getWorldName(), here.getX(), here.getZ(), guild.getId());
+      this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.CHAMPION_TAVERN);
       ChatUtil.broadcastGuild(guild, "&6🍺 Une taverne (zone neutre) a été déclarée en &e" + here.getX() + "," + here.getZ() + "&6 : PvP et armes interdits, pile ou face avec &e/taverne&6 !");
    }
 

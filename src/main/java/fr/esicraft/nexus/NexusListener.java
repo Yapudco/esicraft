@@ -353,7 +353,7 @@ public class NexusListener implements Listener {
    /** Frapper son propre golem gardien ne le met pas en colère : il ne cible jamais un membre de sa guilde (ni un allié). */
    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
    public void onGuardianTarget(org.bukkit.event.entity.EntityTargetLivingEntityEvent event) {
-      if (event.getEntity() instanceof org.bukkit.entity.IronGolem golem && event.getTarget() instanceof Player player) {
+      if (event.getEntity() instanceof org.bukkit.entity.Mob golem && event.getTarget() instanceof Player player) {
          String guildId = NexusManager.guardianGuildId(golem);
          if (guildId != null && this.plugin.getNexusManager().isGuardianFriend(guildId, player)) {
             event.setCancelled(true);
@@ -364,7 +364,7 @@ public class NexusListener implements Listener {
    /** Filet de sécurité : même déjà en colère, le golem gardien ne blesse pas un membre de sa guilde. */
    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
    public void onGuardianHit(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
-      if (event.getDamager() instanceof org.bukkit.entity.IronGolem golem && event.getEntity() instanceof Player player) {
+      if (event.getDamager() instanceof org.bukkit.entity.Mob golem && event.getEntity() instanceof Player player) {
          String guildId = NexusManager.guardianGuildId(golem);
          if (guildId != null && this.plugin.getNexusManager().isGuardianFriend(guildId, player)) {
             event.setCancelled(true);

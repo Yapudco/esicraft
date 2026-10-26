@@ -574,6 +574,9 @@ public class WorldBoss implements Listener {
       this.setWins(this.wins() + 1);
       this.plugin.getSeasonManager().addHistory(fr.esicraft.life.Chronicle.Kind.EVENT, "☠ " + this.kind.plain + (this.heroic ? " (héroïque)" : "") + " a été terrassé (meilleur combattant : " + topName + (guild != null ? ", guilde " + guild.getName() : "") + ").", null, null);
       this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.SLAYER);
+      if (this.heroic) {
+         this.plugin.getAchievements().grant(top, fr.esicraft.life.Achievement.HEROIC_SLAYER);
+      }
    }
 
    // ------------------------------------------------------------------ fin de combat

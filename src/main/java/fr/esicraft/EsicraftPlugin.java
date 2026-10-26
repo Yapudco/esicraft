@@ -117,6 +117,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.game.DuelManager duels;
    private fr.esicraft.game.TavernManager tavern;
    private fr.esicraft.nexus.NexusGamble nexusGamble;
+   private fr.esicraft.nexus.NexusTech nexusTech;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -159,6 +160,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.duels = new fr.esicraft.game.DuelManager(this);
       this.tavern = new fr.esicraft.game.TavernManager(this);
       this.nexusGamble = new fr.esicraft.nexus.NexusGamble(this);
+      this.nexusTech = new fr.esicraft.nexus.NexusTech(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -180,6 +182,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.truce.start();
       this.duels.init();
       this.tavern.init();
+      this.nexusTech.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -203,6 +206,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.truce, this);
       pm.registerEvents(this.duels, this);
       pm.registerEvents(this.tavern, this);
+      pm.registerEvents(this.nexusTech, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -435,6 +439,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.TavernManager getTavern() {
       return this.tavern;
+   }
+
+   public fr.esicraft.nexus.NexusTech getNexusTech() {
+      return this.nexusTech;
    }
 
    public fr.esicraft.nexus.NexusGamble getNexusGamble() {

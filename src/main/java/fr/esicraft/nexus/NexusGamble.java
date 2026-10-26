@@ -106,6 +106,7 @@ public class NexusGamble {
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, loc.clone().add(0.5, 1.0, 0.5), 80, 1.0, 1.0, 1.0, 0.3);
          loc.getWorld().playSound(loc, Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
+         this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.NEXUS_GAMBLER);
          ChatUtil.broadcast("&a&l✔ LA CHANCE SOURIT À &6" + guild.getName() + " &a: Nexus &2+" + gainHp + " PV max&a et &6+" + (long)coins + " pièces &adans la banque !");
       } else {
          int loss = this.plugin.getConfig().getInt("nexus.gamble.lose-hp", 1500);

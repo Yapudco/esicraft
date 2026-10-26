@@ -903,6 +903,7 @@ public class NexusManager {
                                  }
                               }
 
+                              NexusManager.this.plugin.getNexusTech().tickDefenses(guildx, nexus, loc, enemies);
                               if (nexus.hasTrap(NexusTrapType.GUARDIAN_GOLEM)) {
                                  NexusManager.this.maintainGuardian(guildx, loc, nearbyEntities);
                               }

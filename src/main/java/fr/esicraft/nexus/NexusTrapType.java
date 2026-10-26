@@ -13,7 +13,15 @@ public enum NexusTrapType {
    ),
    GUARDIAN_GOLEM(
       "&6\ud83e\udd16 Automate Gardien (Golem)", Material.IRON_BLOCK, 500.0, "&7Invoque un Golem de fer qui attaque les ennemis ; reconstruit 5 min après sa mort."
-   );
+   ),
+   SHULKER_SHOT("&d🟪 Tir de Shulker", Material.SHULKER_SHELL, 0.0, "&7Projectile guidé : dégâts et lévitation sur l'ennemi le plus proche (toutes les 6 s)."),
+   WARDEN_SHOT("&3👁 Tir du Warden", Material.ECHO_SHARD, 0.0, "&7Onde sonique dévastatrice (10 dégâts, repoussée) toutes les 15 s."),
+   EVOKER_SHOT("&5🪄 Tir d'Évocateur", Material.TOTEM_OF_UNDYING, 0.0, "&7Crocs magiques : 6 dégâts de zone sur la cible toutes les 9 s."),
+   GUARDIAN_SHOT("&b🐡 Tir de Gardien", Material.PRISMARINE_CRYSTALS, 0.0, "&7Rayon aquatique : dégâts et lenteur toutes les 4 s."),
+   ELDER_GUARDIAN_SHOT("&9🌊 Malédiction de l'Ancien", Material.SPONGE, 0.0, "&7Fatigue de minage III et dégâts à tous les ennemis proches toutes les 25 s."),
+   BLAZE_SHOT("&6🔥 Tir de Blaze", Material.BLAZE_ROD, 0.0, "&7Jusqu'à 3 boules de feu enflammant les ennemis toutes les 5 s."),
+   GHAST_SHOT("&f👻 Tir de Ghast", Material.GHAST_TEAR, 0.0, "&7Boule de feu explosive de zone (8 dégâts, sans casser de blocs) toutes les 14 s."),
+   BEE_SWARM("&e🐝 Essaim d'abeilles", Material.HONEYCOMB, 0.0, "&7Invoque jusqu'à 6 abeilles enragées qui piquent les ennemis (respawn toutes les 30 s).");
 
    private final String displayName;
    private final Material icon;
