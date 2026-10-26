@@ -2,6 +2,28 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026
+
+### Correctif : coffre de fret
+- **Impossible de déposer des objets dans le coffre de chargement** : le menu partageait le type de fenêtre des menus à boutons, dont tous les clics sont annulés. Il est maintenant un vrai coffre.
+
+### Sécurité et équilibre (audit)
+- **Fret** : la boîte de livraison est un **inventaire partagé unique** en mémoire (plus de duplication quand deux officiers l'ouvrent, ni de livraison écrasée) ; les écritures passent par un fil unique et la suppression du convoi et le dépôt en boîte se font dans **une seule transaction** (plus de double livraison après un plantage). Recherche des joueurs proches toutes les 10 ticks.
+- **Roulette russe** : bonus de PV max plafonné (3 000 cumulés), défaite plus coûteuse (−500 PV max de bonus, −1 000 pièces), délai de 72 h.
+- **Trêve** : elle interdit aussi d'attaquer un Nexus (arme, pioche, siège), de lancer une horde et de piller un convoi.
+- **Paris** : écartés les guildes liées par traité, les adresses IP identiques à celle d'un participant et les comptes récents ; mise maximale 1 000.
+- **Raids factices** : repousser une horde de moins de 12 monstres ne rapporte plus d'XP de Nexus, de points de saison ni de succès. En raid, seuls les monstres de la horde et le TNT de la guilde attaquante détruisent la base ; les explosions de blocs restent bloquées pour un tiers.
+- **Déguisement** : on ne peut plus se déguiser en pseudo d'un joueur du serveur (utiliser la guilde ou un compte étranger) ; les commandes cherchent les joueurs par nom réel (jamais par faux nom).
+- **Nexus** : pose refusée sous plus de 3 blocs de roche (impossible à atteindre en siège). **Étendard de siège** : espace libre sur sol solide, jamais sur le territoire d'une tierce guilde, vérifié avant le paiement. **Arènes de duel** : une plateforme par duel (6 simultanés), construite seulement si la zone est vide.
+- **Bourse** : capitaux propres (banque − dettes nettes) au lieu de la banque seule, délai de détention de 24 h, revente plafonnée à 1,5× le prix payé.
+- **Tribunal** : seules les guildes établies (Nexus, 2 membres, 3 jours) comptent.
+- **Élections du site** : confirmation en jeu avec l'adresse du demandeur (hameçonnage), un compte par connexion et par catégorie, comptes récents exclus, `/webvote optout`, catégories réglables et élections désactivables, instantané en cache 8 s.
+- **Site** : têtes limitées aux joueurs connus (file bornée, caches bornés), page 404 anglaise mise en cache, index sur `players(name)` et `players(coins)`, `X-Forwarded-Proto` lu seulement derrière un proxy de confiance, **port par défaut 8080** (80 demande des droits root sous Linux ; les serveurs existants gardent leur `web.port`).
+- **Optimisations** : sauvegardes de duel gardées en mémoire (plus de requête sur le thread principal), derniers tirages de roulette chargés au démarrage.
+
+### Points inchangés
+- Un raid exige toujours un défenseur connecté sur ses terres (règle voulue, le siège la contourne) ; le soin du Nexus reste bloqué pendant les attaques de joueurs.
+
 ## 29/10/2026
 
 ### Boss mondial refondu

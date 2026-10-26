@@ -182,11 +182,11 @@ Instead of buying disposable traps, officers **unlock** defenses in `/nexus` (th
 | 👁 Warden Shot | 5 | Evoker · **kill a warden** · 8 echo shards, 4 catalysts | Sonic boom: 10 damage and knockback every 15 s |
 | 🌊 Elder's Curse | 6 | Guardian · **kill an elder guardian** · 128 prismarine bricks, 8 nautilus shells | Mining Fatigue III and damage to all nearby enemies every 25 s |
 
-Unlocking everything earns the *Archi-technician* achievement. Settings: `nexus.tech.*` (cost, damage, XP).
+Unlocking everything earns the *Archi-technician* achievement. **Tiny hordes earn nothing**: repelling a horde of fewer than 12 monsters gives no Nexus XP, season points or achievement. During a raid, only the horde's monsters and TNT lit by the attacking guild destroy the base (not a third party). The Nexus must stay **reachable**: it can't be placed under more than 3 solid blocks of rock (sieges only break within 4 blocks of it). Settings: `nexus.tech.*` (cost, damage, XP).
 
 ### 🎰 Nexus Russian roulette (`/nexus gamble`)
 
-The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per 24 h, impossible during a raid): **50%** the Nexus gains **+1,000 max HP** and **2,000 coins** go to the bank; **50%** it loses **1,500 HP** (it always survives at 1 HP) and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
+The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid): **50%** the Nexus gains **+1,000 max HP** (cumulative bonus capped at **3,000**) and **2,000 coins** go to the bank; **50%** it loses **1,500 HP** (it always survives at 1 HP) and **500 max HP** of the roulette bonus, the bank loses **1,000 coins**, and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
 
 ---
 
@@ -344,11 +344,11 @@ The rail network lets you **teleport from station to station**, as long as a **c
 
 ### ⚖ Guild Court (`/vote`)
 
-Every **Monday**, guild members vote with `/vote` (clickable list) on a **rule for the following week** (Tuesday to Monday). Each guild weighs one vote (its choice = the option most voted by its members); ties are broken by number of voters. Rules: **Toll tax** (rail tolls ×2), **Building bonus** (claims -25%), **Free market** (no Auction House tax), **Open hunt** (monster bounties +25%), **Extended truce** (see below). The verdict is announced and written in the journal.
+Every **Monday**, guild members vote with `/vote` (clickable list) on a **rule for the following week** (Tuesday to Monday). Each established guild (active Nexus, at least 2 members and 3 days old: `court.*`) weighs one vote (its choice = the option most voted by its members); ties are broken by number of voters. Rules: **Toll tax** (rail tolls ×2), **Building bonus** (claims -25%), **Free market** (no Auction House tax), **Open hunt** (monster bounties +25%), **Extended truce** (see below). The verdict is announced and written in the journal.
 
 ### 🕊 Weekly truce
 
-On **Friday and Saturday at 9 pm**, **one hour with no PvP** (hits, arrows, harmful potions) for everyone; honor duels are exempt. Adjustable in `truce.*` (days, time, length). With the "Extended truce" rule it also starts on Thursday and lasts twice as long.
+On **Friday and Saturday at 9 pm**, **one hour with no PvP** (hits, arrows, harmful potions) for everyone, **and no attack on a Nexus, no horde launched, no convoy looted**; honor duels are exempt. A siege whose time falls during a truce waits for its end. Adjustable in `truce.*` (days, time, length). With the "Extended truce" rule it also starts on Thursday and lasts twice as long.
 
 ### Seasons
 
@@ -374,7 +374,7 @@ During a raid or an attack on your Nexus, `/aide` warns your **allies** (allianc
 For **750 coins** you change **skin and name** for **5 minutes** (the skin is refreshed for everyone, and restored at the end):
 
 - `/deguisement <guild>`: pose as a member of that guild (skin of one of its members, made-up pseudonym, guild tag in chat and the list). Its traps and golem ignore you.
-- `/deguisement <Name>`: take the skin and name of **any Minecraft account**, even one that isn't on the server (`/deguisement aypierre_`). If that player belongs to another guild on the server, you also borrow its guild identity. Not possible while that player is online.
+- `/deguisement <Name>`: take the skin and name of a Minecraft account **outside the server** (`/deguisement Notch`). Names of players on the server are **refused** (impersonation: announcements, journal and commands would be hijacked): to imitate one of ours, use their guild. Impossible if that player is online.
 - `/deguisement off`: remove the disguise (original name and skin restored).
 
 **Offline-mode server behind Velocity or BungeeCord**: it works. The skins of the server's own players are the ones the proxy forwards at login (enable **modern** forwarding: `player-info-forwarding-mode = "modern"` in Velocity and `velocity-support` in Paper), and other accounts are looked up directly with Mojang (the server must be able to reach `api.mojang.com` and `sessionserver.mojang.com`).
@@ -438,9 +438,9 @@ With no decision, they are executed. Logging out while captive counts as dying. 
 
 ### 🗡 Honor duels and bets (`/duel`, `/pari`)
 
-- `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world; their **inventory, health and position are saved** then returned at the end (even after a crash, when they reconnect).
+- `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world (one platform per duel, 6 at a time, built only if the area is empty); their **inventory, health and position are saved** then returned at the end (even after a crash, when they reconnect).
 - **Nobody dies**: the deciding blow ends the fight. The winner takes the opponent's stake. A duel **triggers no rivalry, betrayal, capture or combat tag**, and is not stopped by the truce. 5 minutes at most (draw after that, stakes returned); quitting = losing.
-- `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 5,000 coins) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded.
+- `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 1,000 coins) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded. **Anti-cheat**: members of the guilds involved **and guilds bound to them by a treaty** are excluded, as is anyone whose **IP address** matches an online participant, and accounts under 3 days old.
 
 ### 🍺 Taverns (`/taverne`)
 
@@ -448,11 +448,11 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 
 ### 📈 The stock exchange (`/bourse`)
 
-From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1,000 shares). **Outside** players buy shares (`/bourse acheter <guild> <shares>`, price = 10 + bank ÷ 1,000; 100 shares per player, 49% of the capital at most) and sell them back to the guild at 90% of the price. Every 6 hours, **20% of the guild's profit** (rise of its bank: sales, raid bounties, donations) is paid to shareholders **pro rata to their shares**. `/bourse` lists listed guilds, `/bourse portefeuille` your shares. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement.
+From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1,000 shares). **Outside** players buy shares (`/bourse acheter <guild> <shares>`, price = 10 + equity ÷ 1,000; 100 shares per player, 49% of the capital at most) and sell them back to the guild at 90% of the price, **after holding them 24 h** and never for more than 1.5 times what they paid (the exchange can't be used to drain the bank). Every 6 hours, **20% of the guild's profit** (rise of its **equity**: bank minus net debts, so a received loan is never profit) is paid to shareholders **pro rata to their shares**. `/bourse` lists listed guilds, `/bourse portefeuille` your shares. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement.
 
 ### ⚔ Formal wars: sieges (`/siege`)
 
-An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk next to theirs) with `/siege declarer <guild> <day> <hour>` (e.g. `samedi 21`): **24 hours' notice**, 500 coins fee from the bank, a one-hour slot that can't overlap the truce, impossible under a treaty. The target can **cancel the siege by destroying the banner** before the time (and keeps the fee). During the slot, members of the besieging guild can **tear down the enemy Nexus with pickaxes or heavy weapons**: damage ×2, even with no defender present, without buying a horde. **Victory** if the Nexus falls or 40% of its max HP is dealt: 10% of the loser's bank (3,000 max) is looted. Otherwise the defender keeps the fee. `/siege liste` shows sieges, `/siege annuler` gives up (half the fee refunded). History in the website Pantheon. *Siege master* achievement.
+An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk next to theirs, on free ground or their own land, in an empty space on solid ground) with `/siege declarer <guild> <day> <hour>` (e.g. `samedi 21`): **24 hours' notice**, 500 coins fee from the bank, a one-hour slot that can't overlap the truce, impossible under a treaty. The target can **cancel the siege by destroying the banner** before the time (and keeps the fee). During the slot, members of the besieging guild can **tear down the enemy Nexus with pickaxes or heavy weapons**: damage ×2, even with no defender present, without buying a horde. **Victory** if the Nexus falls or 40% of its max HP is dealt: 10% of the loser's bank (3,000 max) is looted. Otherwise the defender keeps the fee. `/siege liste` shows sieges, `/siege annuler` gives up (half the fee refunded). History in the website Pantheon. *Siege master* achievement.
 
 ### 🔱 Atlanteans
 
@@ -460,7 +460,7 @@ The **Atlantean** specialization (see the table above) requires a Nexus **in the
 
 ### 🗳 Website elections and Pantheon
 
-Every week the community elects on the website (`/votes`) the most **clueless**, the **biggest**, the **funniest** and the most **annoying** player. To vote: click "Revendiquer ce pseudo" (on your profile or the votes page); the site shows a **code** (`ESI-XXXX`) to **type in the game chat** with that account (the message isn't broadcast); a **cookie** (random token, HttpOnly, 90 days) then recognizes your browser. One vote per category, changeable, never for yourself. The week's winners are announced in chat and shown in the **Pantheon** (`/pantheon`), along with slain bosses, sieges and the Court rule.
+Every week the community elects on the website (`/votes`) the most **clueless**, the **biggest**, the **funniest** and the most **annoying** player. To vote: click "Revendiquer ce pseudo" (on your profile or the votes page); the site shows a **code** (`ESI-XXXX`) to **type in the game chat** with that account (the message isn't broadcast); the game then asks for a **confirmation** (`[CONFIRMER]` / `[REFUSER]`, with the requester's approximate address: never confirm a request you didn't make). A **cookie** (random token, HttpOnly, 90 days) then recognizes your browser. One vote per category, changeable, never for yourself; accounts under 2 days old are excluded, and **only one account per connection and category**. `/webvote optout` removes you from the elections; admins can disable them or rename the categories (`web.votes.*`). The week's winners are announced in chat and shown in the **Pantheon** (`/pantheon`), along with slain bosses, sieges and the Court rule.
 
 ### ⚖ Balance: revenge and catch-up
 
@@ -473,7 +473,7 @@ Every week the community elects on the website (`/votes`) the most **clueless**,
 
 ### The website
 
-The server has a public website: **`http://<server-address>/`**, which updates itself (every 30 seconds, adjustable with `web.refresh-seconds`). It shows **no coordinates**: nothing that helps find a base. The website is in French.
+The server has a public website: **`http://<server-address>:8080/`**, which updates itself (every 30 seconds, adjustable with `web.refresh-seconds`). It shows **no coordinates**: nothing that helps find a base. The website is in French.
 
 | Page | Content |
 | :--- | :--- |
@@ -569,7 +569,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 
 ### The website
 
-- Enabled by default on **port 80** (`web.port`). On Linux this port needs root or `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))`; otherwise use 8080. If the port is refused, the plugin still starts and says so in the console.
+- Enabled by default on **port 8080** (`web.port`). On Linux this port needs root or `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))`; otherwise use 8080. If the port is refused, the plugin still starts and says so in the console.
 - Remember to **open the port** on your router and firewall.
 - Read-only, with no coordinates. Nexus HP is hidden by default (`web.show-nexus-health`). Banks and balances can be hidden (`web.show-guild-banks`, `web.show-balances`). Vanished players don't appear.
 - Anti-flood: 60 requests per 10 seconds per IP address (`web.rate-limit`). Behind a reverse proxy, raise this limit.

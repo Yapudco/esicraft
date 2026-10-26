@@ -13,8 +13,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -48,11 +50,38 @@ final class HeadService {
    private final Map<String, URL> skinUrls = new ConcurrentHashMap<>();
    private final Set<String> inflight = ConcurrentHashMap.newKeySet();
    private final Set<String> warned = ConcurrentHashMap.newKeySet();
-   private final ExecutorService io = Executors.newFixedThreadPool(2, r -> {
+   /** File bornée : une rafale de pseudos inventés ne remplit pas la mémoire (les demandes en trop sont simplement ignorées). */
+   private final ExecutorService io = new ThreadPoolExecutor(2, 2, 30L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(64), r -> {
       Thread t = new Thread(r, "esicraft-heads");
       t.setDaemon(true);
       return t;
    });
+   private static final int MAX_CACHE = 1500;
+   /** Pseudos des joueurs du serveur (en minuscules) : seuls ceux-là déclenchent une recherche Mojang. */
+   private volatile Set<String> known = Set.of();
+
+   /** Remplace la liste des joueurs connus du site. */
+   void setKnown(Collection<String> names) {
+      Set<String> set = ConcurrentHashMap.newKeySet();
+      for (String n : names) {
+         if (n != null) {
+            set.add(n.toLowerCase(Locale.ROOT));
+         }
+      }
+
+      this.known = set;
+   }
+
+   private void trim() {
+      if (this.cache.size() > MAX_CACHE) {
+         this.cache.entrySet().stream().sorted(java.util.Comparator.comparingLong(e -> e.getValue().at())).limit(this.cache.size() - MAX_CACHE + 200L)
+            .map(Map.Entry::getKey).toList().forEach(this.cache::remove);
+      }
+
+      if (this.skinUrls.size() > MAX_CACHE * 2) {
+         this.skinUrls.keySet().stream().filter(k -> !this.known.contains(k)).limit(500).toList().forEach(this.skinUrls::remove);
+      }
+   }
 
    HeadService(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -84,6 +113,11 @@ final class HeadService {
       }
 
       String key = name.toLowerCase(Locale.ROOT);
+      if (!this.known.contains(key) && !this.skinUrls.containsKey(key)) {
+         // Pseudo inconnu du serveur : aucun appel à Mojang (sinon n'importe qui épuiserait notre quota avec des pseudos inventés).
+         return new Head(placeholder(name), false);
+      }
+
       Entry e = this.cache.get(key);
       long now = System.currentTimeMillis();
       if (e == null || now - e.at() > (e.head().real() ? TTL_MS : RETRY_MS)) {
@@ -128,6 +162,7 @@ final class HeadService {
             try {
                byte[] png = this.render(name, key);
                this.cache.put(key, new Entry(png != null ? new Head(png, true) : new Head(placeholder(name), false), System.currentTimeMillis()));
+               this.trim();
             } catch (Throwable t) {
                this.cache.put(key, new Entry(new Head(placeholder(name), false), System.currentTimeMillis()));
                this.plugin.getLogger().log(Level.FINE, "Tête de " + name + " indisponible : " + t);

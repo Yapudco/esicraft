@@ -161,6 +161,9 @@ commands:
     description: "Zone neutre - déclarer une taverne, jouer au pile ou face"
     aliases: [tavern]
     usage: /taverne [declarer|retirer|jeu]
+  webvote:
+    description: "Élections du site - confirmer la liaison d'un navigateur, ne plus être candidat"
+    usage: /webvote [confirmer|refuser|optout|optin]
   siege:
     description: "Guerre formelle - déclarer un siège avec 24 h de préavis"
     usage: /siege [declarer <guilde> <jour> <heure>|liste|annuler]

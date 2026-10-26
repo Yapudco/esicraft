@@ -45,6 +45,7 @@ import fr.esicraft.rail.RailManager;
 import fr.esicraft.command.RailCommand;
 import fr.esicraft.command.TreatyCommand;
 import fr.esicraft.web.WebServer;
+import fr.esicraft.util.ChatUtil;
 import fr.esicraft.util.Lang;
 import fr.esicraft.life.AchievementManager;
 import fr.esicraft.life.Chronicle;
@@ -170,6 +171,8 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
+      this.dataManager.getStorage().exec("CREATE INDEX IF NOT EXISTS idx_players_name ON players (lower(name));");
+      this.dataManager.getStorage().exec("CREATE INDEX IF NOT EXISTS idx_players_coins ON players (coins);");
       Lang.init(this);
       this.chronicle.init();
       this.achievements.init();
@@ -330,6 +333,15 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("siege")).setTabCompleter(this.siege);
       Objects.requireNonNull(this.getCommand("bourse")).setExecutor(this.bourse);
       Objects.requireNonNull(this.getCommand("bourse")).setTabCompleter(this.bourse);
+      if (this.webServer != null && this.webServer.getVotes() != null) {
+         Objects.requireNonNull(this.getCommand("webvote")).setExecutor(this.webServer.getVotes());
+      } else {
+         Objects.requireNonNull(this.getCommand("webvote")).setExecutor((s, c, l, a) -> {
+            s.sendMessage(ChatUtil.color("&cLe site web ou ses élections sont désactivés."));
+            return true;
+         });
+      }
+
       Objects.requireNonNull(this.getCommand("duel")).setExecutor(this.duels);
       Objects.requireNonNull(this.getCommand("duel")).setTabCompleter(this.duels);
       Objects.requireNonNull(this.getCommand("pari")).setExecutor(this.betting);

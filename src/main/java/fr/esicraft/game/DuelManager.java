@@ -86,12 +86,29 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
    /** Emplacements d'arène occupés : plusieurs duels peuvent avoir lieu en même temps, chacun dans sa plateforme. */
    private final boolean[] slotsUsed = new boolean[6];
    private boolean teleporting;
+   /** Sauvegardes d'avant-duel gardées en mémoire (la base n'est lue qu'au démarrage et écrite en tâche de fond : plus de requête sur le thread principal). */
+   private final Map<UUID, String> snaps = new ConcurrentHashMap<>();
 
    public DuelManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
    }
 
+   private void async(Runnable r) {
+      if (this.plugin.isEnabled()) {
+         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, r);
+      } else {
+         r.run();
+      }
+   }
+
    public void init() {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'duel_snap:%';", 2)) {
+         try {
+            this.snaps.put(UUID.fromString(String.valueOf(row[0]).substring(10)), String.valueOf(row[1]));
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
       this.plugin.getTruce().addExemption(this::isDueling);
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::tick, 20L, 20L);
    }
@@ -377,20 +394,22 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
    private void snapshot(Player p) {
       byte[] inv = ItemStack.serializeItemsAsBytes(p.getInventory().getContents());
       String value = Base64.getEncoder().encodeToString(inv) + ";" + encodeLoc(p.getLocation()) + ";" + p.getLevel() + ";" + p.getExp() + ";" + p.getHealth() + ";" + p.getFoodLevel() + ";" + p.getSaturation();
-      this.plugin.getDataManager().getStorage().exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "duel_snap:" + p.getUniqueId(), value);
+      this.snaps.put(p.getUniqueId(), value);
+      this.async(() -> this.plugin.getDataManager().getStorage().exec(
+         "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "duel_snap:" + p.getUniqueId(), value));
       p.getInventory().clear();
    }
 
    /** Rend l'inventaire et l'état d'avant-duel ; renvoie la position d'origine. */
    private boolean restore(Player p) {
       String key = "duel_snap:" + p.getUniqueId();
-      List<Object[]> rows = this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, key);
-      if (rows.isEmpty()) {
+      String saved = this.snaps.get(p.getUniqueId());
+      if (saved == null) {
          return false;
       }
 
       try {
-         String[] parts = String.valueOf(rows.get(0)[0]).split(";");
+         String[] parts = saved.split(";");
          ItemStack[] items = ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode(parts[0]));
          p.getInventory().clear();
          p.getInventory().setContents(items);
@@ -417,7 +436,8 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
          this.plugin.getLogger().warning("Restauration du duel impossible pour " + p.getName() + " : " + e.getMessage());
       }
 
-      this.plugin.getDataManager().getStorage().exec("DELETE FROM kv WHERE k = ?;", key);
+      this.snaps.remove(p.getUniqueId());
+      this.async(() -> this.plugin.getDataManager().getStorage().exec("DELETE FROM kv WHERE k = ?;", key));
       return true;
    }
 
@@ -537,10 +557,10 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
    @EventHandler
    public void onRespawn(PlayerRespawnEvent event) {
       Player p = event.getPlayer();
-      List<Object[]> rows = this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, "duel_snap:" + p.getUniqueId());
-      if (!rows.isEmpty()) {
+      String saved = this.snaps.get(p.getUniqueId());
+      if (saved != null) {
          try {
-            Location origin = decodeLoc(String.valueOf(rows.get(0)[0]).split(";")[1]);
+            Location origin = decodeLoc(saved.split(";")[1]);
             if (origin != null) {
                event.setRespawnLocation(origin);
             }
@@ -566,7 +586,7 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
    @EventHandler
    public void onJoin(PlayerJoinEvent event) {
       Player p = event.getPlayer();
-      if (!this.duels.containsKey(p.getUniqueId())) {
+      if (this.snaps.containsKey(p.getUniqueId()) && !this.duels.containsKey(p.getUniqueId())) {
          Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             if (p.isOnline() && this.restore(p)) {
                ChatUtil.sendMessage(p, "&a⚔ Votre inventaire d'avant-duel vous a été rendu.");

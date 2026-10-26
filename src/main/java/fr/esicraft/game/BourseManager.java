@@ -31,6 +31,9 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       double snapshot;
       long lastDividend;
       final Map<UUID, Integer> holders = new ConcurrentHashMap<>();
+      /** Prix payé au total par chaque actionnaire pour ses parts, et date de son dernier achat. */
+      final Map<UUID, Double> costs = new ConcurrentHashMap<>();
+      final Map<UUID, Long> since = new ConcurrentHashMap<>();
 
       Listing(String guildId, int total, int treasury, double snapshot, long lastDividend) {
          this.guildId = guildId;
@@ -55,16 +58,22 @@ public class BourseManager implements CommandExecutor, TabCompleter {
    public void init() {
       var db = this.plugin.getDataManager().getStorage();
       db.exec("CREATE TABLE IF NOT EXISTS stock_listings (guild_id VARCHAR(64) PRIMARY KEY, total INT, treasury INT, snapshot REAL, last_div BIGINT);");
-      db.exec("CREATE TABLE IF NOT EXISTS stock_holdings (guild_id VARCHAR(64), uuid VARCHAR(36), shares INT, PRIMARY KEY (guild_id, uuid));");
+      db.exec("CREATE TABLE IF NOT EXISTS stock_positions (guild_id VARCHAR(64), uuid VARCHAR(36), shares INT, cost REAL, since BIGINT, PRIMARY KEY (guild_id, uuid));");
+      // Migration de l'ancienne table (sans prix de revient) : coût estimé au prix plancher.
+      db.exec("INSERT OR IGNORE INTO stock_positions (guild_id, uuid, shares, cost, since) SELECT guild_id, uuid, shares, shares * 10.0, 0 FROM stock_holdings;");
+      db.exec("DROP TABLE IF EXISTS stock_holdings;");
       for (Object[] row : db.select("SELECT guild_id, total, treasury, snapshot, last_div FROM stock_listings;", 5)) {
          this.listings.put(String.valueOf(row[0]), new Listing(String.valueOf(row[0]), ((Number)row[1]).intValue(), ((Number)row[2]).intValue(), ((Number)row[3]).doubleValue(), ((Number)row[4]).longValue()));
       }
 
-      for (Object[] row : db.select("SELECT guild_id, uuid, shares FROM stock_holdings;", 3)) {
+      for (Object[] row : db.select("SELECT guild_id, uuid, shares, cost, since FROM stock_positions;", 5)) {
          Listing l = this.listings.get(String.valueOf(row[0]));
          try {
             if (l != null) {
-               l.holders.put(UUID.fromString(String.valueOf(row[1])), ((Number)row[2]).intValue());
+               UUID id = UUID.fromString(String.valueOf(row[1]));
+               l.holders.put(id, ((Number)row[2]).intValue());
+               l.costs.put(id, ((Number)row[3]).doubleValue());
+               l.since.put(id, ((Number)row[4]).longValue());
             }
          } catch (IllegalArgumentException ignored) {
          }
@@ -85,15 +94,21 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       this.async(w);
    }
 
-   private void saveHolding(String guildId, UUID uuid, int shares) {
+   private void saveHolding(String guildId, UUID uuid, int shares, double cost, long since) {
       this.async(() -> {
          var db = this.plugin.getDataManager().getStorage();
          if (shares <= 0) {
-            db.exec("DELETE FROM stock_holdings WHERE guild_id = ? AND uuid = ?;", guildId, uuid.toString());
+            db.exec("DELETE FROM stock_positions WHERE guild_id = ? AND uuid = ?;", guildId, uuid.toString());
          } else {
-            db.exec("INSERT INTO stock_holdings (guild_id, uuid, shares) VALUES (?, ?, ?) ON CONFLICT(guild_id, uuid) DO UPDATE SET shares = excluded.shares;", guildId, uuid.toString(), shares);
+            db.exec("INSERT INTO stock_positions (guild_id, uuid, shares, cost, since) VALUES (?, ?, ?, ?, ?) ON CONFLICT(guild_id, uuid) DO UPDATE SET shares = excluded.shares, cost = excluded.cost, since = excluded.since;",
+               guildId, uuid.toString(), shares, cost, since);
          }
       });
+   }
+
+   /** Capitaux propres de la guilde : banque moins ses dettes nettes. Un prêt reçu n'est donc jamais un bénéfice distribuable. */
+   private double equity(Guild g) {
+      return g.getBankBalance() - this.plugin.getLoans().netDebt(g.getId());
    }
 
    private void async(Runnable r) {
@@ -107,7 +122,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
    /** Cours d'une part : prix plancher + banque de la guilde répartie sur l'ensemble des parts. */
    public double price(Guild guild, Listing l) {
       double floor = Math.max(1.0, this.plugin.getConfig().getDouble("bourse.floor-price", 10.0));
-      return Math.round((floor + guild.getBankBalance() / Math.max(1, l.total)) * 100.0) / 100.0;
+      return Math.round((floor + Math.max(0.0, this.equity(guild)) / Math.max(1, l.total)) * 100.0) / 100.0;
    }
 
    /** Une guilde dissoute disparaît de la cote (ses actions ne valent plus rien). */
@@ -116,7 +131,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          this.async(() -> {
             var db = this.plugin.getDataManager().getStorage();
             db.exec("DELETE FROM stock_listings WHERE guild_id = ?;", guildId);
-            db.exec("DELETE FROM stock_holdings WHERE guild_id = ?;", guildId);
+            db.exec("DELETE FROM stock_positions WHERE guild_id = ?;", guildId);
          });
       }
    }
@@ -137,7 +152,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
             continue;
          }
 
-         double profit = g.getBankBalance() - l.snapshot;
+         double profit = this.equity(g) - l.snapshot;
          int outstanding = l.outstanding();
          if (profit > 0.0 && outstanding > 0) {
             double pool = Math.floor(profit * percent);
@@ -159,7 +174,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
             }
          }
 
-         l.snapshot = g.getBankBalance();
+         l.snapshot = this.equity(g);
          l.lastDividend = now;
          this.saveListing(l);
       }
@@ -229,7 +244,7 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       }
 
       int total = Math.max(10, this.plugin.getConfig().getInt("bourse.total-shares", 1000));
-      Listing l = new Listing(g.getId(), total, total, g.getBankBalance(), System.currentTimeMillis());
+      Listing l = new Listing(g.getId(), total, total, this.equity(g), System.currentTimeMillis());
       this.listings.put(g.getId(), l);
       this.saveListing(l);
       ChatUtil.broadcast("&6📈 &e" + g.getName() + " &6entre en bourse ! &7" + total + " parts disponibles, cours initial &6" + String.format(Locale.ROOT, "%.2f", this.price(g, l)) + " &7(/bourse).");
@@ -321,8 +336,11 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       this.plugin.getDataManager().saveGuild(g);
       l.treasury -= n;
       l.holders.merge(player.getUniqueId(), n, Integer::sum);
+      l.costs.merge(player.getUniqueId(), cost, Double::sum);
+      long bought = System.currentTimeMillis();
+      l.since.put(player.getUniqueId(), bought);
       this.saveListing(l);
-      this.saveHolding(g.getId(), player.getUniqueId(), l.holders.get(player.getUniqueId()));
+      this.saveHolding(g.getId(), player.getUniqueId(), l.holders.get(player.getUniqueId()), l.costs.get(player.getUniqueId()), bought);
       this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.SHAREHOLDER);
       ChatUtil.sendMessage(player, "&a📈 Vous achetez &e" + n + " part(s) de " + g.getName() + " &apour &6" + (long)cost + " pièces&a.");
       ChatUtil.broadcastGuild(g, "&6📈 &e" + player.getName() + " &6investit &e" + (long)cost + " pièces &6dans votre guilde (" + n + " parts).");
@@ -343,25 +361,39 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          return;
       }
 
-      double proceeds = Math.floor(this.price(g, l) * n * Math.max(0.1, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.buyback-ratio", 0.9))));
+      long holdMs = this.plugin.getConfig().getLong("bourse.min-hold-hours", 24L) * 3600000L;
+      long boughtAt = l.since.getOrDefault(player.getUniqueId(), 0L);
+      if (System.currentTimeMillis() - boughtAt < holdMs && !this.plugin.bypassCooldowns(player)) {
+         ChatUtil.sendMessage(player, "&c❌ Vous devez garder vos parts au moins &e" + (holdMs / 3600000L) + " h&c après le dernier achat avant de les revendre.");
+         return;
+      }
+
+      // Revente à la guilde : 90 % du cours, et jamais plus de 1,5 fois le prix de revient (une guilde ne peut pas vider sa banque vers un complice).
+      double avgCost = l.costs.getOrDefault(player.getUniqueId(), 0.0) / Math.max(1, owned);
+      double marketValue = this.price(g, l) * n * Math.max(0.1, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.buyback-ratio", 0.9)));
+      double proceeds = Math.floor(Math.min(marketValue, avgCost * n * Math.max(1.0, this.plugin.getConfig().getDouble("bourse.max-gain-ratio", 1.5))));
       if (!g.withdrawBank(proceeds)) {
          ChatUtil.sendMessage(player, "&c❌ La banque de la guilde ne peut pas racheter vos parts pour l'instant (" + (long)proceeds + " pièces nécessaires).");
          return;
       }
 
-      l.snapshot = Math.min(l.snapshot, g.getBankBalance());
+      l.snapshot = Math.min(l.snapshot, this.equity(g));
       this.plugin.getDataManager().saveGuild(g);
       this.plugin.getDataManager().creditPlayer(player.getUniqueId(), proceeds);
       int left = owned - n;
+      double remainingCost = l.costs.getOrDefault(player.getUniqueId(), 0.0) - avgCost * n;
       if (left <= 0) {
          l.holders.remove(player.getUniqueId());
+         l.costs.remove(player.getUniqueId());
+         l.since.remove(player.getUniqueId());
       } else {
          l.holders.put(player.getUniqueId(), left);
+         l.costs.put(player.getUniqueId(), Math.max(0.0, remainingCost));
       }
 
       l.treasury += n;
       this.saveListing(l);
-      this.saveHolding(g.getId(), player.getUniqueId(), left);
+      this.saveHolding(g.getId(), player.getUniqueId(), left, Math.max(0.0, remainingCost), boughtAt);
       ChatUtil.sendMessage(player, "&a📈 Vous revendez &e" + n + " part(s) de " + g.getName() + " &apour &6" + (long)proceeds + " pièces&a.");
    }
 

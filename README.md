@@ -179,11 +179,11 @@ Au lieu d'acheter des pièges jetables, les officiers **débloquent** les défen
 | 👁 Tir du Warden | 5 | Évocateur · **tuer un warden** · 8 éclats d'écho, 4 catalyseurs | Onde sonique : 10 dégâts et repoussée toutes les 15 s |
 | 🌊 Malédiction de l'Ancien | 6 | Gardien · **tuer un gardien ancien** · 128 briques de prismarine, 8 coquilles de nautile | Fatigue de minage III et dégâts à tous les ennemis proches toutes les 25 s |
 
-Tout débloquer rapporte le succès *Archi-technicien*. Réglages : `nexus.tech.*` (coût, dégâts, XP).
+Tout débloquer rapporte le succès *Archi-technicien*. Les **hordes minuscules ne rapportent rien** : repousser une horde de moins de 12 monstres ne donne ni XP de Nexus, ni points de saison, ni succès. Pendant un raid, seuls les monstres de la horde et le TNT allumé par la guilde attaquante détruisent la base (pas un tiers). Le Nexus doit rester **atteignable** : on ne peut pas le poser sous plus de 3 blocs pleins de roche (le siège ne casse qu'à 4 blocs de lui). Réglages : `nexus.tech.*` (coût, dégâts, XP).
 
 ### 🎰 Roulette russe du Nexus (`/nexus gamble`)
 
-Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par 24 h, impossible pendant un raid) : **50 %** le Nexus gagne **+1 000 PV max** et **2 000 pièces** vont à la banque ; **50 %** il perd **1 500 PV** (il survit toujours à 1 PV) et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
+Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid) : **50 %** le Nexus gagne **+1 000 PV max** (bonus cumulé plafonné à **3 000**) et **2 000 pièces** vont à la banque ; **50 %** il perd **1 500 PV** (il survit toujours à 1 PV) et **500 PV max** du bonus de roulette, la banque perd **1 000 pièces**, et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
 
 ---
 
@@ -341,11 +341,11 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 
 ### ⚖ Tribunal des guildes (`/vote`)
 
-Chaque **lundi**, les membres de guilde votent avec `/vote` (liste cliquable) une **règle pour la semaine suivante** (du mardi au lundi). Chaque guilde pèse une voix (son choix = l'option la plus votée par ses membres), l'égalité se départage au nombre de votants. Règles : **Taxe de passage** (péages ferroviaires ×2), **Bonus de construction** (claims -25 %), **Marché libre** (aucune taxe à l'Hôtel des Ventes), **Chasse ouverte** (primes de monstres +25 %), **Trêve prolongée** (voir ci-dessous). Le verdict est annoncé et inscrit au journal.
+Chaque **lundi**, les membres de guilde votent avec `/vote` (liste cliquable) une **règle pour la semaine suivante** (du mardi au lundi). Chaque guilde établie (Nexus actif, 2 membres et 3 jours d'existence au moins : `court.*`) pèse une voix (son choix = l'option la plus votée par ses membres), l'égalité se départage au nombre de votants. Règles : **Taxe de passage** (péages ferroviaires ×2), **Bonus de construction** (claims -25 %), **Marché libre** (aucune taxe à l'Hôtel des Ventes), **Chasse ouverte** (primes de monstres +25 %), **Trêve prolongée** (voir ci-dessous). Le verdict est annoncé et inscrit au journal.
 
 ### 🕊 Trêve hebdomadaire
 
-Le **vendredi et le samedi à 21 h**, **une heure sans PvP** (coups, flèches, potions néfastes) pour tout le monde ; les duels d'honneur en sont exemptés. Réglable dans `truce.*` (jours, heure, durée). Avec la règle « Trêve prolongée », elle commence aussi le jeudi et dure deux fois plus longtemps.
+Le **vendredi et le samedi à 21 h**, **une heure sans PvP** (coups, flèches, potions néfastes) pour tout le monde, **et aucune attaque contre un Nexus, aucune horde lancée, aucun convoi pillé** ; les duels d'honneur en sont exemptés. Un siège dont l'heure tombe pendant une trêve attend sa fin. Réglable dans `truce.*` (jours, heure, durée). Avec la règle « Trêve prolongée », elle commence aussi le jeudi et dure deux fois plus longtemps.
 
 ### Saisons
 
@@ -371,7 +371,7 @@ Pendant un raid ou une attaque de ton Nexus, `/aide` prévient tes **alliés** (
 Pour **750 pièces**, tu changes de **skin et de pseudo** pendant **5 minutes** (le skin est rafraîchi chez tous les joueurs, et rendu à la fin) :
 
 - `/deguisement <guilde>` : tu te fais passer pour un membre de cette guilde (skin d'un de ses membres, pseudonyme inventé, étiquette de guilde dans le tchat et la liste). Ses pièges et son golem t'ignorent.
-- `/deguisement <Pseudo>` : tu prends le skin et le pseudo de **n'importe quel compte Minecraft**, même hors du serveur (`/deguisement aypierre_`). Si ce joueur est membre d'une autre guilde du serveur, tu empruntes aussi son identité de guilde. Impossible si ce joueur est connecté.
+- `/deguisement <Pseudo>` : tu prends le skin et le pseudo d'un compte Minecraft **étranger au serveur** (`/deguisement Notch`). Les pseudos des joueurs du serveur sont **refusés** (usurpation : annonces, journal et commandes seraient détournés) : pour imiter quelqu'un de chez nous, utilise sa guilde. Impossible si ce joueur est connecté.
 - `/deguisement off` : retire le déguisement (nom et skin d'origine rendus).
 
 **Serveur hors ligne derrière Velocity ou BungeeCord** : ça fonctionne. Les skins des joueurs du serveur sont ceux que le proxy transmet à la connexion (activez le transfert d'informations **moderne** : `player-info-forwarding-mode = "modern"` dans Velocity et `velocity-support` dans Paper), et les autres comptes sont cherchés directement auprès de Mojang (le serveur doit pouvoir joindre `api.mojang.com` et `sessionserver.mojang.com`).
@@ -435,9 +435,9 @@ Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mou
 
 ### 🗡 Duels d'honneur et paris (`/duel`, `/pari`)
 
-- `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin (même après un plantage, à la reconnexion).
+- `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde (une plateforme par duel, 6 en même temps, construite seulement si la zone est vide) ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin (même après un plantage, à la reconnexion).
 - **Personne ne meurt** : le coup décisif met fin au combat. Le vainqueur remporte la mise de l'adversaire. Un duel **ne déclenche ni rivalité, ni trahison, ni capture, ni marque de combat**, et n'est pas stoppé par la trêve. Maximum 5 minutes (match nul au-delà, mises rendues) ; abandonner = perdre.
-- `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 5 000 pièces) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé.
+- `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 1 000 pièces) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé. **Anti-triche** : sont écartés les membres des guildes concernées **et celles qui leur sont liées par un traité**, tout joueur dont l'**adresse IP** est celle d'un participant en ligne, et les comptes de moins de 3 jours.
 
 ### 🍺 Tavernes (`/taverne`)
 
@@ -445,11 +445,11 @@ Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 
 
 ### 📈 La bourse (`/bourse`)
 
-À partir de l'**Âge 4**, le chef peut **ouvrir le capital** de sa guilde (`/bourse ouvrir`, 1 000 parts). Les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, cours = 10 + banque ÷ 1 000 ; 100 parts par joueur, 49 % du capital au plus) et les revendent à la guilde à 90 % du cours. Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de sa banque : ventes, primes de raids, dons) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` liste les guildes cotées, `/bourse portefeuille` vos actions. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*.
+À partir de l'**Âge 4**, le chef peut **ouvrir le capital** de sa guilde (`/bourse ouvrir`, 1 000 parts). Les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, cours = 10 + capitaux propres ÷ 1 000 ; 100 parts par joueur, 49 % du capital au plus) et les revendent à la guilde à 90 % du cours, **après 24 h de détention** et sans jamais gagner plus de 1,5 fois le prix payé (la bourse ne sert pas à vider la banque). Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de ses **capitaux propres** : banque moins dettes nettes, donc un prêt reçu n'est jamais un bénéfice) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` liste les guildes cotées, `/bourse portefeuille` vos actions. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*.
 
 ### ⚔ Guerres formelles : les sièges (`/siege`)
 
-Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde rivale (dans un chunk voisin du sien) avec `/siege declarer <guilde> <jour> <heure>` (ex. `samedi 21`) : **24 heures de préavis**, 500 pièces de frais pris dans la banque, créneau d'une heure qui ne peut pas chevaucher la trêve, impossible sous traité. La cible peut **annuler le siège en détruisant l'Étendard** avant l'heure dite (elle empoche les frais). Pendant le créneau, les membres de la guilde assiégeante peuvent **démolir le Nexus ennemi à la pioche ou à l'arme lourde** : dégâts ×2, même sans défenseur présent, sans acheter de horde. **Victoire** si le Nexus tombe ou si 40 % de ses PV max sont infligés : 10 % de la banque du vaincu (3 000 maximum) sont pillés. Sinon le défenseur garde les frais. `/siege liste` montre les sièges, `/siege annuler` renonce (moitié des frais rendue). Historique au Panthéon du site. Succès *Maître du siège*.
+Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde rivale (dans un chunk voisin du sien, en terrain libre ou sur son propre territoire, dans un espace vide posé sur un sol solide) avec `/siege declarer <guilde> <jour> <heure>` (ex. `samedi 21`) : **24 heures de préavis**, 500 pièces de frais pris dans la banque, créneau d'une heure qui ne peut pas chevaucher la trêve, impossible sous traité. La cible peut **annuler le siège en détruisant l'Étendard** avant l'heure dite (elle empoche les frais). Pendant le créneau, les membres de la guilde assiégeante peuvent **démolir le Nexus ennemi à la pioche ou à l'arme lourde** : dégâts ×2, même sans défenseur présent, sans acheter de horde. **Victoire** si le Nexus tombe ou si 40 % de ses PV max sont infligés : 10 % de la banque du vaincu (3 000 maximum) sont pillés. Sinon le défenseur garde les frais. `/siege liste` montre les sièges, `/siege annuler` renonce (moitié des frais rendue). Historique au Panthéon du site. Succès *Maître du siège*.
 
 ### 🔱 Atlantes
 
@@ -457,7 +457,7 @@ La spécialisation **Atlante** (voir la table ci-dessus) exige un Nexus **dans l
 
 ### 🗳 Élections du site et Panthéon
 
-Chaque semaine, la communauté élit sur le site (`/votes`) le plus **débile**, le plus **gros**, le plus **drôle** et le plus **chiant**. Pour voter : cliquez « Revendiquer ce pseudo » (sur votre profil ou sur la page des votes), le site affiche un **code** (`ESI-XXXX`) à **taper dans le chat du jeu** avec ce compte (le message n'est pas diffusé) ; un **cookie** (jeton aléatoire, HttpOnly, 90 jours) reconnaît ensuite votre navigateur. Un vote par catégorie, modifiable, jamais pour soi. Les vainqueurs de la semaine sont proclamés dans le chat et affichés au **Panthéon** (`/pantheon`), avec les boss terrassés, les sièges et la règle du Tribunal.
+Chaque semaine, la communauté élit sur le site (`/votes`) le plus **débile**, le plus **gros**, le plus **drôle** et le plus **chiant**. Pour voter : cliquez « Revendiquer ce pseudo » (sur votre profil ou sur la page des votes), le site affiche un **code** (`ESI-XXXX`) à **taper dans le chat du jeu** avec ce compte (le message n'est pas diffusé) ; le jeu demande alors une **confirmation** (`[CONFIRMER]` / `[REFUSER]`, avec l'adresse approximative du demandeur : ne confirmez jamais une demande que vous n'avez pas faite). Un **cookie** (jeton aléatoire, HttpOnly, 90 jours) reconnaît ensuite votre navigateur. Un vote par catégorie, modifiable, jamais pour soi ; comptes de moins de 2 jours exclus, et **un seul compte par connexion et par catégorie**. `/webvote optout` vous retire des élections ; les admins peuvent les désactiver ou renommer les catégories (`web.votes.*`). Les vainqueurs de la semaine sont proclamés dans le chat et affichés au **Panthéon** (`/pantheon`), avec les boss terrassés, les sièges et la règle du Tribunal.
 
 ### ⚖ Équilibre : revanche et rattrapage
 
@@ -470,7 +470,7 @@ Chaque semaine, la communauté élit sur le site (`/votes`) le plus **débile**,
 
 ### Le site web
 
-Le serveur a un site public : **`http://<adresse-du-serveur>/`**, qui se met à jour tout seul (toutes les 30 secondes, réglable avec `web.refresh-seconds`). Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
+Le serveur a un site public : **`http://<adresse-du-serveur>:8080/`**, qui se met à jour tout seul (toutes les 30 secondes, réglable avec `web.refresh-seconds`). Il n'affiche **aucune coordonnée** : rien qui aide à trouver une base.
 
 | Page | Contenu |
 | :--- | :--- |
@@ -568,7 +568,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 
 ### Le site web
 
-- Activé par défaut sur le **port 80** (`web.port`). Sous Linux, ce port demande les droits root ou `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))` ; sinon, utiliser 8080. Si le port est refusé, le plugin démarre quand même et le signale dans la console.
+- Activé par défaut sur le **port 8080** (`web.port`). Sous Linux, ce port demande les droits root ou `setcap 'cap_net_bind_service=+ep' $(readlink -f $(which java))` ; sinon, utiliser 8080. Si le port est refusé, le plugin démarre quand même et le signale dans la console.
 - Penser à **ouvrir le port** sur la box et le pare-feu.
 - Lecture seule et sans coordonnées. Les PV du Nexus sont masqués par défaut (`web.show-nexus-health`). Banques et soldes peuvent être cachés (`web.show-guild-banks`, `web.show-balances`). Les joueurs en vanish n'apparaissent pas.
 - Protection anti-flood : 60 requêtes par 10 secondes et par adresse IP (`web.rate-limit`). Derrière un proxy inverse, augmenter cette limite.
