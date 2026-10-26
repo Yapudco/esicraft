@@ -305,8 +305,11 @@ betting:
 # Tavernes (zones neutres, pile ou face)
 taverns:
   max-per-guild: 2
+  max-bet: 1000                          # Mise maximale de tous les jeux
   coinflip:
     win-chance: 0.47                     # 47 % de gagner : l'avantage va à la banque de la taverne
+  bar:
+    price: 50                            # Prix d'un verre (tirage du bar)
 
 # Guerres formelles (/siege)
 siege:

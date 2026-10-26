@@ -445,7 +445,18 @@ Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mou
 
 ### 🍺 Tavernes (`/taverne`)
 
-Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 2 chunks de leur territoire (jamais celui du Nexus) **zones neutres** avec `/taverne declarer` (`/taverne retirer`). Dedans, le **PvP, les armes de tir et les potions offensives sont désactivés**. `/taverne` ouvre un **pile ou face** (interface à cliquer) : on mise 10 à 1 000 pièces contre la **banque de la guilde propriétaire** (47 % de chances de gagner, mise doublée) ; la banque doit pouvoir couvrir la mise. Succès *Tavernier*.
+Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 2 chunks de leur territoire (jamais celui du Nexus) **zones neutres** avec `/taverne declarer` (`/taverne retirer`). Le chunk doit contenir **un coffre vide, un tonneau (barrel) et un toit** au-dessus de l'un et de l'autre. Dedans, le **PvP, les armes de tir et les potions offensives sont désactivés**.
+
+`/taverne` ouvre le menu des jeux, tous joués contre la **banque de la guilde propriétaire** (la mise maximale s'adapte à ce que la banque peut payer ; 1 000 pièces au plus, `taverns.max-bet`) :
+
+| Jeu | Règle |
+| :--- | :--- |
+| 🪙 **Pile ou face** | 47 % de chances de doubler sa mise |
+| 🍻 **Le bar** | Un verre (50 pièces, ou 5 / 10 d'un coup) donne un tirage : **0,0001 %** pomme dorée enchantée, **1 %** pomme dorée, **12 %** 8 steaks, **12 %** 16 pommes de terre cuites, **50 %** une *pinte de Kastell rouge* (nausée, 30 s), le reste une soupe suspecte aléatoire |
+| 🎡 **Roulette** | Européenne (0 à 36) : rouge/noir, pair/impair, manque/passe ×2, douzaines ×3, numéro plein ×36 ; le 0 fait gagner la maison |
+| 🎰 **Machine à sous** | Trois rouleaux : 7-7-7 ×50, diamants ×20, cloches ×10, citrons ×6, cerises ×4 ; deux cerises ×1,5 ; une cerise ×0,5 |
+
+Les gains viennent de la banque de la taverne, les pertes y entrent. Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
 
 ### 📈 La bourse (`/bourse`)
 

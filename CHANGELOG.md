@@ -2,6 +2,13 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (tavernes)
+
+### Taverne : conditions de construction et quatre jeux
+- Pour déclarer une taverne, le chunk doit contenir **un coffre vide, un tonneau (barrel) et un toit** au-dessus des deux.
+- `/taverne` ouvre un **menu de jeux**, tous contre la banque de la guilde propriétaire : **pile ou face**, **le bar** (tirage de nourriture, soupes suspectes et *pintes de Kastell rouge* à nausée ; pomme dorée 1 %, enchantée 0,0001 %), **roulette européenne** (rouge/noir, pair/impair, manque/passe, douzaines, numéro plein) et **machine à sous** (jusqu'à ×50). La mise maximale s'adapte aux fonds de la banque (1 000 au plus).
+- Les tavernes déjà déclarées gardent leur zone neutre mais n'ouvrent leurs jeux qu'une fois les conditions réunies.
+
 ## 30/10/2026 (dissolution)
 
 ### Correctif : une guilde dissoute disparaît du site
