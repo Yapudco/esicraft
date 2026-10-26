@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 30/10/2026 (Atlantes)
+
+### Eau autour du Nexus
+- Dans le chunk du Nexus d'une guilde **Atlante**, on peut poser de l'eau (blocs, seaux, distributeurs) et l'eau peut couler. La lave et l'obsidienne restent interdites.
+
 ## 30/10/2026 (péages)
 
 ### Péages ferroviaires pour toutes les guildes

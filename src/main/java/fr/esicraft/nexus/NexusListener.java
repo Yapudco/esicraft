@@ -45,6 +45,16 @@ public class NexusListener implements Listener {
       this.plugin = plugin;
    }
 
+   /** L'eau est permise autour du Nexus d'une guilde Atlante (son Nexus doit être immergé) ; lave et obsidienne restent interdites. */
+   private boolean atlanteanWater(Location loc) {
+      if (loc.getWorld() == null) {
+         return false;
+      }
+
+      Guild g = this.plugin.getGuildManager().getGuildByChunk(new fr.esicraft.util.ChunkKey(loc.getWorld().getName(), loc.getBlockX() >> 4, loc.getBlockZ() >> 4));
+      return g != null && g.getSpecialization() == fr.esicraft.guild.GuildSpecialization.ATLANTEAN;
+   }
+
    private Guild getNexusGuild(Location loc) {
       return this.plugin.getNexusManager().getGuildByNexusLocation(loc);
    }
@@ -82,7 +92,7 @@ public class NexusListener implements Listener {
       if (this.plugin.getNexusManager().isNexusChunk(loc)) {
          Material type = event.getBlock().getType();
          String forbiddenName = FORBIDDEN_IN_NEXUS_CHUNK.get(type);
-         if (forbiddenName != null) {
+         if (forbiddenName != null && !(type == Material.WATER && this.atlanteanWater(loc))) {
             event.setCancelled(true);
             ChatUtil.sendMessage(event.getPlayer(), "&c❌ " + forbiddenName + " est strictement interdite dans le périmètre du Nexus (16 blocs) !");
             ChatUtil.playSound(event.getPlayer(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
@@ -98,7 +108,7 @@ public class NexusListener implements Listener {
       Location targetLoc = event.getBlockClicked().getRelative(event.getBlockFace()).getLocation();
       if (this.plugin.getNexusManager().isNexusChunk(targetLoc)) {
          String forbiddenName = FORBIDDEN_BUCKETS.get(event.getBucket());
-         if (forbiddenName != null) {
+         if (forbiddenName != null && !(event.getBucket() == Material.WATER_BUCKET && this.atlanteanWater(targetLoc))) {
             event.setCancelled(true);
             ChatUtil.sendMessage(event.getPlayer(), "&c❌ " + forbiddenName + " est strictement interdite dans le périmètre du Nexus (16 blocs) !");
             ChatUtil.playSound(event.getPlayer(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
@@ -112,7 +122,8 @@ public class NexusListener implements Listener {
    )
    public void onLavaFlow(BlockFromToEvent event) {
       Material type = event.getBlock().getType();
-      if ((type == Material.LAVA || type == Material.WATER) && this.plugin.getNexusManager().isNexusChunk(event.getToBlock().getLocation())) {
+      if ((type == Material.LAVA || type == Material.WATER) && this.plugin.getNexusManager().isNexusChunk(event.getToBlock().getLocation())
+         && !(type == Material.WATER && this.atlanteanWater(event.getToBlock().getLocation()))) {
          event.setCancelled(true);
       }
    }
@@ -134,7 +145,8 @@ public class NexusListener implements Listener {
    )
    public void onDispenseLava(BlockDispenseEvent event) {
       Material itemType = event.getItem().getType();
-      if ((itemType == Material.LAVA_BUCKET || itemType == Material.WATER_BUCKET) && this.plugin.getNexusManager().isNexusChunk(event.getBlock().getLocation())
+      if ((itemType == Material.LAVA_BUCKET || itemType == Material.WATER_BUCKET && !this.atlanteanWater(event.getBlock().getLocation()))
+         && this.plugin.getNexusManager().isNexusChunk(event.getBlock().getLocation())
          )
        {
          event.setCancelled(true);

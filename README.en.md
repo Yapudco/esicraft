@@ -456,7 +456,7 @@ An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk n
 
 ### 🔱 Atlanteans
 
-The **Atlantean** specialization (see the table above) requires a Nexus **in the water**: place it against a water block (water around it is then allowed for this specialization). Members get all the underwater perks **while in water** and suffer **Slowness I on dry land**.
+The **Atlantean** specialization (see the table above) requires a Nexus **in the water**: place it against a water block. Water is allowed all around it (placing, buckets, flowing) in the Nexus chunk; lava and obsidian stay forbidden. Members get all the underwater perks **while in water** and suffer **Slowness I on dry land**.
 
 ### 🗳 Website elections and Pantheon
 
