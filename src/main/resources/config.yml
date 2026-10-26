@@ -240,6 +240,13 @@ races:
 
 # Événements serveur aléatoires (Lune de Sang, Météorites, Marché Noir, Boss Mondial)
 events:
+  boss:                                  # Boss mondial (Seigneur des Cendres)
+    coin-pool: 1000.0                    # Cagnotte de pièces partagée selon les dégâts (3 000 auparavant)
+    min-share-percent: 10                # Part minimale des dégâts pour toucher la cagnotte
+    max-per-player: 400.0                # Plafond de pièces par joueur
+    top-diamonds: 3                      # Diamants du meilleur combattant (8 auparavant)
+    top-star-chance: 0.2                 # Probabilité d'une Étoile du Nether (garantie auparavant)
+    xp: 500                              # XP lâchée à la mort (2 000 auparavant)
   blood-moon-extra-spawn-chance: 0.25   # Part des monstres naturels dupliqués pendant la Lune de sang (0.5 doublait les fermes à monstres)
   enabled: true
   min-interval-minutes: 1440   # 24 h minimum entre deux événements
