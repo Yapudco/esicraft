@@ -105,6 +105,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private CombatManager combatManager;
    private AgeDimensionListener ageDimension;
    private CosmeticManager cosmetics;
+   private fr.esicraft.life.SkinLookup skins;
    private BalanceManager balance;
    private LoanManager loans;
    private ReputationManager reputation;
@@ -147,6 +148,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.mentors = new MentorManager(this);
       this.ransom = new RansomManager(this);
       this.cosmetics = new CosmeticManager(this);
+      this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
       this.dataManager.init();
       Lang.init(this);
@@ -255,6 +257,10 @@ public final class EsicraftPlugin extends JavaPlugin {
          this.disguiseManager.shutdown();
       }
 
+      if (this.skins != null) {
+         this.skins.shutdown();
+      }
+
       if (this.dataManager != null) {
          this.dataManager.close();
       }
@@ -346,6 +352,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public HelpCallManager getHelpCalls() {
       return this.helpCalls;
+   }
+
+   public fr.esicraft.life.SkinLookup getSkins() {
+      return this.skins;
    }
 
    public WebServer getWebServer() {

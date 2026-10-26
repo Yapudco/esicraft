@@ -1,6 +1,7 @@
 package fr.esicraft.life;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import fr.esicraft.EsicraftPlugin;
 import fr.esicraft.data.PlayerData;
 import fr.esicraft.guild.Guild;
@@ -197,21 +198,31 @@ public class DisguiseManager implements Listener {
          return;
       }
 
-      PlayerProfile wanted = skinUuid != null && skinName != null ? Bukkit.createProfile(skinUuid, skinName) : Bukkit.createProfile(skinName != null ? skinName : fakeName);
+      // Skin déjà connu (joueur passé par le proxy : aucun appel réseau) ou recherche directe auprès de Mojang, quel que soit le mode du serveur.
+      SkinLookup skins = this.plugin.getSkins();
+      SkinLookup.Skin direct = skinUuid != null ? skins.cached(skinUuid) : null;
+      java.util.concurrent.CompletableFuture<SkinLookup.Skin> future = direct != null
+         ? java.util.concurrent.CompletableFuture.completedFuture(direct) : skins.lookup(skinName != null ? skinName : fakeName);
       this.pending.add(uuid);
       Guild finalIdentity = identity;
       String finalFake = fakeName;
       boolean requireSkin = guildTarget == null;
       ChatUtil.sendMessage(player, "&7🎭 Récupération du skin en cours…");
-      wanted.update().whenComplete((fetched, error) -> Bukkit.getScheduler().runTask(this.plugin, () -> {
+      future.whenComplete((fetched, error) -> Bukkit.getScheduler().runTask(this.plugin, () -> {
          this.pending.remove(uuid);
          if (!player.isOnline()) {
             return;
          }
 
-         boolean hasSkin = error == null && fetched != null && fetched.hasTextures();
+         boolean hasSkin = error == null && fetched != null;
          if (requireSkin && !hasSkin) {
-            done.accept("&cSkin introuvable pour &e" + arg + " &c(ce compte Minecraft n'existe pas ou Mojang ne répond pas). Aucune pièce débitée.");
+            if (error != null) {
+               this.plugin.getLogger().warning("Déguisement : recherche du skin de « " + arg + " » impossible : " + error.getMessage());
+               done.accept("&cMojang est injoignable depuis le serveur : réessayez dans un instant. Aucune pièce débitée.");
+            } else {
+               done.accept("&cLe compte Minecraft &e" + arg + " &cn'existe pas. Aucune pièce débitée.");
+            }
+
             return;
          }
 
@@ -228,9 +239,11 @@ public class DisguiseManager implements Listener {
 
          this.plugin.getDataManager().savePlayer(fresh);
          long until = System.currentTimeMillis() + this.durationMs();
+         // Pour un pseudo libre, on adopte la casse exacte du compte (aypierre_ → AyPierre_ s'il s'écrit ainsi chez Mojang).
+         String shownName = hasSkin && requireSkin && finalIdentity == null && fetched.name() != null ? fetched.name() : finalFake;
          Disguise d = finalIdentity != null
-            ? new Disguise(finalIdentity.getId(), finalIdentity.getTag(), finalIdentity.getName(), finalFake, until)
-            : new Disguise("", "", "", finalFake, until);
+            ? new Disguise(finalIdentity.getId(), finalIdentity.getTag(), finalIdentity.getName(), shownName, until)
+            : new Disguise("", "", "", shownName, until);
          this.active.put(uuid, d);
          this.cooldowns.put(uuid, System.currentTimeMillis() + this.cooldownMs());
          this.apply(player, d, hasSkin ? fetched : null);
@@ -252,7 +265,7 @@ public class DisguiseManager implements Listener {
    }
 
    /** Change le profil (skin et nom, rafraîchi chez tous les joueurs) ; en cas d'échec, repli sur le simple masquage du nom. */
-   private void apply(Player player, Disguise d, PlayerProfile skinSource) {
+   private void apply(Player player, Disguise d, SkinLookup.Skin skinSource) {
       UUID uuid = player.getUniqueId();
       PlayerProfile original = player.getPlayerProfile();
       this.originals.put(uuid, original);
@@ -260,7 +273,7 @@ public class DisguiseManager implements Listener {
       try {
          PlayerProfile fake = Bukkit.createProfile(uuid, d.fakeName());
          if (skinSource != null) {
-            fake.setProperties(skinSource.getProperties());
+            fake.setProperty(skinSource.signature() != null ? new ProfileProperty("textures", skinSource.value(), skinSource.signature()) : new ProfileProperty("textures", skinSource.value()));
          }
 
          player.setPlayerProfile(fake);

@@ -225,6 +225,7 @@ public class WebServer {
    private void capture() {
       for (Player online : Bukkit.getOnlinePlayers()) {
          this.heads.remember(online);
+         this.plugin.getSkins().remember(online);
       }
 
       boolean showBank = this.plugin.getConfig().getBoolean("web.show-guild-banks", true);

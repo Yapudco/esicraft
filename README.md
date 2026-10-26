@@ -336,6 +336,8 @@ Pour **750 pièces**, tu changes de **skin et de pseudo** pendant **5 minutes** 
 - `/deguisement <Pseudo>` : tu prends le skin et le pseudo de **n'importe quel compte Minecraft**, même hors du serveur (`/deguisement aypierre_`). Si ce joueur est membre d'une autre guilde du serveur, tu empruntes aussi son identité de guilde. Impossible si ce joueur est connecté.
 - `/deguisement off` : retire le déguisement (nom et skin d'origine rendus).
 
+**Serveur hors ligne derrière Velocity ou BungeeCord** : ça fonctionne. Les skins des joueurs du serveur sont ceux que le proxy transmet à la connexion (activez le transfert d'informations **moderne** : `player-info-forwarding-mode = "modern"` dans Velocity et `velocity-support` dans Paper), et les autres comptes sont cherchés directement auprès de Mojang (le serveur doit pouvoir joindre `api.mojang.com` et `sessionserver.mojang.com`).
+
 Les protections de territoire restent actives. **Infliger des dégâts ou frapper le Nexus te démasque**, et la guilde imitée est prévenue. Un déguisement toutes les 30 minutes ; les pièces ne sont débitées que si le skin a bien été trouvé. Les messages de mort ne révèlent pas ton vrai nom.
 
 ### ✨ Les cosmétiques (`/cosmetique`)
