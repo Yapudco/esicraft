@@ -90,7 +90,7 @@ Land is counted in **chunks** (16 × 16 block squares). With `/guild claim`, an 
 
 - **All chunks must touch** along a **side** (not diagonally: no more "snakes"). Only the first one can go anywhere. Only the **leader** can give up a chunk (`/guild unclaim`), and not if that would split the territory in two, or if it holds the Nexus.
 - **Anti-encirclement buffer**: a new chunk must stay at least **1 chunk** away from the territory of a guild with no treaty with yours.
-- **Officer cap**: an officer spends at most **3,000 coins per day** from the bank (claims, traps); the leader has no limit.
+- **Officer cap**: an officer spends at most **3,000 coins per day** from the bank (claims, traps, **hordes**, **sieges**, **loans**); the leader has no limit.
 - **Price**: paid from the guild bank. The first chunk costs 100 coins, then each new chunk costs 25 more than the previous one (100, 125, 150, 175…).
 - **Maximum size by Age**:
 
@@ -190,7 +190,7 @@ Every **specialization change** gives the guild the right to **move its Nexus on
 
 ### 🎰 Nexus Russian roulette (`/nexus gamble`)
 
-The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid): **50%** (heads) the Nexus gains **+1,000 max HP** and **2,000 coins** go to the bank; **50%** (tails) it loses **1,000 max HP** and **1,500 HP** (it always survives at 1 HP, max HP never below 1,000), the bank loses **2,000 coins** (up to its balance), and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
+The **guild leader**, facing the Nexus (within 6 blocks), can try an all-in gamble (retype to confirm within 15 s, once per **72 h**, impossible during a raid). The bank must hold the **2,000-coin stake**, which is set aside as soon as you confirm: **50%** (heads) the Nexus gains **+1,000 max HP** and the bank gets its stake back **plus 2,000 coins**; **50%** (tails) it loses **1,000 max HP** and **1,500 HP** (it always survives at 1 HP, max HP never below 1,000), the stake is lost, and a **mini-horde of pillagers** appears with no warning at its foot. *All or nothing* achievement on a win.
 
 ---
 
@@ -260,7 +260,7 @@ Your guild starts at **Age 1** and can go up to **Age 6**. To reach the next Age
 ### Earning coins
 
 - **Killing monsters**: every monster pays a bounty, from 1.50 coins (silverfish) to 750 coins (Ender Dragon). Repetitive mob farms pay less.
-- **Daily contracts** (`/contrat`): 3 missions a day, one of them tied to your profession. +400 coins if you complete all three.
+- **Daily contracts** (`/contrat`): 3 missions a day, one of them tied to your profession. +400 coins if you complete all three. Monsters from spawners, spawn eggs or commands do not count for "kill" contracts.
 - **Auction House** (`/ah`): sell the item in your hand with `/ah sell <price>` (10 listings max). Click your own listing to take it back.
 - **Events** and the **world boss** (see [Server life](#-10-server-life)).
 
@@ -416,7 +416,7 @@ Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…)
 Between two guilds **bound by a treaty** (alliance, pact or vassalage):
 
 - `/banque pret <guild> <amount>`: an officer offers a loan (100 to 20,000 coins). The other guild accepts with `/banque accepter <guild>` (or `refuser`). The coins move from one bank to the other; the borrowing guild must give back the amount **+ 10% interest** within **5 days**.
-- `/banque dettes` lists loans · `/banque rembourser <guild> [amount]` repays (in several payments if needed) · `/banque pardonner <guild>` forgives a debt.
+- `/banque dettes` lists loans · `/banque rembourser <guild> [amount]` repays (in several payments if needed) · `/banque pardonner <guild>` forgives a debt (**leader only**). A loan offered by an officer counts towards their 3,000-coin daily cap.
 - `/banque coffre <guild>` opens a 54-slot **shared chest** used by both guilds (available as long as a treaty binds them).
 - **An unpaid debt weighs on the land**: once the deadline has passed, the guild can no longer claim chunks, and **one chunk is seized every 24 h** (never the Nexus chunk, never one that would split the territory). Each seized chunk wipes 300 coins of debt.
 
@@ -444,11 +444,11 @@ With no decision, they are executed. Logging out while captive counts as dying. 
 
 - `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world (one platform per duel, 6 at a time, built only if the area is empty); their **inventory, health and position are saved** then returned at the end; they fight with the **same supplied kit** (full iron armor, iron sword and axe, shield, bow, 16 arrows, 64 steaks, 1 instant health potion) (even after a crash, when they reconnect).
 - **Nobody dies**: the deciding blow ends the fight. The winner takes the opponent's stake. A duel **triggers no rivalry, betrayal, capture or combat tag**, and is not stopped by the truce. 5 minutes at most (draw after that, stakes returned); quitting = losing.
-- `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 1,000 coins) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded. **Anti-cheat**: members of the guilds involved **and guilds bound to them by a treaty** are excluded, as is anyone whose **IP address** matches an online participant, and accounts under 3 days old.
+- `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 1,000 coins **in total** per bet) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded. **Anti-cheat**: members of the guilds involved **and guilds bound to them by a treaty** are excluded, as is anyone whose **IP address** matches an online participant, and accounts under 3 days old.
 
 ### 🍺 Taverns (`/taverne`)
 
-The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunks of their territory (never the Nexus chunk) as **neutral zones** with `/taverne declarer` (`/taverne retirer`). The chunk must contain **an empty chest, a barrel and a roof** over both. Inside, **PvP, ranged weapons and offensive potions are disabled**.
+The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunks of their territory (never the Nexus chunk) as **neutral zones** with `/taverne declarer` (`/taverne retirer`). The chunk must contain **an empty chest, a barrel and a roof** over both. Inside, **PvP, ranged weapons and offensive potions are disabled**, except between two players **already in combat**: a tavern is not a refuge to escape a fight.
 
 `/taverne` opens the games menu, all played against the **owning guild's bank** (the maximum bet adapts to what the bank can pay; 1,000 coins at most, `taverns.max-bet`):
 

@@ -140,6 +140,21 @@ public class RaidManager implements Listener {
       return raidType.getPrimaryMobType();
    }
 
+   /**
+    * Plafond quotidien de dépenses d'un officier (guilds.officer-daily-spend-cap, déjà appliqué aux claims et aux sièges) : un officier ne peut
+    * plus vider à lui seul la banque de sa guilde en achetant des hordes. Le chef n'est pas limité.
+    */
+   private boolean officerMaySpend(Guild guild, Player buyer, double amount) {
+      if (amount <= 0.0 || this.adminLaunch || this.plugin.getGuildManager().officerMaySpend(guild, buyer, amount)) {
+         return true;
+      }
+
+      ChatUtil.sendMessage(buyer, "&c❌ Plafond quotidien de dépenses des officiers atteint (&e"
+         + String.format("%.0f", this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0)) + " pièces&c) : seul le chef peut engager davantage aujourd'hui.");
+      ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+      return false;
+   }
+
    public boolean launchCustomRaid(Guild attackerGuild, Guild targetGuild, Map<CustomHordeUnit, Integer> composition, Player buyer) {
       return this.launchCustomRaid(attackerGuild, targetGuild, composition, false, false, buyer);
    }
@@ -253,6 +268,10 @@ public class RaidManager implements Listener {
                         ChatUtil.sendMessage(buyer, "&c❌ Le monde du Nexus ciblé est introuvable : aucun fonds n'a été prélevé.");
                      }
 
+                     return false;
+                  }
+
+                  if (attackerGuild != null && buyer != null && !this.officerMaySpend(attackerGuild, buyer, price)) {
                      return false;
                   }
 
@@ -470,6 +489,10 @@ public class RaidManager implements Listener {
                            ChatUtil.sendMessage(buyer, "&c❌ Le monde du Nexus ciblé est introuvable : aucun fonds n'a été prélevé.");
                         }
 
+                        return false;
+                     }
+
+                     if (buyer != null && !this.officerMaySpend(attackerGuild, buyer, totalPrice)) {
                         return false;
                      }
 

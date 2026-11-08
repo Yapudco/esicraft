@@ -94,6 +94,16 @@ public class ContractListener implements Listener {
          return;
       }
 
+      // Fermes à générateur (spawner), œufs et commandes : ces monstres ne sont jamais enregistrés par l'anti-farm (aucune prime), son
+      // multiplicateur restait donc à 1 et une ferme à XP remplissait d'elle-même les contrats « tuer » du joueur et de sa guilde.
+      switch (entity.getEntitySpawnReason()) {
+         case SPAWNER, SPAWNER_EGG, DISPENSE_EGG, EGG, COMMAND, BUILD_IRONGOLEM, BUILD_SNOWMAN, BUILD_WITHER -> {
+            return;
+         }
+         default -> {
+         }
+      }
+
       // Les kills trop répétitifs sur un même type (ferme) ne comptent plus.
       if (this.plugin.getAntiFarmManager().getMultiplier(killer.getUniqueId(), entity.getType()) < 0.7) {
          return;

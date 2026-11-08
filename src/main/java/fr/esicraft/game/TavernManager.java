@@ -252,6 +252,11 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
       }
 
       Player attacker = fr.esicraft.combat.CombatManager.attackerOf(event.getDamager());
+      // Pas de refuge pour un joueur déjà en combat : entrer dans une taverne pour fuir un affrontement (siège, poursuite) ne protège pas.
+      if (attacker != null && this.plugin.getCombatManager().isInCombat(victim) && this.plugin.getCombatManager().isInCombat(attacker)) {
+         return;
+      }
+
       if (attacker != null && !attacker.equals(victim) && (this.isTavern(victim.getLocation()) || this.isTavern(attacker.getLocation()))) {
          event.setCancelled(true);
          ChatUtil.sendActionbar(attacker, "&6🍺 Zone neutre : ici, on ne se bat pas.");

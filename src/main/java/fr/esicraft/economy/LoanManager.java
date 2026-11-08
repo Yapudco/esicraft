@@ -420,6 +420,10 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          ChatUtil.sendMessage(p, "&c❌ &6" + borrower.getName() + " &caccuse déjà un retard de paiement.");
       } else if (this.debtOf(borrower.getId()) + amount > this.plugin.getConfig().getDouble("loans.max-total-debt", 30000.0)) {
          ChatUtil.sendMessage(p, "&c❌ Cette guilde serait trop endettée.");
+      } else if (!this.plugin.getGuildManager().officerMaySpend(lender, p, amount)) {
+         // Un officier seul ne peut plus prêter toute la banque à une guilde complice puis effacer la dette.
+         ChatUtil.sendMessage(p, "&c❌ Plafond quotidien de dépenses des officiers atteint (&e" + money(this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0))
+            + " pièces&c) : seul le chef peut prêter davantage aujourd'hui.");
       } else {
          this.proposals.removeIf(x -> x.lenderId().equals(lender.getId()) && x.borrowerId().equals(borrower.getId()));
          this.proposals.add(new Proposal(lender.getId(), borrower.getId(), amount, System.currentTimeMillis() + 600000L));
@@ -569,8 +573,9 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    }
 
    private void forgive(Player p, Guild lender, String[] args) {
-      if (!this.isOfficer(lender, p)) {
-         ChatUtil.sendMessage(p, "&cRéservé aux officiers et au chef de guilde.");
+      // Effacer une dette, c'est donner l'argent de la guilde : décision du chef seul.
+      if (!lender.getLeaderUuid().equals(p.getUniqueId())) {
+         ChatUtil.sendMessage(p, "&cSeul le chef de guilde peut effacer une dette.");
          return;
       }
 
@@ -661,6 +666,32 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    public void onClose(InventoryCloseEvent event) {
       if (event.getInventory().getHolder() instanceof ChestHolder holder) {
          this.saveChestAsync(holder.pair, event.getInventory());
+      }
+   }
+
+   /** Coffres modifiés ce tick : enregistrés au tick suivant (une seule écriture par tick et par coffre). */
+   private final java.util.Set<String> dirtyChests = ConcurrentHashMap.newKeySet();
+
+   /**
+    * Toute modification du coffre commun est enregistrée dès le tick suivant (et plus seulement toutes les 30 s ou à la fermeture) :
+    * après un plantage, un objet retiré ne peut plus réapparaître dans le coffre alors que l'inventaire du joueur l'a déjà sauvegardé.
+    */
+   @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+   public void onChestClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+      this.markDirty(event.getView().getTopInventory());
+   }
+
+   @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+   public void onChestDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+      this.markDirty(event.getView().getTopInventory());
+   }
+
+   private void markDirty(Inventory top) {
+      if (top.getHolder() instanceof ChestHolder holder && this.dirtyChests.add(holder.pair)) {
+         Bukkit.getScheduler().runTask(this.plugin, () -> {
+            this.dirtyChests.remove(holder.pair);
+            this.saveChestAsync(holder.pair, top);
+         });
       }
    }
 

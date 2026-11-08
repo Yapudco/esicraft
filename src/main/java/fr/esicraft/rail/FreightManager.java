@@ -222,6 +222,18 @@ public class FreightManager implements Listener {
    }
 
    public void shutdown() {
+      // Coffres de chargement encore ouverts : à l'arrêt, le plugin est désactivé AVANT que les joueurs ne soient déconnectés, la fermeture
+      // n'était donc plus traitée et leur contenu disparaissait. On le rend tout de suite.
+      for (Player p : Bukkit.getOnlinePlayers()) {
+         Inventory top = p.getOpenInventory().getTopInventory();
+         if (top.getHolder() instanceof LoadHolder holder && !holder.done) {
+            holder.done = true;
+            this.giveBack(p, top.getContents());
+            top.clear();
+            p.closeInventory();
+         }
+      }
+
       for (Convoy c : this.convoys.values()) {
          this.despawn(c);
       }
@@ -405,6 +417,35 @@ public class FreightManager implements Listener {
          if (b != null) {
             this.saveBox(b);
          }
+      }
+   }
+
+   /** Boîtes de gare modifiées ce tick : enregistrées au tick suivant (une seule écriture par tick et par gare). */
+   private final java.util.Set<String> dirtyBoxes = ConcurrentHashMap.newKeySet();
+
+   /**
+    * Toute prise ou dépôt dans une boîte de livraison est enregistré dès le tick suivant (et plus seulement à la fermeture) : après un
+    * plantage, un objet déjà pris ne peut plus réapparaître dans la boîte.
+    */
+   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+   public void onBoxClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+      this.markBoxDirty(event.getView().getTopInventory());
+   }
+
+   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+   public void onBoxDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+      this.markBoxDirty(event.getView().getTopInventory());
+   }
+
+   private void markBoxDirty(Inventory top) {
+      if (top.getHolder() instanceof BoxHolder holder && this.dirtyBoxes.add(holder.stationId)) {
+         Bukkit.getScheduler().runTask(this.plugin, () -> {
+            this.dirtyBoxes.remove(holder.stationId);
+            Box b = this.boxes.get(holder.stationId);
+            if (b != null) {
+               this.saveBox(b);
+            }
+         });
       }
    }
 

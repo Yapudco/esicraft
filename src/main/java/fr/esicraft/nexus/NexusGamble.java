@@ -75,6 +75,14 @@ public class NexusGamble {
          return;
       }
 
+      // La mise en pièces doit être réellement en jeu : avec une banque vide, la défaite ne coûtait rien et la victoire rapportait 2 000 pièces
+      // (espérance positive, vider la banque juste avant de jouer suffisait).
+      double stakeCoins = Math.max(0.0, this.plugin.getConfig().getDouble("nexus.gamble.stake-coins", 2000.0));
+      if (guild.getBankBalance() < stakeCoins) {
+         ChatUtil.sendMessage(player, "&c❌ La banque de la guilde doit contenir la mise (&6" + (long)stakeCoins + " pièces&c) pour tenter la roulette russe.");
+         return;
+      }
+
       long now = System.currentTimeMillis();
       Long ask = this.pending.get(player.getUniqueId());
       if (ask == null || ask < now) {
@@ -84,25 +92,36 @@ public class NexusGamble {
       }
 
       this.pending.remove(player.getUniqueId());
+      // Mise retenue tout de suite (séquestre) : la banque ne peut plus être vidée pendant les 2 secondes du tirage.
+      if (stakeCoins > 0.0 && !guild.withdrawBank(stakeCoins)) {
+         ChatUtil.sendMessage(player, "&c❌ La banque de la guilde ne couvre plus la mise.");
+         return;
+      }
+
+      this.plugin.getDataManager().saveGuild(guild);
       this.last.put(guild.getId(), now);
       this.kvSet("gamble:" + guild.getId(), String.valueOf(now));
       ChatUtil.broadcast("&4&l☠ " + player.getName() + " &c fait tourner la roulette russe du Nexus de &6" + guild.getName() + " &c…");
       loc.getWorld().playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2.0F, 0.6F);
-      Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.resolve(player, guild, nexus, loc), 40L);
+      Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.resolve(player, guild, nexus, loc, stakeCoins), 40L);
    }
 
-   private void resolve(Player player, Guild guild, Nexus nexus, Location loc) {
-      if (!nexus.isAlive() || !guild.hasNexus()) {
+   private void resolve(Player player, Guild guild, Nexus nexus, Location loc, double escrow) {
+      if (!nexus.isAlive() || !guild.hasNexus() || this.plugin.getGuildManager().getGuildById(guild.getId()) == null) {
+         // Tirage annulé (Nexus tombé, guilde dissoute) : la mise retenue est rendue.
+         guild.depositBank(escrow);
+         this.plugin.getDataManager().saveGuild(guild);
          return;
       }
 
       // Vrai pile ou face : mêmes enjeux des deux côtés (PV max et pièces), la horde s'ajoute seulement à la défaite.
       int hp = this.plugin.getConfig().getInt("nexus.gamble.stake-max-hp", 1000);
-      double stake = this.plugin.getConfig().getDouble("nexus.gamble.stake-coins", 2000.0);
+      double stake = escrow;
       if (ThreadLocalRandom.current().nextBoolean()) {
          nexus.setMaxHealth(nexus.getMaxHealth() + hp);
          nexus.heal(hp);
-         guild.depositBank(stake);
+         // La mise retenue revient, plus le gain.
+         guild.depositBank(stake * 2.0);
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, loc.clone().add(0.5, 1.0, 0.5), 80, 1.0, 1.0, 1.0, 0.3);
@@ -115,8 +134,8 @@ public class NexusGamble {
          int loss = this.plugin.getConfig().getInt("nexus.gamble.lose-hp", 1500);
          nexus.setMaxHealth(nexus.getMaxHealth() - lostMax);
          nexus.setCurrentHealth(Math.max(1, Math.min(nexus.getCurrentHealth() - loss, nexus.getMaxHealth())));
-         double fine = Math.min(guild.getBankBalance(), stake);
-         guild.withdrawBank(fine);
+         // La mise a déjà été retenue à la confirmation : elle est simplement perdue.
+         double fine = stake;
          this.plugin.getDataManager().saveGuild(guild);
          this.plugin.getNexusManager().updateHologram(guild);
          loc.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, loc.clone().add(0.5, 1.0, 0.5), 3, 1.0, 0.5, 1.0, 0.0);

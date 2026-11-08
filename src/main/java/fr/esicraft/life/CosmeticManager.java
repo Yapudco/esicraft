@@ -81,12 +81,14 @@ public class CosmeticManager implements Listener, CommandExecutor {
    private final Map<UUID, Location> lastSeen = new ConcurrentHashMap<>();
    private int tick;
 
-   private static final class Holder implements InventoryHolder {
+   /** Menu à boutons : hérite de BaseGUIHolder pour que le glisser-déposer y soit aussi bloqué (un objet glissé dans le menu était perdu). */
+   private static final class Holder extends fr.esicraft.gui.holder.BaseGUIHolder {
       Inventory inv;
       Slot slot = Slot.AURA;
       int page;
       String pendingBuy;
 
+      @Override
       public @NotNull Inventory getInventory() {
          return this.inv;
       }

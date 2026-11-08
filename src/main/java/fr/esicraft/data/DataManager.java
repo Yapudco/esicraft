@@ -195,8 +195,22 @@ public class DataManager {
       return this.storage;
    }
 
+   private volatile List<Entry<String, Double>> topCache = List.of();
+   private volatile int topCacheLimit;
+   private volatile long topCacheAt;
+
+   /** Classement des fortunes, mis en cache 15 s : /baltop répété et le site ne relancent pas la requête à chaque fois. */
    public List<Entry<String, Double>> getTopBalances(int limit) {
-      return this.storage.getTopBalances(limit);
+      long now = System.currentTimeMillis();
+      if (limit == this.topCacheLimit && now - this.topCacheAt < 15000L) {
+         return this.topCache;
+      }
+
+      List<Entry<String, Double>> fresh = List.copyOf(this.storage.getTopBalances(limit));
+      this.topCache = fresh;
+      this.topCacheLimit = limit;
+      this.topCacheAt = now;
+      return fresh;
    }
 
    public List<UUID> getTopPlayerUuids(int limit) {

@@ -363,8 +363,13 @@ public class TavernGames implements Listener {
                   p.getWorld().dropItemNaturally(p.getLocation(), left);
                }
             } else {
-               // Joueur parti : le butin est rendu sous forme de pièces (prix payé) pour ne rien perdre.
-               this.plugin.getDataManager().creditPlayer(id, this.barPrice());
+               // Joueur parti : le verre est remboursé PAR LA MAISON (qui a encaissé le prix). Avant, le remboursement était créé de rien
+               // pendant que la banque gardait la commande : commander puis se déconnecter faisait apparaître de l'argent à chaque fois.
+               double refund = Math.min(this.barPrice(), owner.getBankBalance());
+               if (refund > 0.0 && owner.withdrawBank(refund)) {
+                  this.plugin.getDataManager().creditPlayer(id, refund);
+                  this.plugin.getDataManager().saveGuild(owner);
+               }
             }
 
             if (prize.getType() == Material.GOLDEN_APPLE || prize.getType() == Material.ENCHANTED_GOLDEN_APPLE) {
