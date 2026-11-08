@@ -419,7 +419,7 @@ Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
 
 ### ❤ Réputation (`/merci <joueur>`)
 
-Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier la même personne **une fois par jour**. Les points s'affichent dans le **tab** (❤), sur le **profil du site** et dans le classement « Les plus honorables » de la page Joueurs. `/merci` seul montre ta réputation et le top 3.
+Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier la même personne **une fois par jour**, **5 personnes par jour au plus**, avec **60 secondes** entre deux remerciements ; un joueur ne peut en recevoir que **10 par jour**. Pas de remerciement entre membres d'une **même guilde** ni entre joueurs connectés depuis la **même adresse**, et le compte doit avoir **2 jours** (la réputation pèse sur le cours en bourse). Les opérateurs sont soumis aux mêmes limites. Les points s'affichent dans le **tab** (❤), sur le **profil du site** et dans le classement « Les plus honorables » de la page Joueurs. `/merci` seul montre ta réputation et le top 3.
 
 ### 🎓 Parrainage (`/parrain <joueur>`)
 
@@ -614,7 +614,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 
 ### Opérateurs et délais d'attente
 
-Les **opérateurs** (`op`) ne sont soumis à **aucun délai d'attente** : déguisement (30 min), appel à l'aide (10 min), protection d'une guilde après un raid, soin du Nexus (30 s et blocage après une attaque), changement de métier (24 h), changement de spécialisation (7 jours), recherche de lignes de train, `/merci` (une fois par jour et par personne) et délai anti-farm des primes PvP. Réglage : `admin.ops-bypass-cooldowns` (`true` par défaut).
+Les **opérateurs** (`op`) ne sont soumis à **aucun délai d'attente** : déguisement (30 min), appel à l'aide (10 min), protection d'une guilde après un raid, soin du Nexus (30 s et blocage après une attaque), changement de métier (24 h), changement de spécialisation (7 jours), recherche de lignes de train, et délai anti-farm des primes PvP. Réglage : `admin.ops-bypass-cooldowns` (`true` par défaut).
 
 ### Anti-triche intégré
 

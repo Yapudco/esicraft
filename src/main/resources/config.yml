@@ -402,6 +402,11 @@ catchup:
 
 reputation:
   enabled: true
+  max-thanks-per-day: 5          # Remerciements par joueur et par jour (opérateurs compris)
+  max-received-per-day: 10       # Remerciements qu'un joueur peut recevoir par jour
+  cooldown-seconds: 60           # Délai entre deux /merci d'un même joueur
+  min-account-days: 2            # Ancienneté minimale du compte pour remercier
+  allow-same-guild: false        # Les membres d'une même guilde ne peuvent pas se remercier
 
 cosmetics:
   price-multiplier: 1.0         # Multiplie les prix de la boutique de cosmétiques (3 000 à 15 000 pièces)

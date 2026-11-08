@@ -29,6 +29,9 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
    /** « giver|receiver|jour » déjà remerciés : l'ajout est atomique, donc 20 /merci dans le même tick ne donnent qu'un point. */
    private final java.util.Set<String> thankedToday = ConcurrentHashMap.newKeySet();
    private final Map<String, Integer> givenToday = new ConcurrentHashMap<>();
+   /** « receveur|jour » → points reçus aujourd'hui, et dernier /merci de chaque joueur (délai entre deux remerciements). */
+   private final Map<String, Integer> receivedToday = new ConcurrentHashMap<>();
+   private final Map<UUID, Long> lastThanks = new ConcurrentHashMap<>();
 
    public ReputationManager(EsicraftPlugin plugin) {
       this.plugin = plugin;
@@ -50,6 +53,7 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       for (Object[] row : db.select("SELECT giver, receiver FROM reputation_thanks WHERE day = ?;", 2, today)) {
          this.thankedToday.add(row[0] + "|" + row[1] + "|" + today);
          this.givenToday.merge(row[0] + "|" + today, 1, Integer::sum);
+         this.receivedToday.merge(row[1] + "|" + today, 1, Integer::sum);
       }
    }
 
@@ -57,6 +61,8 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       this.points.clear();
       this.thankedToday.clear();
       this.givenToday.clear();
+      this.receivedToday.clear();
+      this.lastThanks.clear();
    }
 
    public int get(UUID uuid) {
@@ -126,7 +132,42 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       long day = LocalDate.now().toEpochDay();
       int perDay = this.plugin.getConfig().getInt("reputation.max-thanks-per-day", 5);
       String giverDay = giver + "|" + day;
-      boolean bypass = this.plugin.bypassCooldowns(player);
+      // La réputation pèse sur le cours en bourse : aucun contournement, même pour les opérateurs.
+      boolean bypass = false;
+      long minAgeMs = this.plugin.getConfig().getLong("reputation.min-account-days", 2L) * 86400000L;
+      if (player.getFirstPlayed() > 0L && System.currentTimeMillis() - player.getFirstPlayed() < minAgeMs) {
+         ChatUtil.sendMessage(player, "&c❌ Votre compte est trop récent pour remercier quelqu'un (&e" + this.plugin.getConfig().getLong("reputation.min-account-days", 2L) + " jours&c d'ancienneté).");
+         return true;
+      }
+
+      long waitMs = this.plugin.getConfig().getLong("reputation.cooldown-seconds", 60L) * 1000L;
+      Long last = this.lastThanks.get(giver);
+      if (last != null && System.currentTimeMillis() - last < waitMs) {
+         ChatUtil.sendMessage(player, "&c❌ Patientez &e" + ((waitMs - (System.currentTimeMillis() - last) + 999L) / 1000L) + " s&c avant de remercier quelqu'un d'autre.");
+         return true;
+      }
+
+      if (!this.plugin.getConfig().getBoolean("reputation.allow-same-guild", false)) {
+         var gg = this.plugin.getGuildManager().getGuildByPlayer(giver);
+         var rg = this.plugin.getGuildManager().getGuildByPlayer(receiver);
+         if (gg != null && rg != null && gg.getId().equals(rg.getId())) {
+            ChatUtil.sendMessage(player, "&c❌ La réputation récompense les joueurs d'autres guildes : on ne remercie pas un membre de sa propre guilde.");
+            return true;
+         }
+      }
+
+      Player online0 = target.getPlayer();
+      if (online0 != null && player.getAddress() != null && online0.getAddress() != null && player.getAddress().getAddress().equals(online0.getAddress().getAddress())) {
+         ChatUtil.sendMessage(player, "&c❌ Vous ne pouvez pas remercier un joueur connecté depuis la même adresse que vous.");
+         return true;
+      }
+
+      int maxReceived = this.plugin.getConfig().getInt("reputation.max-received-per-day", 10);
+      if (this.receivedToday.getOrDefault(receiver + "|" + day, 0) >= maxReceived) {
+         ChatUtil.sendMessage(player, "&c❌ Ce joueur a déjà reçu le maximum de remerciements aujourd'hui.");
+         return true;
+      }
+
       if (!bypass && this.givenToday.getOrDefault(giverDay, 0) >= perDay) {
          ChatUtil.sendMessage(player, "&c❌ Vous avez déjà remercié &e" + perDay + " &cjoueurs aujourd'hui. Revenez demain !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
@@ -140,6 +181,8 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       }
 
       this.givenToday.merge(giverDay, 1, Integer::sum);
+      this.receivedToday.merge(receiver + "|" + day, 1, Integer::sum);
+      this.lastThanks.put(giver, System.currentTimeMillis());
 
       this.points.merge(receiver, 1, Integer::sum);
       int total = this.points.get(receiver);
