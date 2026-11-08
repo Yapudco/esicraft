@@ -87,7 +87,7 @@ Le territoire se compte en **chunks** (carrés de 16 × 16 blocs). Avec `/guild 
 
 - **Tous les chunks doivent se toucher** par un **côté** (pas en diagonale : plus de « serpents »). Seul le premier peut être placé n'importe où. Seul le **chef** peut abandonner un chunk (`/guild unclaim`), et pas si ça coupe le territoire en deux, ni celui du Nexus.
 - **Tampon anti-encerclement** : un nouveau chunk doit rester à au moins **1 chunk** du territoire d'une guilde sans traité avec la tienne.
-- **Plafond des officiers** : un officier dépense au plus **3 000 pièces par jour** de la banque (claims, pièges) ; le chef n'a pas de limite.
+- **Plafond des officiers** : un officier dépense au plus **3 000 pièces par jour** de la banque (claims, pièges, **hordes**, **sièges**, **prêts**) ; le chef n'a pas de limite.
 - **Prix** : payé par la banque de guilde. Le premier coûte 100 pièces, puis chaque nouveau chunk coûte 25 pièces de plus que le précédent (100, 125, 150, 175…).
 - **Taille maximale selon l'Âge** :
 
@@ -187,7 +187,7 @@ Chaque **changement de spécialisation** offre à la guilde le droit de **dépla
 
 ### 🎰 Roulette russe du Nexus (`/nexus gamble`)
 
-Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid) : **50 %** (pile) le Nexus gagne **+1 000 PV max** et **2 000 pièces** vont à la banque ; **50 %** (face) il perd **1 000 PV max** et **1 500 PV** (il survit toujours à 1 PV, PV max jamais sous 1 000), la banque perd **2 000 pièces** (dans la limite de son solde), et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
+Le **chef de guilde**, face au Nexus (moins de 6 blocs), peut tenter un coup de poker (confirmation à retaper dans les 15 s, une fois par **72 h**, impossible pendant un raid). La banque doit contenir la **mise de 2 000 pièces**, retenue dès la confirmation : **50 %** (pile) le Nexus gagne **+1 000 PV max** et la banque récupère sa mise **plus 2 000 pièces** ; **50 %** (face) il perd **1 000 PV max** et **1 500 PV** (il survit toujours à 1 PV, PV max jamais sous 1 000), la mise est perdue, et une **mini-horde de pillards** surgit sans préavis au pied du Nexus. Succès *Tout pour le tout* en cas de victoire.
 
 ---
 
@@ -257,7 +257,7 @@ Ta guilde commence à l'**Âge 1** et peut monter jusqu'à l'**Âge 6**. Pour pa
 ### Gagner des pièces
 
 - **Tuer des monstres** : chaque monstre rapporte une prime, de 1,50 pièce (poisson d'argent) à 750 pièces (Ender Dragon). Les fermes à monstres répétitives rapportent moins.
-- **Contrats du jour** (`/contrat`) : 3 missions par jour, dont une liée à ton métier. +400 pièces si tu fais les trois.
+- **Contrats du jour** (`/contrat`) : 3 missions par jour, dont une liée à ton métier. +400 pièces si tu fais les trois. Les monstres de générateur (spawner), d'œuf ou de commande ne comptent pas pour les contrats « tuer ».
 - **Hôtel des Ventes** (`/ah`) : vends l'objet que tu tiens avec `/ah sell <prix>` (10 annonces maximum). Clique sur ta propre annonce pour la retirer.
 - **Événements** et **boss mondial** (voir [La vie du serveur](#-10-la-vie-du-serveur)).
 
@@ -413,7 +413,7 @@ Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…
 Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
 
 - `/banque pret <guilde> <montant>` : un officier propose un prêt (de 100 à 20 000 pièces). L'autre guilde l'accepte avec `/banque accepter <guilde>` (ou `refuser`). Les pièces passent d'une banque à l'autre ; la guilde emprunteuse doit rendre le montant **+ 10 % d'intérêts** sous **5 jours**.
-- `/banque dettes` liste les prêts · `/banque rembourser <guilde> [montant]` rembourse (en plusieurs fois possible) · `/banque pardonner <guilde>` efface une dette.
+- `/banque dettes` liste les prêts · `/banque rembourser <guilde> [montant]` rembourse (en plusieurs fois possible) · `/banque pardonner <guilde>` efface une dette (**chef seulement**). Un prêt proposé par un officier compte dans son plafond de 3 000 pièces par jour.
 - `/banque coffre <guilde>` ouvre un **coffre commun** de 54 cases partagé par les deux guildes (accessible tant qu'un traité les lie).
 - **Une dette impayée pèse sur les territoires** : dès l'échéance dépassée, la guilde ne peut plus revendiquer de chunk, et **un chunk lui est saisi toutes les 24 h** (jamais celui du Nexus, jamais un chunk qui couperait le territoire). Chaque chunk saisi efface 300 pièces de dette.
 
@@ -441,11 +441,11 @@ Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mou
 
 - `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde (une plateforme par duel, 6 en même temps, construite seulement si la zone est vide) ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin ; ils combattent avec le **même équipement fourni** (armure en fer complète, épée et hache en fer, bouclier, arc, 16 flèches, 64 steaks, 1 potion de soin instantané) (même après un plantage, à la reconnexion).
 - **Personne ne meurt** : le coup décisif met fin au combat. Le vainqueur remporte la mise de l'adversaire. Un duel **ne déclenche ni rivalité, ni trahison, ni capture, ni marque de combat**, et n'est pas stoppé par la trêve. Maximum 5 minutes (match nul au-delà, mises rendues) ; abandonner = perdre.
-- `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 1 000 pièces) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé. **Anti-triche** : sont écartés les membres des guildes concernées **et celles qui leur sont liées par un traité**, tout joueur dont l'**adresse IP** est celle d'un participant en ligne, et les comptes de moins de 3 jours.
+- `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 1 000 pièces **au total** par pari) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé. **Anti-triche** : sont écartés les membres des guildes concernées **et celles qui leur sont liées par un traité**, tout joueur dont l'**adresse IP** est celle d'un participant en ligne, et les comptes de moins de 3 jours.
 
 ### 🍺 Tavernes (`/taverne`)
 
-Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 2 chunks de leur territoire (jamais celui du Nexus) **zones neutres** avec `/taverne declarer` (`/taverne retirer`). Le chunk doit contenir **un coffre vide, un tonneau (barrel) et un toit** au-dessus de l'un et de l'autre. Dedans, le **PvP, les armes de tir et les potions offensives sont désactivés**.
+Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 2 chunks de leur territoire (jamais celui du Nexus) **zones neutres** avec `/taverne declarer` (`/taverne retirer`). Le chunk doit contenir **un coffre vide, un tonneau (barrel) et un toit** au-dessus de l'un et de l'autre. Dedans, le **PvP, les armes de tir et les potions offensives sont désactivés**, sauf entre deux joueurs **déjà en combat** : une taverne n'est pas un refuge pour fuir un affrontement.
 
 `/taverne` ouvre le menu des jeux, tous joués contre la **banque de la guilde propriétaire** (la mise maximale s'adapte à ce que la banque peut payer ; 1 000 pièces au plus, `taverns.max-bet`) :
 

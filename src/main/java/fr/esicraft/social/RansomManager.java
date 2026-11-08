@@ -272,6 +272,11 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
       }
    }
 
+   /** Téléportation interne (vers la cellule, retour à l'origine) en cours. */
+   public boolean isInternalTeleport() {
+      return this.internalTp;
+   }
+
    @EventHandler(ignoreCancelled = true)
    public void onTeleport(PlayerTeleportEvent event) {
       if (!this.internalTp && this.captives.containsKey(event.getPlayer().getUniqueId())) {

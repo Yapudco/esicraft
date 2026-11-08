@@ -208,6 +208,12 @@ public class CombatManager implements Listener {
    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
    public void onTeleport(PlayerTeleportEvent event) {
       PlayerTeleportEvent.TeleportCause cause = event.getCause();
+      // Les téléportations imposées par le jeu lui-même (mise en cellule d'un captif, retour de duel) ne sont pas des fuites :
+      // un captif est presque toujours marqué en combat, et sa mise en cellule était annulée.
+      if (this.plugin.getRansom().isInternalTeleport() || this.plugin.getDuels().isInternalTeleport()) {
+         return;
+      }
+
       if ((cause == PlayerTeleportEvent.TeleportCause.COMMAND || cause == PlayerTeleportEvent.TeleportCause.PLUGIN) && this.isInCombat(event.getPlayer())) {
          event.setCancelled(true);
          ChatUtil.sendMessage(event.getPlayer(), "&c❌ Téléportation impossible en plein combat.");

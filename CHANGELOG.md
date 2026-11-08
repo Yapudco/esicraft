@@ -2,6 +2,27 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 08/11/2026 (audit)
+
+### Sécurité : triche et duplications (audit complet)
+- **Bar de la taverne : argent infini corrigé.** Commander puis se déconnecter avant la fin du service remboursait le client avec des pièces créées de rien, pendant que la banque de la taverne gardait le paiement. Le remboursement vient maintenant de la caisse de la maison.
+- **Duels : le kit ne sort plus de l'arène.** Un objet du kit (armure en fer, steaks, potion…) posé dans la grille d'artisanat 2 × 2 ou tenu au curseur à la fin du duel revenait dans l'inventaire du joueur. Curseur et grille sont vidés avant la restauration ; on ne peut plus jeter ni ramasser d'objets pendant un duel ; la fenêtre est fermée avant la sauvegarde de l'inventaire (un objet au curseur n'est plus perdu).
+- **Roulette russe du Nexus** : la banque doit contenir la mise de 2 000 pièces, **retenue dès la confirmation**. Avant, une banque vide jouait sans rien risquer (la défaite ne coûtait que le solde, la victoire rapportait 2 000 pièces).
+- **Traduction anglaise** : elle réécrivait le nom et la description des **vrais objets** du coffre commun entre guildes et des coffres de fret quand un joueur anglophone les ouvrait. Seuls les menus sont traduits.
+- **Officiers** : le plafond de 3 000 pièces par jour s'applique aussi aux **hordes** et aux **prêts** (un officier ne vide plus seul la banque) ; **effacer une dette** est réservé au chef.
+- **Paris** : la limite de 1 000 pièces vaut pour le **total** misé par joueur sur un pari (répéter `/pari` la contournait).
+- **Contrats** : les monstres de **générateur (spawner)**, d'œuf ou de commande ne font plus avancer les contrats « tuer » du joueur ni ceux de sa guilde (une ferme à XP les remplissait seule).
+- **Tavernes** : la zone neutre ne protège plus deux joueurs **déjà en combat** (plus de refuge pour fuir un affrontement).
+- **Coffre commun et boîtes de fret** : chaque modification est enregistrée au tick suivant (avant : toutes les 30 s ou à la fermeture), ce qui ferme la fenêtre de duplication après un plantage. À l'arrêt du serveur, un coffre de chargement de fret encore ouvert est rendu à son joueur (il était perdu).
+- **Menu des cosmétiques** : glisser un objet dedans le faisait disparaître ; le glisser-déposer y est bloqué.
+
+### Correctifs
+- **Cellule de prison** : le captif n'y était presque jamais envoyé (la téléportation était annulée par le blocage « en combat », alors qu'un captif vient toujours de combattre). Les téléportations imposées par le jeu (cellule, retour de duel) passent.
+
+### Optimisations
+- Chat : le préfixe d'un message est calculé une seule fois (et non une fois par joueur connecté).
+- Classement des fortunes (`/baltop`, site) et masse monétaire : lus sur la connexion en lecture seule, sans bloquer les sauvegardes, avec un cache de 15 s.
+
 ## 08/11/2026
 
 ### Correctif : `/merci` ne peut plus être spammé

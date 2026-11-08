@@ -27,10 +27,15 @@ public class ChatFormatListener implements Listener, ChatRenderer {
       ignoreCancelled = true
    )
    public void onAsyncChat(AsyncChatEvent event) {
-      event.renderer(this);
+      // Le rendu ne dépend pas du lecteur : calculé une seule fois par message (et non une fois par joueur connecté).
+      event.renderer(ChatRenderer.viewerUnaware(this::renderOnce));
    }
 
    public Component render(Player source, Component sourceDisplayName, Component message, Audience viewer) {
+      return this.renderOnce(source, sourceDisplayName, message);
+   }
+
+   private Component renderOnce(Player source, Component sourceDisplayName, Component message) {
       Guild guild = this.plugin.getGuildManager().getGuildByPlayer(source.getUniqueId());
       StringBuilder prefixBuilder = new StringBuilder();
       fr.esicraft.life.DisguiseManager.Disguise disguise = this.plugin.getDisguiseManager().get(source.getUniqueId());

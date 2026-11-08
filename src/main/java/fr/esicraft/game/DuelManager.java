@@ -412,7 +412,23 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
       return w == null ? null : new Location(w, Double.parseDouble(p[1]), Double.parseDouble(p[2]), Double.parseDouble(p[3]), Float.parseFloat(p[4]), Float.parseFloat(p[5]));
    }
 
+   /**
+    * Vide le curseur et la grille d'artisanat 2 × 2 du joueur, puis ferme sa fenêtre : sans cela, un objet du kit posé dans la grille
+    * (ou tenu au curseur) au moment de la restauration revenait dans l'inventaire à la fermeture et sortait du duel.
+    */
+   private static void discardTransientSlots(Player p) {
+      p.setItemOnCursor(null);
+      org.bukkit.inventory.Inventory top = p.getOpenInventory().getTopInventory();
+      if (top.getType() == org.bukkit.event.inventory.InventoryType.CRAFTING) {
+         top.clear();
+      }
+
+      p.closeInventory();
+   }
+
    private void snapshot(Player p) {
+      // Fermer d'abord la fenêtre : curseur et grille d'artisanat reviennent dans l'inventaire et sont sauvegardés avec lui.
+      p.closeInventory();
       byte[] inv = ItemStack.serializeItemsAsBytes(p.getInventory().getContents());
       String value = Base64.getEncoder().encodeToString(inv) + ";" + encodeLoc(p.getLocation()) + ";" + p.getLevel() + ";" + p.getExp() + ";" + p.getHealth() + ";" + p.getFoodLevel() + ";" + p.getSaturation();
       this.snaps.put(p.getUniqueId(), value);
@@ -432,6 +448,7 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
       try {
          String[] parts = saved.split(";");
          ItemStack[] items = ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode(parts[0]));
+         discardTransientSlots(p);
          p.getInventory().clear();
          p.getInventory().setContents(items);
          p.setLevel(Integer.parseInt(parts[2]));
@@ -614,6 +631,26 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
             }
          }, 20L);
       }
+   }
+
+   /** Aucun objet du kit ne quitte l'arène : on ne jette rien et on ne ramasse rien pendant un duel. */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onDrop(org.bukkit.event.player.PlayerDropItemEvent event) {
+      if (this.isDueling(event.getPlayer())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onPickup(org.bukkit.event.entity.EntityPickupItemEvent event) {
+      if (event.getEntity() instanceof Player p && this.isDueling(p)) {
+         event.setCancelled(true);
+      }
+   }
+
+   /** Téléportation interne du duel (arène, retour) : le blocage des téléportations en combat ne doit pas la bloquer. */
+   public boolean isInternalTeleport() {
+      return this.teleporting;
    }
 
    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

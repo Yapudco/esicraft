@@ -593,87 +593,36 @@ public class SQLiteStorage {
       }
    }
 
-   public synchronized List<Entry<String, Double>> getTopBalances(int limit) {
+   // Classements et masse monétaire : lus sur la connexion en lecture seule (mode WAL), sans prendre le verrou des écritures
+   // (un /baltop répété faisait patienter les sauvegardes, et le thread principal derrière elles).
+   public List<Entry<String, Double>> getTopBalances(int limit) {
       List<Entry<String, Double>> results = new ArrayList<>();
-      if (this.connection == null) {
-         return results;
-      } else {
-         String sql = "SELECT name, coins FROM players ORDER BY coins DESC LIMIT ?;";
-
-         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
-            ps.setInt(1, Math.max(1, limit));
-
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  String name = rs.getString("name");
-                  double coins = rs.getDouble("coins");
-                  if (name != null) {
-                     results.add(new SimpleEntry<>(name, coins));
-                  }
-               }
-            }
-         } catch (SQLException var13) {
-            this.plugin.getLogger().log(Level.SEVERE, "Erreur lors de la récupération du baltop", (Throwable)var13);
+      for (Object[] row : this.select("SELECT name, coins FROM players WHERE name IS NOT NULL ORDER BY coins DESC LIMIT ?;", 2, Math.max(1, limit))) {
+         if (row[0] != null && row[1] instanceof Number n) {
+            results.add(new SimpleEntry<>(String.valueOf(row[0]), n.doubleValue()));
          }
-
-         return results;
       }
+
+      return results;
    }
 
-   public synchronized List<UUID> getTopPlayerUuids(int limit) {
+   public List<UUID> getTopPlayerUuids(int limit) {
       List<UUID> results = new ArrayList<>();
-      if (this.connection == null) {
-         return results;
-      } else {
-         String sql = "SELECT uuid FROM players ORDER BY coins DESC LIMIT ?;";
-
-         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
-            ps.setInt(1, Math.max(1, limit));
-
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  String uuidStr = rs.getString("uuid");
-                  if (uuidStr != null) {
-                     try {
-                        results.add(UUID.fromString(uuidStr));
-                     } catch (IllegalArgumentException var10) {
-                     }
-                  }
-               }
+      for (Object[] row : this.select("SELECT uuid FROM players ORDER BY coins DESC LIMIT ?;", 1, Math.max(1, limit))) {
+         if (row[0] != null) {
+            try {
+               results.add(UUID.fromString(String.valueOf(row[0])));
+            } catch (IllegalArgumentException ignored) {
             }
-         } catch (SQLException var13) {
-            this.plugin.getLogger().log(Level.SEVERE, "Erreur lors de la récupération du top UUIDs", (Throwable)var13);
          }
-
-         return results;
       }
+
+      return results;
    }
 
-   public synchronized double getTotalPlayersCoins() {
-      if (this.connection == null) {
-         return 0.0;
-      } else {
-         String sql = "SELECT SUM(coins) FROM players;";
-
-         try {
-            double var4;
-            try (
-               Statement statement = this.connection.createStatement();
-               ResultSet rs = statement.executeQuery(sql);
-            ) {
-               if (!rs.next()) {
-                  return 0.0;
-               }
-
-               var4 = rs.getDouble(1);
-            }
-
-            return var4;
-         } catch (SQLException var10) {
-            this.plugin.getLogger().log(Level.SEVERE, "Erreur lors du calcul de la masse monétaire des joueurs", (Throwable)var10);
-            return 0.0;
-         }
-      }
+   public double getTotalPlayersCoins() {
+      List<Object[]> rows = this.select("SELECT SUM(coins) FROM players;", 1);
+      return !rows.isEmpty() && rows.get(0)[0] instanceof Number n ? n.doubleValue() : 0.0;
    }
 
    public synchronized void resetAllGameData() {

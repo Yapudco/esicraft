@@ -25,9 +25,13 @@ public class LangListener implements Listener {
       this.plugin = plugin;
    }
 
+   /**
+    * Seuls les menus à boutons sont traduits. Les inventaires de stockage du plugin (coffre commun entre guildes, coffre de chargement
+    * et boîte de livraison du fret) contiennent de VRAIS objets : les traduire réécrivait le nom et la description des objets des joueurs.
+    */
    private boolean isPluginMenu(Inventory inventory) {
       InventoryHolder holder = inventory.getHolder();
-      return holder != null && holder.getClass().getName().startsWith("fr.esicraft");
+      return holder instanceof fr.esicraft.gui.holder.BaseGUIHolder;
    }
 
    @EventHandler(priority = EventPriority.MONITOR)

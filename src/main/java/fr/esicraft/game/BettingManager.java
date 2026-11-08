@@ -341,6 +341,13 @@ public class BettingManager implements CommandExecutor, TabCompleter {
          }
       }
 
+      // Le plafond vaut pour le total misé sur ce pari, pas pour chaque commande (sinon il suffisait de répéter /pari).
+      double already = found.stakes.get(side).getOrDefault(player.getUniqueId(), 0.0);
+      if (already + amount > max) {
+         ChatUtil.sendMessage(player, "&c❌ Mise totale limitée à &e" + (long)max + " &cpièces par pari (déjà misé : &e" + (long)already + "&c).");
+         return true;
+      }
+
       PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
       if (data == null || !data.removeCoins(amount)) {
          ChatUtil.sendMessage(player, "&c❌ Vous n'avez pas assez de pièces.");
