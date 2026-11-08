@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 08/11/2026
+
+### Correctif : `/merci` ne peut plus être spammé
+- La réputation pesant désormais sur le cours en bourse, `/merci` est verrouillé : **les opérateurs n'y échappent plus** (ils contournaient tous les plafonds), **60 secondes** entre deux remerciements, un joueur ne reçoit **que 10 remerciements par jour**, **pas de remerciement entre membres d'une même guilde** ni entre joueurs de **même adresse IP**, et **compte d'au moins 2 jours**. Le plafond de 5 remerciements par jour et d'un par personne reste. Réglages : `reputation.*`.
+
 ## 31/10/2026
 
 ### Bourse : un vrai marché

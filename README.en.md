@@ -422,7 +422,7 @@ Between two guilds **bound by a treaty** (alliance, pact or vassalage):
 
 ### ❤ Reputation (`/merci <player>`)
 
-Thank a helpful player: they gain **1 honor point**. You can thank the same person **once a day**. Points show in the **tab list** (❤), on the **website profile** and in the "Most honorable" ranking on the Players page. `/merci` alone shows your reputation and the top 3.
+Thank a helpful player: they gain **1 honor point**. You can thank the same person **once a day**, **5 people a day at most**, with **60 seconds** between two thanks; a player can only receive **10 a day**. No thanks between members of the **same guild** or between players connected from the **same address**, and the account must be **2 days** old (reputation weighs on share prices). Operators are subject to the same limits. Points show in the **tab list** (❤), on the **website profile** and in the "Most honorable" ranking on the Players page. `/merci` alone shows your reputation and the top 3.
 
 ### 🎓 Mentoring (`/parrain <player>`)
 
