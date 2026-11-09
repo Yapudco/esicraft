@@ -74,6 +74,45 @@ public class CombatManager implements Listener {
       return true;
    }
 
+   /** Vrai (avec message) si le joueur est en combat : il ne peut ni ranger, ni donner, ni sacrifier d'objets (son butin revient à son tueur). */
+   public boolean denyItems(Player player) {
+      if (!this.isInCombat(player)) {
+         return false;
+      }
+
+      ChatUtil.sendMessage(player, "&c❌ Impossible de ranger, donner ou sacrifier des objets en plein combat (&e" + this.remainingSeconds(player) + " s&c).");
+      ChatUtil.playSound(player, org.bukkit.Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+      return true;
+   }
+
+   /** Inventaire contenant de vrais objets : coffre, tonneau, boîte de shulker, coffre de l'Ender, wagonnet ou âne à coffre, coffres du plugin. */
+   private static boolean isStorage(org.bukkit.inventory.Inventory inv) {
+      if (inv == null) {
+         return false;
+      }
+
+      if (inv.getType() == org.bukkit.event.inventory.InventoryType.ENDER_CHEST) {
+         return true;
+      }
+
+      // getHolder(false) : pas de copie de l'état du bloc, le test reste léger.
+      org.bukkit.inventory.InventoryHolder holder = inv.getHolder(false);
+      return holder instanceof fr.esicraft.util.StorageHolder || holder instanceof org.bukkit.block.Container || holder instanceof org.bukkit.block.DoubleChest
+         || holder instanceof org.bukkit.entity.minecart.StorageMinecart || holder instanceof org.bukkit.entity.minecart.HopperMinecart
+         || holder instanceof org.bukkit.entity.ChestedHorse;
+   }
+
+   /**
+    * Coffres fermés pendant le combat (le message de combat l'annonçait, mais rien ne le faisait) : un joueur sur le point de mourir rangeait son
+    * équipement dans un coffre de l'Ender ou une boîte de shulker et son tueur ne récupérait rien.
+    */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onStorageOpen(org.bukkit.event.inventory.InventoryOpenEvent event) {
+      if (event.getPlayer() instanceof Player p && this.isInCombat(p) && isStorage(event.getInventory()) && this.denyItems(p)) {
+         event.setCancelled(true);
+      }
+   }
+
    public long remainingSeconds(Player player) {
       Long until = this.taggedUntil.get(player.getUniqueId());
       return until == null ? 0L : Math.max(0L, (until - System.currentTimeMillis() + 999L) / 1000L);
@@ -101,6 +140,11 @@ public class CombatManager implements Listener {
    }
 
    private void tag(Player player) {
+      // Un coffre déjà ouvert au moment du coup est refermé.
+      if (isStorage(player.getOpenInventory().getTopInventory())) {
+         player.closeInventory();
+      }
+
       if (this.taggedUntil.put(player.getUniqueId(), System.currentTimeMillis() + this.durationMs()) == null) {
          ChatUtil.sendMessage(player, "&c⚔ Vous êtes en combat ! &7Téléportation, /hub, argent et coffres sont bloqués, et se déconnecter est puni (&e"
             + this.plugin.getConfig().getLong("combat.seconds", 15L) + " s&7).");

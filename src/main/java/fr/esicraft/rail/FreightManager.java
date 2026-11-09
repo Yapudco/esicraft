@@ -114,7 +114,7 @@ public class FreightManager implements Listener {
    }
 
    /** Coffre de chargement : ce n'est volontairement PAS un BaseGUIHolder (le listener global annulerait tous les clics et rien ne pourrait y être déposé). */
-   static final class LoadHolder implements InventoryHolder {
+   static final class LoadHolder implements InventoryHolder, fr.esicraft.util.StorageHolder {
       RailSearch.Reached trip;
       boolean done;
 
@@ -124,7 +124,7 @@ public class FreightManager implements Listener {
       }
    }
 
-   static final class BoxHolder implements InventoryHolder {
+   static final class BoxHolder implements InventoryHolder, fr.esicraft.util.StorageHolder {
       String stationId;
 
       @Override

@@ -104,7 +104,7 @@ Land is counted in **chunks** (16 × 16 block squares). With `/guild claim`, an 
 
 On another guild's land you **can't break or place blocks**, or open its chests, furnaces, barrels, shulkers or hoppers.
 
-Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **Chorus Fruit** to teleport in, **End Crystals**, **pistons**, **lava, water and fire** coming from outside, block destruction by Withers, Endermen and Ravagers, and **projectiles** hitting animals, item frames and armor stands.
+Also forbidden there: **TNT** (including TNT minecarts), **Ender Pearls** and **Chorus Fruit** to teleport in, **End Crystals**, **pistons**, **lava, water and fire** coming from outside, block destruction by Withers, Endermen and Ravagers, **projectiles** hitting animals, item frames and armor stands or blocks (decorated pots and their contents, chorus flowers, dripstone), and the **fishing rod** to pull its animals, villagers, armor stands, minecarts or dropped items out of the territory.
 
 **Lava and water**: a liquid never crosses from one territory to another (even during a raid), dispensers cannot pour any into a neighbour's land, and a **lava** bucket cannot be emptied within 5 blocks of a player who is neither in your guild nor your ally.
 
@@ -182,7 +182,7 @@ Instead of buying disposable traps, officers **unlock** defenses in `/nexus` (th
 | 👁 Warden Shot | 5 | Evoker · **kill a warden** · 8 echo shards, 4 catalysts | Sonic boom: 10 damage and knockback every 15 s |
 | 🌊 Elder's Curse | 6 | Guardian · **kill an elder guardian** · 128 prismarine bricks, 8 nautilus shells | Mining Fatigue III and damage to all nearby enemies every 25 s |
 
-Unlocking everything earns the *Archi-technician* achievement. **Tiny hordes earn nothing**: repelling a horde of fewer than 12 monsters gives no Nexus XP, season points or achievement. During a raid, only the horde's monsters and TNT lit by the attacking guild destroy the base (not a third party). The Nexus must stay **reachable**: it can't be placed under more than 3 solid blocks of rock (sieges only break within 4 blocks of it). Settings: `nexus.tech.*` (cost, damage, XP).
+Unlocking everything earns the *Archi-technician* achievement. **Tiny hordes earn nothing**: repelling a horde of fewer than 12 monsters gives no Nexus XP, season points, achievement or reinforcement bounty (`/aide`); nobody can bet on it and it doesn't count for the "Launch 3 hordes" quest (`raids.min-mobs-for-rewards`). During a raid, only the horde's monsters and TNT lit by the attacking guild destroy the base (not a third party). The Nexus must stay **reachable**: it can't be placed under more than 3 solid blocks of rock (sieges only break within 4 blocks of it). Settings: `nexus.tech.*` (cost, damage, XP).
 
 ### 🚚 Moving the Nexus (`/nexus move`)
 
@@ -322,7 +322,7 @@ The rail network lets you **teleport from station to station**, as long as a **c
 - **Managing your network** (`/rail`, officers): set your toll (**up to 10 coins for every specialization, up to 100 for the Merchant Syndicate**), and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
 - **📦 Freight train** (Age 2 minimum, officers): **Shift + click** a destination in the `/station` menu to open a **double chest (54 slots)**. Close it, then click **[+ COFFRE]** to load another or **[ENVOYER]** in chat (fee: arrival fare ×5 per filled chest). The number of double chests per convoy depends on the guild's Age: **Age 2: 1 · Age 3: 2 · Age 4: 3 · Age 5: 5 · Age 6: 10**: a **chest minecart** leaves on its own and follows the rails, **slowly** (**4 min** under 1,000 blocks, **8 min** up to 3,000, **12 min** up to 5,000, **15 min** up to 10,000, **20 min** beyond). It isn't a real minecart: its position is computed from the clock, it is only visible near players and survives restarts. On arrival, items useful for the next Age are **donated automatically** if the station is yours; the rest goes into the **arrival station's box, open to every player present** (`/station fret recuperer [chest number]`, up to 30 chests): freight also works as an **exchange between guilds** (the station's guild is told of the arrival). Two convoys per guild at most.
 - **🏹 Attacking a convoy**: when a convoy crosses the territory of a guild with **no treaty** with the sender, its members hit it (**25 hits**) to **loot** it: the loot spills on the rails. Both guilds are warned at each border crossed. *Convoy looter* and *Freight king* achievements.
-- **Building a station**: an officer places a sign with `[Gare]` on line 1 and the station name on line 2, within 2 blocks of a rail. Requires Age 2, 500 coins from the bank, and no more than 6 stations per guild.
+- **Building a station**: an officer places a sign with `[Gare]` on line 1 and the station name on line 2, within 2 blocks of a rail. Requires Age 2, 500 coins from the bank (within the officers' daily spending cap), and no more than 6 stations per guild.
 
 ---
 
@@ -333,7 +333,7 @@ The rail network lets you **teleport from station to station**, as long as a **c
 | Event | Duration | What happens |
 | :--- | :--- | :--- |
 | 🌑 Blood Moon | 10 min | More monsters, bounties ×2 |
-| ☄ Meteor Shower | 3 min | Ore blocks fall from the sky near players |
+| ☄ Meteor Shower | 3 min | Ore blocks fall from the sky near players (on natural ground, never on a build) |
 | 🧙 Black Market | 5 min | A merchant offers 3 randomly picked rare items, **32 to 128 diamonds** each. **Each offer is locked after a single purchase** and each player can only buy **one thing** |
 | ☠ World Boss | 15 min | A **different boss every week** (see below): 1,000 coins shared by damage dealt (at least 10% of the damage, 400 coins max per player), and for the top fighter 3 diamonds + a 20% chance of a Nether Star |
 
@@ -373,7 +373,7 @@ The world changes season **every two weeks** (configurable):
 
 ### 🆘 Calling for help (`/aide`)
 
-During a raid or an attack on your Nexus, `/aide` warns your **allies** (alliance or vassalage). Each ally who reaches your land before the horde ends earns **250 coins** if it is repelled (6 allies max). One call every 10 minutes.
+During a raid or an attack on your Nexus, `/aide` warns your **allies** (alliance or vassalage). Each ally who reaches your land before the horde ends earns **250 coins** (taken from your guild's bank) if it is repelled (6 allies max), as long as it is a real horde (at least 12 monsters, two victories counted per day against the same attacker). One call every 10 minutes.
 
 ### 🎭 Disguise (`/deguisement`)
 
@@ -411,7 +411,7 @@ The `/cosmetique` menu has one tab per slot; locked cosmetics say how to get the
 
 ### ⚔ PvP combat
 
-Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…) or being hit puts you "in combat" for 15 seconds. During that time **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… are blocked**, command teleports too, and **logging out is punished by death** (kicks included; only a server shutdown is excused). Spending or transferring coins is also impossible (purchases, `/pay`, bank, profession, disguise); only paying a ransom is allowed.
+Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…) or being hit puts you "in combat" for 15 seconds. During that time **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… are blocked**, command teleports too, and **logging out is punished by death** (kicks included; only a server shutdown is excused). Spending or transferring coins is also impossible (purchases, `/pay`, bank, profession, disguise); only paying a ransom is allowed. **Chests are closed**: you can't open a chest, barrel, shulker box, Ender chest, chest minecart or donkey (a chest open when you're hit closes), nor donate items to your guild's Age or sacrifice them to the Nexus: the loot of a player who dies goes to their killer.
 
 ### 🏦 Guild bank: loans and shared chest (`/banque`)
 
@@ -444,7 +444,7 @@ With no decision, they are executed. Logging out while captive counts as dying. 
 
 ### 🗡 Honor duels and bets (`/duel`, `/pari`)
 
-- `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world (one platform per duel, 6 at a time, built only if the area is empty); their **inventory, health and position are saved** then returned at the end; they fight with the **same supplied kit** (full iron armor, iron sword and axe, shield, bow, 16 arrows, 64 steaks, 1 instant health potion) (even after a crash, when they reconnect).
+- `/duel <player> [stake]` challenges a player (optional coin stake, `/duel accepter` or `/duel refuser`). Both are **teleported to a lit neutral arena** above the world (one platform per duel, 6 at a time, built only if the area is empty, **indestructible** and repaired before every duel: breaking the floor to make the opponent fall is no longer possible); their **inventory, health and position are saved** then returned at the end; they fight with the **same supplied kit** (full iron armor, iron sword and axe, shield, bow, 16 arrows, 64 steaks, 1 instant health potion) (even after a crash, when they reconnect).
 - **Nobody dies**: the deciding blow ends the fight. The winner takes the opponent's stake. A duel **triggers no rivalry, betrayal, capture or combat tag**, and is not stopped by the truce. 5 minutes at most (draw after that, stakes returned); quitting = losing.
 - `/pari <side> <amount>`: at the start of a **raid** or a **duel**, **spectators** (not in the guilds involved / not the duelists) have **2 minutes** to bet (10 to 1,000 coins **in total** per bet) on the `attaquante`/`defensive` guild (or its name) or on a duelist. The winning side shares the pot minus **5%** kept by the server; with no opposing bets, or if the fight is cancelled, everything is refunded. **Anti-cheat**: members of the guilds involved **and guilds bound to them by a treaty** are excluded, as is anyone whose **IP address** matches an online participant, and accounts under 3 days old.
 

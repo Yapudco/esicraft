@@ -89,6 +89,12 @@ public class RailListener implements Listener {
       }
 
       double cost = this.plugin.getConfig().getDouble("rail.station-creation-cost", 500.0);
+      // Plafond quotidien des officiers : un officier pouvait vider la banque en construisant puis démantelant des gares à la chaîne.
+      if (cost > 0.0 && !this.plugin.getGuildManager().officerMaySpend(guild, player, cost)) {
+         this.fail(event, player, "Plafond quotidien de dépenses des officiers atteint : demandez au chef de guilde.");
+         return;
+      }
+
       if (!guild.withdrawBank(cost)) {
          this.fail(event, player, "La banque de guilde doit contenir " + String.format(Locale.ROOT, "%.0f", cost) + " pièces.");
          return;

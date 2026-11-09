@@ -342,7 +342,7 @@ public class RaidManager implements Listener {
                      }
 
                      ChatUtil.broadcast("&4&l⚔️ UNE HORDE DE MONSTRES A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
-                     this.onRaidLaunched(attackerGuild, targetGuild, buyer, fr.esicraft.util.ChatUtil.color(raidType.getDisplayName()));
+                     this.onRaidLaunched(attackerGuild, targetGuild, buyer, fr.esicraft.util.ChatUtil.color(raidType.getDisplayName()), raid.getTotalMobs());
                      String details = "&7Type d'invasion : " + raidType.getDisplayName() + " &7par &e" + attackerName;
                      if (explosiveBreachers) {
                         details = details + " &c&l[SAPEURS EXPLOSIFS]";
@@ -576,7 +576,7 @@ public class RaidManager implements Listener {
                         }
 
                         ChatUtil.broadcast("&4&l⚔️ UNE HORDE PERSONNALISÉE SUR-MESURE A ÉTÉ LANCEE SUR LA GUILDE &c" + targetGuild.getName() + " &4&l!");
-                        this.onRaidLaunched(attackerGuild, targetGuild, buyer, "horde personnalisée");
+                        this.onRaidLaunched(attackerGuild, targetGuild, buyer, "horde personnalisée", raid.getTotalMobs());
                         String details = "&7Commanditaire : &e" + attackerName + " &7| Total : &c" + totalUnits + " monstres d'élite";
                         if (explosiveBreachers) {
                            details = details + " &c&l[SAPEURS EXPLOSIFS]";
@@ -618,16 +618,28 @@ public class RaidManager implements Listener {
    }
 
    /** Journal de guerre, rivalités et succès au lancement d'une horde. */
-   private void onRaidLaunched(Guild attackerGuild, Guild targetGuild, Player buyer, String hordeName) {
+   private void onRaidLaunched(Guild attackerGuild, Guild targetGuild, Player buyer, String hordeName, int mobs) {
       String attacker = attackerGuild != null ? attackerGuild.getName() : "L'administration";
       this.plugin.getChronicle().log(fr.esicraft.life.Chronicle.Kind.RAID, attacker + " lance une horde (" + hordeName.replaceAll("§.", "") + ") sur " + targetGuild.getName() + ".",
          attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId());
       this.plugin.getChronicle().raid(attackerGuild != null ? attackerGuild.getId() : null, targetGuild.getId(), "launched");
-      this.plugin.getBetting().openRaid(attackerGuild, targetGuild);
+      // Pas de paris sur une horde minuscule : son issue se décide entre complices (l'attaquant lance trois zombies, le défenseur choisit de
+      // les laisser faire ou non) et des amis extérieurs misaient à coup sûr contre les vrais spectateurs.
+      if (mobs >= this.minMobsForRewards()) {
+         this.plugin.getBetting().openRaid(attackerGuild, targetGuild);
+      }
+
       if (buyer != null) {
          this.plugin.getAchievements().grant(buyer.getUniqueId(), fr.esicraft.life.Achievement.RAIDER);
-         this.plugin.getAchievements().addStat(buyer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_RAIDS, 1L);
+         // La quête « Lancer 3 hordes » ne compte que les vraies hordes (pas trois zombies achetés pour rien).
+         if (mobs >= this.minMobsForRewards()) {
+            this.plugin.getAchievements().addStat(buyer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_RAIDS, 1L);
+         }
       }
+   }
+
+   private int minMobsForRewards() {
+      return this.plugin.getConfig().getInt("raids.min-mobs-for-rewards", 12);
    }
 
    /** Raids en cours (lecture seule), pour le site web. */
@@ -941,7 +953,7 @@ public class RaidManager implements Listener {
                String pairKey = raid.getAttackerGuildId() + ">" + targetGuild.getId() + "|" + java.time.LocalDate.now().toEpochDay();
                int credited = this.repelCredits.merge(pairKey, 1, Integer::sum);
                // Une horde minuscule (complice qui lance un zombie) ne rapporte ni points de saison, ni XP de Nexus, ni succès.
-               boolean worthy = raid.getTotalMobs() >= this.plugin.getConfig().getInt("raids.min-mobs-for-rewards", 12)
+               boolean worthy = raid.getTotalMobs() >= this.minMobsForRewards()
                   && credited <= this.plugin.getConfig().getInt("raids.max-credited-repels-per-pair-per-day", 2);
                if (worthy) {
                   this.plugin.getSeasonManager().recordRepelled(targetGuild);
@@ -954,7 +966,9 @@ public class RaidManager implements Listener {
                }
 
                this.plugin.getChronicle().raid(raid.getAttackerGuildId(), targetGuild.getId(), "repelled");
-               this.plugin.getHelpCalls().onRepelled(targetGuild);
+               // Les renforts ne sont payés (par la banque de la guilde défendue) que pour une vraie horde : un faux raid de quelques monstres
+               // servait à faire passer l'argent de la banque vers les poches de joueurs alliés.
+               this.plugin.getHelpCalls().onRepelled(targetGuild, worthy);
                for (UUID memberUuid : targetGuild.getMembers().keySet()) {
                   Player defender = Bukkit.getPlayer(memberUuid);
                   if (worthy && defender != null && targetGuild.isClaimed(ChunkKey.from(defender.getLocation().getChunk()))) {

@@ -124,10 +124,21 @@ public class HelpCallManager {
       }
    }
 
-   /** Appelé quand une horde est repoussée. */
-   public void onRepelled(Guild guild) {
+   /** Appelé quand une horde est repoussée ({@code worthy} : horde assez grande pour être récompensée). */
+   public void onRepelled(Guild guild, boolean worthy) {
       Call call = this.calls.remove(guild.getId());
       if (call == null || call.helpers.isEmpty()) {
+         return;
+      }
+
+      if (!worthy) {
+         for (UUID uuid : call.helpers) {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p != null) {
+               ChatUtil.sendMessage(p, "&7🆘 La horde est repoussée, mais elle était trop petite pour justifier une prime de renfort.");
+            }
+         }
+
          return;
       }
 

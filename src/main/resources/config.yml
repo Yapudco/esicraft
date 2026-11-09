@@ -211,7 +211,8 @@ guilds:
 # Contrats de Hordes de Monstres (Achat à l'Hôtel des Ventes)
 raids:
   max-credited-repels-per-pair-per-day: 2   # Victoires comptées au classement par couple attaquant/cible et par jour
-  max-minutes: 25               # Durée maximale d'un raid (mob piégé) ; au-delà il s'achève sans victoire ni défaite
+  min-mobs-for-rewards: 12      # En dessous : horde « factice », sans points, XP, succès, quête, primes de renfort (/aide) ni paris
+  max-minutes: 25              # Durée maximale d'un raid (mob piégé) ; au-delà il s'achève sans victoire ni défaite
   cooldown-minutes-between-raids: 30
   max-custom-horde-units: 60 # Plafond de monstres d'une horde personnalisée (anti-crash serveur)
   types:

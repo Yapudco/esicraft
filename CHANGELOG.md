@@ -2,6 +2,19 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 09/11/2026 (audit, troisième passe)
+
+### Sécurité : triche et boucles de jeu abusées
+- **Faux raids et appels à l'aide** : une guilde faisait lancer par un complice une horde de quelques monstres contre elle-même, appelait ses alliés avec `/aide`, et chaque allié touchait 250 pièces prises dans sa banque. C'était un moyen de vider la banque (qu'on ne peut pas retirer) vers les poches de joueurs alliés. La prime de renfort n'est versée que pour une vraie horde (12 monstres au moins, deux victoires comptées par jour contre le même attaquant).
+- **Paris truqués** : plus de paris sur une horde de moins de 12 monstres. Son issue se décidait entre complices et des amis extérieurs misaient à coup sûr. La quête « Lancer 3 hordes » ne compte plus ces fausses hordes non plus.
+- **Coffres en combat** : le message de combat annonçait « coffres bloqués », mais rien ne le faisait. Un joueur sur le point de mourir rangeait son équipement dans un coffre de l'Ender ou une boîte de shulker, et son tueur ne récupérait rien. En combat, on ne peut plus ouvrir de coffre, tonneau, shulker, coffre de l'Ender, wagonnet ou âne à coffre (un coffre déjà ouvert se referme), ni donner d'objets à l'Âge de sa guilde ou en sacrifier au Nexus.
+- **Arènes de duel** : rien ne les protégeait. Pendant un duel avec mise, on cassait le sol sous l'adversaire : il tombait de 280 blocs, sa « chute » donnait la victoire et la mise. Un joueur volant pouvait aussi démonter les plateformes. Les arènes sont indestructibles (hors créatif) et réparées avant chaque duel.
+- **Territoires** : une flèche tirée de l'extérieur brisait les pots décorés d'une guilde, et leur contenu tombait. Les projectiles d'un étranger ne cassent plus aucun bloc d'un territoire. La **canne à pêche** ne tire plus hors d'un territoire ses animaux, villageois, supports d'armure, wagonnets ni les objets au sol.
+- **Gares** : construire une gare (500 pièces de la banque) compte dans le plafond quotidien des officiers. Un officier pouvait vider la banque en construisant et démantelant des gares à la chaîne.
+
+### Correctifs
+- **Pluie de météorites** : le minerai ne tombe plus que sur du terrain naturel. Il remplaçait aussi les constructions hors territoire : un coffre écrasé perdait tout son contenu.
+
 ## 09/11/2026 (audit, suite)
 
 ### Sécurité : comptes multiples et boucles de jeu abusées

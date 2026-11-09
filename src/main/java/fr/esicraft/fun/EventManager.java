@@ -399,6 +399,11 @@ public class EventManager implements Listener {
       }
    }
 
+   private static boolean isNaturalGround(Material m) {
+      return org.bukkit.Tag.BASE_STONE_OVERWORLD.isTagged(m) || org.bukkit.Tag.DIRT.isTagged(m) || org.bukkit.Tag.SAND.isTagged(m) || org.bukkit.Tag.TERRACOTTA.isTagged(m)
+         || m == Material.GRAVEL || m == Material.CLAY || m == Material.SANDSTONE || m == Material.RED_SANDSTONE || m == Material.SNOW_BLOCK;
+   }
+
    private void dropMeteor(Player near) {
       Location impact = this.findSurfaceNear(near, 30, 80);
       if (impact == null) {
@@ -411,7 +416,9 @@ public class EventManager implements Listener {
          int dx = i == 0 ? 0 : ThreadLocalRandom.current().nextInt(-1, 2);
          int dz = i == 0 ? 0 : ThreadLocalRandom.current().nextInt(-1, 2);
          Block ground = world.getHighestBlockAt(impact.getBlockX() + dx, impact.getBlockZ() + dz, HeightMap.MOTION_BLOCKING_NO_LEAVES);
-         if (ground.getType().isSolid() && !ground.isLiquid() && !this.inClaim(ground.getLocation())) {
+         // Seulement sur du terrain naturel : la météorite écrasait aussi les constructions hors territoire (un coffre remplacé par du minerai
+         // perdait tout son contenu).
+         if (isNaturalGround(ground.getType()) && !this.inClaim(ground.getLocation())) {
             // Posé sans BlockPlaceEvent : le bloc n'est pas « posé par un joueur », les bonus de minage s'appliquent.
             ground.setType(this.meteorOre(), false);
          }

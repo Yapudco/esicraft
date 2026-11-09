@@ -370,6 +370,7 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
       int cy = c.getBlockY();
       int cz = c.getBlockZ();
       if (w.getBlockAt(cx, cy, cz).getType() == Material.POLISHED_BLACKSTONE_BRICKS || w.getBlockAt(cx, cy, cz).getType() == Material.SEA_LANTERN) {
+         this.repairArena(w, cx, cy, cz);
          return true;
       }
 
@@ -398,6 +399,111 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
       }
 
       return true;
+   }
+
+   /**
+    * Remet en état une arène déjà construite avant chaque duel : trous du sol rebouchés, barrières manquantes replacées, liquides, feu et toiles
+    * retirés. Seuls les emplacements vides (ou les pièges) sont touchés : aucun autre bloc n'est remplacé.
+    */
+   private void repairArena(World w, int cx, int cy, int cz) {
+      int r = 15;
+      for (int x = -r; x <= r; x++) {
+         for (int z = -r; z <= r; z++) {
+            org.bukkit.block.Block floor = w.getBlockAt(cx + x, cy, cz + z);
+            if (floor.getType().isAir()) {
+               floor.setType((x + z) % 2 == 0 ? Material.SEA_LANTERN : Material.POLISHED_BLACKSTONE_BRICKS, false);
+            }
+
+            boolean wall = Math.abs(x) == r || Math.abs(z) == r;
+            for (int h = 1; h <= 10; h++) {
+               org.bukkit.block.Block b = w.getBlockAt(cx + x, cy + h, cz + z);
+               Material type = b.getType();
+               if ((wall || h == 10) && type.isAir()) {
+                  b.setType(Material.BARRIER, false);
+               } else if (!wall && h < 10 && (type == Material.WATER || type == Material.LAVA || type == Material.FIRE || type == Material.SOUL_FIRE || type == Material.COBWEB
+                  || type == Material.POWDER_SNOW)) {
+                  b.setType(Material.AIR, false);
+               }
+            }
+         }
+      }
+   }
+
+   private Location[] arenaCache;
+
+   /** Centres des arènes (calculés une fois : le test est fait à chaque bloc cassé ou posé sur le serveur). */
+   private Location[] arenas() {
+      Location[] cached = this.arenaCache;
+      if (cached != null) {
+         return cached;
+      }
+
+      Location[] centers = new Location[this.slotsUsed.length];
+      for (int i = 0; i < centers.length; i++) {
+         centers[i] = this.arenaCenter(i);
+      }
+
+      if (centers.length > 0 && centers[0] != null) {
+         this.arenaCache = centers;
+      }
+
+      return centers;
+   }
+
+   /** Vrai si ce bloc fait partie d'une arène de duel (sol, murs, plafond ou intérieur). */
+   private boolean inArena(org.bukkit.block.Block b) {
+      Location[] centers = this.arenas();
+      if (centers.length == 0 || centers[0] == null || centers[0].getWorld() == null || !centers[0].getWorld().equals(b.getWorld())) {
+         return false;
+      }
+
+      int y0 = centers[0].getBlockY();
+      if (b.getY() < y0 || b.getY() > y0 + 11) {
+         return false;
+      }
+
+      for (Location c : centers) {
+         if (c != null && Math.abs(b.getX() - c.getBlockX()) <= 15 && Math.abs(b.getZ() - c.getBlockZ()) <= 15) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   /**
+    * Les arènes sont indestructibles (hors créatif) : casser le sol pendant un duel faisait tomber l'adversaire de 280 blocs (« chute » = victoire et
+    * mise empochée), et un joueur volant pouvait démonter les plateformes pour en récupérer les lanternes.
+    */
+   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+   public void onArenaBreak(org.bukkit.event.block.BlockBreakEvent event) {
+      if (event.getPlayer().getGameMode() != org.bukkit.GameMode.CREATIVE && this.inArena(event.getBlock())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+   public void onArenaPlace(org.bukkit.event.block.BlockPlaceEvent event) {
+      if (event.getPlayer().getGameMode() != org.bukkit.GameMode.CREATIVE && this.inArena(event.getBlockPlaced())) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+   public void onArenaBucket(org.bukkit.event.player.PlayerBucketEmptyEvent event) {
+      if (event.getPlayer().getGameMode() != org.bukkit.GameMode.CREATIVE && this.inArena(event.getBlockClicked().getRelative(event.getBlockFace()))) {
+         event.setCancelled(true);
+      }
+   }
+
+   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+   public void onArenaExplode(org.bukkit.event.entity.EntityExplodeEvent event) {
+      event.blockList().removeIf(this::inArena);
+   }
+
+   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+   public void onArenaBlockExplode(org.bukkit.event.block.BlockExplodeEvent event) {
+      event.blockList().removeIf(this::inArena);
    }
 
    // ------------------------------------------------------------------ sauvegarde de l'état
