@@ -127,6 +127,10 @@ public class AgeManager {
    }
 
    public boolean depositItemForGuild(Player player, ItemStack item) {
+      if (player != null && this.plugin.getCombatManager().denyItems(player)) {
+         return false;
+      }
+
       if (player != null && item != null && !item.getType().isAir()) {
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
          if (guild == null) {

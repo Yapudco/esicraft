@@ -498,6 +498,23 @@ public class GuildClaimListener implements Listener {
       ignoreCancelled = true
    )
    public void onMobGrief(EntityChangeBlockEvent event) {
+      // Projectiles (flèches, tridents, boules de neige…) : ils brisent pots décorés (et leur contenu tombe), fleurs de chorus et stalactites.
+      // Un joueur extérieur vidait ainsi les pots d'une guilde depuis l'extérieur de son territoire.
+      if (event.getEntity() instanceof Projectile projectile) {
+         Guild guild = this.protectedGuildAt(new ChunkKey(event.getBlock().getWorld().getName(), event.getBlock().getX() >> 4, event.getBlock().getZ() >> 4));
+         if (guild != null) {
+            boolean allowed = projectile.getShooter() instanceof Player shooter
+               ? guild.isMember(shooter.getUniqueId()) || shooter.hasPermission("esicraft.admin")
+               : this.isRaided(guild.getId()) || projectile.getShooter() instanceof org.bukkit.projectiles.BlockProjectileSource source
+                  && guild.getId().equals(this.claimOwnerId(source.getBlock()));
+            if (!allowed) {
+               event.setCancelled(true);
+            }
+         }
+
+         return;
+      }
+
       EntityType type = event.getEntityType();
       if (type == EntityType.ENDERMAN || type == EntityType.WITHER || type == EntityType.RAVAGER || type == EntityType.SILVERFISH) {
          String owner = this.claimOwnerId(event.getBlock());
@@ -655,6 +672,26 @@ public class GuildClaimListener implements Listener {
          if (guild != null) {
             event.setCancelled(true);
          }
+      }
+   }
+
+   /**
+    * Canne à pêche : elle tirait hors d'un territoire adverse ses animaux, ses villageois, ses supports d'armure, ses minecarts et les objets au sol.
+    * Les joueurs restent « pêchables » (c'est du combat).
+    */
+   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+   public void onFishEntity(org.bukkit.event.player.PlayerFishEvent event) {
+      Entity caught = event.getCaught();
+      if (event.getState() != org.bukkit.event.player.PlayerFishEvent.State.CAUGHT_ENTITY || caught == null || caught instanceof Player
+         || event.getPlayer().hasPermission("esicraft.admin")) {
+         return;
+      }
+
+      Guild guild = this.protectedGuildAt(ChunkKey.from(caught.getLocation().getChunk()));
+      if (guild != null && !guild.isMember(event.getPlayer().getUniqueId())) {
+         event.setCancelled(true);
+         event.getHook().remove();
+         ChatUtil.sendActionbar(event.getPlayer(), "&c❌ Territoire protégé : impossible d'en tirer quoi que ce soit à la canne à pêche.");
       }
    }
 

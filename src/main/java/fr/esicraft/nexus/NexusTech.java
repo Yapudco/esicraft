@@ -254,6 +254,10 @@ public class NexusTech implements Listener {
    // ------------------------------------------------------------------ sacrifice
 
    public void sacrifice(Player player, Guild guild) {
+      if (this.plugin.getCombatManager().denyItems(player)) {
+         return;
+      }
+
       Nexus nexus = guild.getNexus();
       if (nexus == null || !nexus.isAlive() || nexus.getLocation() == null) {
          ChatUtil.sendMessage(player, "&c❌ Votre guilde n'a pas de Nexus actif.");
@@ -485,6 +489,10 @@ public class NexusTech implements Listener {
    }
 
    private void tryUnlock(Player player, Guild guild, Node n) {
+      if (this.plugin.getCombatManager().denyItems(player)) {
+         return;
+      }
+
       Nexus nexus = guild.getNexus();
       if (nexus.hasTrap(n.type())) {
          ChatUtil.sendMessage(player, "&aCette défense est déjà débloquée.");

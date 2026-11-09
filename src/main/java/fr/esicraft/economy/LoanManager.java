@@ -85,7 +85,7 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    private record Proposal(String lenderId, String borrowerId, double amount, long expiresAt) {
    }
 
-   private static final class ChestHolder implements InventoryHolder {
+   private static final class ChestHolder implements InventoryHolder, fr.esicraft.util.StorageHolder {
       final String pair;
       Inventory inventory;
 

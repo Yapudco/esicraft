@@ -101,7 +101,7 @@ Le territoire se compte en **chunks** (carrés de 16 × 16 blocs). Avec `/guild 
 
 Sur les terres d'une autre guilde, tu ne peux **ni casser ni poser de blocs**, ni ouvrir ses coffres, fours, barils, shulkers ou entonnoirs.
 
-Y sont aussi interdits : la **TNT** (y compris en wagonnet), les **perles de l'Ender** et le **fruit de Chorus** pour s'y téléporter, les **cristaux de l'End**, les **pistons**, la **lave, l'eau et le feu** qui viennent de l'extérieur, la destruction de blocs par les Withers, Endermen et Ravageurs, et les **projectiles** sur les animaux, cadres et supports d'armure.
+Y sont aussi interdits : la **TNT** (y compris en wagonnet), les **perles de l'Ender** et le **fruit de Chorus** pour s'y téléporter, les **cristaux de l'End**, les **pistons**, la **lave, l'eau et le feu** qui viennent de l'extérieur, la destruction de blocs par les Withers, Endermen et Ravageurs, les **projectiles** sur les animaux, cadres et supports d'armure ou sur les blocs (pots décorés et leur contenu, fleurs de chorus, stalactites), et la **canne à pêche** pour tirer hors du territoire ses animaux, villageois, supports d'armure, wagonnets ou objets au sol.
 
 **Lave et eau** : un liquide ne passe jamais d'un territoire à un autre (même pendant un raid), les distributeurs ne peuvent pas en verser chez le voisin, et on ne peut pas vider un seau de **lave** à moins de 5 blocs d'un joueur qui n'est ni de sa guilde ni son allié.
 
@@ -179,7 +179,7 @@ Au lieu d'acheter des pièges jetables, les officiers **débloquent** les défen
 | 👁 Tir du Warden | 5 | Évocateur · **tuer un warden** · 8 éclats d'écho, 4 catalyseurs | Onde sonique : 10 dégâts et repoussée toutes les 15 s |
 | 🌊 Malédiction de l'Ancien | 6 | Gardien · **tuer un gardien ancien** · 128 briques de prismarine, 8 coquilles de nautile | Fatigue de minage III et dégâts à tous les ennemis proches toutes les 25 s |
 
-Tout débloquer rapporte le succès *Archi-technicien*. Les **hordes minuscules ne rapportent rien** : repousser une horde de moins de 12 monstres ne donne ni XP de Nexus, ni points de saison, ni succès. Pendant un raid, seuls les monstres de la horde et le TNT allumé par la guilde attaquante détruisent la base (pas un tiers). Le Nexus doit rester **atteignable** : on ne peut pas le poser sous plus de 3 blocs pleins de roche (le siège ne casse qu'à 4 blocs de lui). Réglages : `nexus.tech.*` (coût, dégâts, XP).
+Tout débloquer rapporte le succès *Archi-technicien*. Les **hordes minuscules ne rapportent rien** : repousser une horde de moins de 12 monstres ne donne ni XP de Nexus, ni points de saison, ni succès, ni prime de renfort (`/aide`) ; on ne peut pas parier dessus et elle ne compte pas pour la quête « Lancer 3 hordes » (`raids.min-mobs-for-rewards`). Pendant un raid, seuls les monstres de la horde et le TNT allumé par la guilde attaquante détruisent la base (pas un tiers). Le Nexus doit rester **atteignable** : on ne peut pas le poser sous plus de 3 blocs pleins de roche (le siège ne casse qu'à 4 blocs de lui). Réglages : `nexus.tech.*` (coût, dégâts, XP).
 
 ### 🚚 Déplacer le Nexus (`/nexus move`)
 
@@ -319,7 +319,7 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 - **Gérer son réseau** (`/rail`, officiers) : fixer son péage (**toutes les spécialisations jusqu'à 10 pièces, le Syndicat Marchand jusqu'à 100**), et pour chaque autre guilde choisir **Normale**, **Alliée** (gratuit) ou **Bannie** (les lignes qui passent chez vous lui sont coupées).
 - **📦 Train de fret** (Âge 2 minimum, officiers) : **Maj + clic** sur une destination du menu `/station` ouvre un **double coffre (54 emplacements)**. Fermez-le, puis cliquez sur **[+ COFFRE]** pour en charger un autre ou sur **[ENVOYER]** dans le chat (frais : tarif d'arrivée ×5 par coffre rempli). Le nombre de doubles coffres par convoi dépend de l'Âge de la guilde : **Âge 2 : 1 · Âge 3 : 2 · Âge 4 : 3 · Âge 5 : 5 · Âge 6 : 10** : un **wagonnet à coffre** part tout seul et suit le tracé des rails, **lentement** (**4 min** sous 1 000 blocs, **8 min** jusqu'à 3 000, **12 min** jusqu'à 5 000, **15 min** jusqu'à 10 000, **20 min** au-delà). Ce n'est pas un vrai wagonnet : sa position est calculée à partir de l'heure, il n'est visible que près des joueurs et survit aux redémarrages. À l'arrivée, les objets utiles à l'Âge suivant sont **donnés automatiquement** si la gare est à vous ; le reste est déposé dans la **boîte de la gare d'arrivée, ouverte à tous les joueurs présents** (`/station fret recuperer [numéro de coffre]`, jusqu'à 30 coffres) : le fret sert aussi d'**échange entre guildes** (la guilde de la gare est prévenue de l'arrivée). Deux convois par guilde au plus.
 - **🏹 Attaquer un convoi** : quand un convoi traverse le territoire d'une guilde **sans traité** avec l'expéditeur, ses membres le frappent (**25 coups**) pour le **piller** : le butin tombe sur les rails. Les deux guildes sont prévenues à chaque frontière franchie. Succès *Pilleur de convois* et *Roi du fret*.
-- **Construire une gare** : un officier pose un panneau avec `[Gare]` sur la 1re ligne et le nom de la gare sur la 2e, à moins de 2 blocs d'un rail. Il faut être à l'Âge 2, payer 500 pièces avec la banque, et pas plus de 6 gares par guilde.
+- **Construire une gare** : un officier pose un panneau avec `[Gare]` sur la 1re ligne et le nom de la gare sur la 2e, à moins de 2 blocs d'un rail. Il faut être à l'Âge 2, payer 500 pièces avec la banque (dans la limite du plafond quotidien des officiers), et pas plus de 6 gares par guilde.
 
 ---
 
@@ -330,7 +330,7 @@ Le réseau ferroviaire permet de **se téléporter de gare en gare**, à conditi
 | Événement | Durée | Ce qui se passe |
 | :--- | :--- | :--- |
 | 🌑 Lune de sang | 10 min | Plus de monstres, primes ×2 |
-| ☄ Pluie de météorites | 3 min | Des blocs de minerai tombent du ciel près des joueurs |
+| ☄ Pluie de météorites | 3 min | Des blocs de minerai tombent du ciel près des joueurs (sur le terrain naturel, jamais sur une construction) |
 | 🧙 Marché noir | 5 min | Un marchand propose 3 objets rares tirés au hasard, de **32 à 128 diamants** chacun. **Chaque offre est verrouillée après un seul achat** et chaque joueur ne peut acheter qu'**une seule chose** |
 | ☠ Boss mondial | 15 min | Un **boss différent chaque semaine** (voir ci-dessous) : 1 000 pièces partagées selon les dégâts (au moins 10 % des dégâts, 400 pièces max par joueur), et pour le meilleur 3 diamants + 20 % de chance d'une Étoile du Nether |
 
@@ -370,7 +370,7 @@ Le monde change de saison **toutes les deux semaines** (réglable) :
 
 ### 🆘 L'appel à l'aide (`/aide`)
 
-Pendant un raid ou une attaque de ton Nexus, `/aide` prévient tes **alliés** (alliance ou vassalité). Chaque allié qui rejoint tes terres avant la fin de la horde gagne **250 pièces** si elle est repoussée (6 alliés au plus). Un appel toutes les 10 minutes.
+Pendant un raid ou une attaque de ton Nexus, `/aide` prévient tes **alliés** (alliance ou vassalité). Chaque allié qui rejoint tes terres avant la fin de la horde gagne **250 pièces** (prises dans la banque de ta guilde) si elle est repoussée (6 alliés au plus), à condition que ce soit une vraie horde (au moins 12 monstres, deux victoires comptées par jour contre le même attaquant). Un appel toutes les 10 minutes.
 
 ### 🎭 Le déguisement (`/deguisement`)
 
@@ -408,7 +408,7 @@ Le menu `/cosmetique` a un onglet par emplacement ; les cosmétiques verrouillé
 
 ### ⚔ Combat PvP
 
-Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…) ou être frappé met « en combat » 15 secondes. Pendant ce temps : **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… sont bloqués**, les téléportations par commande aussi, et **se déconnecter est puni de mort** (kick compris ; seul l'arrêt du serveur est excusé). Dépenser ou transférer ses pièces est aussi impossible (achats, `/pay`, banque, métier, déguisement) ; seul le paiement d'une rançon reste permis.
+Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…) ou être frappé met « en combat » 15 secondes. Pendant ce temps : **`/hub`, `/station`, `/pay`, `/ah`, `/banque`, `/guild bank|home|leave`, `/home`, `/tpa`… sont bloqués**, les téléportations par commande aussi, et **se déconnecter est puni de mort** (kick compris ; seul l'arrêt du serveur est excusé). Dépenser ou transférer ses pièces est aussi impossible (achats, `/pay`, banque, métier, déguisement) ; seul le paiement d'une rançon reste permis. **Les coffres sont fermés** : impossible d'ouvrir un coffre, un tonneau, une boîte de shulker, un coffre de l'Ender, un wagonnet ou un âne à coffre (un coffre ouvert au moment du coup se referme), et impossible de donner des objets à l'Âge de sa guilde ou de les sacrifier au Nexus : le butin d'un joueur qui meurt revient à son tueur.
 
 ### 🏦 Banque de guilde : prêts et coffre commun (`/banque`)
 
@@ -441,7 +441,7 @@ Sans décision, il est exécuté. Se déconnecter en captivité équivaut à mou
 
 ### 🗡 Duels d'honneur et paris (`/duel`, `/pari`)
 
-- `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde (une plateforme par duel, 6 en même temps, construite seulement si la zone est vide) ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin ; ils combattent avec le **même équipement fourni** (armure en fer complète, épée et hache en fer, bouclier, arc, 16 flèches, 64 steaks, 1 potion de soin instantané) (même après un plantage, à la reconnexion).
+- `/duel <joueur> [mise]` provoque un joueur (mise en pièces optionnelle, `/duel accepter` ou `/duel refuser`). Les deux sont **téléportés dans une arène neutre** éclairée au-dessus du monde (une plateforme par duel, 6 en même temps, construite seulement si la zone est vide, **indestructible** et réparée avant chaque duel : casser le sol pour faire tomber l'adversaire n'est plus possible) ; leur **inventaire, leur vie et leur position sont sauvegardés** puis rendus à la fin ; ils combattent avec le **même équipement fourni** (armure en fer complète, épée et hache en fer, bouclier, arc, 16 flèches, 64 steaks, 1 potion de soin instantané) (même après un plantage, à la reconnexion).
 - **Personne ne meurt** : le coup décisif met fin au combat. Le vainqueur remporte la mise de l'adversaire. Un duel **ne déclenche ni rivalité, ni trahison, ni capture, ni marque de combat**, et n'est pas stoppé par la trêve. Maximum 5 minutes (match nul au-delà, mises rendues) ; abandonner = perdre.
 - `/pari <camp> <montant>` : au début d'un **raid** ou d'un **duel**, les **spectateurs** (hors des guildes concernées / hors duellistes) ont **2 minutes** pour parier (10 à 1 000 pièces **au total** par pari) sur la guilde `attaquante`/`defensive` (ou son nom) ou sur un duelliste. Le camp vainqueur se partage la cagnotte moins **5 %** prélevés par le serveur ; sans pari adverse, ou si le combat est annulé, tout est remboursé. **Anti-triche** : sont écartés les membres des guildes concernées **et celles qui leur sont liées par un traité**, tout joueur dont l'**adresse IP** est celle d'un participant en ligne, et les comptes de moins de 3 jours.
 
