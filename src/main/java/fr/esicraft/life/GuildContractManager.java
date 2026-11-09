@@ -182,7 +182,9 @@ public class GuildContractManager {
       }
 
       this.plugin.getDataManager().saveGuild(guild);
-      this.persist(guild.getId(), state);
+      String id = guild.getId();
+      state.dirty = true;
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.persist(id, state));
    }
 
    public String label(Part part) {
@@ -223,8 +225,14 @@ public class GuildContractManager {
          }
       }
 
-      this.plugin.getDataManager().getStorage().exec("DELETE FROM guild_contract WHERE day < ?;", java.time.LocalDate.now(java.time.ZoneId.of("Europe/Paris")).minusDays(3).toString());
+      String day = ContractManager.today();
+      if (!day.equals(this.lastPurge)) {
+         this.lastPurge = day;
+         this.plugin.getDataManager().getStorage().exec("DELETE FROM guild_contract WHERE day < ?;", java.time.LocalDate.now(java.time.ZoneId.of("Europe/Paris")).minusDays(3).toString());
+      }
    }
+
+   private volatile String lastPurge = "";
 
    public void clear() {
       this.days.clear();

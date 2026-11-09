@@ -214,8 +214,10 @@ Options possibles : des **sapeurs** qui font exploser les murs et assèchent l'e
 ### Si le Nexus tombe
 
 - Le **territoire** du perdant passe au gagnant (dans la limite de son Âge).
-- Toute la **banque** du perdant passe au gagnant.
+- Toute la **banque** du perdant passe au gagnant, avec ses **dettes et ses créances** (`/banque dettes`) ; si le perdant était coté en bourse, ses actionnaires sont d'abord remboursés.
+- Ses traités, gares et péages disparaissent.
 - Les membres du perdant choisissent : rejoindre le vainqueur (`/guild annex join`) ou partir (`/guild annex decline`).
+- La conquête ne rapporte des **points de saison** et le succès *Conquérant* que si la guilde vaincue était **établie** (au moins 2 membres et 3 jours d'existence).
 
 ### ⭐ Les guildes trop riches sont des cibles
 
@@ -353,7 +355,7 @@ Le **vendredi et le samedi à 21 h**, **une heure sans PvP** (coups, flèches, p
 
 ### Saisons
 
-Chaque mois, `/classement` classe les guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). La guilde championne gagne **5 000 pièces**, **500 par membre** et une couronne 👑 dans le tchat. `/histoire` raconte les derniers grands moments du serveur.
+Chaque mois, `/classement` classe les guildes (territoire, Âge, richesse, membres, raids repoussés, conquêtes). La guilde championne gagne **5 000 pièces**, **500 par membre présent depuis au moins 7 jours** (`season.member-min-days`) et une couronne 👑 dans le tchat. `/histoire` raconte les derniers grands moments du serveur.
 
 ### 🍂 Les saisons naturelles (`/climat`)
 
@@ -419,11 +421,11 @@ Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
 
 ### ❤ Réputation (`/merci <joueur>`)
 
-Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier la même personne **une fois par jour**, **5 personnes par jour au plus**, avec **60 secondes** entre deux remerciements ; un joueur ne peut en recevoir que **10 par jour**. Pas de remerciement entre membres d'une **même guilde** ni entre joueurs connectés depuis la **même adresse**, et le compte doit avoir **2 jours** (la réputation pèse sur le cours en bourse). Les opérateurs sont soumis aux mêmes limites. Les points s'affichent dans le **tab** (❤), sur le **profil du site** et dans le classement « Les plus honorables » de la page Joueurs. `/merci` seul montre ta réputation et le top 3.
+Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier la même personne **une fois par jour**, **5 personnes par jour au plus**, avec **60 secondes** entre deux remerciements ; un joueur ne peut en recevoir que **10 par jour**. Pas de remerciement entre membres d'une **même guilde** ni entre joueurs qui jouent (ou ont joué ces 30 derniers jours) depuis la **même connexion**, et le compte doit avoir **2 jours** (la réputation pèse sur le cours en bourse). Les opérateurs sont soumis aux mêmes limites. Les points s'affichent dans le **tab** (❤), sur le **profil du site** et dans le classement « Les plus honorables » de la page Joueurs. `/merci` seul montre ta réputation et le top 3.
 
 ### 🎓 Parrainage (`/parrain <joueur>`)
 
-Un joueur avancé (métier choisi, en guilde, 5 h de jeu) peut guider une **recrue** (arrivée depuis moins de 14 jours, 5 recrues au plus). La recrue accepte avec `/parrain accepter`. Le parrain est récompensé quand elle atteint des jalons : **premier métier** (+200 pièces, +50 pour la recrue) et **premier territoire** de sa guilde (+300, +100 pour la recrue). `/parrain` montre l'avancement.
+Un joueur avancé (métier choisi, en guilde, 5 h de jeu) peut guider une **recrue** (arrivée depuis moins de 14 jours, 5 recrues au plus). La recrue accepte avec `/parrain accepter`. Le parrain est récompensé quand elle atteint des jalons : **premier métier** (+200 pièces, +50 pour la recrue) et **premier territoire** de sa guilde (+300, +100 pour la recrue). Parrain et recrue ne doivent jamais avoir joué depuis la même connexion, même à des moments différents. `/parrain` montre l'avancement.
 
 ### ⛓ Rançon
 
@@ -456,7 +458,7 @@ Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 
 | 🎡 **Roulette** | Européenne (0 à 36) : rouge/noir, pair/impair, manque/passe ×2, douzaines ×3, numéro plein ×36 ; le 0 fait gagner la maison |
 | 🎰 **Machine à sous** | Trois rouleaux : 7-7-7 ×50, diamants ×20, cloches ×10, citrons ×6, cerises ×4 ; deux cerises ×1,5 ; une cerise ×0,5 |
 
-Les gains viennent de la banque de la taverne, les pertes y entrent. Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
+Les gains viennent de la banque de la taverne, les pertes y entrent. **La maison ne joue pas contre ses propres membres** : pile ou face, roulette et machine à sous sont réservés aux clients des autres guildes (le bar reste ouvert à tous). Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
 
 ### 📈 La bourse (`/bourse`)
 
@@ -471,7 +473,7 @@ Les gains viennent de la banque de la taverne, les pertes y entrent. Succès *Ta
 
 **Comment le cours bouge** : il se rapproche de la valeur fondamentale (15 % de l'écart à chaque mise à jour) avec un **bruit aléatoire** et l'**humeur générale du marché** (optimiste ou pessimiste, qui tire tous les cours dans le même sens). Des **chocs** immédiats suivent les événements : horde repoussée +2 %, siège gagné +4 % / perdu −4 %, siège repoussé +3 % / raté −3 %, boss terrassé +3 %, **Nexus détruit −35 %**. Enfin, **vos ordres comptent** : acheter 10 % du capital relève le cours de 8 %, vendre le fait baisser.
 
-**Acheter et vendre** : les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, 100 par joueur, 49 % du capital au plus) et les revendent à la guilde à 95 % du cours, **après 24 h de détention** et sans jamais gagner plus de 3 fois le prix payé. Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de ses capitaux propres) est versé aux actionnaires **au prorata de leurs parts**. `/bourse` affiche les cours (▲▼ sur 24 h), `/bourse portefeuille` vos actions ; la page **Bourse** du site montre cours, variation et mini-graphiques. Une guilde dissoute disparaît de la cote : ses actions ne valent plus rien. Succès *Actionnaire*. Tous les facteurs se règlent dans `bourse.*` (`bourse.weights.*`).
+**Acheter et vendre** : les joueurs **extérieurs** achètent des parts (`/bourse acheter <guilde> <parts>`, 100 par joueur, 49 % du capital au plus) et les revendent à la guilde à 95 % du cours, **après 24 h de détention** et sans jamais gagner plus de 3 fois le prix payé. Toutes les 6 heures, **20 % du bénéfice** de la guilde (hausse de ses capitaux propres) est réparti sur les 1 000 parts : les actionnaires touchent la part de leurs actions, la guilde garde celle des parts qu'elle n'a pas vendues. `/bourse` affiche les cours (▲▼ sur 24 h), `/bourse portefeuille` vos actions ; la page **Bourse** du site montre cours, variation et mini-graphiques. Une guilde **dissoute ou annexée** quitte la cote : avant de disparaître, sa banque **rachète les parts** du public, au plus au prix payé (et à la valeur de marché), au prorata si elle ne suffit pas. Succès *Actionnaire*. Tous les facteurs se règlent dans `bourse.*` (`bourse.weights.*`).
 
 ### ⚔ Guerres formelles : les sièges (`/siege`)
 

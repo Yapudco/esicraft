@@ -217,8 +217,10 @@ Options: **sappers** that blow up walls and dry out the water and lava around th
 ### If the Nexus falls
 
 - The loser's **land** goes to the winner (within the limit of the winner's Age).
-- The loser's whole **bank** goes to the winner.
+- The loser's whole **bank** goes to the winner, along with its **debts and loans owed to it** (`/banque dettes`); if the loser was listed on the exchange, its shareholders are paid back first.
+- Its treaties, stations and tolls disappear.
 - The loser's members choose: join the winner (`/guild annex join`) or leave (`/guild annex decline`).
+- A conquest only gives **season points** and the *Conqueror* achievement if the defeated guild was **established** (at least 2 members and 3 days old).
 
 ### ⭐ Guilds that get too rich become targets
 
@@ -356,7 +358,7 @@ On **Friday and Saturday at 9 pm**, **one hour with no PvP** (hits, arrows, harm
 
 ### Seasons
 
-Every month, `/classement` ranks the guilds (land, Age, wealth, members, raids repelled, conquests). The champion guild wins **5,000 coins**, **500 per member** and a 👑 crown in chat. `/histoire` tells the latest big moments on the server.
+Every month, `/classement` ranks the guilds (land, Age, wealth, members, raids repelled, conquests). The champion guild wins **5,000 coins**, **500 per member who has been in it for at least 7 days** (`season.member-min-days`) and a 👑 crown in chat. `/histoire` tells the latest big moments on the server.
 
 ### 🍂 Natural seasons (`/climat`)
 
@@ -422,11 +424,11 @@ Between two guilds **bound by a treaty** (alliance, pact or vassalage):
 
 ### ❤ Reputation (`/merci <player>`)
 
-Thank a helpful player: they gain **1 honor point**. You can thank the same person **once a day**, **5 people a day at most**, with **60 seconds** between two thanks; a player can only receive **10 a day**. No thanks between members of the **same guild** or between players connected from the **same address**, and the account must be **2 days** old (reputation weighs on share prices). Operators are subject to the same limits. Points show in the **tab list** (❤), on the **website profile** and in the "Most honorable" ranking on the Players page. `/merci` alone shows your reputation and the top 3.
+Thank a helpful player: they gain **1 honor point**. You can thank the same person **once a day**, **5 people a day at most**, with **60 seconds** between two thanks; a player can only receive **10 a day**. No thanks between members of the **same guild** or between players who play (or played in the last 30 days) from the **same connection**, and the account must be **2 days** old (reputation weighs on share prices). Operators are subject to the same limits. Points show in the **tab list** (❤), on the **website profile** and in the "Most honorable" ranking on the Players page. `/merci` alone shows your reputation and the top 3.
 
 ### 🎓 Mentoring (`/parrain <player>`)
 
-An advanced player (profession chosen, in a guild, 5 h played) can guide a **recruit** (joined less than 14 days ago, 5 recruits at most). The recruit accepts with `/parrain accepter`. The mentor is rewarded when the recruit reaches milestones: **first profession** (+200 coins, +50 for the recruit) and **first territory** of their guild (+300, +100 for the recruit). `/parrain` shows progress.
+An advanced player (profession chosen, in a guild, 5 h played) can guide a **recruit** (joined less than 14 days ago, 5 recruits at most). The recruit accepts with `/parrain accepter`. The mentor is rewarded when the recruit reaches milestones: **first profession** (+200 coins, +50 for the recruit) and **first territory** of their guild (+300, +100 for the recruit). Mentor and recruit must never have played from the same connection, even at different times. `/parrain` shows progress.
 
 ### ⛓ Ransom
 
@@ -459,7 +461,7 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 | 🎡 **Roulette** | European (0 to 36): red/black, even/odd, low/high ×2, dozens ×3, straight number ×36; 0 makes the house win |
 | 🎰 **Slot machine** | Three reels: 7-7-7 ×50, diamonds ×20, bells ×10, lemons ×6, cherries ×4; two cherries ×1.5; one cherry ×0.5 |
 
-Winnings come out of the tavern's bank, losses go into it. *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
+Winnings come out of the tavern's bank, losses go into it. **The house doesn't play against its own members**: coin flip, roulette and slot machine are only for customers from other guilds (the bar stays open to everyone). *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
 
 ### 📈 The stock exchange (`/bourse`)
 
@@ -474,7 +476,7 @@ From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1
 
 **How the price moves**: it drifts toward the fundamental value (15% of the gap at each update) with **random noise** and the **overall market mood** (optimistic or pessimistic, pulling every price the same way). Immediate **shocks** follow events: horde repelled +2%, siege won +4% / lost −4%, siege repelled +3% / failed −3%, boss slain +3%, **Nexus destroyed −35%**. And **your orders matter**: buying 10% of the capital lifts the price by 8%, selling lowers it.
 
-**Buying and selling**: **outside** players buy shares (`/bourse acheter <guild> <shares>`, 100 per player, 49% of the capital at most) and sell them back to the guild at 95% of the price, **after holding them 24 h** and never for more than 3 times what they paid. Every 6 hours, **20% of the guild's profit** (rise of its equity) is paid to shareholders **pro rata to their shares**. `/bourse` shows prices (▲▼ over 24 h), `/bourse portefeuille` your shares; the website's **Bourse** page shows prices, change and mini charts. A disbanded guild leaves the exchange: its shares become worthless. *Shareholder* achievement. Every factor is adjustable in `bourse.*` (`bourse.weights.*`).
+**Buying and selling**: **outside** players buy shares (`/bourse acheter <guild> <shares>`, 100 per player, 49% of the capital at most) and sell them back to the guild at 95% of the price, **after holding them 24 h** and never for more than 3 times what they paid. Every 6 hours, **20% of the guild's profit** (rise of its equity) is split over the 1,000 shares: shareholders get the part of the shares they hold, the guild keeps the part of the shares it hasn't sold. `/bourse` shows prices (▲▼ over 24 h), `/bourse portefeuille` your shares; the website's **Bourse** page shows prices, change and mini charts. A **disbanded or annexed** guild leaves the exchange: before it disappears, its bank **buys back** the public's shares, at most at the price paid (and at market value), pro rata if the bank isn't enough. *Shareholder* achievement. Every factor is adjustable in `bourse.*` (`bourse.weights.*`).
 
 ### ⚔ Formal wars: sieges (`/siege`)
 

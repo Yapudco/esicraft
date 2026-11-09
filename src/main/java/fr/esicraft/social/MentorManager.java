@@ -158,7 +158,8 @@ public class MentorManager implements CommandExecutor, TabCompleter {
          }
 
          Player mentorOnline = Bukkit.getPlayer(b.mentor);
-         if (mentorOnline != null && sameAddress(mentorOnline, recruit)) {
+         // Parrain hors ligne : son adresse est retrouvée dans le carnet (un double compte se déconnectait pour toucher les jalons).
+         if (mentorOnline != null && sameAddress(mentorOnline, recruit) || this.plugin.getAddresses().linked(b.mentor, b.recruit)) {
             continue;
          }
 
@@ -270,7 +271,7 @@ public class MentorManager implements CommandExecutor, TabCompleter {
          return;
       }
 
-      if (sameAddress(mentor, recruit)) {
+      if (sameAddress(mentor, recruit) || this.plugin.getAddresses().linked(mentor.getUniqueId(), recruit.getUniqueId())) {
          ChatUtil.sendMessage(mentor, "&c❌ Le parrain et la recrue ne peuvent pas jouer depuis la même connexion.");
          return;
       }

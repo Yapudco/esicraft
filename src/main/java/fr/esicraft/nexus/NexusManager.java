@@ -709,7 +709,12 @@ public class NexusManager {
       this.plugin.getHelpCalls().cancel(guild.getId());
       this.plugin.getChronicle().raid(victorGuild != null ? victorGuild.getId() : null, guild.getId(), "destroyed");
       if (victorGuild != null && !victorGuild.getId().equals(guild.getId())) {
-         this.plugin.getSeasonManager().recordConquest(victorGuild, guild);
+         // Une conquête ne compte pour la saison (150 points) et le succès que si la guilde vaincue était établie : détruire le Nexus d'une guilde
+         // jetable fondée par un complice (ou par soi-même sur un second compte) ne rapporte plus rien.
+         if (this.plugin.getGuildManager().isEstablished(guild)) {
+            this.plugin.getSeasonManager().recordConquest(victorGuild, guild);
+         }
+
          this.plugin.getGuildManager().registerAnnexation(guild, victorGuild);
       } else {
          guild.setVulnerableUntil(System.currentTimeMillis() + 1800000L);

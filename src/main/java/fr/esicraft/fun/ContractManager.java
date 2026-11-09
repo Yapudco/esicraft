@@ -178,6 +178,7 @@ public class ContractManager {
       PlayerData data = this.plugin.getDataManager().getPlayerData(player.getUniqueId());
       if (data != null) {
          data.addCoins(contract.reward());
+         this.plugin.getDataManager().savePlayer(data);
       }
 
       ChatUtil.sendMessage(player, "&a✔ Contrat accompli : &f" + contract.type().describe(contract.target()) + " &8» &6+" + String.format("%.0f", contract.reward()) + " pièces");
@@ -186,6 +187,7 @@ public class ContractManager {
       if (state.completedCount() == CONTRACTS_PER_DAY) {
          if (data != null) {
             data.addCoins(ALL_DONE_BONUS);
+            this.plugin.getDataManager().savePlayer(data);
          }
 
          ChatUtil.sendMessage(player, "&6&l★ Tous les contrats du jour sont accomplis ! &e+" + String.format("%.0f", ALL_DONE_BONUS) + " pièces de bonus.");
@@ -193,8 +195,13 @@ public class ContractManager {
          ChatUtil.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
       }
 
-      this.persist(player.getUniqueId(), state);
+      // Écriture en tâche de fond : trois requêtes SQL sur le thread principal à chaque contrat accompli faisaient de petits à-coups.
+      UUID uuid = player.getUniqueId();
+      state.dirty = true;
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.persist(uuid, state));
    }
+
+   private volatile String lastPurge = "";
 
    private void persist(UUID uuid, DayState state) {
       state.dirty = false;
@@ -214,8 +221,12 @@ public class ContractManager {
          }
       }
 
-      // Purge des anciens contrats (plus de 3 jours) pour garder la base légère.
-      this.plugin.getDataManager().getStorage().exec("DELETE FROM contract_progress WHERE day < ?;", LocalDate.now(ZONE).minusDays(3).toString());
+      // Purge des anciens contrats (plus de 3 jours) pour garder la base légère : une fois par jour suffit (avant : toutes les 30 s).
+      String day = today();
+      if (!day.equals(this.lastPurge)) {
+         this.lastPurge = day;
+         this.plugin.getDataManager().getStorage().exec("DELETE FROM contract_progress WHERE day < ?;", LocalDate.now(ZONE).minusDays(3).toString());
+      }
    }
 
    public void onQuit(UUID uuid) {

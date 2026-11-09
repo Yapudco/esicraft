@@ -47,6 +47,8 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       /** Prix payé au total par chaque actionnaire pour ses parts, et date de son dernier achat. */
       final Map<UUID, Double> costs = new ConcurrentHashMap<>();
       final Map<UUID, Long> since = new ConcurrentHashMap<>();
+      /** Historique des cours (horodatage, prix) des 3 derniers jours, gardé en mémoire : plus de requête SQL sur le thread principal. */
+      final java.util.ArrayDeque<double[]> history = new java.util.ArrayDeque<>();
 
       Listing(String guildId, int total, int treasury, double snapshot, long lastDividend) {
          this.guildId = guildId;
@@ -95,6 +97,13 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       db.exec("CREATE TABLE IF NOT EXISTS stock_market (guild_id VARCHAR(64) PRIMARY KEY, price REAL);");
       db.exec("CREATE TABLE IF NOT EXISTS stock_history (guild_id VARCHAR(64), ts BIGINT, price REAL);");
       db.exec("CREATE INDEX IF NOT EXISTS idx_stock_history ON stock_history (guild_id, ts);");
+      for (Object[] row : db.select("SELECT guild_id, ts, price FROM stock_history WHERE ts >= ? ORDER BY ts ASC;", 3, System.currentTimeMillis() - HISTORY_MS)) {
+         Listing l = this.listings.get(String.valueOf(row[0]));
+         if (l != null) {
+            l.history.addLast(new double[]{((Number)row[1]).doubleValue(), ((Number)row[2]).doubleValue()});
+         }
+      }
+
       java.util.Set<String> priced = new java.util.HashSet<>();
       for (Object[] row : db.select("SELECT guild_id, price FROM stock_market;", 2)) {
          Listing l = this.listings.get(String.valueOf(row[0]));
@@ -167,6 +176,8 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       return new Fund(equity, age, members, chunks, avgRep, season, tech, defenses, pct, diversity, ageMult, repMult, healthMult, debtMult, cap, perShare);
    }
 
+   private static final long HISTORY_MS = 3L * 86400000L;
+
    private double minPrice() {
       return Math.max(1.0, this.plugin.getConfig().getDouble("bourse.min-price", 1.0));
    }
@@ -198,15 +209,28 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          String id = l.guildId;
          this.async(() -> {
             db.exec("INSERT INTO stock_history (guild_id, ts, price) VALUES (?, ?, ?);", id, now, price);
-            db.exec("DELETE FROM stock_history WHERE guild_id = ? AND ts < ?;", id, now - 3L * 86400000L);
+            db.exec("DELETE FROM stock_history WHERE guild_id = ? AND ts < ?;", id, now - HISTORY_MS);
          });
          this.savePrice(l);
-         var rows = db.select("SELECT price FROM stock_history WHERE guild_id = ? AND ts <= ? ORDER BY ts DESC LIMIT 1;", 1, id, now - 86400000L);
-         if (rows.isEmpty()) {
-            rows = db.select("SELECT price FROM stock_history WHERE guild_id = ? ORDER BY ts ASC LIMIT 1;", 1, id);
+         double ref = price;
+         synchronized (l.history) {
+            l.history.addLast(new double[]{now, price});
+            while (!l.history.isEmpty() && l.history.peekFirst()[0] < now - HISTORY_MS) {
+               l.history.pollFirst();
+            }
+
+            // Cours d'il y a 24 h (ou, à défaut, le plus ancien connu).
+            boolean first = true;
+            for (double[] h : l.history) {
+               if (!first && h[0] > now - 86400000L) {
+                  break;
+               }
+
+               ref = h[1];
+               first = false;
+            }
          }
 
-         double ref = rows.isEmpty() ? price : ((Number)rows.get(0)[0]).doubleValue();
          l.change24 = ref <= 0.0 ? 0.0 : (price - ref) / ref;
       }
    }
@@ -235,7 +259,6 @@ public class BourseManager implements CommandExecutor, TabCompleter {
    /** Cotes actuelles (copie pour le site et les commandes). */
    public List<Quote> quotes() {
       List<Quote> out = new ArrayList<>();
-      var db = this.plugin.getDataManager().getStorage();
       for (Listing l : this.listings.values()) {
          Guild g = this.plugin.getGuildManager().getGuildById(l.guildId);
          if (g == null) {
@@ -243,8 +266,13 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          }
 
          List<Double> spark = new ArrayList<>();
-         for (Object[] r : db.select("SELECT price FROM stock_history WHERE guild_id = ? ORDER BY ts DESC LIMIT 36;", 1, l.guildId)) {
-            spark.add(0, ((Number)r[0]).doubleValue());
+         synchronized (l.history) {
+            int skip = Math.max(0, l.history.size() - 36);
+            for (double[] h : l.history) {
+               if (skip-- <= 0) {
+                  spark.add(h[1]);
+               }
+            }
          }
 
          out.add(new Quote(l.guildId, g.getName(), l.price, l.change24, l.treasury, l.total, l.holders.size(), l.fund, spark));
@@ -295,6 +323,44 @@ public class BourseManager implements CommandExecutor, TabCompleter {
       return l.price;
    }
 
+   /**
+    * Dissolution ou annexion d'une guilde cotée : avant de disparaître, sa banque rachète les parts du public au plus à leur prix d'achat (et au plus à
+    * leur valeur de marché), au prorata si elle ne suffit pas. Avant, dissoudre la guilde effaçait simplement les actions : on levait des fonds puis on
+    * dissolvait pour ruiner les actionnaires.
+    */
+   public void liquidate(Guild g) {
+      Listing l = g == null ? null : this.listings.get(g.getId());
+      if (l == null) {
+         return;
+      }
+
+      double ratio = Math.max(0.1, Math.min(1.0, this.plugin.getConfig().getDouble("bourse.buyback-ratio", 0.95)));
+      Map<UUID, Double> dues = new java.util.HashMap<>();
+      double total = 0.0;
+      for (Map.Entry<UUID, Integer> h : l.holders.entrySet()) {
+         double due = Math.floor(Math.min(l.costs.getOrDefault(h.getKey(), 0.0), l.price * h.getValue() * ratio));
+         if (due > 0.0) {
+            dues.put(h.getKey(), due);
+            total += due;
+         }
+      }
+
+      double share = total <= 0.0 ? 0.0 : Math.min(1.0, Math.floor(g.getBankBalance()) / total);
+      for (Map.Entry<UUID, Double> d : dues.entrySet()) {
+         double pay = Math.floor(d.getValue() * share);
+         if (pay > 0.0 && g.withdrawBank(pay)) {
+            this.plugin.getDataManager().creditPlayer(d.getKey(), pay);
+            Player p = Bukkit.getPlayer(d.getKey());
+            if (p != null) {
+               ChatUtil.sendMessage(p, "&6📉 &e" + g.getName() + " &6quitte la bourse : vos parts vous sont rachetées &a" + (long)pay + " pièces&6.");
+            }
+         }
+      }
+
+      // Pas de saveGuild ici : la guilde est en cours de suppression (une sauvegarde après deleteGuild la ferait renaître en base).
+      this.onGuildDisbanded(g.getId());
+   }
+
    /** Une guilde dissoute disparaît de la cote (ses actions ne valent plus rien). */
    public void onGuildDisbanded(String guildId) {
       if (this.listings.remove(guildId) != null) {
@@ -328,21 +394,30 @@ public class BourseManager implements CommandExecutor, TabCompleter {
          int outstanding = l.outstanding();
          if (profit > 0.0 && outstanding > 0) {
             double pool = Math.floor(profit * percent);
-            if (pool > 0.0 && g.withdrawBank(pool)) {
-               double perShare = pool / l.total;
-               for (Map.Entry<UUID, Integer> h : l.holders.entrySet()) {
-                  double due = Math.floor(perShare * h.getValue());
-                  if (due > 0.0) {
-                     this.plugin.getDataManager().creditPlayer(h.getKey(), due);
-                     Player p = Bukkit.getPlayer(h.getKey());
-                     if (p != null) {
-                        ChatUtil.sendMessage(p, "&6📈 Dividende de &e" + g.getName() + " &6: &a+" + (long)due + " pièces &7pour vos " + h.getValue() + " part(s).");
-                     }
+            double perShare = pool / Math.max(1, l.total);
+            // Seule la part des actions détenues par le public est versée (et retirée de la banque) : avant, toute l'enveloppe quittait la banque
+            // alors que les parts encore en trésorerie ne touchaient rien, et la différence disparaissait.
+            Map<UUID, Double> dues = new java.util.HashMap<>();
+            double paid = 0.0;
+            for (Map.Entry<UUID, Integer> h : l.holders.entrySet()) {
+               double due = Math.floor(perShare * h.getValue());
+               if (due > 0.0) {
+                  dues.put(h.getKey(), due);
+                  paid += due;
+               }
+            }
+
+            if (paid > 0.0 && g.withdrawBank(paid)) {
+               for (Map.Entry<UUID, Double> d : dues.entrySet()) {
+                  this.plugin.getDataManager().creditPlayer(d.getKey(), d.getValue());
+                  Player p = Bukkit.getPlayer(d.getKey());
+                  if (p != null) {
+                     ChatUtil.sendMessage(p, "&6📈 Dividende de &e" + g.getName() + " &6: &a+" + d.getValue().longValue() + " pièces &7pour vos " + l.holders.getOrDefault(d.getKey(), 0) + " part(s).");
                   }
                }
 
                this.plugin.getDataManager().saveGuild(g);
-               ChatUtil.broadcastGuild(g, "&6📈 Dividendes versés à vos actionnaires : &e" + (long)pool + " pièces &6(bénéfice de la période : " + (long)profit + ").");
+               ChatUtil.broadcastGuild(g, "&6📈 Dividendes versés à vos actionnaires : &e" + (long)paid + " pièces &6(bénéfice de la période : " + (long)profit + ").");
             }
          }
 
