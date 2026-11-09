@@ -33,13 +33,6 @@ public class PlayerKillEconomyListener implements Listener {
          Guild victimGuild = this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId());
          Guild killerGuild = this.plugin.getGuildManager().getGuildByPlayer(killer.getUniqueId());
          if (victimGuild == null || killerGuild == null || !victimGuild.getId().equals(killerGuild.getId())) {
-            this.plugin.getAchievements().addStat(killer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_KILLS, 1L);
-            this.plugin.getAchievements().addStat(victim.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_DEATHS, 1L);
-            if (victimGuild != null && killerGuild != null) {
-               this.plugin.getAchievements().grant(killer.getUniqueId(), fr.esicraft.life.Achievement.DUELIST);
-               this.plugin.getChronicle().pvpKill(killerGuild.getId(), victimGuild.getId());
-            }
-
             UUID u1 = killer.getUniqueId();
             UUID u2 = victim.getUniqueId();
             String pairKey = u1.compareTo(u2) < 0 ? u1 + ":" + u2 : u2 + ":" + u1;
@@ -49,10 +42,21 @@ public class PlayerKillEconomyListener implements Listener {
             }
 
             Long lastKill = this.lastPvPKillTimes.get(pairKey);
-            if (lastKill != null && now - lastKill < 120000L && !this.plugin.bypassCooldowns(killer)) {
-               ChatUtil.sendMessage(killer, "&c⚠️ Anti-Farm : Vous avez combattu &e" + victim.getName() + " &ctrop récemment pour obtenir une nouvelle prime.");
+            // Un second compte (même connexion) tué en boucle ne compte plus : les statistiques débloquaient succès, cosmétiques de victoire
+            // (5, 25, 100 joueurs tués) et rivalités du site.
+            boolean linked = this.plugin.getAddresses().linked(u1, u2);
+            if (linked || lastKill != null && now - lastKill < 120000L && !this.plugin.bypassCooldowns(killer)) {
+               ChatUtil.sendMessage(killer, linked ? "&c⚠️ Anti-Farm : &e" + victim.getName() + " &cjoue depuis votre connexion : aucune prime ni statistique."
+                  : "&c⚠️ Anti-Farm : Vous avez combattu &e" + victim.getName() + " &ctrop récemment pour obtenir une nouvelle prime.");
             } else {
                this.lastPvPKillTimes.put(pairKey, now);
+               this.plugin.getAchievements().addStat(killer.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_KILLS, 1L);
+               this.plugin.getAchievements().addStat(victim.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_PVP_DEATHS, 1L);
+               if (victimGuild != null && killerGuild != null) {
+                  this.plugin.getAchievements().grant(killer.getUniqueId(), fr.esicraft.life.Achievement.DUELIST);
+                  this.plugin.getChronicle().pvpKill(killerGuild.getId(), victimGuild.getId());
+               }
+
                PlayerData victimData = this.plugin.getDataManager().getPlayerData(victim.getUniqueId());
                PlayerData killerData = this.plugin.getDataManager().getPlayerData(killer.getUniqueId());
                if (victimData != null && killerData != null) {

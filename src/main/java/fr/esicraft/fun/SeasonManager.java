@@ -185,12 +185,18 @@ public class SeasonManager {
          "INSERT INTO kv (k, v) VALUES ('season_champion', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", winner.getId());
       winner.depositBank(CHAMPION_BANK_REWARD);
       this.plugin.getDataManager().saveGuild(winner);
+      // Prime réservée aux membres présents depuis au moins 7 jours (season.member-min-days) : remplir la guilde en tête de recrues de dernière
+      // minute (ou de seconds comptes) juste avant la fin du mois créait 500 pièces par recrue.
+      long minMs = this.plugin.getConfig().getLong("season.member-min-days", 7L) * 86400000L;
+      long nowMs = System.currentTimeMillis();
       for (UUID member : winner.getMembers().keySet()) {
-         this.plugin.getDataManager().creditPlayer(member, CHAMPION_MEMBER_REWARD);
+         if (nowMs - this.plugin.getGuildManager().memberSince(member) >= minMs) {
+            this.plugin.getDataManager().creditPlayer(member, CHAMPION_MEMBER_REWARD);
+         }
       }
 
       ChatUtil.broadcast("&6&l👑 FIN DE SAISON " + endedSeason + " ! &eLa guilde &6&l" + winner.getName() + " &eest sacrée championne avec &f" + ranking.get(0).score() + " points &e!");
-      ChatUtil.broadcast("&7Récompense : &6" + String.format("%.0f", CHAMPION_BANK_REWARD) + " pièces en banque de guilde &7et &6" + String.format("%.0f", CHAMPION_MEMBER_REWARD) + " pièces &7par membre. Une nouvelle saison commence !");
+      ChatUtil.broadcast("&7Récompense : &6" + String.format("%.0f", CHAMPION_BANK_REWARD) + " pièces en banque de guilde &7et &6" + String.format("%.0f", CHAMPION_MEMBER_REWARD) + " pièces &7par membre présent depuis au moins " + (minMs / 86400000L) + " jours. Une nouvelle saison commence !");
       this.addHistory(fr.esicraft.life.Chronicle.Kind.SEASON, "👑 " + winner.getName() + " remporte la saison " + endedSeason + ".", winner.getId(), null);
       this.plugin.getAchievements().grantGuild(winner, fr.esicraft.life.Achievement.CHAMPION, false);
       this.stats.clear();

@@ -118,6 +118,7 @@ public class GuildManager {
                   data.setGuildId(guildId);
                   data.setGuildRole(GuildRole.LEADER);
                   this.registerGuild(guild);
+                  this.markJoined(player.getUniqueId());
                   this.plugin.getDataManager().saveGuild(guild);
                   this.plugin.getDataManager().savePlayer(data);
                   this.updatePlayerTab(player);
@@ -145,6 +146,17 @@ public class GuildManager {
       this.chunkClaims.clear();
       this.playerGuildMap.clear();
       this.pendingInvites.clear();
+   }
+
+   /** Guilde « établie » : au moins 2 membres et 3 jours d'existence (guilds.established-*). Une guilde jetable ne rapporte ni points ni succès. */
+   public boolean isEstablished(Guild guild) {
+      if (guild == null) {
+         return false;
+      }
+
+      long minAge = this.plugin.getConfig().getLong("guilds.established-days", 3L) * 86400000L;
+      return guild.getMembers().size() >= Math.max(1, this.plugin.getConfig().getInt("guilds.established-members", 2))
+         && System.currentTimeMillis() - guild.getCreatedAt() >= minAge;
    }
 
    /** Vérifie qu'un joueur peut dissoudre sa guilde (pas en plein raid / attaque de Nexus). */
@@ -196,7 +208,7 @@ public class GuildManager {
          this.guildsById.remove(guild.getId());
          this.guildsByName.remove(guild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(guild.getId());
-         this.plugin.getBourse().onGuildDisbanded(guild.getId());
+         this.plugin.getBourse().liquidate(guild);
          this.plugin.getTreatyManager().purgeGuild(guild.getId());
          this.plugin.getRailManager().purgeGuild(guild.getId());
          this.plugin.getNexusTech().onGuildDisbanded(guild.getId());
@@ -1013,6 +1025,7 @@ public class GuildManager {
                   data.setHasJoinedGuildBefore(true);
                   guild.addMember(player.getUniqueId(), GuildRole.RECRUIT);
                   this.playerGuildMap.put(player.getUniqueId(), guild.getId());
+                  this.markJoined(player.getUniqueId());
                   if (!guild.isHistoricalMember(player.getUniqueId())) {
                      guild.addHistoricalMember(player.getUniqueId());
                      long hours = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 72000L;
@@ -1053,6 +1066,8 @@ public class GuildManager {
             }
          }
 
+         this.plugin.getBourse().liquidate(defeatedGuild);
+         this.plugin.getLoans().inherit(defeatedGuild.getId(), victorGuild.getId());
          double transferredBank = defeatedGuild.getBankBalance();
          if (transferredBank > 0.0) {
             victorGuild.depositBank(transferredBank);
@@ -1094,6 +1109,14 @@ public class GuildManager {
          this.guildsByName.remove(defeatedGuild.getName().toLowerCase());
          this.plugin.getDataManager().deleteGuild(defeatedGuild.getId());
          this.plugin.getDataManager().saveGuild(victorGuild);
+         // Comme pour une dissolution : traités, gares, péages et arbre du Nexus de la guilde vaincue disparaissent (sinon guilde fantôme).
+         this.plugin.getTreatyManager().purgeGuild(defeatedGuild.getId());
+         this.plugin.getRailManager().purgeGuild(defeatedGuild.getId());
+         this.plugin.getNexusTech().onGuildDisbanded(defeatedGuild.getId());
+         if (this.plugin.getWebServer() != null) {
+            this.plugin.getWebServer().refreshNow();
+         }
+
          this.updateAllPlayerTabs();
          ChatUtil.broadcast(
             "&4&l⚔️ [ANNEXION] &eLa guilde &6"
@@ -1144,6 +1167,7 @@ public class GuildManager {
                   pData.setGuildRole(GuildRole.MEMBER);
                   victorGuild.addMember(player.getUniqueId(), GuildRole.MEMBER);
                   this.playerGuildMap.put(player.getUniqueId(), victorGuild.getId());
+                  this.markJoined(player.getUniqueId());
                   if (!victorGuild.isHistoricalMember(player.getUniqueId())) {
                      victorGuild.addHistoricalMember(player.getUniqueId());
                      victorGuild.setCanChangeSpecialization(true);
@@ -1242,8 +1266,30 @@ public class GuildManager {
    private final java.util.Map<String, Boolean> hegemonyCache = new java.util.concurrent.ConcurrentHashMap<>();
    private final java.util.Map<String, Long> specChangedAt = new java.util.concurrent.ConcurrentHashMap<>();
 
+   private final java.util.Map<UUID, Long> joinedAt = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /** Note la date d'arrivée d'un joueur dans sa guilde (récompenses de fin de saison réservées aux membres installés). */
+   public void markJoined(UUID uuid) {
+      long now = System.currentTimeMillis();
+      this.joinedAt.put(uuid, now);
+      Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+         "INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", "gjoin:" + uuid, String.valueOf(now)));
+   }
+
+   /** Date d'arrivée dans la guilde actuelle (0 si elle est antérieure au suivi). */
+   public long memberSince(UUID uuid) {
+      return this.joinedAt.getOrDefault(uuid, 0L);
+   }
+
    /** À appeler au démarrage : charge les délais de spécialisation et lance le recalcul périodique (asynchrone) de l'hégémonie. */
    public void initCaches() {
+      for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'gjoin:%';", 2)) {
+         try {
+            this.joinedAt.put(UUID.fromString(((String)row[0]).substring(6)), Long.parseLong((String)row[1]));
+         } catch (IllegalArgumentException ignored) {
+         }
+      }
+
       for (Object[] row : this.plugin.getDataManager().getStorage().select("SELECT k, v FROM kv WHERE k LIKE 'speccd:%';", 2)) {
          try {
             this.specChangedAt.put(((String)row[0]).substring(7), Long.parseLong((String)row[1]));

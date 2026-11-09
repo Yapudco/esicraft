@@ -509,7 +509,9 @@ public class DuelManager implements CommandExecutor, TabCompleter, Listener {
 
          this.plugin.getBetting().settleDuel(duel.id, winner.equals(duel.a) ? 0 : 1);
          ChatUtil.broadcast("&6⚔ &e" + winner.getName() + " &6remporte son duel d'honneur contre &e" + loser.getName() + (duel.stake > 0 ? " &7et empoche &6" + (long)(duel.stake * 2) + " pièces" : "") + " &7(" + reason + ") !");
-         if (this.plugin.getAchievements().addStat(winner.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_DUELS, 1L) >= 10L) {
+         // Un duel gagné contre son propre second compte (même connexion) ne compte pas pour le succès « Maître duelliste ».
+         if (!this.plugin.getAddresses().linked(winner.getUniqueId(), loser.getUniqueId())
+            && this.plugin.getAchievements().addStat(winner.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_DUELS, 1L) >= 10L) {
             this.plugin.getAchievements().grant(winner.getUniqueId(), fr.esicraft.life.Achievement.DUEL_MASTER);
          }
       }

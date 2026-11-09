@@ -157,8 +157,9 @@ public class ReputationManager implements CommandExecutor, TabCompleter {
       }
 
       Player online0 = target.getPlayer();
-      if (online0 != null && player.getAddress() != null && online0.getAddress() != null && player.getAddress().getAddress().equals(online0.getAddress().getAddress())) {
-         ChatUtil.sendMessage(player, "&c❌ Vous ne pouvez pas remercier un joueur connecté depuis la même adresse que vous.");
+      if (online0 != null && player.getAddress() != null && online0.getAddress() != null && player.getAddress().getAddress().equals(online0.getAddress().getAddress())
+         || this.plugin.getAddresses().linked(giver, receiver)) {
+         ChatUtil.sendMessage(player, "&c❌ Vous ne pouvez pas remercier un joueur qui joue (ou a joué récemment) depuis la même connexion que vous.");
          return true;
       }
 

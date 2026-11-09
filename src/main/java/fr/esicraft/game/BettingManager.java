@@ -117,7 +117,7 @@ public class BettingManager implements CommandExecutor, TabCompleter {
 
       String ip = ipOf(bettor);
       for (Player p : people.get()) {
-         if (p.equals(bettor) || ip != null && ip.equals(ipOf(p))) {
+         if (p.equals(bettor) || ip != null && ip.equals(ipOf(p)) || this.plugin.getAddresses().linked(bettor.getUniqueId(), p.getUniqueId())) {
             return true;
          }
       }

@@ -30,6 +30,7 @@ public class PlayerConnectionListener implements Listener {
       if (event.getLoginResult() == Result.ALLOWED) {
          java.util.UUID uuid = event.getUniqueId();
          this.plugin.getDataManager().preloadPlayer(uuid, event.getName());
+         this.plugin.getAddresses().record(uuid, event.getAddress());
          org.bukkit.Bukkit.getScheduler().runTaskLater(this.plugin, () -> this.plugin.getDataManager().discardPreloaded(uuid), 600L);
       }
    }

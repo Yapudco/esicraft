@@ -272,6 +272,45 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          l.id, l.lenderId, l.borrowerId, l.principal, l.owed, l.createdAt, l.dueAt, l.status, l.lastSeizure));
    }
 
+   /**
+    * Annexion : le vainqueur hérite de la trésorerie de la guilde vaincue, donc aussi de ses dettes et de ses créances. Avant, l'annexion effaçait la
+    * dette (prêt marqué remboursé) : une guilde endettée se faisait « conquérir » par une guilde complice pour emporter le prêt sans jamais le rendre.
+    */
+   public void inherit(String fromId, String toId) {
+      if (fromId == null || toId == null || fromId.equals(toId)) {
+         return;
+      }
+
+      this.proposals.removeIf(p -> p.lenderId().equals(fromId) || p.borrowerId().equals(fromId));
+      for (Loan l : new ArrayList<>(this.loans.values())) {
+         boolean asBorrower = l.borrowerId.equals(fromId);
+         boolean asLender = l.lenderId.equals(fromId);
+         if (!asBorrower && !asLender) {
+            continue;
+         }
+
+         String lender = asLender ? toId : l.lenderId;
+         String borrower = asBorrower ? toId : l.borrowerId;
+         if (lender.equals(borrower)) {
+            // Le vainqueur était l'autre partie : la conquête solde la dette.
+            this.loans.remove(l.id);
+            l.status = REPAID;
+            this.persist(l);
+            continue;
+         }
+
+         Loan moved = new Loan(l.id, lender, borrower, l.principal, l.owed, l.createdAt, l.dueAt, l.status, l.lastSeizure);
+         this.loans.put(l.id, moved);
+         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> this.plugin.getDataManager().getStorage().exec(
+            "UPDATE loans SET lender = ?, borrower = ? WHERE id = ?;", lender, borrower, moved.id));
+         Guild heir = this.plugin.getGuildManager().getGuildById(toId);
+         if (heir != null) {
+            ChatUtil.broadcastGuild(heir, asBorrower ? "&e⚖ Vous héritez de la dette de la guilde annexée : &6" + money(moved.owed) + " pièces &e(&e/banque dettes&e)."
+               : "&a⚖ Vous héritez d'une créance de la guilde annexée : &6" + money(moved.owed) + " pièces &aà recevoir.");
+         }
+      }
+   }
+
    private void tick() {
       this.proposals.removeIf(p -> p.expiresAt() <= System.currentTimeMillis());
       long now = System.currentTimeMillis();
@@ -398,6 +437,9 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       double amount;
       try {
          amount = Math.floor(Double.parseDouble(args.length > 2 ? args[2] : ""));
+         if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+            throw new NumberFormatException();
+         }
       } catch (NumberFormatException e) {
          ChatUtil.sendMessage(p, "&cUsage : &e/banque pret <guilde> <montant>");
          return;

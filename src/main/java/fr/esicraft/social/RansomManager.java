@@ -580,7 +580,8 @@ public class RansomManager implements Listener, CommandExecutor, TabCompleter {
             double max = this.plugin.getConfig().getDouble("ransom.max", 2000.0);
             try {
                double value = Double.parseDouble(args.length > 1 ? args[1] : "");
-               if (value < min || value > max) {
+               // « NaN » passait les deux comparaisons : la rançon devenait impayable et le captif restait bloqué.
+               if (Double.isNaN(value) || value < min || value > max) {
                   ChatUtil.sendMessage(player, "&c❌ La rançon doit être entre &e" + (int)min + " &cet &e" + (int)max + "&c.");
                   return true;
                }

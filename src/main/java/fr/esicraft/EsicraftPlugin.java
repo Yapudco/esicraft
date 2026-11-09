@@ -111,6 +111,7 @@ public final class EsicraftPlugin extends JavaPlugin {
    private LoanManager loans;
    private ReputationManager reputation;
    private MentorManager mentors;
+   private fr.esicraft.util.AddressBook addresses;
    private RansomManager ransom;
    private fr.esicraft.game.CourtManager court;
    private fr.esicraft.game.TruceManager truce;
@@ -157,6 +158,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.loans = new LoanManager(this);
       this.reputation = new ReputationManager(this);
       this.mentors = new MentorManager(this);
+      this.addresses = new fr.esicraft.util.AddressBook(this);
       this.ransom = new RansomManager(this);
       this.court = new fr.esicraft.game.CourtManager(this);
       this.truce = new fr.esicraft.game.TruceManager(this);
@@ -185,6 +187,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.loans.init();
       this.reputation.init();
       this.mentors.init();
+      this.addresses.init();
       this.ransom.start();
       this.court.init();
       this.truce.start();
@@ -460,6 +463,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public MentorManager getMentors() {
       return this.mentors;
+   }
+
+   public fr.esicraft.util.AddressBook getAddresses() {
+      return this.addresses;
    }
 
    public fr.esicraft.game.CourtManager getCourt() {

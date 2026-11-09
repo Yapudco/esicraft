@@ -193,6 +193,8 @@ guilds:
   spec-change-min-hours: 2          # Temps de jeu minimal d'un nouveau membre pour débloquer un changement de spécialisation
   spec-change-cooldown-days: 7      # Délai minimal entre deux changements de spécialisation
   officer-daily-spend-cap: 3000.0   # Dépenses quotidiennes maximales d'un officier (claims, pièges) ; le chef n'a pas de limite (0 = aucune)
+  established-days: 3               # Une guilde vaincue ne rapporte points de saison et succès de conquête que si elle existe depuis N jours…
+  established-members: 2            # … et compte au moins N membres (plus de conquête de guildes jetables)
   creation-cost: 500.0 # Monnaie
   max-members-default: 10
   max-claims-default: 16
@@ -390,6 +392,13 @@ nexus:
 
 economy:
   hourly-bounty-cap: 4000.0        # Plafond de primes de monstres par joueur et par heure (0 = aucun)
+
+season:
+  member-min-days: 7               # Prime de fin de saison (500 pièces) réservée aux membres de la guilde championne depuis N jours
+
+anti-alt:
+  enabled: true                    # Repère les comptes d'une même connexion (empreintes d'adresse salées, gardées 30 jours) : parrainage, /merci, paris, statistiques de PvP et de duel
+  max-accounts-per-address: 6      # Une adresse vue sur plus de N comptes est considérée comme partagée (proxy, réseau public) et ignorée
 
 revenge:
   enabled: true

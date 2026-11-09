@@ -605,10 +605,12 @@ public class RaceInteractionListener implements Listener {
                finalBounty *= this.plugin.getNatureSeasons().bountyMultiplier();
                finalBounty *= this.plugin.getSynergy().bountyMultiplier(guild);
                finalBounty *= this.plugin.getBalance().catchUpMultiplier(guild);
-               finalBounty = this.plugin.getAntiFarmManager().capHourlyEarning(killer.getUniqueId(), finalBounty);
                if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
                   finalBounty *= 1.2;
                }
+
+               // Le bonus du Syndicat est appliqué AVANT le plafond horaire (sinon le plafond montait à 4 800 pièces au lieu de 4 000).
+               finalBounty = this.plugin.getAntiFarmManager().capHourlyEarning(killer.getUniqueId(), finalBounty);
 
                PlayerData data = this.plugin.getDataManager().getPlayerData(killer.getUniqueId());
                if (data != null) {

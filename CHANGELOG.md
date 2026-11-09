@@ -2,6 +2,31 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 09/11/2026 (audit, suite)
+
+### Sécurité : comptes multiples et boucles de jeu abusées
+- **Carnet des connexions** : le plugin retient les adresses utilisées par chaque compte pendant 30 jours (empreintes salées, jamais l'adresse en clair). Deux comptes qui ont joué depuis la même connexion, même à des moments différents, sont reconnus. Avant, la vérification ne voyait que deux joueurs connectés en même temps. Une adresse partagée par plus de 6 comptes (proxy, réseau public) est ignorée. Réglages : `anti-alt.*`.
+- **Parrainage** : un double compte ne touche plus les jalons en déconnectant le parrain pendant que la recrue joue.
+- **`/merci`** : plus de remerciement vers un second compte hors ligne de la même connexion.
+- **PvP** : tuer en boucle son second compte (ou la même victime en moins de 2 minutes) ne fait plus avancer les statistiques. Avant, ces kills débloquaient les effets de victoire (5, 25, 100 joueurs tués), le succès *Duelliste* et les rivalités du site.
+- **Duels** : une victoire contre son propre second compte ne compte plus pour *Maître d'armes*.
+- **Paris** : un parieur qui a joué depuis la connexion d'un participant est écarté, même si ce participant est hors ligne.
+- **Fin de saison** : la prime de 500 pièces par membre est réservée aux membres présents depuis **7 jours** (`season.member-min-days`). Remplir la guilde en tête de recrues de dernière minute ne crée plus d'argent.
+- **Conquêtes** : détruire le Nexus d'une guilde jetable ne rapporte plus de points de saison (150 par conquête) ni le succès *Conquérant*. La guilde vaincue doit avoir au moins 2 membres et 3 jours d'existence (`guilds.established-*`).
+- **Annexion** : le vainqueur hérite des **dettes et des créances** de la guilde vaincue. Avant, une guilde endettée se faisait conquérir par une guilde complice et le prêt était effacé.
+- **Tavernes** : la maison ne joue plus contre ses propres membres (pile ou face, roulette, machine à sous). Miser contre la banque de sa guilde permettait de faire passer l'argent de la banque vers ses poches. Le bar reste ouvert à tous.
+- **Rançon** : un prix « NaN » n'est plus accepté (la rançon devenait impayable et le captif restait bloqué). Même garde sur les prêts.
+- **Syndicat Marchand** : le bonus de +20 % des primes de monstres compte désormais dans le plafond horaire de 4 000 pièces (il montait à 4 800).
+
+### Correctifs
+- **Bourse : dividendes** : toute l'enveloppe quittait la banque, mais seules les parts détenues par le public étaient payées ; le reste disparaissait. Seul ce qui est versé est retiré.
+- **Bourse : dissolution et annexion** : les actions étaient effacées sans rien rendre. La banque de la guilde rachète maintenant les parts du public, au plus au prix payé, au prorata si elle ne suffit pas.
+- **Annexion** : les traités, gares, péages et l'arbre du Nexus de la guilde vaincue sont supprimés comme pour une dissolution (plus de guilde fantôme), et le site est rafraîchi aussitôt.
+
+### Optimisations
+- **Bourse** : l'historique des cours est gardé en mémoire. `/bourse`, la page Bourse du site et la mise à jour du marché ne lancent plus de requêtes SQL sur le thread principal (deux par guilde cotée toutes les 10 minutes, une par guilde à chaque `/bourse`).
+- **Contrats** : un contrat accompli est enregistré en tâche de fond (avant : 3 écritures SQL sur le thread principal). La purge des vieux contrats passe une fois par jour au lieu de toutes les 30 secondes.
+
 ## 08/11/2026 (audit)
 
 ### Sécurité : triche et duplications (audit complet)
