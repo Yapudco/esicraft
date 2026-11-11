@@ -449,6 +449,11 @@ public class RaceCombatListener implements Listener {
 
    public static boolean sanitizeEnchantments(ItemStack item, boolean allowArcaneBonus) {
       if (item != null && item.getType() != Material.AIR && item.hasItemMeta()) {
+         // Chemin rapide (appelé à chaque clic d'inventaire) : un objet sans enchantement n'a pas besoin que l'on copie ses métadonnées.
+         if (item.getType() != Material.ENCHANTED_BOOK && item.getEnchantments().isEmpty()) {
+            return false;
+         }
+
          ItemMeta meta = item.getItemMeta();
          boolean modified = false;
          if (meta instanceof EnchantmentStorageMeta bookMeta) {

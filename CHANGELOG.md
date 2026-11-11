@@ -2,6 +2,25 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 11/11/2026 (audit, quatrième passe)
+
+### Sécurité : triche et boucles de jeu abusées
+- **Immunité par Nexus mort** : un Nexus détruit sans annexion (par un joueur sans guilde, par exemple un second compte) restait mort pour toujours. La guilde ne pouvait plus être raidée ni assiégée, tout en gardant terres et banque. Le Nexus **renaît** maintenant avec un quart de ses PV à la fin des 30 minutes de vulnérabilité.
+- **Vol du coup final** : la conquête revenait à l'auteur du dernier coup. Un complice sans guilde portait ce coup pour éviter l'annexion, ou une guilde complice raflait le butin. Le vainqueur est désormais la guilde qui a infligé **le plus de dégâts** dans les 10 dernières minutes.
+- **Siège « bouclier »** : une guilde déjà engagée dans un siège ne pouvait pas en subir un autre. Deux guildes complices se déclaraient donc des sièges à tour de rôle pour devenir inattaquables. Une guilde ne mène qu'un siège à la fois, mais peut en subir jusqu'à 3 (`siege.max-incoming`).
+- **Roulette russe** : changer de spécialisation remettait les PV max du Nexus à leur valeur de base et effaçait le malus d'une défaite. L'écart gagné ou perdu est conservé.
+- **Spécialisation** : plus de changement pendant un raid, un siège ou dans les 10 minutes suivant une attaque du Nexus.
+- **Hordes** : les monstres d'une horde achetée ne lâchent plus crânes de Wither squelette, totems, selles ni équipement, et ne comptent plus comme trophées de chasse pour l'arbre du Nexus.
+
+### Correctifs
+- **Nexus détruit plusieurs fois** : pendant une horde, chaque monstre arrivant sur un Nexus déjà détruit relançait la destruction (annonce, vulnérabilité remise à zéro, −35 % en bourse à chaque fois).
+- **Paris sur les raids** : un raid terminé sans vainqueur (durée maximale atteinte, horde volatilisée) était réglé comme une victoire de l'attaquant. Les mises sont remboursées.
+- **Pomme dorée lâchée sur le Nexus** : elle était consommée même quand le soin était refusé (juste après une attaque).
+- **Sièges** : si la cible disparaît avant le siège, les frais de déclaration sont rendus (ils étaient perdus).
+
+### Optimisations
+- La vérification des enchantements à chaque clic d'inventaire ne copie plus les métadonnées des objets non enchantés.
+
 ## 09/11/2026 (audit, troisième passe)
 
 ### Sécurité : triche et boucles de jeu abusées

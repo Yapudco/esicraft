@@ -318,6 +318,7 @@ taverns:
 siege:
   notice-hours: 24                       # Préavis minimal entre la déclaration et le début du siège
   duration-minutes: 60
+  max-incoming: 3                        # Sièges qu'une même guilde peut subir en même temps (une guilde n'en mène qu'un à la fois)
   declaration-fee: 500.0                 # Frais déposés dans la banque de l'assaillant (perdus au profit du défenseur s'il tient bon)
   damage-multiplier: 2.0                 # Dégâts au Nexus majorés pendant le siège (armes et pioches), même sans défenseur présent
   win-damage-percent: 40.0               # Part des PV max du Nexus à infliger pour l'emporter si le Nexus ne tombe pas

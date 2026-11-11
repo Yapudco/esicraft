@@ -213,6 +213,8 @@ Options possibles : des **sapeurs** qui font exploser les murs et assèchent l'e
 
 ### Si le Nexus tombe
 
+- Le vainqueur est la guilde qui a infligé **le plus de dégâts** au Nexus dans les 10 dernières minutes (pas celle qui porte le dernier coup).
+- Sans guilde victorieuse (Nexus détruit par un joueur sans guilde ou par une horde de l'administration), le territoire est **vulnérable 30 minutes**, puis le Nexus **renaît** avec un quart de ses PV : il peut de nouveau être soigné, raidé et assiégé.
 - Le **territoire** du perdant passe au gagnant (dans la limite de son Âge).
 - Toute la **banque** du perdant passe au gagnant, avec ses **dettes et ses créances** (`/banque dettes`) ; si le perdant était coté en bourse, ses actionnaires sont d'abord remboursés.
 - Ses traités, gares et péages disparaissent.
@@ -477,7 +479,7 @@ Les gains viennent de la banque de la taverne, les pertes y entrent. **La maison
 
 ### ⚔ Guerres formelles : les sièges (`/siege`)
 
-Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde rivale (dans un chunk voisin du sien, en terrain libre ou sur son propre territoire, dans un espace vide posé sur un sol solide) avec `/siege declarer <guilde> <jour> <heure>` (ex. `samedi 21`) : **24 heures de préavis**, 500 pièces de frais pris dans la banque, créneau d'une heure qui ne peut pas chevaucher la trêve, impossible sous traité. La cible peut **annuler le siège en détruisant l'Étendard** avant l'heure dite (elle empoche les frais). Pendant le créneau, les membres de la guilde assiégeante peuvent **démolir le Nexus ennemi à la pioche ou à l'arme lourde** : dégâts ×2, même sans défenseur présent, sans acheter de horde. **Victoire** si le Nexus tombe ou si 40 % de ses PV max sont infligés : 10 % de la banque du vaincu (3 000 maximum) sont pillés. Sinon le défenseur garde les frais. `/siege liste` montre les sièges, `/siege annuler` renonce (moitié des frais rendue). Historique au Panthéon du site. Succès *Maître du siège*.
+Un officier plante un **Étendard de Siège** sur la **frontière** d'une guilde rivale (dans un chunk voisin du sien, en terrain libre ou sur son propre territoire, dans un espace vide posé sur un sol solide) avec `/siege declarer <guilde> <jour> <heure>` (ex. `samedi 21`) : **24 heures de préavis**, 500 pièces de frais pris dans la banque, créneau d'une heure qui ne peut pas chevaucher la trêve, impossible sous traité. La cible peut **annuler le siège en détruisant l'Étendard** avant l'heure dite (elle empoche les frais). Pendant le créneau, les membres de la guilde assiégeante peuvent **démolir le Nexus ennemi à la pioche ou à l'arme lourde** : dégâts ×2, même sans défenseur présent, sans acheter de horde. **Victoire** si le Nexus tombe ou si 40 % de ses PV max sont infligés : 10 % de la banque du vaincu (3 000 maximum) sont pillés. Sinon le défenseur garde les frais. Une guilde ne mène qu'**un siège à la fois** mais peut en subir jusqu'à 3 (`siege.max-incoming`) ; si la cible disparaît avant le siège, les frais sont rendus. `/siege liste` montre les sièges, `/siege annuler` renonce (moitié des frais rendue). Historique au Panthéon du site. Succès *Maître du siège*.
 
 ### 🔱 Atlantes
 
