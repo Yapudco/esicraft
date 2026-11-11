@@ -701,6 +701,8 @@ public class RaidManager implements Listener {
                for (ActiveRaid raid : RaidManager.this.activeRaids.values()) {
                   if (System.currentTimeMillis() - raid.getStartTime() > maxRaidMs) {
                      // Un raid ne dure pas indéfiniment (mob piégé) : il s'achève sans victoire ni défaite, la guilde n'est plus « en raid ».
+                     // Les paris sont remboursés (ils étaient réglés comme une victoire de l'attaquant).
+                     RaidManager.this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
                      RaidManager.this.finishRaid(raid, false);
                      continue;
                   }
@@ -709,7 +711,7 @@ public class RaidManager implements Listener {
                      RaidManager.this.finishRaid(raid, true);
                   } else {
                      Guild targetGuild = RaidManager.this.plugin.getGuildManager().getGuildById(raid.getTargetGuildId());
-                     if (targetGuild != null && targetGuild.hasNexus()) {
+                     if (targetGuild != null && targetGuild.hasNexus() && targetGuild.getNexus().isAlive()) {
                         Location nexusLoc = targetGuild.getNexus().getLocation();
 
                         for (UUID mobUuid : raid.getAliveMobUuids()) {
@@ -914,6 +916,9 @@ public class RaidManager implements Listener {
    public void onMobDeath(EntityDeathEvent event) {
       ActiveRaid raid = this.mobRaidIndex.remove(event.getEntity().getUniqueId());
       if (raid != null) {
+         // Une horde achetée n'est pas une ferme à butin rare : ni crânes de Wither squelette, ni totems, ni selles, ni équipement.
+         event.getDrops().removeIf(drop -> drop.getType() == Material.WITHER_SKELETON_SKULL || drop.getType() == Material.TOTEM_OF_UNDYING
+            || drop.getType() == Material.SADDLE || drop.getType().getMaxDurability() > 0);
          raid.removeMob(event.getEntity().getUniqueId());
          this.mobStuckCounters.remove(event.getEntity().getUniqueId());
          this.lastMobPositions.remove(event.getEntity().getUniqueId());
@@ -925,7 +930,13 @@ public class RaidManager implements Listener {
 
    private void finishRaid(ActiveRaid raid, boolean defended) {
       // Pas de victoire si une bonne part de la horde s'est volatilisée sans combat (chunk déchargé, vide, mob piégé).
-      defended = defended && raid != null && raid.getVanished() * 4 <= Math.max(1, raid.getTotalMobs());
+      boolean vanished = raid != null && raid.getVanished() * 4 > Math.max(1, raid.getTotalMobs());
+      if (defended && vanished) {
+         // Ni victoire ni défaite : les paris sont remboursés au lieu d'être réglés en faveur de l'attaquant.
+         this.plugin.getBetting().cancelRaid(raid.getTargetGuildId());
+      }
+
+      defended = defended && raid != null && !vanished;
       if (raid != null) {
          this.plugin.getBetting().settleRaid(raid.getTargetGuildId(), defended);
       }

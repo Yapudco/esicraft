@@ -316,7 +316,8 @@ public class NexusTech implements Listener {
    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
    public void onMobKilled(EntityDeathEvent event) {
       Player killer = event.getEntity().getKiller();
-      if (killer == null) {
+      // Un monstre de horde achetée ne compte pas comme trophée de chasse : il arrive tout seul dans le chunk du Nexus.
+      if (killer == null || event.getEntity().getScoreboardTags().contains("esicraft_raid_mob")) {
          return;
       }
 

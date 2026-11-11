@@ -318,8 +318,22 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
          return;
       }
 
-      if (this.pendingOrActiveOf(mine) != null || this.pendingOrActiveOf(target) != null) {
-         ChatUtil.sendMessage(player, "&c❌ L'une des deux guildes est déjà engagée dans un siège.");
+      // Une guilde ne mène qu'un siège à la fois, mais peut en subir plusieurs : avant, un siège « ami » (déclaré par une guilde complice, puis annulé
+      // ou relancé dans l'autre sens) suffisait à rendre une guilde inattaquable, puisqu'une guilde déjà engagée ne pouvait plus être assiégée.
+      int incoming = 0;
+      for (Siege other : this.sieges.values()) {
+         if (other.attackerId.equals(mine.getId())) {
+            ChatUtil.sendMessage(player, "&c❌ Votre guilde mène déjà un siège : un seul à la fois.");
+            return;
+         }
+
+         if (other.defenderId.equals(target.getId())) {
+            incoming++;
+         }
+      }
+
+      if (incoming >= Math.max(1, this.plugin.getConfig().getInt("siege.max-incoming", 3))) {
+         ChatUtil.sendMessage(player, "&c❌ Cette guilde est déjà visée par trop de sièges.");
          return;
       }
 
@@ -392,7 +406,15 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
 
    private void cancelByAttacker(Player player) {
       Guild mine = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
-      Siege s = mine == null ? null : this.pendingOrActiveOf(mine);
+      Siege s = null;
+      if (mine != null) {
+         for (Siege other : this.sieges.values()) {
+            if (other.attackerId.equals(mine.getId())) {
+               s = other;
+            }
+         }
+      }
+
       if (s == null || !s.attackerId.equals(mine.getId()) || s.state != State.PENDING || !mine.hasRoleAtLeast(player.getUniqueId(), GuildRole.OFFICER)) {
          ChatUtil.sendMessage(player, "&c❌ Aucun siège déclaré par votre guilde à annuler.");
          return;
@@ -503,6 +525,13 @@ public class SiegeManager implements CommandExecutor, TabCompleter, Listener {
       this.delete(s);
       Guild a = this.plugin.getGuildManager().getGuildById(s.attackerId);
       Guild d = this.plugin.getGuildManager().getGuildById(s.defenderId);
+      if (a != null && reason.equals("VOID") && s.fee > 0.0) {
+         // Siège sans objet (cible dissoute ou conquise par une autre guilde) : les frais de déclaration sont rendus.
+         a.depositBank(s.fee);
+         this.plugin.getDataManager().saveGuild(a);
+         ChatUtil.broadcastGuild(a, "&7🏳 Votre siège n'a plus d'objet : les frais de déclaration (&6" + (long)s.fee + " pièces&7) vous sont rendus.");
+      }
+
       if (a == null || d == null) {
          return;
       }

@@ -794,7 +794,27 @@ public class GuildManager {
       return days <= 0L || changed == null ? 0L : Math.max(0L, changed + days * 86400000L - System.currentTimeMillis());
    }
 
+   /** PV max de base du Nexus pour une spécialisation. */
+   private int specNexusHealth(GuildSpecialization spec) {
+      int base = this.plugin.getConfig().getInt("guilds.nexus.base-health", 5000);
+      if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
+         return (int)((double)base * 0.8);
+      } else if (spec == GuildSpecialization.ARCANE_CONCLAVE) {
+         return (int)((double)base * 1.25);
+      } else {
+         return spec == GuildSpecialization.LONE_RANGER ? 2500 : base;
+      }
+   }
+
    public boolean setSpecialization(Guild guild, GuildSpecialization spec, Player player) {
+      // Pas de changement en pleine bataille (les bonus de défense et les PV max du Nexus basculeraient au milieu du combat).
+      if (guild != null && guild.hasNexus() && (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId()) || this.plugin.getSiege().isBesieged(guild)
+         || this.plugin.getNexusManager().wasNexusRecentlyAttacked(guild, 600000L))) {
+         ChatUtil.sendMessage(player, "&c❌ Impossible de changer de spécialisation pendant une attaque (raid, siège ou Nexus frappé il y a moins de 10 minutes).");
+         ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
+         return false;
+      }
+
       if (guild != null && spec != null && guild.getSpecialization() != GuildSpecialization.NONE && guild.getSpecialization() != spec) {
          long left = this.specCooldownLeftMs(guild);
          if (left > 0L && !this.plugin.bypassCooldowns(player)) {
@@ -860,16 +880,9 @@ public class GuildManager {
                   .exec("INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v;", cdKey, String.valueOf(System.currentTimeMillis())));
                if (guild.hasNexus()) {
                   Nexus nexus = guild.getNexus();
-                  int baseHealth = this.plugin.getConfig().getInt("guilds.nexus.base-health", 5000);
-                  int targetMaxHealth = baseHealth;
-                  if (spec == GuildSpecialization.MERCHANT_SYNDICATE) {
-                     targetMaxHealth = (int)((double)baseHealth * 0.8);
-                  } else if (spec == GuildSpecialization.ARCANE_CONCLAVE) {
-                     targetMaxHealth = (int)((double)baseHealth * 1.25);
-                  } else if (spec == GuildSpecialization.LONE_RANGER) {
-                     targetMaxHealth = 2500;
-                  }
-
+                  // L'écart gagné ou perdu à la roulette russe du Nexus est conservé : changer de spécialisation effaçait le malus de PV max.
+                  int delta = nexus.getMaxHealth() - this.specNexusHealth(oldSpecBefore);
+                  int targetMaxHealth = Math.max(this.plugin.getConfig().getInt("nexus.gamble.min-max-hp", 1000), this.specNexusHealth(spec) + delta);
                   nexus.setMaxHealth(targetMaxHealth);
                   nexus.setCurrentHealth(Math.min(nexus.getCurrentHealth(), targetMaxHealth));
                   this.plugin.getNexusManager().updateHologram(guild);

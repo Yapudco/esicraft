@@ -216,6 +216,8 @@ Options: **sappers** that blow up walls and dry out the water and lava around th
 
 ### If the Nexus falls
 
+- The winner is the guild that dealt **the most damage** to the Nexus in the last 10 minutes (not the one landing the last hit).
+- With no winning guild (Nexus destroyed by a guildless player or an admin horde), the land is **vulnerable for 30 minutes**, then the Nexus **comes back** with a quarter of its HP: it can again be healed, raided and besieged.
 - The loser's **land** goes to the winner (within the limit of the winner's Age).
 - The loser's whole **bank** goes to the winner, along with its **debts and loans owed to it** (`/banque dettes`); if the loser was listed on the exchange, its shareholders are paid back first.
 - Its treaties, stations and tolls disappear.
@@ -480,7 +482,7 @@ From **Age 4**, the leader can **open the guild's capital** (`/bourse ouvrir`, 1
 
 ### ⚔ Formal wars: sieges (`/siege`)
 
-An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk next to theirs, on free ground or their own land, in an empty space on solid ground) with `/siege declarer <guild> <day> <hour>` (e.g. `samedi 21`): **24 hours' notice**, 500 coins fee from the bank, a one-hour slot that can't overlap the truce, impossible under a treaty. The target can **cancel the siege by destroying the banner** before the time (and keeps the fee). During the slot, members of the besieging guild can **tear down the enemy Nexus with pickaxes or heavy weapons**: damage ×2, even with no defender present, without buying a horde. **Victory** if the Nexus falls or 40% of its max HP is dealt: 10% of the loser's bank (3,000 max) is looted. Otherwise the defender keeps the fee. `/siege liste` shows sieges, `/siege annuler` gives up (half the fee refunded). History in the website Pantheon. *Siege master* achievement.
+An officer plants a **Siege Banner** on a rival guild's **border** (in a chunk next to theirs, on free ground or their own land, in an empty space on solid ground) with `/siege declarer <guild> <day> <hour>` (e.g. `samedi 21`): **24 hours' notice**, 500 coins fee from the bank, a one-hour slot that can't overlap the truce, impossible under a treaty. The target can **cancel the siege by destroying the banner** before the time (and keeps the fee). During the slot, members of the besieging guild can **tear down the enemy Nexus with pickaxes or heavy weapons**: damage ×2, even with no defender present, without buying a horde. **Victory** if the Nexus falls or 40% of its max HP is dealt: 10% of the loser's bank (3,000 max) is looted. Otherwise the defender keeps the fee. A guild leads only **one siege at a time** but can face up to 3 (`siege.max-incoming`); if the target disappears before the siege, the fee is refunded. `/siege liste` shows sieges, `/siege annuler` gives up (half the fee refunded). History in the website Pantheon. *Siege master* achievement.
 
 ### 🔱 Atlanteans
 

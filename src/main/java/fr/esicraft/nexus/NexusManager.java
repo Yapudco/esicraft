@@ -532,9 +532,25 @@ public class NexusManager {
    public void damageNexus(Guild guild, int damage, String attackerName, Guild attackerGuild, Player attackerPlayer) {
       if (guild != null && guild.hasNexus()) {
          Nexus nexus = guild.getNexus();
+         // Un Nexus déjà détruit n'encaisse plus rien : chaque monstre de horde arrivant ensuite relançait la destruction (annonce, 30 minutes de
+         // vulnérabilité remises à zéro, chute de 35 % en bourse à chaque fois).
+         if (!nexus.isAlive()) {
+            return;
+         }
+
          long hitAt = System.currentTimeMillis();
          this.lastNexusDamage.put(guild.getId(), hitAt);
          nexus.damage(damage);
+         if (attackerGuild != null && !attackerGuild.getId().equals(guild.getId())) {
+            long[] c = this.assault.computeIfAbsent(guild.getId(), k -> new java.util.concurrent.ConcurrentHashMap<>()).computeIfAbsent(attackerGuild.getId(), k -> new long[2]);
+            if (hitAt - c[1] > ASSAULT_WINDOW_MS) {
+               c[0] = 0L;
+            }
+
+            c[0] += damage;
+            c[1] = hitAt;
+         }
+
          this.plugin.getSiege().addDamage(attackerGuild, guild, damage);
          // Les dégâts comptent à chaque coup, mais hologramme, particules, sons, messages et effets de spécialisation une fois par seconde et par guilde.
          Long previousFx = this.lastFeedback.get(guild.getId());
@@ -682,7 +698,42 @@ public class NexusManager {
       this.onNexusDestroyed(guild, killer, null);
    }
 
+   private static final long ASSAULT_WINDOW_MS = 600000L;
+   /** Dégâts récents infligés à chaque Nexus, par guilde attaquante : {total, dernier coup}. */
+   private final Map<String, Map<String, long[]>> assault = new java.util.concurrent.ConcurrentHashMap<>();
+
+   /**
+    * La guilde qui a infligé le plus de dégâts ces 10 dernières minutes : c'est elle qui conquiert, pas l'auteur du dernier coup. Avant, un second
+    * compte sans guilde (ou dans une guilde complice) portait le coup final : pas d'annexion, ou annexion par le complice, et le vrai assaillant
+    * repartait sans rien.
+    */
+   private Guild topAssailant(Guild guild) {
+      Map<String, long[]> byGuild = this.assault.remove(guild.getId());
+      if (byGuild == null) {
+         return null;
+      }
+
+      long now = System.currentTimeMillis();
+      Guild best = null;
+      long bestDamage = 0L;
+      for (Map.Entry<String, long[]> e : byGuild.entrySet()) {
+         Guild g = this.plugin.getGuildManager().getGuildById(e.getKey());
+         if (g != null && now - e.getValue()[1] <= ASSAULT_WINDOW_MS && e.getValue()[0] > bestDamage) {
+            bestDamage = e.getValue()[0];
+            best = g;
+         }
+      }
+
+      return best;
+   }
+
    public void onNexusDestroyed(Guild guild, String killer, Guild attackerGuild) {
+      Guild top = this.topAssailant(guild);
+      if (top != null) {
+         attackerGuild = top;
+         killer = top.getName();
+      }
+
       this.plugin.getSiege().onNexusDestroyed(guild, attackerGuild);
       this.plugin.getBourse().shock(guild.getId(), -0.35, "Nexus détruit");
       this.unindexGuildNexus(guild);
@@ -853,7 +904,13 @@ public class NexusManager {
    public boolean healWithGoldenApple(Guild guild, Player player, ItemStack item) {
       if (guild != null && guild.hasNexus()) {
          Nexus nexus = guild.getNexus();
-         if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId())) {
+         if (!nexus.isAlive()) {
+            if (player != null) {
+               ChatUtil.sendMessage(player, "&c❌ Le Nexus est détruit : il renaîtra de lui-même à la fin de la période de vulnérabilité.");
+            }
+
+            return false;
+         } else if (this.plugin.getRaidManager().isGuildUnderRaid(guild.getId())) {
             if (player != null) {
                ChatUtil.sendMessage(player, "&c❌ Impossible de soigner le Nexus : une invasion de monstres est en cours !");
                ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
@@ -940,6 +997,25 @@ public class NexusManager {
                         if (ageMs > 3600000L) {
                            guildsToDisband.add(guild);
                         }
+                     }
+                  }
+
+                  // Nexus détruit sans annexion : il renaît affaibli à la fin des 30 minutes de vulnérabilité. Avant, il restait mort pour toujours :
+                  // la guilde ne pouvait ni le soigner ni le reposer, et surtout plus personne ne pouvait la raider ni l'assiéger (immunité
+                  // définitive obtenue en le faisant détruire par un compte sans guilde).
+                  for (Guild guild : NexusManager.this.plugin.getGuildManager().getAllGuilds()) {
+                     if (guild.hasNexus() && !guild.getNexus().isAlive() && guild.getVulnerableUntil() <= now) {
+                        Nexus dead = guild.getNexus();
+                        dead.heal(Math.max(1, dead.getMaxHealth() / 4));
+                        NexusManager.this.indexGuildNexus(guild);
+                        Location dl = dead.getLocation();
+                        if (dl.getWorld() != null && dl.getWorld().isChunkLoaded(dl.getBlockX() >> 4, dl.getBlockZ() >> 4)) {
+                           dl.getBlock().setType(Material.CRYING_OBSIDIAN);
+                           NexusManager.this.updateHologram(guild);
+                        }
+
+                        NexusManager.this.plugin.getDataManager().saveGuild(guild);
+                        ChatUtil.broadcastGuild(guild, "&d✨ Votre Nexus renaît de ses cendres avec &e" + dead.getCurrentHealth() + " PV&d : il peut de nouveau être soigné… et attaqué.");
                      }
                   }
 
@@ -1111,14 +1187,15 @@ public class NexusManager {
                                     && guildx.isMember(droppedItem.getThrower())) {
                                     ItemStack itemStack = droppedItem.getItemStack();
                                     if (itemStack.getType() == Material.GOLDEN_APPLE || itemStack.getType() == Material.ENCHANTED_GOLDEN_APPLE) {
-                                       if (itemStack.getAmount() > 1) {
-                                          itemStack.setAmount(itemStack.getAmount() - 1);
-                                          droppedItem.setItemStack(itemStack);
-                                       } else {
-                                          droppedItem.remove();
+                                       // La pomme n'est consommée que si le soin a réellement lieu (elle disparaissait pour rien juste après une attaque).
+                                       if (NexusManager.this.healWithGoldenApple(guildx, null, itemStack)) {
+                                          if (itemStack.getAmount() > 1) {
+                                             itemStack.setAmount(itemStack.getAmount() - 1);
+                                             droppedItem.setItemStack(itemStack);
+                                          } else {
+                                             droppedItem.remove();
+                                          }
                                        }
-
-                                       NexusManager.this.healWithGoldenApple(guildx, null, itemStack);
                                     }
                                  }
                               }
