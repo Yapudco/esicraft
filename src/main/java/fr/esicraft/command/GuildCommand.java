@@ -383,6 +383,9 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                      guild.depositBank(amount);
                      this.plugin.getDataManager().savePlayerAndGuild(pData, guild);
                      ChatUtil.sendMessage(player, "&aDépôt de &6" + amount + " pièces &aeffectué dans la banque de guilde !");
+                     if (amount >= 100.0) {
+                        this.plugin.getTutorial().complete(player, fr.esicraft.life.TutorialManager.Step.BANK);
+                     }
                   } else {
                      ChatUtil.sendMessage(player, "&cVous n'avez pas assez d'argent sur vous.");
                   }

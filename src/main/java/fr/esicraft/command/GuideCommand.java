@@ -17,6 +17,7 @@ public class GuideCommand implements CommandExecutor {
             player.openBook(book);
          ChatUtil.sendMessage(player, "&aUn exemplaire du &6Guide Esicraft &aa été ajouté à votre inventaire !");
          ChatUtil.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1.0F, 1.2F);
+         fr.esicraft.EsicraftPlugin.getInstance().getTutorial().complete(player, fr.esicraft.life.TutorialManager.Step.GUIDE);
          return true;
       } else {
          ChatUtil.sendMessage(sender, "&cCommande réservée aux joueurs.");

@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (tutoriel étoffé)
+
+### Changements
+- **Tutoriel** : 4 nouvelles quêtes (lire le livre des règles, déposer 100 pièces dans la banque de guilde, faire un don pour l'Âge, entrer dans une taverne), soit 9 en tout. Bonus final porté à 400 pièces. Les joueurs qui avaient déjà fini l'ancien tutoriel gardent leur progression et peuvent faire les nouvelles quêtes (récompense de chaque quête, sans second bonus final).
+
 ## 12/11/2026 (bras de fer plus lent)
 
 ### Changements

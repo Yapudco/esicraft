@@ -195,6 +195,7 @@ public class AgeManager {
                      this.plugin.getDataManager().saveGuild(guild);
                      ChatUtil.sendMessage(player, "&aMerci pour votre don de &e" + toDeposit + "x " + mat.name() + " &apour la progression de votre guilde !");
                      ChatUtil.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.5F);
+                     this.plugin.getTutorial().complete(player, fr.esicraft.life.TutorialManager.Step.AGE);
                      this.checkGuildProgression(guild);
                      return true;
                   }
