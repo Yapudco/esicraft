@@ -320,8 +320,11 @@ taverns:
     price: 50                            # Prix d'un verre (tirage du bar)
   arm-wrestling:
     matches-per-day: 6                   # Parties de bras de fer par joueur et par jour (jeu d'adresse : limité)
-    start-window-ticks: 30               # Temps pour cliquer sur le poing au 1er tour (20 ticks = 1 s)
-    min-window-ticks: 14                 # Temps minimal en fin de partie (le délai baisse d'un tick par tour)
+    start-window-ticks: 26               # Temps pour cliquer sur le poing au 1er tour (20 ticks = 1 s)
+    min-window-ticks: 12                 # Temps minimal en fin de partie (le délai baisse d'un tick par tour)
+    champion-push: 0.40                  # Chance que le champion pousse avant chaque poing (+4 points par tour)
+    champion-push-max: 0.75              # Plafond de cette chance
+    feint-chance: 0.25                   # Part des poings qui sont des feintes (à ne pas toucher : -2 crans), dès le 2e tour
 
 # Monde de ressources (/ressources) : monde minier séparé, remis à neuf chaque semaine
 resource-world:
