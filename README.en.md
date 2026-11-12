@@ -430,7 +430,9 @@ Hitting a player from another guild (melee, arrow, TNT, wolf, harmful potion…)
 
 Between two guilds **bound by a treaty** (alliance, pact or vassalage):
 
-- `/banque pret <guild> <amount>`: an officer offers a loan (100 to 20,000 coins). The other guild accepts with `/banque accepter <guild>` (or `refuser`). The coins move from one bank to the other; the borrowing guild must give back the amount **+ 10% interest** within **5 days**.
+- **`/banque` opens the bank menu**: received offers (left click to accept, right click to refuse), debts (left click to repay everything, right click to repay 1,000 coins), credits (Shift + right click to forgive a debt, leader only), sent offers (click to withdraw them), and access to shared chests.
+- **Offering a loan** (officers): "Offer a loan" button, pick the partner guild, then the **amount** (±100, ±1,000, maximum) and the **interest rate**, adjustable from **0 to 50%** (±1, ±5; 10% by default, `loans.min-interest-percent` / `max-interest-percent`). The menu shows the interest and the amount to repay. As a command: `/banque pret <guild> <amount> [rate]`.
+- The offer stays valid for 10 minutes. Once accepted (menu or `/banque accepter <guild>`), the coins move from one bank to the other; the borrowing guild must give back the amount **plus interest at the agreed rate** within **5 days**.
 - `/banque dettes` lists loans · `/banque rembourser <guild> [amount]` repays (in several payments if needed) · `/banque pardonner <guild>` forgives a debt (**leader only**). A loan offered by an officer counts towards their 3,000-coin daily cap.
 - `/banque coffre <guild>` opens a 54-slot **shared chest** used by both guilds (available as long as a treaty binds them).
 - **An unpaid debt weighs on the land**: once the deadline has passed, the guild can no longer claim chunks, and **one chunk is seized every 24 h** (never the Nexus chunk, never one that would split the territory). Each seized chunk wipes 300 coins of debt.
@@ -603,7 +605,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/classement` · `/histoire` | Season ranking · big moments |
 | `/english` · `/francais` | Switch the game to English (menus, messages, dashboard, rule book) · back to French |
 | `/hud` | Show or hide the dashboard |
-| `/banque` | Loans between guilds, debts, shared chest |
+| `/banque` | Bank menu: loans between guilds (rate of your choice), debts, shared chest |
 | `/merci <player>` | Give an honor point (once a day per person) |
 | `/parrain <player>` | Mentor a recruit (`accepter` / `refuser` to answer) |
 | `/rancon` | Manage a prisoner: `prix`, `payer`, `liberer`, `executer` |

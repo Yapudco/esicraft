@@ -140,7 +140,7 @@ commands:
   banque:
     description: Banque de guilde (prêts entre guildes, dettes, coffre commun)
     aliases: [bank, pret]
-    usage: /banque [pret|accepter|refuser|dettes|rembourser|pardonner|coffre]
+    usage: /banque [pret <guilde> <montant> [taux]|accepter|refuser|dettes|rembourser|pardonner|coffre|aide]
 
   vote:
     description: "Tribunal des guildes - voter la règle de la semaine (le lundi)"

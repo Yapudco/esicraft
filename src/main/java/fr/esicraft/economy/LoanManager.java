@@ -82,7 +82,11 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       }
    }
 
-   private record Proposal(String lenderId, String borrowerId, double amount, long expiresAt) {
+   /** Offre de prêt en attente ; {@code rate} est le taux d'intérêt (en %) choisi par le prêteur. */
+   record Proposal(String lenderId, String borrowerId, double amount, double rate, long expiresAt) {
+      double toRepay() {
+         return Math.ceil(this.amount * (1.0 + this.rate / 100.0));
+      }
    }
 
    private static final class ChestHolder implements InventoryHolder, fr.esicraft.util.StorageHolder {
@@ -99,6 +103,7 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    }
 
    private final EsicraftPlugin plugin;
+   private LoanGui gui;
    private final Map<String, Loan> loans = new ConcurrentHashMap<>();
    private final List<Proposal> proposals = new CopyOnWriteArrayList<>();
    private final Map<String, Inventory> chests = new ConcurrentHashMap<>();
@@ -130,6 +135,8 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
             ((Number)r[5]).longValue(), ((Number)r[6]).longValue(), (String)r[7], ((Number)r[8]).longValue()));
       }
 
+      this.gui = new LoanGui(this.plugin, this);
+      Bukkit.getPluginManager().registerEvents(this.gui, this.plugin);
       Bukkit.getScheduler().runTaskTimer(this.plugin, this::tick, 1200L, 6000L);
       // Un coffre ouvert est enregistré toutes les 30 s : un plantage ne perd plus que quelques secondes.
       Bukkit.getScheduler().runTaskTimer(this.plugin, () -> {
@@ -247,16 +254,80 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       return a.compareTo(b) < 0 ? a + "|" + b : b + "|" + a;
    }
 
-   private boolean linked(Guild a, Guild b) {
+   boolean linked(Guild a, Guild b) {
       return this.plugin.getTreatyManager().between(a.getId(), b.getId()) != null;
    }
 
-   private boolean isOfficer(Guild g, Player p) {
+   boolean isOfficer(Guild g, Player p) {
       return g != null && g.hasRoleAtLeast(p.getUniqueId(), GuildRole.OFFICER);
    }
 
-   private static String money(double v) {
+   static String money(double v) {
       return String.format(Locale.ROOT, "%.0f", v);
+   }
+
+   /** Taux d'intérêt par défaut, et bornes du taux qu'un prêteur peut choisir. */
+   double defaultRate() {
+      return this.clampRate(this.plugin.getConfig().getDouble("loans.interest-percent", 10.0));
+   }
+
+   double minRate() {
+      return Math.max(0.0, this.plugin.getConfig().getDouble("loans.min-interest-percent", 0.0));
+   }
+
+   double maxRate() {
+      return Math.max(this.minRate(), this.plugin.getConfig().getDouble("loans.max-interest-percent", 50.0));
+   }
+
+   double clampRate(double rate) {
+      return Math.max(this.minRate(), Math.min(this.maxRate(), Math.round(rate)));
+   }
+
+   long loanDays() {
+      return this.plugin.getConfig().getLong("loans.days", 5L);
+   }
+
+   List<Proposal> proposalsFor(String borrowerId) {
+      List<Proposal> out = new ArrayList<>();
+      for (Proposal p : this.proposals) {
+         if (p.borrowerId().equals(borrowerId) && p.expiresAt() > System.currentTimeMillis()) {
+            out.add(p);
+         }
+      }
+
+      return out;
+   }
+
+   List<Proposal> proposalsFrom(String lenderId) {
+      List<Proposal> out = new ArrayList<>();
+      for (Proposal p : this.proposals) {
+         if (p.lenderId().equals(lenderId) && p.expiresAt() > System.currentTimeMillis()) {
+            out.add(p);
+         }
+      }
+
+      return out;
+   }
+
+   void withdrawProposal(Proposal p) {
+      this.proposals.remove(p);
+   }
+
+   /** Guildes liées par un traité à celle-ci (les seules avec qui l'on peut prêter ou partager un coffre). */
+   List<Guild> partners(Guild guild) {
+      List<Guild> out = new ArrayList<>();
+      for (Guild g : this.plugin.getGuildManager().getAllGuilds()) {
+         if (!g.getId().equals(guild.getId()) && this.linked(guild, g)) {
+            out.add(g);
+         }
+      }
+
+      out.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+      return out;
+   }
+
+   Loan loanById(String id) {
+      return this.loans.get(id);
    }
 
    private static String duration(long ms) {
@@ -402,25 +473,33 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          return true;
       }
 
-      String sub = args.length == 0 ? "aide" : args[0].toLowerCase(Locale.ROOT);
+      String sub = args.length == 0 ? "menu" : args[0].toLowerCase(Locale.ROOT);
       switch (sub) {
+         case "menu", "gui" -> this.gui.openMain(player, guild);
+         case "aide", "help" -> this.help(player);
          case "pret", "prêt" -> this.propose(player, guild, args);
          case "accepter" -> this.accept(player, guild, args);
          case "refuser" -> this.refuse(player, guild, args);
          case "dettes", "dette", "prets" -> this.debts(player, guild);
          case "rembourser" -> this.repay(player, guild, args);
          case "pardonner" -> this.forgive(player, guild, args);
-         case "coffre" -> this.openChest(player, guild, args);
-         default -> this.help(player);
+         case "coffre" -> {
+            if (args.length > 1) {
+               this.openChest(player, guild, args);
+            } else {
+               this.gui.openPartners(player, guild, false);
+            }
+         }
+         default -> this.gui.openMain(player, guild);
       }
 
       return true;
    }
 
    private void help(Player p) {
-      ChatUtil.sendMessage(p, "&6🏦 Banque de guilde (entre guildes liées par un traité)");
-      ChatUtil.sendRaw(p, " &e/banque pret <guilde> <montant> &7: proposer un prêt (intérêts " + money(this.plugin.getConfig().getDouble("loans.interest-percent", 10.0))
-         + " %, " + this.plugin.getConfig().getLong("loans.days", 5L) + " jours)");
+      ChatUtil.sendMessage(p, "&6🏦 Banque de guilde (entre guildes liées par un traité) — &e/banque &6ouvre le menu");
+      ChatUtil.sendRaw(p, " &e/banque pret <guilde> <montant> [taux %] &7: proposer un prêt (taux de " + money(this.minRate()) + " à " + money(this.maxRate())
+         + " %, " + money(this.defaultRate()) + " % par défaut ; " + this.loanDays() + " jours)");
       ChatUtil.sendRaw(p, " &e/banque accepter|refuser <guilde> &7: répondre à une proposition");
       ChatUtil.sendRaw(p, " &e/banque dettes &7: prêts en cours · &e/banque rembourser <guilde> [montant] &7· &e/banque pardonner <guilde>");
       ChatUtil.sendRaw(p, " &e/banque coffre <guilde> &7: coffre commun avec un partenaire");
@@ -435,20 +514,45 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
 
       Guild borrower = args.length > 1 ? this.plugin.getGuildManager().getGuildByName(args[1]) : null;
       double amount;
+      double rate = this.defaultRate();
       try {
          amount = Math.floor(Double.parseDouble(args.length > 2 ? args[2] : ""));
-         if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+         if (args.length > 3) {
+            rate = Double.parseDouble(args[3].replace("%", "").replace(',', '.'));
+         }
+
+         if (Double.isNaN(amount) || Double.isInfinite(amount) || Double.isNaN(rate) || Double.isInfinite(rate)) {
             throw new NumberFormatException();
          }
       } catch (NumberFormatException e) {
-         ChatUtil.sendMessage(p, "&cUsage : &e/banque pret <guilde> <montant>");
+         ChatUtil.sendMessage(p, "&cUsage : &e/banque pret <guilde> <montant> [taux %]");
          return;
+      }
+
+      this.offer(p, lender, borrower, amount, rate);
+   }
+
+   double minAmount() {
+      return this.plugin.getConfig().getDouble("loans.min", 100.0);
+   }
+
+   double maxAmount() {
+      return this.plugin.getConfig().getDouble("loans.max", 20000.0);
+   }
+
+   /** Envoie une offre de prêt après toutes les vérifications ; renvoie vrai si l'offre est partie. Commun à la commande et au menu. */
+   boolean offer(Player p, Guild lender, Guild borrower, double amount, double rate) {
+      if (!this.isOfficer(lender, p)) {
+         ChatUtil.sendMessage(p, "&cRéservé aux officiers et au chef de guilde.");
+         return false;
       }
 
       double min = this.plugin.getConfig().getDouble("loans.min", 100.0);
       double max = this.plugin.getConfig().getDouble("loans.max", 20000.0);
       if (borrower == null || borrower.getId().equals(lender.getId())) {
          ChatUtil.sendMessage(p, "&c❌ Guilde introuvable.");
+      } else if (rate < this.minRate() || rate > this.maxRate()) {
+         ChatUtil.sendMessage(p, "&c❌ Le taux d'intérêt doit être compris entre &e" + money(this.minRate()) + " % &cet &e" + money(this.maxRate()) + " %&c.");
       } else if (!this.linked(lender, borrower)) {
          ChatUtil.sendMessage(p, "&c❌ Les prêts ne sont possibles qu'entre guildes liées par un traité (&e/traite&c).");
       } else if (amount < min || amount > max) {
@@ -467,13 +571,17 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          ChatUtil.sendMessage(p, "&c❌ Plafond quotidien de dépenses des officiers atteint (&e" + money(this.plugin.getConfig().getDouble("guilds.officer-daily-spend-cap", 3000.0))
             + " pièces&c) : seul le chef peut prêter davantage aujourd'hui.");
       } else {
+         double r = Math.round(rate);
          this.proposals.removeIf(x -> x.lenderId().equals(lender.getId()) && x.borrowerId().equals(borrower.getId()));
-         this.proposals.add(new Proposal(lender.getId(), borrower.getId(), amount, System.currentTimeMillis() + 600000L));
-         double interest = this.plugin.getConfig().getDouble("loans.interest-percent", 10.0);
-         ChatUtil.sendMessage(p, "&a🏦 Offre envoyée à &6" + borrower.getName() + "&a.");
-         ChatUtil.broadcastGuild(borrower, "&6🏦 &e" + lender.getName() + " &6vous propose un prêt de &e" + money(amount) + " pièces &6(à rendre &e" + money(amount * (1 + interest / 100.0))
-            + "&6 sous " + this.plugin.getConfig().getLong("loans.days", 5L) + " jours). &e/banque accepter " + lender.getName() + " &6ou &erefuser&6 (10 min).");
+         Proposal pr = new Proposal(lender.getId(), borrower.getId(), amount, r, System.currentTimeMillis() + 600000L);
+         this.proposals.add(pr);
+         ChatUtil.sendMessage(p, "&a🏦 Offre envoyée à &6" + borrower.getName() + "&a : &e" + money(amount) + " pièces &aà &e" + money(r) + " %&a.");
+         ChatUtil.broadcastGuild(borrower, "&6🏦 &e" + lender.getName() + " &6vous propose un prêt de &e" + money(amount) + " pièces &6à &e" + money(r) + " % &6(à rendre &e" + money(pr.toRepay())
+            + "&6 sous " + this.loanDays() + " jours). &e/banque &6pour répondre (10 min).");
+         return true;
       }
+
+      return false;
    }
 
    private Proposal findProposal(Guild borrower, String lenderName) {
@@ -492,8 +600,11 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    }
 
    private void refuse(Player p, Guild borrower, String[] args) {
-      Proposal pr = this.findProposal(borrower, args.length > 1 ? args[1] : null);
-      if (pr == null || !this.isOfficer(borrower, p)) {
+      this.refuseProposal(p, borrower, this.findProposal(borrower, args.length > 1 ? args[1] : null));
+   }
+
+   void refuseProposal(Player p, Guild borrower, Proposal pr) {
+      if (pr == null || !this.isOfficer(borrower, p) || !pr.borrowerId().equals(borrower.getId())) {
          ChatUtil.sendMessage(p, "&cAucune offre valable (ou vous n'êtes pas officier).");
          return;
       }
@@ -507,8 +618,11 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
    }
 
    private void accept(Player p, Guild borrower, String[] args) {
-      Proposal pr = this.findProposal(borrower, args.length > 1 ? args[1] : null);
-      if (pr == null || !this.isOfficer(borrower, p)) {
+      this.acceptProposal(p, borrower, this.findProposal(borrower, args.length > 1 ? args[1] : null));
+   }
+
+   void acceptProposal(Player p, Guild borrower, Proposal pr) {
+      if (pr == null || !this.isOfficer(borrower, p) || !pr.borrowerId().equals(borrower.getId()) || pr.expiresAt() <= System.currentTimeMillis()) {
          ChatUtil.sendMessage(p, "&cAucune offre valable (ou vous n'êtes pas officier).");
          return;
       }
@@ -531,15 +645,13 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
 
       borrower.depositBank(pr.amount());
       long now = System.currentTimeMillis();
-      double interest = this.plugin.getConfig().getDouble("loans.interest-percent", 10.0);
-      Loan loan = new Loan(UUID.randomUUID().toString(), lender.getId(), borrower.getId(), pr.amount(), Math.ceil(pr.amount() * (1 + interest / 100.0)), now,
-         now + this.plugin.getConfig().getLong("loans.days", 5L) * 86400000L, ACTIVE, 0L);
+      Loan loan = new Loan(UUID.randomUUID().toString(), lender.getId(), borrower.getId(), pr.amount(), pr.toRepay(), now, now + this.loanDays() * 86400000L, ACTIVE, 0L);
       this.loans.put(loan.id, loan);
       this.persist(loan);
       this.plugin.getDataManager().saveGuild(lender);
       this.plugin.getDataManager().saveGuild(borrower);
-      ChatUtil.broadcastGuild(borrower, "&a🏦 Prêt accepté : &6+" + money(pr.amount()) + " pièces &adans la banque. À rendre : &e" + money(loan.owed) + " &asous " + duration(loan.dueAt - now) + ".");
-      ChatUtil.broadcastGuild(lender, "&a🏦 &6" + borrower.getName() + " &aa accepté votre prêt de " + money(pr.amount()) + " (retour attendu : " + money(loan.owed) + ").");
+      ChatUtil.broadcastGuild(borrower, "&a🏦 Prêt accepté : &6+" + money(pr.amount()) + " pièces &adans la banque (" + money(pr.rate()) + " %). À rendre : &e" + money(loan.owed) + " &asous " + duration(loan.dueAt - now) + ".");
+      ChatUtil.broadcastGuild(lender, "&a🏦 &6" + borrower.getName() + " &aa accepté votre prêt de " + money(pr.amount()) + " à " + money(pr.rate()) + " % (retour attendu : " + money(loan.owed) + ").");
    }
 
    private void debts(Player p, Guild guild) {
@@ -591,7 +703,24 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
          }
       }
 
-      amount = Math.min(amount, Math.floor(borrower.getBankBalance()));
+      this.repayLoan(p, borrower, loan, amount);
+   }
+
+   /** Rembourse (tout ou partie) une dette depuis la banque de l'emprunteur. Commun à la commande et au menu. */
+   void repayLoan(Player p, Guild borrower, Loan stale, double wanted) {
+      // Le menu peut garder une version périmée du prêt (annexion entre-temps) : on reprend toujours la version courante.
+      Loan loan = stale == null ? null : this.loans.get(stale.id);
+      if (!this.isOfficer(borrower, p) || loan == null || !loan.borrowerId.equals(borrower.getId()) || !this.loans.containsKey(loan.id)) {
+         ChatUtil.sendMessage(p, "&cRéservé aux officiers de la guilde débitrice.");
+         return;
+      }
+
+      Guild lender = this.plugin.getGuildManager().getGuildById(loan.lenderId);
+      if (lender == null) {
+         return;
+      }
+
+      double amount = Math.min(Math.min(wanted, loan.owed), Math.floor(borrower.getBankBalance()));
       if (amount < 1.0 || !borrower.withdrawBank(amount)) {
          ChatUtil.sendMessage(p, "&c❌ La banque de votre guilde est vide ou le montant est invalide.");
          return;
@@ -637,7 +766,24 @@ public class LoanManager implements Listener, CommandExecutor, TabCompleter {
       }
    }
 
+   /** Efface une créance précise (chef du prêteur uniquement). */
+   void forgiveLoan(Player p, Guild lender, Loan loan) {
+      if (!lender.getLeaderUuid().equals(p.getUniqueId())) {
+         ChatUtil.sendMessage(p, "&cSeul le chef de guilde peut effacer une dette.");
+         return;
+      }
+
+      Loan current = loan == null ? null : this.loans.get(loan.id);
+      if (current != null && current.lenderId.equals(lender.getId())) {
+         this.settle(current, "effacé par le prêteur");
+      }
+   }
+
    // ------------------------------------------------------------------ coffre commun
+
+   void openChestWith(Player p, Guild guild, Guild other) {
+      this.openChest(p, guild, new String[]{"coffre", other.getName()});
+   }
 
    private void openChest(Player p, Guild guild, String[] args) {
       Guild other = args.length > 1 ? this.plugin.getGuildManager().getGuildByName(args[1]) : null;
