@@ -443,7 +443,7 @@ Thank a helpful player: they gain **1 honor point**. You can thank the same pers
 
 ### 🎓 Mentoring (`/parrain <player>`)
 
-An advanced player (profession chosen, in a guild, 5 h played) can guide a **recruit** (joined less than 14 days ago, 5 recruits at most). The recruit accepts with `/parrain accepter`. The mentor is rewarded when the recruit reaches milestones: **first profession** (+200 coins, +50 for the recruit) and **first territory** of their guild (+300, +100 for the recruit). Mentor and recruit must never have played from the same connection, even at different times. `/parrain` shows progress.
+An advanced player (profession chosen, in a guild, 15 h played) can guide a **recruit** (joined less than 14 days ago, 5 recruits at most). The recruit accepts with `/parrain accepter`. The mentor is rewarded when the recruit reaches milestones: **first profession** (+200 coins, +50 for the recruit) and **first territory** of their guild (+300, +100 for the recruit). Mentor and recruit must never have played from the same connection, even at different times. `/parrain` shows progress.
 
 ### ⛓ Ransom
 
@@ -541,6 +541,10 @@ Every week the community elects on the website (`/votes`) the most **clueless**,
 
 - **Revenge**: the guild that loses a raid gets **24 h of hordes at -50%** against its victor.
 - **Catch-up**: guilds **below the season median** earn up to **+25%** on monster bounties (at least 4 guilds). The bonus shrinks as they catch up and vanishes at the median.
+
+### 🔇 No private messages
+
+Private messages are **disabled**: `/msg`, `/tell`, `/w`, `/r` and their equivalents (including `minecraft:msg` or Essentials ones) are refused and no longer show up in tab completion. Talk in the public chat or in your guild chat. Configurable list: `chat.blocked-commands`.
 
 ### Playing in English
 

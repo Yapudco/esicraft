@@ -440,7 +440,7 @@ Remercie un joueur serviable : il gagne **1 point d'honneur**. Tu peux remercier
 
 ### 🎓 Parrainage (`/parrain <joueur>`)
 
-Un joueur avancé (métier choisi, en guilde, 5 h de jeu) peut guider une **recrue** (arrivée depuis moins de 14 jours, 5 recrues au plus). La recrue accepte avec `/parrain accepter`. Le parrain est récompensé quand elle atteint des jalons : **premier métier** (+200 pièces, +50 pour la recrue) et **premier territoire** de sa guilde (+300, +100 pour la recrue). Parrain et recrue ne doivent jamais avoir joué depuis la même connexion, même à des moments différents. `/parrain` montre l'avancement.
+Un joueur avancé (métier choisi, en guilde, 15 h de jeu) peut guider une **recrue** (arrivée depuis moins de 14 jours, 5 recrues au plus). La recrue accepte avec `/parrain accepter`. Le parrain est récompensé quand elle atteint des jalons : **premier métier** (+200 pièces, +50 pour la recrue) et **premier territoire** de sa guilde (+300, +100 pour la recrue). Parrain et recrue ne doivent jamais avoir joué depuis la même connexion, même à des moments différents. `/parrain` montre l'avancement.
 
 ### ⛓ Rançon
 
@@ -538,6 +538,10 @@ Chaque semaine, la communauté élit sur le site (`/votes`) le plus **débile**,
 
 - **Revanche** : la guilde qui perd un raid obtient **24 h de hordes à -50 %** contre son vainqueur.
 - **Rattrapage** : les guildes **sous la médiane** de la saison touchent jusqu'à **+25 %** sur les primes de monstres (4 guildes au moins). Le bonus diminue à mesure qu'elles rattrapent et disparaît à la médiane.
+
+### 🔇 Pas de messages privés
+
+Les messages privés sont **désactivés** : `/msg`, `/tell`, `/w`, `/r` et leurs équivalents (y compris `minecraft:msg` ou ceux d'Essentials) sont refusés et n'apparaissent plus dans l'auto-complétion. On parle dans le chat public ou dans celui de sa guilde. Liste réglable : `chat.blocked-commands`.
 
 ### Le jeu en anglais
 
