@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (bras de fer plus lent)
+
+### Changements
+- **Bras de fer** : rythme nettement ralenti. On a 1,5 s pour cliquer sur le poing au début (0,7 s au plus court, contre 0,25 s avant), et 0,75 à 1,5 s de pause entre deux poings. Réglages : `taverns.arm-wrestling.start-window-ticks` et `min-window-ticks`.
+
 ## 12/11/2026 (tavernes ouvertes à la guilde)
 
 ### Changements
