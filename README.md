@@ -473,7 +473,7 @@ Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 
 | 🎡 **Roulette** | Européenne (0 à 36) : rouge/noir, pair/impair, manque/passe ×2, douzaines ×3, numéro plein ×36 ; le 0 fait gagner la maison |
 | 🎰 **Machine à sous** | Trois rouleaux : 7-7-7 ×50, diamants ×20, cloches ×10, citrons ×6, cerises ×4 ; deux cerises ×1,5 ; une cerise ×0,5 |
 | 🎲 **Dés** | Deux dés contre deux dés de la maison : total plus haut ×2, égalité : moitié de la mise rendue |
-| 💪 **Bras de fer** | Jeu d'adresse contre le champion de la taverne : cliquez sur le poing dès qu'il apparaît (1,5 s au début, de moins en moins de temps ensuite). Un clic réussi le fait plier, un clic raté ou trop lent vous fait reculer, et il pousse aussi de lui-même. Victoire ×1,8 ; 6 parties par jour (`taverns.arm-wrestling.matches-per-day`) |
+| 💪 **Bras de fer** | Jeu d'adresse contre le champion de la taverne : cliquez sur le poing dès qu'il apparaît (1,3 s au début, 0,6 s au plus court). Un clic réussi le fait plier, un clic raté ou trop lent vous fait reculer, et il pousse aussi de lui-même, de plus en plus souvent. Attention aux **feintes** (bloc rouge ✋) : il ne faut pas les toucher, sinon vous reculez de deux crans. Victoire ×1,8 ; 6 parties par jour (`taverns.arm-wrestling.matches-per-day`) |
 | 🐖 **Course de cochons** | Quatre cochons (Rosette, Jambonneau, Truffe, Saucisse) : pariez sur le gagnant, ×3,6 |
 
 Les gains viennent de la banque de la taverne, les pertes y entrent. **Tout le monde peut jouer**, y compris les membres de la guilde propriétaire contre leur propre maison. Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.

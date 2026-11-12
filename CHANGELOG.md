@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (bras de fer plus difficile)
+
+### Changements
+- **Bras de fer** : le champion pousse plus souvent (40 % avant chaque poing au départ, jusqu'à 75 %), le temps pour cliquer passe à 1,3 s au début et 0,6 s au plus court, et un poing sur quatre (dès le 2e tour) est une **feinte** à ne pas toucher (−2 crans si on clique dessus). Réglages : `taverns.arm-wrestling.champion-push`, `champion-push-max`, `feint-chance`.
+
 ## 12/11/2026 (tutoriel étoffé)
 
 ### Changements

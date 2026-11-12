@@ -96,6 +96,8 @@ public class TavernGames implements Listener {
       int wait;
       int stake;
       boolean running;
+      /** Le poing affiché est une feinte du champion : il ne faut PAS cliquer dessus. */
+      boolean trap;
 
       Arm(String g) {
          super(g);
@@ -688,11 +690,25 @@ public class TavernGames implements Listener {
 
    /** Temps (en ticks) pour cliquer sur le poing au premier tour ; il raccourcit d'un tick par tour jusqu'au minimum. */
    private int armStartWindow() {
-      return Math.max(10, this.plugin.getConfig().getInt("taverns.arm-wrestling.start-window-ticks", 30));
+      return Math.max(10, this.plugin.getConfig().getInt("taverns.arm-wrestling.start-window-ticks", 26));
+   }
+
+   /** Chance de base que le champion pousse avant chaque poing (+4 points par tour, plafonnée). */
+   private double armPushBase() {
+      return Math.max(0.0, Math.min(1.0, this.plugin.getConfig().getDouble("taverns.arm-wrestling.champion-push", 0.40)));
+   }
+
+   private double armPushMax() {
+      return Math.max(this.armPushBase(), Math.min(1.0, this.plugin.getConfig().getDouble("taverns.arm-wrestling.champion-push-max", 0.75)));
+   }
+
+   /** Part des poings qui sont des feintes (à ne pas toucher), à partir du 2e tour. */
+   private double armTrapChance() {
+      return Math.max(0.0, Math.min(0.8, this.plugin.getConfig().getDouble("taverns.arm-wrestling.feint-chance", 0.25)));
    }
 
    private int armMinWindow() {
-      return Math.max(6, Math.min(this.armStartWindow(), this.plugin.getConfig().getInt("taverns.arm-wrestling.min-window-ticks", 14)));
+      return Math.max(6, Math.min(this.armStartWindow(), this.plugin.getConfig().getInt("taverns.arm-wrestling.min-window-ticks", 12)));
    }
 
    private int armLimit() {
@@ -709,7 +725,7 @@ public class TavernGames implements Listener {
    private void renderArm(Inventory inv, Arm h, Guild owner) {
       this.fill(inv);
       inv.setItem(4, new ItemBuilder(Material.BARREL).name("&6&lBras de fer").lore(this.houseLine(owner), "&7Cliquez sur le &e✊ poing &7dès qu'il apparaît", "&7dans la grille : chaque clic réussi fait",
-         "&7plier le champion. Un clic raté ou trop lent", "&7vous fait reculer, et il pousse de plus en plus fort.", "&7Victoire : &a×" + ARM_MULT + " &7la mise").build());
+         "&7plier le champion. Un clic raté ou trop lent", "&7vous fait reculer, et il pousse de plus en plus fort.", "&7Méfiez-vous des &4✋ feintes &7: n'y touchez pas !","&7Victoire : &a×" + ARM_MULT + " &7la mise").build());
       this.chips(inv, h);
       inv.setItem(16, new ItemBuilder(Material.IRON_INGOT).name("&a&lAFFRONTER LE CHAMPION").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
       this.renderRope(inv, h);
@@ -778,7 +794,7 @@ public class TavernGames implements Listener {
 
             h.round++;
             // Le champion pousse de lui-même de temps en temps, de plus en plus souvent.
-            if (ThreadLocalRandom.current().nextDouble() < Math.min(0.6, 0.25 + h.round * 0.03)) {
+            if (ThreadLocalRandom.current().nextDouble() < Math.min(this.armPushMax(), this.armPushBase() + h.round * 0.04)) {
                h.pos--;
                this.renderRope(inv, h);
                this.tick(p, Sound.ENTITY_IRON_GOLEM_HURT, 0.8F);
@@ -791,7 +807,9 @@ public class TavernGames implements Listener {
 
             h.target = ARM_GRID[ThreadLocalRandom.current().nextInt(ARM_GRID.length)];
             h.deadline = Math.max(this.armMinWindow(), this.armStartWindow() - h.round);
-            inv.setItem(h.target, new ItemBuilder(Material.IRON_INGOT).name("&e&l✊ POUSSEZ !").build());
+            h.trap = h.round > 1 && ThreadLocalRandom.current().nextDouble() < this.armTrapChance();
+            inv.setItem(h.target, h.trap ? new ItemBuilder(Material.REDSTONE_BLOCK).name("&4&l✋ FEINTE ! &cNe touchez pas").build()
+               : new ItemBuilder(Material.IRON_INGOT).name("&e&l✊ POUSSEZ !").build());
             return;
          }
 
@@ -799,6 +817,12 @@ public class TavernGames implements Listener {
             inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
             h.target = -1;
             h.wait = ThreadLocalRandom.current().nextInt(15, 31);
+            if (h.trap) {
+               // Feinte ignorée : c'est bien joué, rien ne bouge.
+               h.trap = false;
+               return;
+            }
+
             h.pos--;
             this.renderRope(inv, h);
             this.tick(p, Sound.BLOCK_NOTE_BLOCK_BASS, 0.6F);
@@ -815,7 +839,14 @@ public class TavernGames implements Listener {
          return;
       }
 
-      boolean hit = slot == h.target;
+      boolean hit = slot == h.target && !h.trap;
+      if (slot == h.target && h.trap) {
+         // Tomber dans la feinte coûte deux crans.
+         h.pos--;
+         ChatUtil.sendActionbar(player, "&c✋ C'était une feinte !");
+      }
+
+      h.trap = false;
       inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
       h.target = -1;
       h.wait = ThreadLocalRandom.current().nextInt(15, 31);
