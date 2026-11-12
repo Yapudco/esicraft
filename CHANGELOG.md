@@ -2,6 +2,19 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (de quoi tenir un an)
+
+### Nouveautés
+- **Monde de ressources** (`/ressources`) : un monde minier séparé, remis à neuf chaque semaine (lundi 5 h par défaut). Minerai frais, PvP libre, aucune revendication possible. Avertissements avant la remise à zéro, retour automatique à la surface, portails désactivés. Réglages : `resource-world.*`.
+- **Marchand itinérant de guilde** (`/marchand`) : chaque jour, un marchand rare s'installe 6 heures près du Nexus d'une guilde tirée au sort. Tout le monde peut venir lui acheter (2 achats par jour) ; la guilde hôte touche 75 pièces par achat d'un visiteur étranger. Réglages : `guild-merchant.*`.
+- **Bâtiments de guilde** (`/batiment`) : forge, bibliothèque et écurie, détectées comme la taverne (blocs requis dans un chunk du territoire). Forge : usure −20 %, enclumes à moitié prix. Bibliothèque : +15 % d'expérience, un niveau rendu à l'enchantement. Écurie : Vitesse et Régénération pour les montures.
+- **Commandes d'achat à l'Hôtel des Ventes** (`/ah commande`, `/ah commandes`) : « j'achète 64 diamants à tel prix ». La somme est bloquée, chacun peut livrer et être payé aussitôt, l'acheteur retire ses objets quand il veut, l'annulation rembourse le reste.
+- **Trois jeux de taverne** : dés (deux dés contre la maison), bras de fer (jeu d'adresse contre le champion, 6 parties par jour) et course de cochons (×3,6).
+- **Tutoriel guidé en quêtes** (`/tutoriel`) : choisir un métier, rejoindre une guilde, premier contrat, monde de ressources, premier échange à l'HDV. Barre de progression, récompenses à chaque étape et bonus final.
+
+### Correctifs
+- Le **Marchand du Marché Noir** était bloqué par la règle « commerce réservé au Syndicat Marchand ou à l'Âge 4 » à l'ouverture de son inventaire : il est ouvert à tous, comme annoncé.
+
 ## 11/11/2026 (audit, quatrième passe)
 
 ### Sécurité : triche et boucles de jeu abusées

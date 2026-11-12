@@ -184,6 +184,7 @@ public class ContractManager {
       ChatUtil.sendMessage(player, "&a✔ Contrat accompli : &f" + contract.type().describe(contract.target()) + " &8» &6+" + String.format("%.0f", contract.reward()) + " pièces");
       ChatUtil.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.2F);
       this.plugin.getAchievements().addStat(player.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_CONTRACTS, 1L);
+      this.plugin.getTutorial().complete(player, fr.esicraft.life.TutorialManager.Step.CONTRACT);
       if (state.completedCount() == CONTRACTS_PER_DAY) {
          if (data != null) {
             data.addCoins(ALL_DONE_BONUS);

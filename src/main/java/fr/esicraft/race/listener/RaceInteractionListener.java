@@ -214,7 +214,7 @@ public class RaceInteractionListener implements Listener {
       if (event.getPlayer() instanceof Player player) {
          AgeType age = this.plugin.getAgeManager().getPlayerAge(player);
          Race race = this.plugin.getRaceManager().getRace(player);
-         if (event.getInventory().getType() == InventoryType.MERCHANT) {
+         if (event.getInventory().getType() == InventoryType.MERCHANT && !fr.esicraft.game.GuildMerchantManager.isSpecialTrader(event.getInventory().getHolder())) {
             Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
             boolean isMerchantSyndicate = guild != null && guild.getSpecialization() == GuildSpecialization.MERCHANT_SYNDICATE;
             boolean canTrade = isMerchantSyndicate || age.getLevel() >= 4;
@@ -325,8 +325,8 @@ public class RaceInteractionListener implements Listener {
       if (event.getRightClicked() instanceof AbstractVillager
          || event.getRightClicked() instanceof Villager
          || event.getRightClicked() instanceof WanderingTrader) {
-         if (event.getRightClicked().getScoreboardTags().contains(fr.esicraft.fun.EventManager.TRADER_TAG)) {
-            return; // Marchand du Marché Noir : ouvert à tous
+         if (fr.esicraft.game.GuildMerchantManager.isSpecialTrader(event.getRightClicked())) {
+            return; // Marchand du Marché Noir ou marchand itinérant de guilde : ouverts à tous
          }
 
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());

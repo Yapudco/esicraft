@@ -42,11 +42,24 @@ public class MarketCommand implements CommandExecutor {
                      return true;
                   }
 
-                  this.plugin.getMarketManager().createListing(player, inHand, price);
+                  if (this.plugin.getMarketManager().createListing(player, inHand, price)) {
+                     this.plugin.getTutorial().complete(player, fr.esicraft.life.TutorialManager.Step.MARKET);
+                  }
                } catch (NumberFormatException var9) {
                   ChatUtil.sendMessage(player, "&cMontant invalide.");
                }
 
+               return true;
+            }
+
+            String sub = args[0].toLowerCase(java.util.Locale.ROOT);
+            if (sub.equals("commande") || sub.equals("acheter") || sub.equals("order") || sub.equals("buy")) {
+               this.plugin.getBuyOrders().create(player, args);
+               return true;
+            }
+
+            if (sub.equals("commandes") || sub.equals("orders") || sub.equals("livrer")) {
+               this.plugin.getBuyOrders().openGui(player, 1);
                return true;
             }
 

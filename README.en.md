@@ -34,6 +34,9 @@
 4. **Earn money**: kill monsters, complete your daily contracts (`/contrat`), sell at the Auction House (`/ah`).
 5. **Level up your guild** by donating resources in `/age` to unlock new gear and dimensions.
 
+> [!NOTE]
+> A **guided quest tutorial** (`/tutoriel`) walks you through the start: a bar at the top of the screen shows the current quest (choose a job, join a guild, complete a first contract, go down to the resource world, make a first trade at the Auction House). Each quest pays 100 to 150 coins, once per account, and finishing the tutorial gives **300 coins** and a basket of food. `/tutoriel masquer` hides the bar.
+
 > [!TIP]
 > Type `/guide` to get the in-game rule book (30 pages: clickable table of contents, jobs, guilds, Nexus, raids, Ages, money, treaties, trains, events, commands), and `/hud` to show or hide the dashboard on the right of your screen.
 
@@ -295,6 +298,14 @@ When you kill a player from another guild, you **take 100 coins + 1% of their fo
 
 Guild bank (`/guild bank <amount>`) for land, traps and raids · transfers (`/pay`) · Auction House purchases · train trips · profession changes.
 
+### 🛒 Buy orders at the Auction House
+
+Besides listings, the Auction House takes **buy orders**: "I'm buying 64 diamonds at 30 coins each".
+
+- **Place an order**: hold the wanted item and type `/ah commande <quantity> <unit price>`, or `/ah commande <material> <quantity> <unit price>` (English name, e.g. `diamond`). The full amount is **locked** right away. 5 open orders at most (`market.max-buy-orders-per-player`), 2,304 items at most per order.
+- **Deliver**: `/ah commandes` (or the book in `/ah`) lists the orders, best-paid first. One click delivers everything you have (up to the order's size) and you're **paid at once**, minus the market tax (no tax for the Merchant Syndicate). Only "plain" items count (no name, enchantment or wear).
+- **Collect**: on your own order, left click to collect delivered items, right click to **cancel** (the undelivered part is refunded). Delivered items wait for you until you collect them, even while you're offline.
+
 ---
 
 ## 🤝 9. Diplomacy and travel
@@ -462,8 +473,40 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 | 🍻 **The bar** | A drink (50 coins, or 5 / 10 at once) gives one draw: **0.0001%** enchanted golden apple, **1%** golden apple, **12%** 8 steaks, **12%** 16 baked potatoes, **50%** a *Kastell red pint* (nausea, 30 s), the rest a random suspicious stew |
 | 🎡 **Roulette** | European (0 to 36): red/black, even/odd, low/high ×2, dozens ×3, straight number ×36; 0 makes the house win |
 | 🎰 **Slot machine** | Three reels: 7-7-7 ×50, diamonds ×20, bells ×10, lemons ×6, cherries ×4; two cherries ×1.5; one cherry ×0.5 |
+| 🎲 **Dice** | Two dice against the house's two dice: higher total ×2, tie: half the bet back |
+| 💪 **Arm wrestling** | Skill game against the tavern champion: click the fist as soon as it appears (faster and faster). A good click bends his arm, a missed or slow click pushes you back, and he pushes on his own too. Win ×1.8; 6 matches a day (`taverns.arm-wrestling.matches-per-day`) |
+| 🐖 **Pig race** | Four pigs (Rosette, Jambonneau, Truffe, Saucisse): bet on the winner, ×3.6 |
 
-Winnings come out of the tavern's bank, losses go into it. **The house doesn't play against its own members**: coin flip, roulette and slot machine are only for customers from other guilds (the bar stays open to everyone). *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
+Winnings come out of the tavern's bank, losses go into it. **The house doesn't play against its own members**: games of chance are only for customers from other guilds (the bar stays open to everyone). *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
+
+### ⛏ The resource world (`/ressources`)
+
+A **separate mining world**, reset **every week** (Monday at 5 am by default, `resource-world.reset-day` / `reset-hour`). It has **fresh ore** and wild land, so the main world doesn't turn into Swiss cheese. **No territory** can be claimed there: **PvP is free** everywhere.
+
+- `/ressources`: go down (random safe landing spot within a 6,000-block border; not in combat, in a duel or in captivity; 5 minutes between trips).
+- `/ressources quitter`: go back to where you came from (or your bed, or spawn).
+- `/ressources info`: date of the next reset.
+
+Players inside are warned 60, 30, 10, 5 and 1 minute before the reset, then sent back to the surface. A player who logged out in the old world comes back at spawn when they reconnect. Portals don't work there. **Don't leave anything valuable down there!**
+
+### 🐫 The travelling guild merchant (`/marchand`)
+
+Every day (around 2 pm, `guild-merchant.hour`), a **rare merchant** settles for 6 hours near the Nexus of a **randomly drawn guild** (Nexus placed, at least 4 claims, a member online; never the same guild two days in a row). The whole server is told and **anyone can come and see him**: a chance to cross foreign lands, negotiate safe passage… or set an ambush.
+
+- He sells 5 items drawn from: Mending, Unbreaking III, Efficiency IV, Fortune III books, trident, heart of the sea, netherite upgrade template, sniffer egg, saddle, name tags, bottles o' enchanting, ancient debris, shulker shells, golden apples. Paid in **emeralds** or **diamonds**, 3 of each offer, **2 purchases per player per day**.
+- He requires no Age: anyone can trade with him.
+- The host guild gets **75 coins** in its bank for each purchase by a foreign visitor (`guild-merchant.host-commission`): it pays to be welcoming.
+- `/marchand` shows where he is and when he leaves. If the land hosting him is lost, he leaves.
+
+### 🏛 Guild buildings (`/batiment`)
+
+Like a tavern, a building is a **chunk of your territory** (never the Nexus one, nor a tavern) holding the right blocks. An officer declares it with `/batiment declarer <forge|bibliotheque|ecurie>` (`/batiment retirer` to free it); each guild can have **one building of each type**. Buildings are checked regularly: if one no longer qualifies, its bonus is suspended until it's fixed. `/batiment` shows the state of all three.
+
+| Building | Blocks required in the chunk | Bonus for members |
+| :--- | :--- | :--- |
+| ⚒ **Forge** | An anvil, a blast furnace (under a roof) and a smithing table | Tools and armour wear out **20% slower**; the forge's anvils cost **half** the experience |
+| 📚 **Library** | An enchanting table (under a roof), a lectern and **15 bookshelves** | **+15% experience**; enchanting at the library table **refunds 1 level** |
+| 🐎 **Stable** | **6 hay bales** and **8 fences** (or fence gates) | Mounts (horses, donkeys, mules, camels, pigs, striders) get **Speed and Regeneration** |
 
 ### 📈 The stock exchange (`/bourse`)
 
@@ -545,6 +588,11 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/age` | Age progression and donations |
 | `/money` · `/baltop` · `/pay <player> <amount>` | Your money · richest players · send coins |
 | `/ah` · `/ah sell <price>` | Auction House and raids · sell the item in your hand |
+| `/ah commande [material] <quantity> <unit price>` · `/ah commandes` | Place a buy order · deliver, collect or cancel orders |
+| `/ressources [quitter\|info]` | Go down to the resource world · go back up · next reset date |
+| `/marchand` | Where today's travelling merchant is |
+| `/batiment [declarer <forge\|bibliotheque\|ecurie>\|retirer]` | Guild buildings and their bonuses |
+| `/tutoriel [masquer\|afficher]` | Guided tutorial quests |
 | `/contrat` | Daily contracts and guild contract |
 | `/aide` | Call your allies for help during an attack |
 | `/deguisement <guild or Name>` · `/deguisement off` | Change skin and name (guild or any Minecraft account) · remove the disguise |
@@ -564,7 +612,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/vote [number]` | Guild Court: vote the week's rule (Mondays) |
 | `/duel <player> [stake]` · `/duel accepter\|refuser` | Honor duel in a neutral arena |
 | `/pari <side> <amount>` | Bet on a raid or a duel (spectators) |
-| `/taverne [declarer\|retirer]` | Neutral zone and coin flip |
+| `/taverne [declarer\|retirer]` | Neutral zone and games (coin flip, bar, roulette, slots, dice, arm wrestling, pig race) |
 | `/bourse [ouvrir\|acheter\|vendre\|portefeuille]` | Guild shares (Age 4) |
 | `/siege [declarer <guild> <day> <hour>\|liste\|annuler]` | Formal war |
 | `/rancon cellule` | Designate your guild's prison cell |

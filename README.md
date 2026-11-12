@@ -31,6 +31,9 @@
 4. **Gagne de l'argent** : tue des monstres, remplis tes contrats du jour (`/contrat`), vends à l'Hôtel des Ventes (`/ah`).
 5. **Fais avancer ta guilde** en donnant des ressources dans `/age` pour débloquer de nouveaux équipements et dimensions.
 
+> [!NOTE]
+> Un **tutoriel guidé en quêtes** (`/tutoriel`) t'accompagne : une barre en haut de l'écran indique la quête en cours (choisir un métier, rejoindre une guilde, accomplir un premier contrat, descendre au monde de ressources, faire un premier échange à l'Hôtel des Ventes). Chaque quête rapporte de 100 à 150 pièces, une seule fois par compte, et le tutoriel terminé offre **300 pièces** et un panier de provisions. `/tutoriel masquer` cache la barre.
+
 > [!TIP]
 > Tape `/guide` pour recevoir le livre de règles en jeu (30 pages : sommaire cliquable, métiers, guildes, Nexus, raids, Âges, argent, traités, train, événements, commandes), et `/hud` pour afficher ou masquer le tableau de bord à droite de l'écran.
 
@@ -292,6 +295,14 @@ Quand tu tues un joueur d'une autre guilde, tu lui **prends 100 pièces + 1 % de
 
 Banque de guilde (`/guild bank <montant>`) pour les terres, les pièges et les raids · virements (`/pay`) · achats à l'Hôtel des Ventes · trajets en train · changements de métier.
 
+### 🛒 Commandes d'achat à l'Hôtel des Ventes
+
+En plus des annonces, l'HDV accepte des **commandes d'achat** : « j'achète 64 diamants à 30 pièces l'unité ».
+
+- **Passer une commande** : tenez l'objet voulu en main et tapez `/ah commande <quantité> <prix unitaire>`, ou `/ah commande <matériau> <quantité> <prix unitaire>` (nom anglais, ex. `diamond`). La somme totale est **bloquée** aussitôt. 5 commandes ouvertes au plus (`market.max-buy-orders-per-player`), 2 304 objets au plus par commande.
+- **Livrer** : `/ah commandes` (ou le livre dans `/ah`) liste les commandes, les mieux payées d'abord. Un clic livre tout ce que vous avez (dans la limite de la commande) et vous **payez aussitôt**, taxe du marché déduite (pas de taxe pour le Syndicat Marchand). Seuls les objets « nus » comptent (sans nom, enchantement ni usure).
+- **Récupérer** : sur sa propre commande, clic gauche pour retirer les objets livrés, clic droit pour **annuler** (la partie non livrée est remboursée). Les objets livrés attendent tant que vous ne les avez pas retirés, même hors connexion.
+
 ---
 
 ## 🤝 9. Diplomatie et transports
@@ -459,8 +470,40 @@ Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 
 | 🍻 **Le bar** | Un verre (50 pièces, ou 5 / 10 d'un coup) donne un tirage : **0,0001 %** pomme dorée enchantée, **1 %** pomme dorée, **12 %** 8 steaks, **12 %** 16 pommes de terre cuites, **50 %** une *pinte de Kastell rouge* (nausée, 30 s), le reste une soupe suspecte aléatoire |
 | 🎡 **Roulette** | Européenne (0 à 36) : rouge/noir, pair/impair, manque/passe ×2, douzaines ×3, numéro plein ×36 ; le 0 fait gagner la maison |
 | 🎰 **Machine à sous** | Trois rouleaux : 7-7-7 ×50, diamants ×20, cloches ×10, citrons ×6, cerises ×4 ; deux cerises ×1,5 ; une cerise ×0,5 |
+| 🎲 **Dés** | Deux dés contre deux dés de la maison : total plus haut ×2, égalité : moitié de la mise rendue |
+| 💪 **Bras de fer** | Jeu d'adresse contre le champion de la taverne : cliquez sur le poing dès qu'il apparaît (de plus en plus vite). Un clic réussi le fait plier, un clic raté ou trop lent vous fait reculer, et il pousse aussi de lui-même. Victoire ×1,8 ; 6 parties par jour (`taverns.arm-wrestling.matches-per-day`) |
+| 🐖 **Course de cochons** | Quatre cochons (Rosette, Jambonneau, Truffe, Saucisse) : pariez sur le gagnant, ×3,6 |
 
-Les gains viennent de la banque de la taverne, les pertes y entrent. **La maison ne joue pas contre ses propres membres** : pile ou face, roulette et machine à sous sont réservés aux clients des autres guildes (le bar reste ouvert à tous). Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
+Les gains viennent de la banque de la taverne, les pertes y entrent. **La maison ne joue pas contre ses propres membres** : les jeux de hasard sont réservés aux clients des autres guildes (le bar reste ouvert à tous). Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
+
+### ⛏ Le monde de ressources (`/ressources`)
+
+Un **monde minier séparé**, remis à neuf **chaque semaine** (le lundi à 5 h par défaut, `resource-world.reset-day` / `reset-hour`). On y trouve du **minerai frais** et des terres sauvages, ce qui évite de transformer le monde principal en gruyère. **Aucun territoire** ne peut y être revendiqué : le **PvP y est libre** partout.
+
+- `/ressources` : descendre (point d'arrivée aléatoire et sûr dans une bordure de 6 000 blocs ; pas en combat, en duel ni en captivité ; 5 minutes entre deux descentes).
+- `/ressources quitter` : remonter là d'où l'on venait (ou à son lit, ou au point d'apparition).
+- `/ressources info` : date de la prochaine remise à zéro.
+
+Les joueurs présents sont prévenus 60, 30, 10, 5 et 1 minute avant la remise à zéro, puis renvoyés à la surface. Un joueur déconnecté dans l'ancien monde revient au point d'apparition à sa reconnexion. Les portails n'y fonctionnent pas. **Ne laissez rien de précieux en bas !**
+
+### 🐫 Le marchand itinérant de guilde (`/marchand`)
+
+Chaque jour (vers 14 h, `guild-merchant.hour`), un **marchand rare** s'installe pendant 6 heures près du Nexus d'une **guilde tirée au sort** (Nexus posé, au moins 4 territoires, un membre en ligne ; jamais deux jours de suite la même). Tout le serveur est prévenu et **tout le monde peut venir le voir** : c'est l'occasion de traverser des terres étrangères, de négocier un passage… ou de tendre une embuscade.
+
+- Il vend 5 objets tirés au sort parmi : livres Raccommodage, Solidité III, Efficacité IV, Fortune III, trident, cœur de la mer, gabarit d'amélioration en netherite, œuf de renifleur, selle, étiquettes, fioles d'expérience, débris antiques, carapaces de shulker, pommes dorées. Paiement en **émeraudes** ou **diamants**, 3 exemplaires par offre, **2 achats par joueur et par jour**.
+- Il n'exige aucun Âge : tout le monde peut commercer avec lui.
+- La guilde hôte touche **75 pièces** en banque à chaque achat d'un visiteur étranger (`guild-merchant.host-commission`) : elle a intérêt à bien recevoir.
+- `/marchand` donne sa position et l'heure de son départ. S'il perd le terrain qui l'accueille, il s'en va.
+
+### 🏛 Bâtiments de guilde (`/batiment`)
+
+Comme la taverne, un bâtiment est un **chunk de son territoire** (jamais celui du Nexus, ni une taverne) qui contient les bons blocs. Un officier le déclare avec `/batiment declarer <forge|bibliotheque|ecurie>` (`/batiment retirer` pour le libérer) ; chaque guilde peut avoir **un bâtiment de chaque type**. Le bâtiment est revérifié régulièrement : s'il n'est plus conforme, son bonus est suspendu jusqu'à ce qu'on le répare. `/batiment` liste l'état des trois.
+
+| Bâtiment | Blocs requis dans le chunk | Bonus pour les membres |
+| :--- | :--- | :--- |
+| ⚒ **Forge** | Une enclume, un haut fourneau (sous un toit) et une table de forgeron | Outils et armures s'usent **20 % moins vite** ; les enclumes de la forge coûtent **moitié moins** d'expérience |
+| 📚 **Bibliothèque** | Une table d'enchantement (sous un toit), un pupitre et **15 bibliothèques** | **+15 % d'expérience** ; enchanter sur la table de la bibliothèque **rend 1 niveau** |
+| 🐎 **Écurie** | **6 bottes de foin** et **8 clôtures** (ou portillons) | Les montures (chevaux, ânes, mules, chameaux, cochons, arpenteurs) reçoivent **Vitesse et Régénération** |
 
 ### 📈 La bourse (`/bourse`)
 
@@ -544,6 +587,11 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/age` | Progression des Âges et dons |
 | `/money` · `/baltop` · `/pay <joueur> <montant>` | Son argent · les plus riches · envoyer des pièces |
 | `/ah` · `/ah sell <prix>` | Hôtel des Ventes et raids · vendre l'objet en main |
+| `/ah commande [matériau] <quantité> <prix unitaire>` · `/ah commandes` | Passer une commande d'achat · livrer, retirer ou annuler des commandes |
+| `/ressources [quitter\|info]` | Descendre au monde de ressources · remonter · date de la remise à zéro |
+| `/marchand` | Où se trouve le marchand itinérant du jour |
+| `/batiment [declarer <forge\|bibliotheque\|ecurie>\|retirer]` | Bâtiments de guilde et leurs bonus |
+| `/tutoriel [masquer\|afficher]` | Quêtes du tutoriel guidé |
 | `/contrat` | Contrats du jour et contrat de guilde |
 | `/aide` | Appeler ses alliés à l'aide pendant une attaque |
 | `/deguisement <guilde ou Pseudo>` · `/deguisement off` | Changer de skin et de pseudo (guilde ou n'importe quel compte Minecraft) · retirer le déguisement |
@@ -563,7 +611,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/vote [numéro]` | Tribunal des guildes : voter la règle de la semaine (le lundi) |
 | `/duel <joueur> [mise]` · `/duel accepter\|refuser` | Duel d'honneur dans une arène neutre |
 | `/pari <camp> <montant>` | Parier sur un raid ou un duel (spectateurs) |
-| `/taverne [declarer\|retirer]` | Zone neutre et pile ou face |
+| `/taverne [declarer\|retirer]` | Zone neutre et jeux (pile ou face, bar, roulette, machine à sous, dés, bras de fer, course de cochons) |
 | `/bourse [ouvrir\|acheter\|vendre\|portefeuille]` | Actions de guilde (Âge 4) |
 | `/siege [declarer <guilde> <jour> <heure>\|liste\|annuler]` | Guerre formelle |
 | `/rancon cellule` | Désigner la cellule de prison de sa guilde |

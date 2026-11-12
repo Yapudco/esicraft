@@ -28,7 +28,7 @@ commands:
   ah:
     description: Hôtel des ventes et contrats de hordes
     aliases: [hdv, market, marche]
-    usage: /ah [sell <prix>|menu]
+    usage: /ah [sell <prix>|commande [matériau] <quantité> <prix unitaire>|commandes|menu]
   money:
     description: Voir son solde (sous-commandes réservées aux administrateurs)
     aliases: [solde]
@@ -158,7 +158,7 @@ commands:
     aliases: [actions]
     usage: /bourse [liste|ouvrir|fermer|acheter|vendre|portefeuille]
   taverne:
-    description: "Zone neutre - déclarer une taverne, jouer au pile ou face"
+    description: "Zone neutre - déclarer une taverne, jouer (pile ou face, roulette, dés, bras de fer, course de cochons…)"
     aliases: [tavern]
     usage: /taverne [declarer|retirer|jeu]
   webvote:
@@ -172,6 +172,23 @@ commands:
     description: "Menu des cosmétiques (auras, traînées, effets de victoire) : à gagner ou à acheter"
     aliases: [cosmetic, cosmetics]
     usage: /cosmetique [off]
+
+  ressources:
+    description: "Monde de ressources remis à neuf chaque semaine (minerai frais, PvP hors territoires)"
+    aliases: [ressource, minage, rw, resources]
+    usage: /ressources [aller|quitter|info]
+  marchand:
+    description: "Où se trouve le marchand itinérant de guilde du jour"
+    aliases: [merchant, marchanditinerant]
+    usage: /marchand
+  batiment:
+    description: "Bâtiments de guilde (forge, bibliothèque, écurie) et leurs bonus"
+    aliases: [batiments, building, buildings]
+    usage: /batiment [liste|declarer <forge|bibliotheque|ecurie>|retirer]
+  tutoriel:
+    description: "Tutoriel guidé en quêtes pour bien démarrer"
+    aliases: [tuto, tutorial]
+    usage: /tutoriel [masquer|afficher]
 
 permissions:
   esicraft.user:

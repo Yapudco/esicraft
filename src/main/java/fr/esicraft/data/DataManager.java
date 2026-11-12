@@ -290,6 +290,10 @@ public class DataManager {
       this.plugin.getFreight().clear();
       this.plugin.getSiege().clear();
       this.plugin.getBourse().clear();
+      this.plugin.getGuildMerchant().clear();
+      this.plugin.getBuildings().clear();
+      this.plugin.getBuyOrders().clear();
+      this.plugin.getTutorial().clear();
       if (this.plugin.getWebServer() != null) {
          this.plugin.getWebServer().clearVotes();
       }

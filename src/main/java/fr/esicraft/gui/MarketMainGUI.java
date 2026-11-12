@@ -58,7 +58,7 @@ public class MarketMainGUI {
          4,
          new ItemBuilder(Material.GOLD_INGOT)
             .name("&6&lVotre Solde : &e" + String.format("%.2f", balance) + " pièces")
-            .lore("&7Pour mettre en vente un objet :", "&e/ah sell <prix> &7avec l'objet en main.")
+            .lore("&7Pour mettre en vente un objet :", "&e/ah sell <prix> &7avec l'objet en main.", "&7Pour acheter en gros :", "&e/ah commande <quantité> <prix unitaire>")
             .glow()
             .build()
       );
@@ -68,6 +68,13 @@ public class MarketMainGUI {
             .name("&4&l⚔️ Contrats de Hordes & Mercenaires")
             .lore("&7Achetez une armée de monstres", "&7pour assaillir le Nexus d'une guilde rivale !", "", "&e➤ Cliquez pour ouvrir les contrats d'invasion !")
             .glow()
+            .build()
+      );
+      inv.setItem(
+         47,
+         new ItemBuilder(Material.WRITABLE_BOOK)
+            .name("&e&l🛒 Commandes d'achat")
+            .lore("&7« J'achète 64 diamants à tel prix » :", "&7livrez les commandes des autres et soyez", "&7payé aussitôt, ou passez la vôtre.", "", "&e➤ Cliquez pour ouvrir les commandes")
             .build()
       );
       if (page > 1) {

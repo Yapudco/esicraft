@@ -134,6 +134,7 @@ public class MarketManager {
                }
 
                ChatUtil.sendMessage(buyer, "&aAchat réussi pour &6" + listing.getPrice() + " pièces &a!");
+               this.plugin.getTutorial().complete(buyer, fr.esicraft.life.TutorialManager.Step.MARKET);
                ChatUtil.playSound(buyer, Sound.ENTITY_VILLAGER_CELEBRATE, 1.0F, 1.0F);
                return true;
             }

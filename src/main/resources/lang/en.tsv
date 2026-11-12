@@ -1764,3 +1764,93 @@ Les premiers titres seront proclamés à la fin de la semaine (	The first titles
 🗳 C'est vous ? Revendiquer ce pseudo pour voter	🗳 Is this you? Claim this username to vote
 Défenses (arbre technologique	Defenses (tech tree
 💎 Le Nexus et ses défenses	💎 The Nexus and its defenses
+# --- Monde de ressources, marchand itinérant, bâtiments, commandes d'achat, jeux de taverne, tutoriel
+&6⛏ Bienvenue dans le monde de ressources ! &7Pas de territoires ici : le PvP est libre. Remise à zéro : &e	&6⛏ Welcome to the resource world! &7No territories here: PvP is free. Reset: &e
+&6⛏ Recherche d'un point d'arrivée sûr…	&6⛏ Looking for a safe landing spot…
+&6⛏ Retour à la surface…	&6⛏ Back to the surface…
+&6⛏ Le monde de ressources se referme : retour à la surface !	&6⛏ The resource world is closing: back to the surface!
+&6⛏ Le monde de ressources sera remis à neuf dans &e	&6⛏ The resource world will be reset in &e
+&6 : remontez avec &e/ressources quitter&6 !	&6: head back up with &e/ressources quitter&6!
+&6&l⛏ Le monde de ressources a été remis à neuf ! &7Minerai frais et terres sauvages : &e/ressources&7. Prochaine remise à zéro : &e	&6&l⛏ The resource world has been reset! &7Fresh ore and wild lands: &e/ressources&7. Next reset: &e
+&6⛏ Le monde de ressources a été remis à neuf pendant votre absence : vous voici de retour à la surface.	&6⛏ The resource world was reset while you were away: you are back on the surface.
+&6⛏ Monde de ressources : minerai frais, PvP libre, aucune revendication. Bordure : &e	&6⛏ Resource world: fresh ore, free PvP, no claims. Border: &e
+&6. Prochaine remise à zéro : &e	&6. Next reset: &e
+&c❌ Le monde de ressources est fermé pour le moment.	&c❌ The resource world is closed for now.
+&7Vous êtes déjà dans le monde de ressources (&e/ressources quitter&7 pour remonter).	&7You are already in the resource world (&e/ressources quitter&7 to go back up).
+&c❌ Impossible de partir maintenant (combat, duel ou captivité).	&c❌ You cannot leave right now (combat, duel or captivity).
+&cavant de redescendre.	&cbefore going down again.
+&c❌ Aucun point d'arrivée sûr trouvé, réessayez.	&c❌ No safe landing spot found, try again.
+&7Vous n'êtes pas dans le monde de ressources.	&7You are not in the resource world.
+&c❌ Pas de fuite en plein combat !	&c❌ No running away mid-fight!
+&6⛏ Les portails ne fonctionnent pas dans le monde de ressources.	&6⛏ Portals do not work in the resource world.
+&c❌ Le monde de ressources est remis à neuf chaque semaine : on n'y revendique aucun territoire.	&c❌ The resource world is reset every week: no territory can be claimed there.
+&6&l🐫 Un marchand itinérant s'est installé chez &e	&6&l🐫 A travelling merchant has set up shop at &e
+&7Il vend des objets rares jusqu'à &e	&7He sells rare items until &e
+&7. Allez le voir… poliment.	&7. Go and see him… politely.
+&6🐫 Le marchand itinérant s'installe sur vos terres : vous touchez une commission sur chaque achat d'un visiteur étranger. Accueillez-les bien !	&6🐫 The travelling merchant is settling on your lands: you earn a commission on every purchase by a foreign visitor. Welcome them well!
+&7🐫 Le marchand itinérant a plié bagage. Il reviendra demain chez une autre guilde.	&7🐫 The travelling merchant has packed up. He will be back tomorrow at another guild.
+&7🐫 Le marchand itinérant a fui : les terres qui l'accueillaient ont changé de mains.	&7🐫 The travelling merchant fled: the lands hosting him changed hands.
+&6🐫 Aucun marchand itinérant en ce moment. &7Il s'installe chaque jour vers &e	&6🐫 No travelling merchant right now. &7He settles every day around &e
+&6🐫 Le marchand itinérant est chez &e	&6🐫 The travelling merchant is at &e
+&6. Il repart dans &e	&6. He leaves in &e
+&6🐫 &7« Vous m'avez déjà assez acheté aujourd'hui, l'ami. Laissez-en aux autres. »	&6🐫 &7"You've bought enough from me today, friend. Leave some for the others."
+&7est venu acheter au marchand sur vos terres	&7came to buy from the merchant on your lands
+Marchand itinérant	Travelling merchant
+&6&l🏛 Bâtiments de guilde &7— un chunk de votre territoire (hors Nexus) qui contient les bons blocs. Un de chaque par guilde.	&6&l🏛 Guild buildings &7— a chunk of your territory (not the Nexus one) holding the right blocks. One of each per guild.
+&7Officiers : &e/batiment declarer <forge|bibliotheque|ecurie> &7dans le chunk, &e/batiment retirer &7pour le libérer.	&7Officers: &e/batiment declarer <forge|bibliotheque|ecurie> &7in the chunk, &e/batiment retirer &7to free it.
+   &7Blocs : &f	   &7Blocks: &f
+   &7Bonus : &a	   &7Bonus: &a
+&8(non construit)	&8(not built)
+&a✔ actif	&a✔ active
+&c✖ suspendu	&c✖ suspended
+&c❌ Le chunk du Nexus ne peut pas accueillir de bâtiment.	&c❌ The Nexus chunk cannot host a building.
+&c❌ Ce chunk abrite déjà un bâtiment (&e/batiment retirer&c d'abord).	&c❌ This chunk already hosts a building (&e/batiment retirer&c first).
+&c❌ Ce chunk abrite déjà un bâtiment de guilde (forge, bibliothèque ou écurie).	&c❌ This chunk already hosts a guild building (forge, library or stable).
+&b📚 La bibliothèque vous rend un niveau.	&b📚 The library gives you back a level.
+outils et armures s'usent 20 % moins vite ; enclumes de la forge à moitié prix en expérience	tools and armour wear out 20% slower; forge anvils cost half the experience
++15 % d'expérience pour les membres ; enchanter dans la bibliothèque rend 1 niveau	+15% experience for members; enchanting in the library refunds 1 level
+les montures des membres reçoivent Vitesse et Régénération	members' mounts get Speed and Regeneration
+enclume, haut fourneau et table de forgeron (haut fourneau sous un toit)	anvil, blast furnace and smithing table (blast furnace under a roof)
+table d'enchantement sous un toit, pupitre et 15 bibliothèques	roofed enchanting table, lectern and 15 bookshelves
+6 bottes de foin et 8 clôtures (ou portillons)	6 hay bales and 8 fences (or fence gates)
+&e&l🛒 Commandes d'achat	&e&l🛒 Buy orders
+&8» &6Commandes d'achat 	&8» &6Buy orders
+&a✔ Commande d'achat publiée : &e	&a✔ Buy order posted: &e
+&cUtilisation : &e/ah commande <quantité> <prix unitaire> &7(objet en main) &cou &e/ah commande <matériau> <quantité> <prix unitaire>	&cUsage: &e/ah commande <quantity> <unit price> &7(item in hand) &cor &e/ah commande <material> <quantity> <unit price>
+&c❌ Matériau inconnu : tenez l'objet voulu en main, ou donnez son nom anglais (ex. &ediamond&c).	&c❌ Unknown material: hold the wanted item, or give its English name (e.g. &ediamond&c).
+&c❌ Quantité ou prix invalide.	&c❌ Invalid quantity or price.
+&7Acheteur : &f	&7Buyer: &f
+&7Prix unitaire : &6	&7Unit price: &6
+&7Reste à livrer : &e	&7Left to deliver: &e
+&7À retirer : &a	&7To collect: &a
+&a➤ Clic gauche : retirer les objets livrés	&a➤ Left click: collect delivered items
+&c➤ Clic droit : annuler (remboursement de la partie non livrée)	&c➤ Right click: cancel (refund of the undelivered part)
+&6◀ Retour à l'Hôtel des Ventes	&6◀ Back to the Auction House
+&e&lPasser une commande	&e&lPlace an order
+&cCette commande n'existe plus.	&cThis order no longer exists.
+&cCette commande est déjà remplie.	&cThis order is already filled.
+&f&lDés	&f&lDice
+&6&lBras de fer	&6&lArm wrestling
+&d&lCourse de cochons	&d&lPig race
+&a&lLANCER	&a&lROLL
+&a&lAFFRONTER LE CHAMPION	&a&lFACE THE CHAMPION
+&e&l✊ POUSSEZ !	&e&l✊ PUSH!
+&a&lREVANCHE	&a&lREMATCH
+&f🏁 Arrivée	&f🏁 Finish
+&cLe champion	&cThe champion
+&aVous	&aYou
+&fVos dés	&fYour dice
+&cLa maison	&cThe house
+&6&l📜 Tutoriel d'Esicraft 	&6&l📜 Esicraft tutorial
+&a&l✔ Quête accomplie : &f	&a&l✔ Quest completed: &f
+&7Prochaine quête : &e	&7Next quest: &e
+&6📜 Tutoriel : &e	&6📜 Tutorial: &e
+Choisir un métier	Choose a job
+Rejoindre ou fonder une guilde	Join or found a guild
+Accomplir un premier contrat	Complete a first contract
+Descendre au monde de ressources	Go down to the resource world
+Faire un premier échange à l'Hôtel des Ventes	Make a first trade at the Auction House
+&6&l★ Tutoriel terminé ! &eVous connaissez l'essentiel d'Esicraft. &6+	&6&l★ Tutorial complete! &eYou know the essentials of Esicraft. &6+
+&7a terminé le tutoriel : souhaitez-lui la bienvenue !	&7finished the tutorial: give them a warm welcome!
+&7Barre du tutoriel masquée (&e/tutoriel afficher&7 pour la remettre). Les quêtes restent valables.	&7Tutorial bar hidden (&e/tutoriel afficher&7 to show it again). Quests still count.
+&7Barre du tutoriel affichée.	&7Tutorial bar shown.
