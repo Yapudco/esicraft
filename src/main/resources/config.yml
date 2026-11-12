@@ -475,7 +475,9 @@ ransom:
 
 loans:
   enabled: true
-  interest-percent: 10.0
+  interest-percent: 10.0      # Taux proposé par défaut (le prêteur le choisit dans /banque)
+  min-interest-percent: 0.0   # Taux minimal qu'un prêteur peut choisir
+  max-interest-percent: 50.0  # Taux maximal (anti-usure)
   days: 5                     # Délai de remboursement
   min: 100.0
   max: 20000.0

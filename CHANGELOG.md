@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (banque de guilde)
+
+### Nouveautés
+- **Menu de la banque** (`/banque`) : offres reçues et envoyées, dettes, créances et coffres communs en un seul écran. On accepte, refuse, rembourse, efface ou retire une offre d'un clic.
+- **Taux d'intérêt au choix** : le prêteur règle le montant et le taux (0 à 50 %, 10 % par défaut) dans le menu, qui affiche les intérêts et la somme à rendre. En commande : `/banque pret <guilde> <montant> [taux]`. Réglages : `loans.min-interest-percent`, `loans.max-interest-percent`.
+
 ## 12/11/2026 (de quoi tenir un an)
 
 ### Nouveautés

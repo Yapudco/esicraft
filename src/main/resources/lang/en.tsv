@@ -1854,3 +1854,72 @@ Faire un premier échange à l'Hôtel des Ventes	Make a first trade at the Aucti
 &7a terminé le tutoriel : souhaitez-lui la bienvenue !	&7finished the tutorial: give them a warm welcome!
 &7Barre du tutoriel masquée (&e/tutoriel afficher&7 pour la remettre). Les quêtes restent valables.	&7Tutorial bar hidden (&e/tutoriel afficher&7 to show it again). Quests still count.
 &7Barre du tutoriel affichée.	&7Tutorial bar shown.
+# --- Menu de la banque de guilde
+&8» &6🏦 Banque de 	&8» &6🏦 Bank of
+&6&lBanque de 	&6&lBank of
+&7Prêts entre guildes liées par un &etraité&7.	&7Loans between guilds bound by a &etreaty&7.
+&7Taux d'intérêt libre, de &e	&7Free interest rate, from &e
+&cUne dette en retard bloque les revendications	&cAn overdue debt blocks claims
+&cet fait saisir un chunk par jour.	&cand gets one chunk seized per day.
+&e&lOffres reçues	&e&lReceived offers
+&7Clic gauche : accepter	&7Left click: accept
+&7Clic droit : refuser	&7Right click: refuse
+&a➤ Clic gauche : accepter	&a➤ Left click: accept
+&c➤ Clic droit : refuser	&c➤ Right click: refuse
+&ePrêt de &6	&eLoan from &6
+&7Montant : &a+	&7Amount: &a+
+&7Taux : &e	&7Rate: &e
+&7À rendre : &c	&7To repay: &c
+&7Expire dans &f	&7Expires in &f
+&c&lNos dettes	&c&lOur debts
+&7Clic gauche : tout rembourser (selon la banque)	&7Left click: repay everything (as the bank allows)
+&7Clic droit : rembourser 1 000 pièces	&7Right click: repay 1,000 coins
+&a&lNos créances	&a&lOur credits
+&7Ce que les autres guildes nous doivent.	&7What other guilds owe us.
+&7Maj + clic droit : effacer la dette (chef)	&7Shift + right click: forgive the debt (leader)
+&c➤ Maj + clic droit : effacer la dette (chef)	&c➤ Shift + right click: forgive the debt (leader)
+&cDette envers &6	&cDebt to &6
+&7Emprunté : &f	&7Borrowed: &f
+&7Reste dû : &c	&7Still owed: &c
+&7Reste dû : &a	&7Still owed: &a
+&7Prêté : &f	&7Lent: &f
+&4&lEN RETARD	&4&lOVERDUE
+&7Échéance dans &f	&7Due in &f
+&a➤ Clic gauche : tout rembourser	&a➤ Left click: repay everything
+&e➤ Clic droit : rembourser 1 000	&e➤ Right click: repay 1,000
+&anous doit	&aowes us
+&b&lOffres envoyées	&b&lSent offers
+&7Cliquez sur une offre pour la retirer.	&7Click an offer to withdraw it.
+&bOffre à &6	&bOffer to &6
+&7Retour attendu : &a	&7Expected return: &a
+&c➤ Cliquez pour retirer l'offre	&c➤ Click to withdraw the offer
+&a&lProposer un prêt	&a&lOffer a loan
+&7Choisissez une guilde partenaire,	&7Choose a partner guild,
+&7le montant et le taux d'intérêt.	&7the amount and the interest rate.
+&8(officiers et chef)	&8(officers and leader)
+&6&lCoffres communs	&6&lShared chests
+&7Un coffre partagé avec chaque	&7A chest shared with each
+&7guilde liée par un traité.	&7guild bound by a treaty.
+&8» &6Prêter à quelle guilde ?	&8» &6Lend to which guild?
+&8» &6Coffre commun avec…	&8» &6Shared chest with…
+&cAucune guilde partenaire	&cNo partner guild
+&7Territoires : &f	&7Territories: &f
+&7Prêt maximal garanti : &e	&7Maximum guaranteed loan: &e
+&4En retard de paiement : prêt impossible	&4Behind on payments: no loan possible
+&a➤ Cliquez pour préparer un prêt	&a➤ Click to prepare a loan
+&a➤ Cliquez pour ouvrir le coffre commun	&a➤ Click to open the shared chest
+&8» &6Prêt à 	&8» &6Loan to
+&7Notre banque : &e	&7Our bank: &e
+&7Prêt possible : &e	&7Possible loan: &e
+&e&lMontant	&e&lAmount
+&6Maximum	&6Maximum
+&b&lTaux d'intérêt	&b&lInterest rate
+&7Intérêts : &a+	&7Interest: &a+
+&7Délai : &f	&7Term: &f
+&7Taux par défaut	&7Default rate
+&a&lENVOYER L'OFFRE	&a&lSEND THE OFFER
+&8L'argent ne quitte notre banque	&8The money only leaves our bank
+&8que si l'offre est acceptée (10 min).	&8if the offer is accepted (10 min).
+&7Offre retirée.	&7Offer withdrawn.
+&c❌ Le taux d'intérêt doit être compris entre &e	&c❌ The interest rate must be between &e
+&cUsage : &e/banque pret <guilde> <montant> [taux %]	&cUsage: &e/banque pret <guild> <amount> [rate %]

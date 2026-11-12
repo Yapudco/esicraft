@@ -427,7 +427,9 @@ Frapper un joueur d'une autre guilde (coup, flèche, TNT, loup, potion nocive…
 
 Entre deux guildes **liées par un traité** (alliance, pacte ou vassalité) :
 
-- `/banque pret <guilde> <montant>` : un officier propose un prêt (de 100 à 20 000 pièces). L'autre guilde l'accepte avec `/banque accepter <guilde>` (ou `refuser`). Les pièces passent d'une banque à l'autre ; la guilde emprunteuse doit rendre le montant **+ 10 % d'intérêts** sous **5 jours**.
+- **`/banque` ouvre le menu de la banque** : offres reçues (clic gauche pour accepter, clic droit pour refuser), dettes (clic gauche pour tout rembourser, clic droit pour rembourser 1 000 pièces), créances (Maj + clic droit pour effacer une dette, chef seulement), offres envoyées (clic pour les retirer), et accès aux coffres communs.
+- **Proposer un prêt** (officiers) : bouton « Proposer un prêt », choix de la guilde partenaire, puis du **montant** (±100, ±1 000, maximum) et du **taux d'intérêt**, réglable de **0 à 50 %** (±1, ±5 ; 10 % par défaut, `loans.min-interest-percent` / `max-interest-percent`). Le menu affiche les intérêts et la somme à rendre. En commande : `/banque pret <guilde> <montant> [taux]`.
+- L'offre reste valable 10 minutes. Une fois acceptée (menu ou `/banque accepter <guilde>`), les pièces passent d'une banque à l'autre ; la guilde emprunteuse doit rendre le montant **plus les intérêts au taux convenu** sous **5 jours**.
 - `/banque dettes` liste les prêts · `/banque rembourser <guilde> [montant]` rembourse (en plusieurs fois possible) · `/banque pardonner <guilde>` efface une dette (**chef seulement**). Un prêt proposé par un officier compte dans son plafond de 3 000 pièces par jour.
 - `/banque coffre <guilde>` ouvre un **coffre commun** de 54 cases partagé par les deux guildes (accessible tant qu'un traité les lie).
 - **Une dette impayée pèse sur les territoires** : dès l'échéance dépassée, la guilde ne peut plus revendiquer de chunk, et **un chunk lui est saisi toutes les 24 h** (jamais celui du Nexus, jamais un chunk qui couperait le territoire). Chaque chunk saisi efface 300 pièces de dette.
@@ -602,7 +604,7 @@ Les données sont aussi en JSON : `/api/stats.json`, `/api/journal.json`, `/api/
 | `/classement` · `/histoire` | Classement de la saison · grands moments |
 | `/hud` | Afficher ou masquer le tableau de bord |
 | `/english` · `/francais` | Passer le jeu en anglais (menus, messages, tableau de bord, livre) · revenir au français |
-| `/banque` | Prêts entre guildes, dettes, coffre commun |
+| `/banque` | Menu de la banque : prêts entre guildes (taux au choix), dettes, coffre commun |
 | `/merci <joueur>` | Offrir un point d'honneur (une fois par jour et par personne) |
 | `/parrain <joueur>` | Parrainer une recrue (`accepter` / `refuser` pour répondre) |
 | `/rancon` | Gérer un prisonnier : `prix`, `payer`, `liberer`, `executer` |
