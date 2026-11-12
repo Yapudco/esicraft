@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (Greed à la taverne)
+
+### Nouveautés
+- **Greed** (taverne) : un multiplicateur part de ×1,00 et grimpe de plus en plus vite ; il faut cliquer sur « Encaisser » avant qu'il n'explose, sinon la mise est perdue. Point d'explosion aléatoire avec 4 % d'avantage pour la maison, plafond ×20 (abaissé si la banque de la taverne ne peut pas payer). Réglages : `taverns.greed.max-multiplier`, `taverns.greed.house-edge`.
+
 ## 12/11/2026 (bras de fer plus difficile)
 
 ### Changements

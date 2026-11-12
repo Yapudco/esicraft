@@ -1936,3 +1936,27 @@ Entrer dans une taverne	Step into a tavern
 &4&l✋ FEINTE ! &cNe touchez pas	&4&l✋ FEINT! &cDon't touch
 &c✋ C'était une feinte !	&c✋ That was a feint!
 &7Méfiez-vous des &4✋ feintes &7: n'y touchez pas !	&7Beware of &4✋ feints&7: don't touch them!
+&7Un multiplicateur grimpe : &a×1,00, ×1,50, ×3…	&7A multiplier climbs: &a×1.00, ×1.50, ×3…
+&7Encaissez avant qu'il n'explose,	&7Cash out before it blows up,
+&7sinon la mise est perdue !	&7or the bet is lost!
+&7Lancez la partie : le multiplicateur part de	&7Start the game: the multiplier starts at
+&a×1,00 &7et grimpe de plus en plus vite.	&a×1.00 &7and climbs faster and faster.
+&7Cliquez sur &aENCAISSER &7pour empocher	&7Click &aCASH OUT &7to pocket
+&7mise × multiplicateur… avant l'explosion !	&7bet × multiplier… before the blast!
+&cS'il explose avant, la mise est perdue.	&cIf it blows up first, the bet is lost.
+&8Fermer le menu en cours de partie = abandon.	&8Closing the menu mid-game = forfeit.
+&7Plafond : &a×	&7Cap: &a×
+&7(encaissé automatiquement)	&7(cashed out automatically)
+&a&lENCAISSER	&a&lCASH OUT
+&7Cliquez n'importe où ici !	&7Click anywhere here!
+&4&lBOUM !	&4&lBOOM!
+&a&lREJOUER	&a&lPLAY AGAIN
+&7Gain si vous encaissez : &6	&7Payout if you cash out: &6
+&c💣 Vous avez quitté la table en pleine partie : la mise de &6	&c💣 You left the table mid-game: your bet of &6
+&cest perdue.	&cis lost.
+&c💣 BOUM à ×	&c💣 BOOM at ×
+ ! La maison garde vos &6	! The house keeps your &6
+&a💣 Encaissé à ×	&a💣 Cashed out at ×
+&a(gain net 	&a(net gain
+&7a encaissé un &a×	&7cashed out a &a×
+&7au Greed de la taverne de 	&7at the Greed table of the tavern of

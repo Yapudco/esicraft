@@ -477,6 +477,7 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 | 🎰 **Slot machine** | Three reels: 7-7-7 ×50, diamonds ×20, bells ×10, lemons ×6, cherries ×4; two cherries ×1.5; one cherry ×0.5 |
 | 🎲 **Dice** | Two dice against the house's two dice: higher total ×2, tie: half the bet back |
 | 💪 **Arm wrestling** | Skill game against the tavern champion: click the fist as soon as it appears (1.3 s at first, 0.6 s at the shortest). A good click bends his arm, a missed or slow click pushes you back, and he pushes on his own too, more and more often. Watch out for **feints** (red block ✋): don't touch them, or you lose two notches. Win ×1.8; 6 matches a day (`taverns.arm-wrestling.matches-per-day`) |
+| 💣 **Greed** | A multiplier starts at ×1.00 and climbs faster and faster: click **CASH OUT** to pocket bet × multiplier before it **blows up**, or lose the bet. The blow-up point is random (4% of games blow up right away); ×20 cap, cashed out automatically (`taverns.greed.*`). Closing the menu mid-game forfeits the bet |
 | 🐖 **Pig race** | Four pigs (Rosette, Jambonneau, Truffe, Saucisse): bet on the winner, ×3.6 |
 
 Winnings come out of the tavern's bank, losses go into it. **Everyone can play**, including members of the owning guild against their own house. *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
@@ -618,7 +619,7 @@ Data is also available as JSON: `/api/stats.json`, `/api/journal.json`, `/api/ra
 | `/vote [number]` | Guild Court: vote the week's rule (Mondays) |
 | `/duel <player> [stake]` · `/duel accepter\|refuser` | Honor duel in a neutral arena |
 | `/pari <side> <amount>` | Bet on a raid or a duel (spectators) |
-| `/taverne [declarer\|retirer]` | Neutral zone and games (coin flip, bar, roulette, slots, dice, arm wrestling, pig race) |
+| `/taverne [declarer\|retirer]` | Neutral zone and games (coin flip, bar, roulette, slots, dice, arm wrestling, pig race, greed) |
 | `/bourse [ouvrir\|acheter\|vendre\|portefeuille]` | Guild shares (Age 4) |
 | `/siege [declarer <guild> <day> <hour>\|liste\|annuler]` | Formal war |
 | `/rancon cellule` | Designate your guild's prison cell |
