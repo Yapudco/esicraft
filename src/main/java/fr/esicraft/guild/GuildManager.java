@@ -560,7 +560,10 @@ public class GuildManager {
          Chunk chunk = player.getLocation().getChunk();
          ChunkKey chunkKey = ChunkKey.from(chunk);
          Guild existing = this.chunkClaims.get(chunkKey);
-         if (existing != null) {
+         if (this.plugin.getResourceWorld() != null && this.plugin.getResourceWorld().isResourceWorld(chunk.getWorld())) {
+            ChatUtil.sendMessage(player, "&c❌ Le monde de ressources est remis à neuf chaque semaine : on n'y revendique aucun territoire.");
+            return false;
+         } else if (existing != null) {
             ChatUtil.sendMessage(player, "&cCe chunk est déjà revendiqué par la guilde &e" + existing.getName() + " &c!");
             return false;
          } else if (this.hasEnemyNeighbor(guild, chunkKey)) {

@@ -6,6 +6,8 @@ import fr.esicraft.gui.holder.BaseGUIHolder;
 import fr.esicraft.guild.Guild;
 import fr.esicraft.util.ChatUtil;
 import fr.esicraft.util.ItemBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +31,7 @@ import org.bukkit.potion.PotionEffectType;
 
 /**
  * Jeux d'une taverne, tous contre la banque de la guilde propriétaire (la « maison ») : pile ou face, tirage du bar (nourriture et pintes),
- * roulette européenne et machine à sous. La maison ne paie jamais plus que ce que sa banque peut couvrir : la mise maximale s'adapte.
+ * roulette européenne, machine à sous, dés, bras de fer et course de cochons. La maison ne paie jamais plus que ce que sa banque peut couvrir : la mise maximale s'adapte.
  */
 public class TavernGames implements Listener {
    private static final int[] BETS = {10, 50, 100, 500, 1000};
@@ -75,6 +77,33 @@ public class TavernGames implements Listener {
 
    static final class Slots extends GameHolder {
       Slots(String g) {
+         super(g);
+      }
+   }
+
+   static final class Dice extends GameHolder {
+      Dice(String g) {
+         super(g);
+      }
+   }
+
+   /** Bras de fer contre le champion de la taverne : cliquer à temps sur le poing qui apparaît. */
+   static final class Arm extends GameHolder {
+      int pos = 4;
+      int round;
+      int target = -1;
+      int deadline;
+      int wait;
+      int stake;
+      boolean running;
+
+      Arm(String g) {
+         super(g);
+      }
+   }
+
+   static final class Pigs extends GameHolder {
+      Pigs(String g) {
          super(g);
       }
    }
@@ -191,6 +220,9 @@ public class TavernGames implements Listener {
       inv.setItem(12, new ItemBuilder(Material.POTION).name("&c&lLe bar : tirage").lore("&7Payez un verre et tentez votre chance :", "&7nourriture, soupes… ou une pinte de", "&4Kastell rouge&7 (nausée !).", "&7Une pomme dorée à 1 % !").build());
       inv.setItem(14, new ItemBuilder(Material.RED_WOOL).name("&4&lRoulette").lore("&7Roulette européenne (0 à 36) :", "&7rouge/noir, pair/impair, douzaines, numéro plein.").build());
       inv.setItem(16, new ItemBuilder(Material.BELL).name("&d&lMachine à sous").lore("&7Trois rouleaux : cerises, citrons, cloches,", "&7diamants et sept. Jusqu'à ×50 !").build());
+      inv.setItem(20, new ItemBuilder(Material.WHITE_CONCRETE).name("&f&lDés").lore("&7Deux dés contre deux dés de la maison.", "&7Plus haut : mise doublée · égalité : moitié rendue.").build());
+      inv.setItem(22, new ItemBuilder(Material.IRON_INGOT).name("&6&lBras de fer").lore("&7Affrontez le champion de la taverne :", "&7cliquez sur le poing dès qu'il apparaît !", "&7Victoire : &a×" + ARM_MULT + " &7(" + this.armLimit() + " parties par jour).").build());
+      inv.setItem(24, new ItemBuilder(Material.PORKCHOP).name("&d&lCourse de cochons").lore("&7Quatre cochons, un seul vainqueur.", "&7Pariez sur le bon : &a×" + PIG_MULT + " &7la mise.").build());
       player.openInventory(inv);
    }
 
@@ -580,6 +612,340 @@ public class TavernGames implements Listener {
       }, 3L, 3L);
    }
 
+   // ------------------------------------------------------------------ dés
+
+   private void openDice(Player player, Guild owner) {
+      Dice h = new Dice(owner.getId());
+      Inventory inv = Bukkit.createInventory(h, 27, ChatUtil.component("&8&l🎲 Dés — " + owner.getName()));
+      this.renderDice(inv, h, owner);
+      player.openInventory(inv);
+   }
+
+   private ItemStack die(int value, boolean house) {
+      return new ItemBuilder(house ? Material.RED_CONCRETE : Material.WHITE_CONCRETE).amount(Math.max(1, value)).name((house ? "&c" : "&f") + (value > 0 ? "Dé : " + value : "?")).build();
+   }
+
+   private void renderDice(Inventory inv, Dice h, Guild owner) {
+      this.fill(inv);
+      inv.setItem(4, new ItemBuilder(Material.BARREL).name("&f&lDés").lore(this.houseLine(owner), "&7Vous lancez deux dés, la maison aussi.", "&7Total plus haut : &amise doublée",
+         "&7Égalité : &emoitié de la mise rendue", "&7Plus bas : &cperdu").build());
+      this.chips(inv, h);
+      inv.setItem(19, new ItemBuilder(Material.PLAYER_HEAD).name("&fVos dés").build());
+      inv.setItem(20, this.die(0, false));
+      inv.setItem(21, this.die(0, false));
+      inv.setItem(22, new ItemBuilder(Material.LIME_CONCRETE).name("&a&lLANCER").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+      inv.setItem(23, this.die(0, true));
+      inv.setItem(24, this.die(0, true));
+      inv.setItem(25, new ItemBuilder(Material.BARREL).name("&cLa maison").build());
+      inv.setItem(18, this.back());
+   }
+
+   private void rollDice(Player player, Dice h, Guild owner, Inventory inv) {
+      int stake = BETS[h.bet];
+      if (!this.take(player, owner, stake, 2.0)) {
+         return;
+      }
+
+      h.busy = true;
+      UUID id = player.getUniqueId();
+      this.playing.add(id);
+      ThreadLocalRandom r = ThreadLocalRandom.current();
+      int[] mine = {r.nextInt(1, 7), r.nextInt(1, 7)};
+      int[] house = {r.nextInt(1, 7), r.nextInt(1, 7)};
+      int[] frame = {0};
+      Bukkit.getScheduler().runTaskTimer(this.plugin, task -> {
+         ThreadLocalRandom rr = ThreadLocalRandom.current();
+         frame[0]++;
+         if (frame[0] <= 10) {
+            boolean stopMine = frame[0] > 6;
+            inv.setItem(20, this.die(stopMine ? mine[0] : rr.nextInt(1, 7), false));
+            inv.setItem(21, this.die(stopMine ? mine[1] : rr.nextInt(1, 7), false));
+            inv.setItem(23, this.die(rr.nextInt(1, 7), true));
+            inv.setItem(24, this.die(rr.nextInt(1, 7), true));
+            this.tick(Bukkit.getPlayer(id), Sound.BLOCK_WOOD_HIT, 0.8F + frame[0] * 0.05F);
+            return;
+         }
+
+         task.cancel();
+         h.busy = false;
+         this.playing.remove(id);
+         int a = mine[0] + mine[1];
+         int b = house[0] + house[1];
+         double mult = a > b ? 2.0 : a == b ? 0.5 : 0.0;
+         double payout = this.settle(owner, id, stake, mult);
+         this.note(id, a > b ? "&a🎲 " + a + " contre " + b + " : vous gagnez &6" + (long)(payout - stake) + " pièces&a !"
+            : a == b ? "&e🎲 Égalité (" + a + ") : la moitié de votre mise vous est rendue." : "&c🎲 " + a + " contre " + b + " : la maison empoche vos &6" + stake + " pièces&c.", a > b);
+         if (!inv.getViewers().isEmpty()) {
+            inv.setItem(20, this.die(mine[0], false));
+            inv.setItem(21, this.die(mine[1], false));
+            inv.setItem(23, this.die(house[0], true));
+            inv.setItem(24, this.die(house[1], true));
+         }
+      }, 3L, 3L);
+   }
+
+   // ------------------------------------------------------------------ bras de fer
+
+   private static final double ARM_MULT = 1.8;
+   private static final int[] ARM_GRID = {27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44};
+   private final java.util.Map<UUID, Integer> armToday = new ConcurrentHashMap<>();
+   private String armDay = "";
+
+   private int armLimit() {
+      return Math.max(1, this.plugin.getConfig().getInt("taverns.arm-wrestling.matches-per-day", 6));
+   }
+
+   private void openArm(Player player, Guild owner) {
+      Arm h = new Arm(owner.getId());
+      Inventory inv = Bukkit.createInventory(h, 54, ChatUtil.component("&8&l💪 Bras de fer — " + owner.getName()));
+      this.renderArm(inv, h, owner);
+      player.openInventory(inv);
+   }
+
+   private void renderArm(Inventory inv, Arm h, Guild owner) {
+      this.fill(inv);
+      inv.setItem(4, new ItemBuilder(Material.BARREL).name("&6&lBras de fer").lore(this.houseLine(owner), "&7Cliquez sur le &e✊ poing &7dès qu'il apparaît", "&7dans la grille : chaque clic réussi fait",
+         "&7plier le champion. Un clic raté ou trop lent", "&7vous fait reculer, et il pousse de plus en plus fort.", "&7Victoire : &a×" + ARM_MULT + " &7la mise").build());
+      this.chips(inv, h);
+      inv.setItem(16, new ItemBuilder(Material.IRON_INGOT).name("&a&lAFFRONTER LE CHAMPION").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+      this.renderRope(inv, h);
+      inv.setItem(45, this.back());
+   }
+
+   /** La corde : à gauche le champion, à droite vous. Le marqueur avance vers la droite quand vous gagnez du terrain. */
+   private void renderRope(Inventory inv, Arm h) {
+      for (int i = 0; i <= 8; i++) {
+         Material m = i == h.pos ? Material.IRON_BLOCK : i < h.pos ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+         inv.setItem(18 + i, new ItemBuilder(m).name(i == 0 ? "&cLe champion" : i == 8 ? "&aVous" : i == h.pos ? "&f&lLes bras" : " ").build());
+      }
+   }
+
+   private void startArm(Player player, Arm h, Guild owner, Inventory inv) {
+      String today = java.time.LocalDate.now().toString();
+      if (!today.equals(this.armDay)) {
+         this.armDay = today;
+         this.armToday.clear();
+      }
+
+      int played = this.armToday.getOrDefault(player.getUniqueId(), 0);
+      if (played >= this.armLimit()) {
+         ChatUtil.sendMessage(player, "&c💪 Le champion refuse : vous avez déjà joué " + this.armLimit() + " parties aujourd'hui. Revenez demain !");
+         return;
+      }
+
+      int stake = BETS[h.bet];
+      if (!this.take(player, owner, stake, ARM_MULT)) {
+         return;
+      }
+
+      this.armToday.put(player.getUniqueId(), played + 1);
+      h.stake = stake;
+      h.pos = 4;
+      h.round = 0;
+      h.target = -1;
+      h.wait = 20;
+      h.running = true;
+      UUID id = player.getUniqueId();
+      this.playing.add(id);
+      for (int s : ARM_GRID) {
+         inv.setItem(s, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
+      }
+
+      inv.setItem(16, new ItemBuilder(Material.CLOCK).name("&e&lPrêt…").build());
+      this.renderRope(inv, h);
+      ChatUtil.playSound(player, Sound.ENTITY_IRON_GOLEM_ATTACK, 1.0F, 1.0F);
+      Bukkit.getScheduler().runTaskTimer(this.plugin, task -> {
+         Player p = Bukkit.getPlayer(id);
+         if (!h.running) {
+            task.cancel();
+            return;
+         }
+
+         if (p == null || inv.getViewers().isEmpty()) {
+            task.cancel();
+            this.endArm(id, h, owner, inv, false, "&c💪 Vous avez lâché le bras du champion : la mise est perdue.");
+            return;
+         }
+
+         if (h.target < 0) {
+            if (--h.wait > 0) {
+               return;
+            }
+
+            h.round++;
+            // Le champion pousse de lui-même de temps en temps, de plus en plus souvent.
+            if (ThreadLocalRandom.current().nextDouble() < Math.min(0.6, 0.25 + h.round * 0.03)) {
+               h.pos--;
+               this.renderRope(inv, h);
+               this.tick(p, Sound.ENTITY_IRON_GOLEM_HURT, 0.8F);
+               if (h.pos <= 0) {
+                  task.cancel();
+                  this.endArm(id, h, owner, inv, false, "&c💪 Le champion vous plaque le bras sur la table ! La maison garde vos &6" + h.stake + " pièces&c.");
+                  return;
+               }
+            }
+
+            h.target = ARM_GRID[ThreadLocalRandom.current().nextInt(ARM_GRID.length)];
+            h.deadline = Math.max(5, 15 - h.round * 2);
+            inv.setItem(h.target, new ItemBuilder(Material.IRON_INGOT).name("&e&l✊ POUSSEZ !").build());
+            return;
+         }
+
+         if (--h.deadline <= 0) {
+            inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
+            h.target = -1;
+            h.wait = ThreadLocalRandom.current().nextInt(4, 12);
+            h.pos--;
+            this.renderRope(inv, h);
+            this.tick(p, Sound.BLOCK_NOTE_BLOCK_BASS, 0.6F);
+            if (h.pos <= 0) {
+               task.cancel();
+               this.endArm(id, h, owner, inv, false, "&c💪 Trop lent ! Le champion l'emporte et la maison garde vos &6" + h.stake + " pièces&c.");
+            }
+         }
+      }, 1L, 1L);
+   }
+
+   private void armClick(Player player, Arm h, int slot, Inventory inv) {
+      if (h.target < 0 || slot < 27 || slot > 44) {
+         return;
+      }
+
+      boolean hit = slot == h.target;
+      inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
+      h.target = -1;
+      h.wait = ThreadLocalRandom.current().nextInt(4, 12);
+      h.pos += hit ? 1 : -1;
+      this.renderRope(inv, h);
+      this.tick(player, hit ? Sound.ENTITY_PLAYER_ATTACK_STRONG : Sound.BLOCK_NOTE_BLOCK_BASS, hit ? 1.2F : 0.6F);
+      Guild owner = this.plugin.getGuildManager().getGuildById(h.guildId);
+      if (owner == null) {
+         h.running = false;
+         this.playing.remove(player.getUniqueId());
+         return;
+      }
+
+      if (h.pos >= 8) {
+         this.endArm(player.getUniqueId(), h, owner, inv, true, null);
+      } else if (h.pos <= 0) {
+         this.endArm(player.getUniqueId(), h, owner, inv, false, "&c💪 Raté ! Le champion vous plaque le bras sur la table. La maison garde vos &6" + h.stake + " pièces&c.");
+      }
+   }
+
+   private void endArm(UUID id, Arm h, Guild owner, Inventory inv, boolean win, String loseMessage) {
+      if (!h.running) {
+         return;
+      }
+
+      h.running = false;
+      this.playing.remove(id);
+      double payout = this.settle(owner, id, h.stake, win ? ARM_MULT : 0.0);
+      if (win) {
+         this.note(id, "&a💪 Vous faites plier le champion de " + owner.getName() + " ! &6+" + (long)(payout - h.stake) + " pièces&a.", true);
+         Player p = Bukkit.getPlayer(id);
+         if (p != null && h.stake >= 500) {
+            ChatUtil.broadcast("&6💪 &e" + p.getName() + " &6a battu le champion de bras de fer de la taverne de " + owner.getName() + " !");
+         }
+      } else {
+         this.note(id, loseMessage, false);
+      }
+
+      if (!inv.getViewers().isEmpty()) {
+         for (int s : ARM_GRID) {
+            inv.setItem(s, this.glass());
+         }
+
+         inv.setItem(16, new ItemBuilder(Material.IRON_INGOT).name("&a&lREVANCHE").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+      }
+   }
+
+   // ------------------------------------------------------------------ course de cochons
+
+   private static final double PIG_MULT = 3.6;
+   private static final String[] PIG_NAMES = {"&dRosette", "&6Jambonneau", "&8Truffe", "&cSaucisse"};
+   private static final Material[] PIG_LANES = {Material.PINK_STAINED_GLASS_PANE, Material.ORANGE_STAINED_GLASS_PANE, Material.BROWN_STAINED_GLASS_PANE, Material.RED_STAINED_GLASS_PANE};
+
+   private void openPigs(Player player, Guild owner) {
+      Pigs h = new Pigs(owner.getId());
+      Inventory inv = Bukkit.createInventory(h, 54, ChatUtil.component("&8&l🐖 Course de cochons — " + owner.getName()));
+      this.renderPigs(inv, h, owner);
+      player.openInventory(inv);
+   }
+
+   private void renderPigs(Inventory inv, Pigs h, Guild owner) {
+      this.fill(inv);
+      inv.setItem(4, new ItemBuilder(Material.BARREL).name("&d&lCourse de cochons").lore(this.houseLine(owner), "&7Choisissez votre mise, puis cliquez sur", "&7le cochon qui va gagner (colonne de gauche).",
+         "&7Gain : &a×" + PIG_MULT + " &7la mise").build());
+      this.chips(inv, h);
+      inv.setItem(0, this.back());
+      this.renderTrack(inv, new int[]{0, 0, 0, 0});
+      for (int lane = 0; lane < 4; lane++) {
+         inv.setItem(18 + lane * 9, new ItemBuilder(Material.PORKCHOP).name("&e&lParier sur " + PIG_NAMES[lane]).lore("&7Mise : &6" + BETS[h.bet] + " pièces", "&7Gain : &a×" + PIG_MULT).build());
+      }
+   }
+
+   private void renderTrack(Inventory inv, int[] pos) {
+      for (int lane = 0; lane < 4; lane++) {
+         for (int col = 1; col <= 8; col++) {
+            int slot = 18 + lane * 9 + col;
+            boolean pig = Math.min(7, pos[lane]) == col - 1;
+            inv.setItem(slot, pig ? new ItemBuilder(Material.PIG_SPAWN_EGG).name(PIG_NAMES[lane]).build()
+               : new ItemBuilder(col == 8 ? Material.WHITE_STAINED_GLASS_PANE : PIG_LANES[lane]).name(col == 8 ? "&f🏁 Arrivée" : " ").build());
+         }
+      }
+   }
+
+   private void racePigs(Player player, Pigs h, Guild owner, int choice, Inventory inv) {
+      if (choice < 0 || choice > 3) {
+         return;
+      }
+
+      int stake = BETS[h.bet];
+      if (!this.take(player, owner, stake, PIG_MULT)) {
+         return;
+      }
+
+      h.busy = true;
+      UUID id = player.getUniqueId();
+      this.playing.add(id);
+      int[] pos = {0, 0, 0, 0};
+      this.renderTrack(inv, pos);
+      ChatUtil.sendMessage(player, "&d🐖 Vous pariez &6" + stake + " pièces &dsur " + PIG_NAMES[choice] + "&d. Partez !");
+      Bukkit.getScheduler().runTaskTimer(this.plugin, task -> {
+         ThreadLocalRandom r = ThreadLocalRandom.current();
+         List<Integer> finished = new ArrayList<>();
+         for (int lane = 0; lane < 4; lane++) {
+            double roll = r.nextDouble();
+            pos[lane] += roll < 0.08 ? 2 : roll < 0.55 ? 1 : 0;
+            if (pos[lane] >= 7) {
+               finished.add(lane);
+            }
+         }
+
+         if (!inv.getViewers().isEmpty()) {
+            this.renderTrack(inv, pos);
+         }
+
+         this.tick(Bukkit.getPlayer(id), Sound.ENTITY_PIG_AMBIENT, 0.8F + r.nextFloat() * 0.6F);
+         if (finished.isEmpty()) {
+            return;
+         }
+
+         task.cancel();
+         h.busy = false;
+         this.playing.remove(id);
+         int winner = finished.get(r.nextInt(finished.size()));
+         boolean win = winner == choice;
+         double payout = this.settle(owner, id, stake, win ? PIG_MULT : 0.0);
+         this.note(id, win ? "&a🐖 " + PIG_NAMES[winner] + " &al'emporte ! Vous gagnez &6" + (long)(payout - stake) + " pièces&a."
+            : "&c🐖 " + PIG_NAMES[winner] + " &cfranchit la ligne la première… La maison garde vos &6" + stake + " pièces&c.", win);
+      }, 10L, 6L);
+   }
+
+   private static int backSlot(GameHolder h) {
+      return h instanceof Pigs ? 0 : h instanceof Roulette || h instanceof Arm ? 45 : 18;
+   }
+
    // ------------------------------------------------------------------ clics
 
    @EventHandler(priority = EventPriority.HIGHEST)
@@ -607,6 +973,9 @@ public class TavernGames implements Listener {
             case 12 -> this.openBar(player, owner);
             case 14 -> this.openRoulette(player, owner);
             case 16 -> this.openSlots(player, owner);
+            case 20 -> this.openDice(player, owner);
+            case 22 -> this.openArm(player, owner);
+            case 24 -> this.openPigs(player, owner);
             default -> {
             }
          }
@@ -614,7 +983,12 @@ public class TavernGames implements Listener {
          return;
       }
 
-      if (slot == 18 && !(holder instanceof Roulette) || slot == 45 && holder instanceof Roulette) {
+      if (holder instanceof Arm arm && arm.running) {
+         this.armClick(player, arm, slot, inv);
+         return;
+      }
+
+      if (slot == backSlot(holder)) {
          this.openMenu(player, owner);
          return;
       }
@@ -632,6 +1006,12 @@ public class TavernGames implements Listener {
                this.renderRoulette(inv, r, owner);
             } else if (holder instanceof Slots s) {
                this.renderSlots(inv, s, owner);
+            } else if (holder instanceof Dice d) {
+               this.renderDice(inv, d, owner);
+            } else if (holder instanceof Arm a) {
+               this.renderArm(inv, a, owner);
+            } else if (holder instanceof Pigs pg) {
+               this.renderPigs(inv, pg, owner);
             }
 
             ChatUtil.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 1.2F);
@@ -648,6 +1028,12 @@ public class TavernGames implements Listener {
          }
       } else if (holder instanceof Slots s && slot == 22) {
          this.spinSlots(player, s, owner, inv);
+      } else if (holder instanceof Dice d && slot == 22) {
+         this.rollDice(player, d, owner, inv);
+      } else if (holder instanceof Arm a && slot == 16) {
+         this.startArm(player, a, owner, inv);
+      } else if (holder instanceof Pigs pg && (slot == 18 || slot == 27 || slot == 36 || slot == 45)) {
+         this.racePigs(player, pg, owner, (slot - 18) / 9, inv);
       } else if (holder instanceof Roulette r) {
          String bet = switch (slot) {
             case 19 -> "red";

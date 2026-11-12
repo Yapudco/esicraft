@@ -148,6 +148,8 @@ public class GUIListener implements Listener {
                } else if (holder instanceof MarketMainHolder marketHolder) {
                   if (slot == 49) {
                      MercenaryHordeGUI.open(player, this.plugin);
+                  } else if (slot == 47) {
+                     this.plugin.getBuyOrders().openGui(player, 1);
                   } else if (slot == 45 && event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ARROW) {
                      MarketMainGUI.open(player, this.plugin, marketHolder.getPage() - 1);
                   } else if (slot == 53 && event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ARROW) {

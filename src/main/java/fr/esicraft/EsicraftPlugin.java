@@ -123,6 +123,11 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.rail.FreightManager freight;
    private fr.esicraft.game.SiegeManager siege;
    private fr.esicraft.game.BourseManager bourse;
+   private fr.esicraft.world.ResourceWorldManager resourceWorld;
+   private fr.esicraft.game.GuildMerchantManager guildMerchant;
+   private fr.esicraft.guild.GuildBuildingManager buildings;
+   private fr.esicraft.market.BuyOrderManager buyOrders;
+   private fr.esicraft.life.TutorialManager tutorial;
    private boolean nexusDestructionEnabled = true;
 
    public void onEnable() {
@@ -169,6 +174,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.nexusTech = new fr.esicraft.nexus.NexusTech(this);
       this.siege = new fr.esicraft.game.SiegeManager(this);
       this.bourse = new fr.esicraft.game.BourseManager(this);
+      this.resourceWorld = new fr.esicraft.world.ResourceWorldManager(this);
+      this.guildMerchant = new fr.esicraft.game.GuildMerchantManager(this);
+      this.buildings = new fr.esicraft.guild.GuildBuildingManager(this);
+      this.buyOrders = new fr.esicraft.market.BuyOrderManager(this);
+      this.tutorial = new fr.esicraft.life.TutorialManager(this);
       this.cosmetics = new CosmeticManager(this);
       this.skins = new fr.esicraft.life.SkinLookup(this);
       this.dataManager = new DataManager(this);
@@ -198,6 +208,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.nexusManager.loadRelocations();
       this.siege.init();
       this.bourse.init();
+      this.resourceWorld.init();
+      this.guildMerchant.init();
+      this.buildings.init();
+      this.buyOrders.init();
+      this.tutorial.init();
       this.cosmetics.init();
       this.guildManager.initCaches();
       this.disguiseManager.init();
@@ -225,6 +240,11 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.tavern, this);
       pm.registerEvents(this.nexusTech, this);
       pm.registerEvents(this.siege, this);
+      pm.registerEvents(this.resourceWorld, this);
+      pm.registerEvents(this.guildMerchant, this);
+      pm.registerEvents(this.buildings, this);
+      pm.registerEvents(this.buyOrders, this);
+      pm.registerEvents(this.tutorial, this);
       this.combatManager.start();
       pm.registerEvents(new CraftRestrictionListener(this), this);
       pm.registerEvents(new RaceInteractionListener(this), this);
@@ -275,6 +295,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
       if (this.betting != null) {
          this.betting.shutdown();
+      }
+
+      if (this.guildMerchant != null) {
+         this.guildMerchant.shutdown();
       }
 
       if (this.raidManager != null) {
@@ -337,6 +361,14 @@ public final class EsicraftPlugin extends JavaPlugin {
       Objects.requireNonNull(this.getCommand("siege")).setTabCompleter(this.siege);
       Objects.requireNonNull(this.getCommand("bourse")).setExecutor(this.bourse);
       Objects.requireNonNull(this.getCommand("bourse")).setTabCompleter(this.bourse);
+      Objects.requireNonNull(this.getCommand("ressources")).setExecutor(this.resourceWorld);
+      Objects.requireNonNull(this.getCommand("ressources")).setTabCompleter(this.resourceWorld);
+      Objects.requireNonNull(this.getCommand("marchand")).setExecutor(this.guildMerchant);
+      Objects.requireNonNull(this.getCommand("marchand")).setTabCompleter(this.guildMerchant);
+      Objects.requireNonNull(this.getCommand("batiment")).setExecutor(this.buildings);
+      Objects.requireNonNull(this.getCommand("batiment")).setTabCompleter(this.buildings);
+      Objects.requireNonNull(this.getCommand("tutoriel")).setExecutor(this.tutorial);
+      Objects.requireNonNull(this.getCommand("tutoriel")).setTabCompleter(this.tutorial);
       if (this.webServer != null && this.webServer.getVotes() != null) {
          Objects.requireNonNull(this.getCommand("webvote")).setExecutor(this.webServer.getVotes());
       } else {
@@ -483,6 +515,26 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.game.BourseManager getBourse() {
       return this.bourse;
+   }
+
+   public fr.esicraft.world.ResourceWorldManager getResourceWorld() {
+      return this.resourceWorld;
+   }
+
+   public fr.esicraft.game.GuildMerchantManager getGuildMerchant() {
+      return this.guildMerchant;
+   }
+
+   public fr.esicraft.guild.GuildBuildingManager getBuildings() {
+      return this.buildings;
+   }
+
+   public fr.esicraft.market.BuyOrderManager getBuyOrders() {
+      return this.buyOrders;
+   }
+
+   public fr.esicraft.life.TutorialManager getTutorial() {
+      return this.tutorial;
    }
 
    public fr.esicraft.game.SiegeManager getSiege() {

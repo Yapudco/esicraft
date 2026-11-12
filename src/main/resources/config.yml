@@ -18,6 +18,7 @@ market:
     z: 0.0
   tax-percentage: 5.0 # Taxe prélevée sur chaque vente
   max-listings-per-player: 10 # Annonces actives max par joueur (anti-saturation de l'HDV)
+  max-buy-orders-per-player: 5 # Commandes d'achat ouvertes max par joueur (/ah commande)
   mercenary-hordes-enabled: true
 
 # Progression des Âges (Ressources requises pour débloquer l'Âge supérieur)
@@ -313,6 +314,32 @@ taverns:
     win-chance: 0.47                     # 47 % de gagner : l'avantage va à la banque de la taverne
   bar:
     price: 50                            # Prix d'un verre (tirage du bar)
+  arm-wrestling:
+    matches-per-day: 6                   # Parties de bras de fer par joueur et par jour (jeu d'adresse : limité)
+
+# Monde de ressources (/ressources) : monde minier séparé, remis à neuf chaque semaine
+resource-world:
+  enabled: true
+  name: "esicraft_ressources"
+  border-size: 6000                      # Côté de la bordure (centrée en 0,0)
+  reset-day: MONDAY                      # Jour de la remise à zéro (MONDAY … SUNDAY)
+  reset-hour: 5                          # Heure de la remise à zéro (heure du serveur)
+  teleport-cooldown-seconds: 300         # Délai entre deux descentes
+
+# Marchand itinérant de guilde (/marchand) : chaque jour chez une guilde tirée au sort
+guild-merchant:
+  enabled: true
+  hour: 14                               # Heure d'arrivée
+  duration-hours: 6                      # Durée de son séjour
+  min-claims: 4                          # Territoires minimum (et un Nexus) pour être tirée au sort
+  offers: 5                              # Nombre d'offres proposées
+  stock-per-offer: 3                     # Exemplaires de chaque offre
+  trades-per-player: 2                   # Achats par joueur et par jour
+  host-commission: 75                    # Pièces versées à la banque hôte pour chaque achat d'un visiteur étranger
+
+# Tutoriel guidé en quêtes (/tutoriel)
+tutorial:
+  enabled: true
 
 # Guerres formelles (/siege)
 siege:

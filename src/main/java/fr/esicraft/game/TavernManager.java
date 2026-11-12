@@ -158,6 +158,11 @@ public class TavernManager implements CommandExecutor, TabCompleter, Listener {
          return;
       }
 
+      if (this.plugin.getBuildings().isBuilding(here)) {
+         ChatUtil.sendMessage(player, "&c❌ Ce chunk abrite déjà un bâtiment de guilde (forge, bibliothèque ou écurie).");
+         return;
+      }
+
       int max = Math.max(1, this.plugin.getConfig().getInt("taverns.max-per-guild", 2));
       if (this.chunksOf(guild.getId()).size() >= max) {
          ChatUtil.sendMessage(player, "&c❌ Votre guilde possède déjà " + max + " taverne(s).");
