@@ -131,7 +131,7 @@ public class MentorManager implements CommandExecutor, TabCompleter {
          return false;
       }
 
-      long minHours = this.plugin.getConfig().getLong("mentoring.mentor-min-hours", 5L);
+      long minHours = this.plugin.getConfig().getLong("mentoring.mentor-min-hours", 15L);
       return p.getStatistic(Statistic.PLAY_ONE_MINUTE) / 72000L >= minHours;
    }
 
@@ -278,7 +278,7 @@ public class MentorManager implements CommandExecutor, TabCompleter {
 
       if (!this.isAdvanced(mentor)) {
          ChatUtil.sendMessage(mentor, "&c❌ Pour parrainer, il faut avoir choisi un métier, appartenir à une guilde et avoir joué au moins &e"
-            + this.plugin.getConfig().getLong("mentoring.mentor-min-hours", 5L) + " h&c.");
+            + this.plugin.getConfig().getLong("mentoring.mentor-min-hours", 15L) + " h&c.");
          return;
       }
 

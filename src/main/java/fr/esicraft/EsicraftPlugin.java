@@ -262,6 +262,7 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.raidManager, this);
       pm.registerEvents(new GUIListener(this), this);
       pm.registerEvents(new ChatFormatListener(this), this);
+      pm.registerEvents(new fr.esicraft.chat.PrivateMessageBlocker(this), this);
       pm.registerEvents(new PlayerKillEconomyListener(this), this);
       this.ageDimension = new AgeDimensionListener(this);
       pm.registerEvents(this.ageDimension, this);

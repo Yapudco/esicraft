@@ -2,6 +2,12 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (messages privés et parrainage)
+
+### Changements
+- **Messages privés désactivés** : `/msg`, `/tell`, `/w`, `/r` et leurs équivalents (préfixes `minecraft:` et Essentials compris) sont refusés et retirés de l'auto-complétion. Liste réglable : `chat.blocked-commands`.
+- **Parrainage** : il faut désormais **15 h de jeu** (au lieu de 5) pour devenir parrain (`mentoring.mentor-min-hours`).
+
 ## 12/11/2026 (banque de guilde)
 
 ### Nouveautés

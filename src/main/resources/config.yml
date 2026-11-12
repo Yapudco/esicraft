@@ -9,6 +9,10 @@ storage:
   save-interval-seconds: 180
   async-chunk-checking: true
 
+# Chat : messages privés désactivés (ces commandes sont refusées et retirées de l'auto-complétion, préfixes minecraft:/essentials: compris)
+chat:
+  blocked-commands: [msg, tell, w, whisper, m, t, pm, dm, r, reply, emsg, etell, ewhisper, er, ereply, teammsg, tm]
+
 # Paramètres du Marché Central et Hôtel des Ventes
 market:
   location:
@@ -451,7 +455,7 @@ cosmetics:
 
 mentoring:
   enabled: true
-  mentor-min-hours: 5         # Temps de jeu minimal du parrain
+  mentor-min-hours: 15        # Temps de jeu minimal du parrain
   recruit-max-days: 14        # Ancienneté maximale d'une recrue
   max-recruits: 5
   rewards:

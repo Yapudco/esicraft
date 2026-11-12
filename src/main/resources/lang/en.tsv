@@ -1923,3 +1923,4 @@ Faire un premier échange à l'Hôtel des Ventes	Make a first trade at the Aucti
 &7Offre retirée.	&7Offer withdrawn.
 &c❌ Le taux d'intérêt doit être compris entre &e	&c❌ The interest rate must be between &e
 &cUsage : &e/banque pret <guilde> <montant> [taux %]	&cUsage: &e/banque pret <guild> <amount> [rate %]
+&c❌ Les messages privés sont désactivés sur ce serveur : parlez dans le chat public ou celui de votre guilde.	&c❌ Private messages are disabled on this server: talk in the public chat or your guild chat.
