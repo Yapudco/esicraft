@@ -476,7 +476,7 @@ Le **Syndicat Marchand** et l'**Enclave Champêtre** peuvent déclarer jusqu'à 
 | 💪 **Bras de fer** | Jeu d'adresse contre le champion de la taverne : cliquez sur le poing dès qu'il apparaît (de plus en plus vite). Un clic réussi le fait plier, un clic raté ou trop lent vous fait reculer, et il pousse aussi de lui-même. Victoire ×1,8 ; 6 parties par jour (`taverns.arm-wrestling.matches-per-day`) |
 | 🐖 **Course de cochons** | Quatre cochons (Rosette, Jambonneau, Truffe, Saucisse) : pariez sur le gagnant, ×3,6 |
 
-Les gains viennent de la banque de la taverne, les pertes y entrent. **La maison ne joue pas contre ses propres membres** : les jeux de hasard sont réservés aux clients des autres guildes (le bar reste ouvert à tous). Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
+Les gains viennent de la banque de la taverne, les pertes y entrent. **Tout le monde peut jouer**, y compris les membres de la guilde propriétaire contre leur propre maison. Succès *Tavernier*. Une taverne déclarée avant cette mise à jour garde sa zone neutre mais n'ouvre ses jeux qu'une fois le coffre, le tonneau et le toit en place.
 
 ### ⛏ Le monde de ressources (`/ressources`)
 
