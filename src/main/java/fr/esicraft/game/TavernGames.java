@@ -153,13 +153,8 @@ public class TavernGames implements Listener {
          return false;
       }
 
-      // La maison ne joue pas contre ses propres membres : miser contre la banque de sa guilde servait à faire passer l'argent de la banque (qu'on ne
-      // peut pas retirer) vers ses poches, à quelques pour cent de perte près.
-      if (owner.isMember(p.getUniqueId())) {
-         ChatUtil.sendMessage(p, "&c❌ La maison ne joue pas contre ses propres membres : les jeux de hasard sont réservés aux clients des autres guildes (le bar reste ouvert).");
-         return false;
-      }
-
+      // Les membres de la guilde propriétaire peuvent jouer contre leur propre maison (choix de conception : la taverne est aussi un lieu de vie
+      // pour la guilde). L'avantage de la maison et la mise maximale limitent ce que la banque peut perdre.
       if (bet > this.maxBet() || owner.getBankBalance() < bet * (maxMultiplier - 1.0)) {
          ChatUtil.sendMessage(p, "&c❌ La banque de la taverne ne couvre pas le gain maximal de cette mise (choisissez une mise plus petite).");
          return false;

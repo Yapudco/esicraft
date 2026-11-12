@@ -479,7 +479,7 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 | 💪 **Arm wrestling** | Skill game against the tavern champion: click the fist as soon as it appears (faster and faster). A good click bends his arm, a missed or slow click pushes you back, and he pushes on his own too. Win ×1.8; 6 matches a day (`taverns.arm-wrestling.matches-per-day`) |
 | 🐖 **Pig race** | Four pigs (Rosette, Jambonneau, Truffe, Saucisse): bet on the winner, ×3.6 |
 
-Winnings come out of the tavern's bank, losses go into it. **The house doesn't play against its own members**: games of chance are only for customers from other guilds (the bar stays open to everyone). *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
+Winnings come out of the tavern's bank, losses go into it. **Everyone can play**, including members of the owning guild against their own house. *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
 
 ### ⛏ The resource world (`/ressources`)
 

@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (tavernes ouvertes à la guilde)
+
+### Changements
+- **Tavernes** : les membres de la guilde propriétaire peuvent de nouveau jouer contre leur propre maison (pile ou face, roulette, machine à sous, dés, bras de fer, course de cochons).
+
 ## 12/11/2026 (messages privés et parrainage)
 
 ### Changements
