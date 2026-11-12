@@ -35,7 +35,7 @@
 5. **Level up your guild** by donating resources in `/age` to unlock new gear and dimensions.
 
 > [!NOTE]
-> A **guided quest tutorial** (`/tutoriel`) walks you through the start: a bar at the top of the screen shows the current quest (choose a job, join a guild, complete a first contract, go down to the resource world, make a first trade at the Auction House). Each quest pays 100 to 150 coins, once per account, and finishing the tutorial gives **300 coins** and a basket of food. `/tutoriel masquer` hides the bar.
+> A **guided quest tutorial** (`/tutoriel`) walks you through the start: a bar at the top of the screen shows the current quest out of **9 quests**: read the rule book, choose a job, join a guild, complete a first contract, deposit 100 coins in the guild bank, donate to the guild's Age, step into a tavern, go down to the resource world and make a first trade at the Auction House. Each quest pays 50 to 150 coins, once per account, and finishing the tutorial gives **400 coins** and a basket of food. `/tutoriel masquer` hides the bar.
 
 > [!TIP]
 > Type `/guide` to get the in-game rule book (30 pages: clickable table of contents, jobs, guilds, Nexus, raids, Ages, money, treaties, trains, events, commands), and `/hud` to show or hide the dashboard on the right of your screen.

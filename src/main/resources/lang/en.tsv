@@ -1924,3 +1924,12 @@ Faire un premier échange à l'Hôtel des Ventes	Make a first trade at the Aucti
 &c❌ Le taux d'intérêt doit être compris entre &e	&c❌ The interest rate must be between &e
 &cUsage : &e/banque pret <guilde> <montant> [taux %]	&cUsage: &e/banque pret <guild> <amount> [rate %]
 &c❌ Les messages privés sont désactivés sur ce serveur : parlez dans le chat public ou celui de votre guilde.	&c❌ Private messages are disabled on this server: talk in the public chat or your guild chat.
+Lire le livre des règles	Read the rule book
+Déposer 100 pièces dans la banque de guilde	Deposit 100 coins in the guild bank
+Faire un don pour l'Âge de sa guilde	Donate to your guild's Age
+Entrer dans une taverne	Step into a tavern
+&e/guide &7— tout le jeu expliqué, avec un sommaire cliquable	&e/guide &7— the whole game explained, with a clickable table of contents
+&e/g bank 100 &7— la banque paie les terres, les pièges et les raids	&e/g bank 100 &7— the bank pays for land, traps and raids
+&e/age &7— donnez les ressources demandées pour débloquer l'Âge suivant	&e/age &7— donate the required resources to unlock the next Age
+&7zone neutre ouverte par le Syndicat Marchand ou l'Enclave Champêtre (&e/taverne&7)	&7neutral zone opened by the Merchant Syndicate or the Druidic Enclave (&e/taverne&7)
+&6&l★ Toutes les quêtes du tutoriel sont accomplies !	&6&l★ All tutorial quests are complete!

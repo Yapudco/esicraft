@@ -32,18 +32,28 @@ import org.jetbrains.annotations.NotNull;
  * récompense, une seule fois par compte ; le tutoriel terminé offre un bonus final.
  */
 public class TutorialManager implements CommandExecutor, TabCompleter, Listener {
+   /**
+    * Étapes, dans l'ordre d'affichage. Chacune a un bit FIXE dans la progression enregistrée : on peut ajouter ou réordonner des étapes sans
+    * fausser la progression des joueurs existants.
+    */
    public enum Step {
-      JOB("Choisir un métier", "&e/metier &7— chaque métier a ses talents (mineur, forgeron, rôdeur…)", 100),
-      GUILD("Rejoindre ou fonder une guilde", "&e/g join <guilde> &7après une invitation, ou &e/g create <nom> <tag>", 150),
-      CONTRACT("Accomplir un premier contrat", "&e/contrat &7— trois petites missions par jour, payées en pièces", 150),
-      RESOURCE_WORLD("Descendre au monde de ressources", "&e/ressources &7— minerai frais, remis à neuf chaque semaine", 100),
-      MARKET("Faire un premier échange à l'Hôtel des Ventes", "&e/ah &7— acheter, vendre (&e/ah sell <prix>&7) ou passer une commande", 100);
+      GUIDE(5, "Lire le livre des règles", "&e/guide &7— tout le jeu expliqué, avec un sommaire cliquable", 50),
+      JOB(0, "Choisir un métier", "&e/metier &7— chaque métier a ses talents (mineur, forgeron, rôdeur…)", 100),
+      GUILD(1, "Rejoindre ou fonder une guilde", "&e/g join <guilde> &7après une invitation, ou &e/g create <nom> <tag>", 150),
+      CONTRACT(2, "Accomplir un premier contrat", "&e/contrat &7— trois petites missions par jour, payées en pièces", 150),
+      BANK(6, "Déposer 100 pièces dans la banque de guilde", "&e/g bank 100 &7— la banque paie les terres, les pièges et les raids", 100),
+      AGE(7, "Faire un don pour l'Âge de sa guilde", "&e/age &7— donnez les ressources demandées pour débloquer l'Âge suivant", 100),
+      TAVERN(8, "Entrer dans une taverne", "&7zone neutre ouverte par le Syndicat Marchand ou l'Enclave Champêtre (&e/taverne&7)", 75),
+      RESOURCE_WORLD(3, "Descendre au monde de ressources", "&e/ressources &7— minerai frais, remis à neuf chaque semaine", 100),
+      MARKET(4, "Faire un premier échange à l'Hôtel des Ventes", "&e/ah &7— acheter, vendre (&e/ah sell <prix>&7) ou passer une commande", 100);
 
+      final int bit;
       final String title;
       final String hint;
       final int reward;
 
-      Step(String title, String hint, int reward) {
+      Step(int bit, String title, String hint, int reward) {
+         this.bit = 1 << bit;
          this.title = title;
          this.hint = hint;
          this.reward = reward;
@@ -52,8 +62,21 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
 
    private static final String KV = "tuto:";
    private static final String KV_HIDDEN = "tutohide:";
-   private static final int ALL = (1 << Step.values().length) - 1;
-   private static final double FINAL_BONUS = 300.0;
+   private static final int ALL;
+   /** Bonus final déjà versé (les joueurs qui avaient fini l'ancien tutoriel en 5 étapes ne le touchent pas deux fois). */
+   private static final int FINAL_PAID = 1 << 20;
+   /** Les 5 étapes de la première version du tutoriel. */
+   private static final int OLD_ALL = 0b11111;
+   private static final double FINAL_BONUS = 400.0;
+
+   static {
+      int all = 0;
+      for (Step s : Step.values()) {
+         all |= s.bit;
+      }
+
+      ALL = all;
+   }
 
    private final EsicraftPlugin plugin;
    private final Map<UUID, Integer> progress = new ConcurrentHashMap<>();
@@ -98,6 +121,12 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
          }
       }
 
+      if ((mask & OLD_ALL) == OLD_ALL && (mask & FINAL_PAID) == 0) {
+         // Tutoriel de la première version déjà terminé (bonus final touché) : les nouvelles quêtes restent à faire, sans second bonus final.
+         mask |= FINAL_PAID;
+         this.save(id, mask);
+      }
+
       this.progress.put(id, mask);
       if (!this.plugin.getDataManager().getStorage().select("SELECT v FROM kv WHERE k = ?;", 1, KV_HIDDEN + id).isEmpty()) {
          this.hidden.add(id);
@@ -111,7 +140,7 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
    }
 
    public boolean isDone(UUID id, Step step) {
-      return (this.progress.getOrDefault(id, 0) & 1 << step.ordinal()) != 0;
+      return (this.progress.getOrDefault(id, 0) & step.bit) != 0;
    }
 
    private Step current(UUID id) {
@@ -132,11 +161,16 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
 
       UUID id = p.getUniqueId();
       Integer mask = this.progress.get(id);
-      if (mask == null || (mask & 1 << step.ordinal()) != 0) {
+      if (mask == null || (mask & step.bit) != 0) {
          return;
       }
 
-      int next = mask | 1 << step.ordinal();
+      int next = mask | step.bit;
+      boolean finished = (next & ALL) == ALL && (next & FINAL_PAID) == 0;
+      if (finished) {
+         next |= FINAL_PAID;
+      }
+
       this.progress.put(id, next);
       this.save(id, next);
       PlayerData data = this.plugin.getDataManager().getPlayerData(id);
@@ -147,7 +181,9 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
 
       ChatUtil.sendMessage(p, "&a&l✔ Quête accomplie : &f" + step.title + " &8» &6+" + step.reward + " pièces");
       ChatUtil.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7F, 1.4F);
-      if (next == ALL) {
+      if ((next & ALL) == ALL && !finished) {
+         ChatUtil.sendMessage(p, "&6&l★ Toutes les quêtes du tutoriel sont accomplies !");
+      } else if (finished) {
          if (data != null) {
             data.addCoins(FINAL_BONUS);
             this.plugin.getDataManager().savePlayer(data);
@@ -183,7 +219,7 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
          return;
       }
 
-      int done = Integer.bitCount(this.progress.getOrDefault(id, 0));
+      int done = Integer.bitCount(this.progress.getOrDefault(id, 0) & ALL);
       int total = Step.values().length;
       var title = ChatUtil.component("&6📜 Quête " + (done + 1) + "/" + total + " : &e" + s.title + " &7(/tutoriel)");
       float prog = Math.max(0.0F, Math.min(1.0F, (float)done / total));
@@ -206,7 +242,7 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
       for (Player p : Bukkit.getOnlinePlayers()) {
          UUID id = p.getUniqueId();
          Integer mask = this.progress.get(id);
-         if (mask == null || mask == ALL) {
+         if (mask == null || (mask & ALL) == ALL) {
             continue;
          }
 
@@ -220,6 +256,10 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
 
          if (!this.isDone(id, Step.RESOURCE_WORLD) && this.plugin.getResourceWorld().isResourceWorld(p.getWorld())) {
             this.complete(p, Step.RESOURCE_WORLD);
+         }
+
+         if (!this.isDone(id, Step.TAVERN) && this.plugin.getTavern().isTavern(p.getLocation())) {
+            this.complete(p, Step.TAVERN);
          }
       }
    }
@@ -272,7 +312,7 @@ public class TutorialManager implements CommandExecutor, TabCompleter, Listener 
          return true;
       }
 
-      int done = Integer.bitCount(this.progress.getOrDefault(id, 0));
+      int done = Integer.bitCount(this.progress.getOrDefault(id, 0) & ALL);
       ChatUtil.sendMessage(p, "&6&l📜 Tutoriel d'Esicraft &7(" + done + "/" + Step.values().length + ") — chaque quête est récompensée, " + (long)FINAL_BONUS + " pièces de bonus à la fin.");
       for (Step s : Step.values()) {
          boolean ok = this.isDone(id, s);

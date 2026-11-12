@@ -32,7 +32,7 @@
 5. **Fais avancer ta guilde** en donnant des ressources dans `/age` pour débloquer de nouveaux équipements et dimensions.
 
 > [!NOTE]
-> Un **tutoriel guidé en quêtes** (`/tutoriel`) t'accompagne : une barre en haut de l'écran indique la quête en cours (choisir un métier, rejoindre une guilde, accomplir un premier contrat, descendre au monde de ressources, faire un premier échange à l'Hôtel des Ventes). Chaque quête rapporte de 100 à 150 pièces, une seule fois par compte, et le tutoriel terminé offre **300 pièces** et un panier de provisions. `/tutoriel masquer` cache la barre.
+> Un **tutoriel guidé en quêtes** (`/tutoriel`) t'accompagne : une barre en haut de l'écran indique la quête en cours parmi **9 quêtes** : lire le livre des règles, choisir un métier, rejoindre une guilde, accomplir un premier contrat, déposer 100 pièces dans la banque de guilde, faire un don pour l'Âge, entrer dans une taverne, descendre au monde de ressources et faire un premier échange à l'Hôtel des Ventes. Chaque quête rapporte de 50 à 150 pièces, une seule fois par compte, et le tutoriel terminé offre **400 pièces** et un panier de provisions. `/tutoriel masquer` cache la barre.
 
 > [!TIP]
 > Tape `/guide` pour recevoir le livre de règles en jeu (30 pages : sommaire cliquable, métiers, guildes, Nexus, raids, Âges, argent, traités, train, événements, commandes), et `/hud` pour afficher ou masquer le tableau de bord à droite de l'écran.
