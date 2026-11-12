@@ -104,6 +104,19 @@ public class TavernGames implements Listener {
       }
    }
 
+   /** Jeu du « greed » : un multiplicateur grimpe, il faut encaisser avant qu'il n'explose. */
+   static final class Greed extends GameHolder {
+      boolean running;
+      double mult = 1.0;
+      double crash;
+      double cap;
+      int stake;
+
+      Greed(String g) {
+         super(g);
+      }
+   }
+
    static final class Pigs extends GameHolder {
       Pigs(String g) {
          super(g);
@@ -217,6 +230,8 @@ public class TavernGames implements Listener {
       inv.setItem(12, new ItemBuilder(Material.POTION).name("&c&lLe bar : tirage").lore("&7Payez un verre et tentez votre chance :", "&7nourriture, soupes… ou une pinte de", "&4Kastell rouge&7 (nausée !).", "&7Une pomme dorée à 1 % !").build());
       inv.setItem(14, new ItemBuilder(Material.RED_WOOL).name("&4&lRoulette").lore("&7Roulette européenne (0 à 36) :", "&7rouge/noir, pair/impair, douzaines, numéro plein.").build());
       inv.setItem(16, new ItemBuilder(Material.BELL).name("&d&lMachine à sous").lore("&7Trois rouleaux : cerises, citrons, cloches,", "&7diamants et sept. Jusqu'à ×50 !").build());
+      inv.setItem(26, new ItemBuilder(Material.TNT).name("&c&lGreed").lore("&7Un multiplicateur grimpe : &a×1,00, ×1,50, ×3…", "&7Encaissez avant qu'il n'explose,", "&7sinon la mise est perdue !",
+         "&7Jusqu'à &a×" + this.greedCap()).build());
       inv.setItem(20, new ItemBuilder(Material.WHITE_CONCRETE).name("&f&lDés").lore("&7Deux dés contre deux dés de la maison.", "&7Plus haut : mise doublée · égalité : moitié rendue.").build());
       inv.setItem(22, new ItemBuilder(Material.IRON_INGOT).name("&6&lBras de fer").lore("&7Affrontez le champion de la taverne :", "&7cliquez sur le poing dès qu'il apparaît !", "&7Victoire : &a×" + ARM_MULT + " &7(" + this.armLimit() + " parties par jour).").build());
       inv.setItem(24, new ItemBuilder(Material.PORKCHOP).name("&d&lCourse de cochons").lore("&7Quatre cochons, un seul vainqueur.", "&7Pariez sur le bon : &a×" + PIG_MULT + " &7la mise.").build());
@@ -977,8 +992,140 @@ public class TavernGames implements Listener {
       }, 10L, 6L);
    }
 
+   // ------------------------------------------------------------------ greed (multiplicateur qui explose)
+
+   private double greedCap() {
+      return Math.max(2.0, this.plugin.getConfig().getDouble("taverns.greed.max-multiplier", 20.0));
+   }
+
+   private double greedEdge() {
+      return Math.max(0.0, Math.min(0.2, this.plugin.getConfig().getDouble("taverns.greed.house-edge", 0.04)));
+   }
+
+   private void openGreed(Player player, Guild owner) {
+      Greed h = new Greed(owner.getId());
+      Inventory inv = Bukkit.createInventory(h, 45, ChatUtil.component("&8&l💣 Greed — " + owner.getName()));
+      this.renderGreed(inv, h, owner);
+      player.openInventory(inv);
+   }
+
+   private void renderGreed(Inventory inv, Greed h, Guild owner) {
+      this.fill(inv);
+      inv.setItem(4, new ItemBuilder(Material.BARREL).name("&c&lGreed").lore(this.houseLine(owner), "&7Lancez la partie : le multiplicateur part de", "&a×1,00 &7et grimpe de plus en plus vite.",
+         "&7Cliquez sur &aENCAISSER &7pour empocher", "&7mise × multiplicateur… avant l'explosion !", "&cS'il explose avant, la mise est perdue.", "&8Fermer le menu en cours de partie = abandon.",
+         "&7Plafond : &a×" + this.greedCap() + " &7(encaissé automatiquement)").build());
+      this.chips(inv, h);
+      inv.setItem(16, new ItemBuilder(Material.TNT).name("&a&lLANCER").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+      inv.setItem(0, this.back());
+      this.renderGreedBar(inv, 1.0, false);
+   }
+
+   /** Rangée de verre qui se remplit au fil du multiplicateur (échelle logarithmique jusqu'au plafond). */
+   private void renderGreedBar(Inventory inv, double mult, boolean boom) {
+      double fill = Math.log(mult) / Math.log(this.greedCap());
+      int lit = (int)Math.round(Math.max(0.0, Math.min(1.0, fill)) * 9);
+      for (int i = 0; i < 9; i++) {
+         Material m = boom ? Material.RED_STAINED_GLASS_PANE : i < lit ? (i < 3 ? Material.LIME_STAINED_GLASS_PANE : i < 6 ? Material.YELLOW_STAINED_GLASS_PANE : Material.ORANGE_STAINED_GLASS_PANE)
+            : Material.BLACK_STAINED_GLASS_PANE;
+         inv.setItem(18 + i, new ItemBuilder(m).name(boom ? "&4&lBOUM !" : String.format(java.util.Locale.ROOT, "&e×%.2f", mult)).build());
+      }
+   }
+
+   private void startGreed(Player player, Greed h, Guild owner, Inventory inv) {
+      int stake = BETS[h.bet];
+      // La banque doit au moins couvrir un ×2 ; au-delà, le plafond de la partie s'adapte à ce qu'elle peut payer.
+      if (!this.take(player, owner, stake, 2.0)) {
+         return;
+      }
+
+      h.stake = stake;
+      h.cap = Math.max(1.01, Math.min(this.greedCap(), 1.0 + owner.getBankBalance() / stake));
+      // Point d'explosion : P(explosion après m) = (1 - avantage) / m, donc espérance (1 - avantage) quel que soit le moment où l'on encaisse.
+      double u = ThreadLocalRandom.current().nextDouble();
+      h.crash = (1.0 - this.greedEdge()) / Math.max(1e-9, 1.0 - u);
+      h.mult = 1.0;
+      h.running = true;
+      UUID id = player.getUniqueId();
+      this.playing.add(id);
+      ItemStack cash = new ItemBuilder(Material.EMERALD_BLOCK).name("&a&lENCAISSER").lore("&7Cliquez n'importe où ici !").build();
+      for (int s = 27; s <= 44; s++) {
+         inv.setItem(s, cash);
+      }
+
+      ChatUtil.playSound(player, Sound.ENTITY_TNT_PRIMED, 0.8F, 1.2F);
+      Bukkit.getScheduler().runTaskTimer(this.plugin, task -> {
+         if (!h.running) {
+            task.cancel();
+            return;
+         }
+
+         Player p = Bukkit.getPlayer(id);
+         if (p == null || inv.getViewers().isEmpty()) {
+            task.cancel();
+            h.running = false;
+            this.playing.remove(id);
+            this.settle(owner, id, h.stake, 0.0);
+            this.note(id, "&c💣 Vous avez quitté la table en pleine partie : la mise de &6" + h.stake + " pièces &cest perdue.", false);
+            return;
+         }
+
+         double next = Math.floor(h.mult * 1.012 * 100.0 + 1.0) / 100.0;
+         if (next >= h.crash) {
+            task.cancel();
+            h.running = false;
+            this.playing.remove(id);
+            this.settle(owner, id, h.stake, 0.0);
+            this.renderGreedBar(inv, h.mult, true);
+            inv.setItem(16, new ItemBuilder(Material.TNT).name("&a&lREJOUER").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+            for (int s = 27; s <= 44; s++) {
+               inv.setItem(s, this.glass());
+            }
+
+            ChatUtil.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.7F, 1.0F);
+            this.note(id, String.format(java.util.Locale.ROOT, "&c💣 BOUM à ×%.2f ! La maison garde vos &6%d pièces&c.", Math.max(1.0, h.crash), h.stake), false);
+            return;
+         }
+
+         h.mult = Math.min(next, h.cap);
+         this.renderGreedBar(inv, h.mult, false);
+         inv.setItem(16, new ItemBuilder(Material.GOLD_BLOCK).name(String.format(java.util.Locale.ROOT, "&e&l×%.2f", h.mult))
+            .lore(String.format(java.util.Locale.ROOT, "&7Gain si vous encaissez : &6%d pièces", (long)Math.floor(h.stake * h.mult))).build());
+         if ((int)(h.mult * 100) % 10 == 0) {
+            this.tick(p, Sound.BLOCK_NOTE_BLOCK_PLING, (float)Math.min(2.0, 0.5 + h.mult / 4.0));
+         }
+
+         if (h.mult >= h.cap) {
+            task.cancel();
+            this.cashOut(id, h, owner, inv);
+         }
+      }, 10L, 2L);
+   }
+
+   private void cashOut(UUID id, Greed h, Guild owner, Inventory inv) {
+      if (!h.running) {
+         return;
+      }
+
+      h.running = false;
+      this.playing.remove(id);
+      double payout = this.settle(owner, id, h.stake, h.mult);
+      this.note(id, String.format(java.util.Locale.ROOT, "&a💣 Encaissé à ×%.2f : &6+%d pièces &a(gain net %d).", h.mult, (long)payout, (long)(payout - h.stake)), payout > h.stake);
+      Player p = Bukkit.getPlayer(id);
+      if (p != null && h.mult >= 10.0) {
+         ChatUtil.broadcast(String.format(java.util.Locale.ROOT, "&c💣 &e%s &7a encaissé un &a×%.2f &7au Greed de la taverne de %s !", p.getName(), h.mult, owner.getName()));
+      }
+
+      if (!inv.getViewers().isEmpty()) {
+         for (int s = 27; s <= 44; s++) {
+            inv.setItem(s, this.glass());
+         }
+
+         inv.setItem(16, new ItemBuilder(Material.TNT).name("&a&lREJOUER").lore("&7Mise : &6" + BETS[h.bet] + " pièces").build());
+      }
+   }
+
    private static int backSlot(GameHolder h) {
-      return h instanceof Pigs ? 0 : h instanceof Roulette || h instanceof Arm ? 45 : 18;
+      return h instanceof Pigs || h instanceof Greed ? 0 : h instanceof Roulette || h instanceof Arm ? 45 : 18;
    }
 
    // ------------------------------------------------------------------ clics
@@ -1011,8 +1158,17 @@ public class TavernGames implements Listener {
             case 20 -> this.openDice(player, owner);
             case 22 -> this.openArm(player, owner);
             case 24 -> this.openPigs(player, owner);
+            case 26 -> this.openGreed(player, owner);
             default -> {
             }
+         }
+
+         return;
+      }
+
+      if (holder instanceof Greed g && g.running) {
+         if (slot >= 27 && slot <= 44) {
+            this.cashOut(player.getUniqueId(), g, owner, inv);
          }
 
          return;
@@ -1047,6 +1203,8 @@ public class TavernGames implements Listener {
                this.renderArm(inv, a, owner);
             } else if (holder instanceof Pigs pg) {
                this.renderPigs(inv, pg, owner);
+            } else if (holder instanceof Greed gr) {
+               this.renderGreed(inv, gr, owner);
             }
 
             ChatUtil.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 1.2F);
@@ -1067,6 +1225,8 @@ public class TavernGames implements Listener {
          this.rollDice(player, d, owner, inv);
       } else if (holder instanceof Arm a && slot == 16) {
          this.startArm(player, a, owner, inv);
+      } else if (holder instanceof Greed g && slot == 16) {
+         this.startGreed(player, g, owner, inv);
       } else if (holder instanceof Pigs pg && (slot == 18 || slot == 27 || slot == 36 || slot == 45)) {
          this.racePigs(player, pg, owner, (slot - 18) / 9, inv);
       } else if (holder instanceof Roulette r) {

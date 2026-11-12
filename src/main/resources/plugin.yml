@@ -158,7 +158,7 @@ commands:
     aliases: [actions]
     usage: /bourse [liste|ouvrir|fermer|acheter|vendre|portefeuille]
   taverne:
-    description: "Zone neutre - déclarer une taverne, jouer (pile ou face, roulette, dés, bras de fer, course de cochons…)"
+    description: "Zone neutre - déclarer une taverne, jouer (pile ou face, roulette, dés, bras de fer, course de cochons, greed…)"
     aliases: [tavern]
     usage: /taverne [declarer|retirer|jeu]
   webvote:

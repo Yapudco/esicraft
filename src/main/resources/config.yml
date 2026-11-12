@@ -325,6 +325,9 @@ taverns:
     champion-push: 0.40                  # Chance que le champion pousse avant chaque poing (+4 points par tour)
     champion-push-max: 0.75              # Plafond de cette chance
     feint-chance: 0.25                   # Part des poings qui sont des feintes (à ne pas toucher : -2 crans), dès le 2e tour
+  greed:
+    max-multiplier: 20.0                 # Plafond du multiplicateur (encaissé automatiquement ; abaissé si la banque ne peut pas payer)
+    house-edge: 0.04                     # Avantage de la maison : 4 % des parties explosent dès ×1,00
 
 # Monde de ressources (/ressources) : monde minier séparé, remis à neuf chaque semaine
 resource-world:
