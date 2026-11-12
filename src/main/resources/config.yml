@@ -328,6 +328,7 @@ taverns:
   greed:
     max-multiplier: 20.0                 # Plafond du multiplicateur (encaissé automatiquement ; abaissé si la banque ne peut pas payer)
     house-edge: 0.04                     # Avantage de la maison : 4 % des parties explosent dès ×1,00
+    step-ticks: 3                        # Ticks entre deux hausses du multiplicateur (plus grand = plus lent) : à 3, ×2 en ~7 s, ×10 en ~25 s, ×20 en ~34 s
 
 # Monde de ressources (/ressources) : monde minier séparé, remis à neuf chaque semaine
 resource-world:

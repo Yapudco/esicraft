@@ -998,6 +998,11 @@ public class TavernGames implements Listener {
       return Math.max(2.0, this.plugin.getConfig().getDouble("taverns.greed.max-multiplier", 20.0));
    }
 
+   /** Ticks entre deux hausses du multiplicateur : plus c'est grand, plus il monte doucement (20 ticks = 1 s). */
+   private long greedStepTicks() {
+      return Math.max(1L, Math.min(10L, this.plugin.getConfig().getLong("taverns.greed.step-ticks", 3L)));
+   }
+
    private double greedEdge() {
       return Math.max(0.0, Math.min(0.2, this.plugin.getConfig().getDouble("taverns.greed.house-edge", 0.04)));
    }
@@ -1098,7 +1103,7 @@ public class TavernGames implements Listener {
             task.cancel();
             this.cashOut(id, h, owner, inv);
          }
-      }, 10L, 2L);
+      }, 10L, this.greedStepTicks());
    }
 
    private void cashOut(UUID id, Greed h, Guild owner, Inventory inv) {

@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 12/11/2026 (Greed plus lent)
+
+### Changements
+- **Greed** : le multiplicateur monte moins vite (×2 en ~7 s au lieu de ~4,5 s, ×20 en ~34 s au lieu de ~22 s). Réglage : `taverns.greed.step-ticks`. L'avantage de la maison ne change pas.
+
 ## 12/11/2026 (Greed à la taverne)
 
 ### Nouveautés
