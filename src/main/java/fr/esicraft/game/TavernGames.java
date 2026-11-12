@@ -686,6 +686,15 @@ public class TavernGames implements Listener {
    private final java.util.Map<UUID, Integer> armToday = new ConcurrentHashMap<>();
    private String armDay = "";
 
+   /** Temps (en ticks) pour cliquer sur le poing au premier tour ; il raccourcit d'un tick par tour jusqu'au minimum. */
+   private int armStartWindow() {
+      return Math.max(10, this.plugin.getConfig().getInt("taverns.arm-wrestling.start-window-ticks", 30));
+   }
+
+   private int armMinWindow() {
+      return Math.max(6, Math.min(this.armStartWindow(), this.plugin.getConfig().getInt("taverns.arm-wrestling.min-window-ticks", 14)));
+   }
+
    private int armLimit() {
       return Math.max(1, this.plugin.getConfig().getInt("taverns.arm-wrestling.matches-per-day", 6));
    }
@@ -738,7 +747,7 @@ public class TavernGames implements Listener {
       h.pos = 4;
       h.round = 0;
       h.target = -1;
-      h.wait = 20;
+      h.wait = 40;
       h.running = true;
       UUID id = player.getUniqueId();
       this.playing.add(id);
@@ -781,7 +790,7 @@ public class TavernGames implements Listener {
             }
 
             h.target = ARM_GRID[ThreadLocalRandom.current().nextInt(ARM_GRID.length)];
-            h.deadline = Math.max(5, 15 - h.round * 2);
+            h.deadline = Math.max(this.armMinWindow(), this.armStartWindow() - h.round);
             inv.setItem(h.target, new ItemBuilder(Material.IRON_INGOT).name("&e&l✊ POUSSEZ !").build());
             return;
          }
@@ -789,7 +798,7 @@ public class TavernGames implements Listener {
          if (--h.deadline <= 0) {
             inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
             h.target = -1;
-            h.wait = ThreadLocalRandom.current().nextInt(4, 12);
+            h.wait = ThreadLocalRandom.current().nextInt(15, 31);
             h.pos--;
             this.renderRope(inv, h);
             this.tick(p, Sound.BLOCK_NOTE_BLOCK_BASS, 0.6F);
@@ -809,7 +818,7 @@ public class TavernGames implements Listener {
       boolean hit = slot == h.target;
       inv.setItem(h.target, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name(" ").build());
       h.target = -1;
-      h.wait = ThreadLocalRandom.current().nextInt(4, 12);
+      h.wait = ThreadLocalRandom.current().nextInt(15, 31);
       h.pos += hit ? 1 : -1;
       this.renderRope(inv, h);
       this.tick(player, hit ? Sound.ENTITY_PLAYER_ATTACK_STRONG : Sound.BLOCK_NOTE_BLOCK_BASS, hit ? 1.2F : 0.6F);

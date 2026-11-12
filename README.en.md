@@ -476,7 +476,7 @@ The **Merchant Syndicate** and the **Druidic Enclave** can declare up to 2 chunk
 | 🎡 **Roulette** | European (0 to 36): red/black, even/odd, low/high ×2, dozens ×3, straight number ×36; 0 makes the house win |
 | 🎰 **Slot machine** | Three reels: 7-7-7 ×50, diamonds ×20, bells ×10, lemons ×6, cherries ×4; two cherries ×1.5; one cherry ×0.5 |
 | 🎲 **Dice** | Two dice against the house's two dice: higher total ×2, tie: half the bet back |
-| 💪 **Arm wrestling** | Skill game against the tavern champion: click the fist as soon as it appears (faster and faster). A good click bends his arm, a missed or slow click pushes you back, and he pushes on his own too. Win ×1.8; 6 matches a day (`taverns.arm-wrestling.matches-per-day`) |
+| 💪 **Arm wrestling** | Skill game against the tavern champion: click the fist as soon as it appears (1.5 s at first, less and less time after that). A good click bends his arm, a missed or slow click pushes you back, and he pushes on his own too. Win ×1.8; 6 matches a day (`taverns.arm-wrestling.matches-per-day`) |
 | 🐖 **Pig race** | Four pigs (Rosette, Jambonneau, Truffe, Saucisse): bet on the winner, ×3.6 |
 
 Winnings come out of the tavern's bank, losses go into it. **Everyone can play**, including members of the owning guild against their own house. *Tavern keeper* achievement. A tavern declared before this update keeps its neutral zone but only opens its games once the chest, barrel and roof are in place.
