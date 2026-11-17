@@ -44,7 +44,7 @@ ages:
       CARROT: 750
   age-3:
     name: "Âge de l'Alchimie"
-    description: "Déblocage universel des armures complètes en fer, outils diamant et potions T1."
+    description: "Déblocage universel des armures complètes en fer et outils diamant."
     requirements:
       IRON_INGOT: 3500
       GOLD_INGOT: 1500
@@ -63,7 +63,7 @@ ages:
       BEETROOT: 1500
   age-4:
     name: "Âge de Guerre Totale"
-    description: "Déblocage universel des armures en diamant, enchantements, commerce villageois, TNT et machinerie de siège."
+    description: "Déblocage universel des armures en diamant, enchantements, alambics, potions jetables, commerce villageois, TNT et machinerie de siège."
     requirements:
       DIAMOND: 500
       IRON_BLOCK: 150

@@ -125,7 +125,7 @@ Une fois dans une guilde, voici une routine efficace :
 | Objectif | Comment |
 | :--- | :--- |
 | **Recruter** | Invite des amis aux métiers différents : 3 métiers = primes de monstres +10 %, jusqu'à 6 métiers = contrats ×1,5. |
-| **Choisir une spécialisation** | Le chef ouvre `/guild spec` (combat, minage, nature, commerce, magie, solitaire, océan). Le premier choix est immédiat ; lis bien les contraintes de composition. |
+| **Choisir une spécialisation** | Un officier ouvre `/guild spec` (combat, minage, nature, commerce, magie, solitaire, océan). Le premier choix est immédiat ; lis bien les contraintes de composition. |
 | **Défendre le Nexus** | Les officiers débloquent des défenses permanentes dans `/nexus` (brasier, toile, foudre, golem…). Sacrifie des ressources avec `/nexus sacrifice`. Soigne-le avec des pommes dorées. |
 | **Monter à l'Âge 2** | Débloque le **Nether**, les outils en fer pour tous, et la possibilité de construire des gares. |
 | **Se protéger** | Signe un traité (`/traite`) avec une guilde voisine : alliance, pacte de non-agression ou vassalité. Les guildes liées ne peuvent pas se raider. |
@@ -230,7 +230,7 @@ Une fois dans une guilde, voici une routine efficace :
 | `/guild claim` | Officier | Revendiquer le chunk où tu te trouves |
 | `/guild claim show` | Tous | Voir les bordures des territoires pendant 1 minute |
 | `/guild unclaim` | Chef | Abandonner le chunk où tu te trouves |
-| `/guild spec` | Chef | Choisir la spécialisation |
+| `/guild spec` | Officier | Choisir la spécialisation |
 | `/guild bank` | Membre | Voir le solde de la banque |
 | `/guild bank <montant>` | Membre | Y déposer des pièces |
 | `/guild nexus` | Membre | État du Nexus |
@@ -372,7 +372,7 @@ Chaque métier a des **objets qu'il est seul à pouvoir fabriquer**, des **avant
 | 🌿 **Sylvain** (fermier) | Houes, poudre d'os, élevage, pommes dorées | Régénération I pour lui et les membres de sa guilde à moins de 4 blocs · récolte d'un clic droit avec replantation automatique | -20 % de dégâts au corps à corps |
 | 🔨 **Forgeron** | Armures, épées, haches, boucliers, enclumes, meules, hauts-fourneaux | Résistance au feu permanente · 35 % de chances de doubler un lingot au four · enclume 2× moins chère en XP | Il a faim 25 % plus vite |
 | 🏹 **Rôdeur** (archer) | Arcs, arbalètes et flèches (jusqu'à l'Âge 3) | Ses flèches empoisonnent · +25 % de dégâts à distance · Vitesse I dans les plaines, forêts, jungles et taïgas | Lenteur I avec un plastron en diamant ou Netherite |
-| 🧪 **Arcaniste** (mage) | Enchantements, potions jetables, alambics (jusqu'à l'Âge 3) | +30 % d'XP · potions qui durent 25 % plus longtemps · -20 % de dégâts magiques subis | +15 % de dégâts subis au corps à corps |
+| 🧪 **Arcaniste** (mage) | Enchantements, potions jetables, alambics (jusqu'à l'Âge 3) | +30 % d'XP · potions (bues ou jetées) qui durent 25 % plus longtemps · -20 % de dégâts magiques subis | +15 % de dégâts subis au corps à corps |
 | ⚙ **Ingénieur** | Redstone, pistons, entonnoirs, distributeurs et **TNT** (jusqu'à l'Âge 3) | -40 % de dégâts d'explosion subis | -20 % de dégâts au corps à corps |
 
 <details>
@@ -399,8 +399,8 @@ Chaque métier a des **objets qu'il est seul à pouvoir fabriquer**, des **avant
 
 | Rôle | Ce qu'il peut faire |
 | :--- | :--- |
-| 👑 **Chef** | Tout, plus : nommer des officiers, céder la guilde (`/guild transfer`), la dissoudre (`/guild disband`), abandonner un chunk, choisir la spécialisation |
-| 🛡 **Officier** | Inviter, expulser, revendiquer des terres, poser le Nexus, débloquer des défenses, lancer des raids, signer des traités, gérer les gares |
+| 👑 **Chef** | Tout, plus : nommer des officiers, céder la guilde (`/guild transfer`), la dissoudre (`/guild disband`), abandonner un chunk |
+| 🛡 **Officier** | Inviter, expulser, revendiquer des terres, poser le Nexus, choisir la spécialisation, débloquer des défenses, lancer des raids, signer des traités, gérer les gares |
 | 🙂 **Membre** | Déposer de l'argent dans la banque, donner des ressources pour l'Âge, défendre |
 
 - **10 joueurs maximum** par guilde, et on ne peut être que dans **une seule guilde**.
@@ -464,11 +464,11 @@ Comme la taverne, un bâtiment est un **chunk de son territoire** (jamais celui 
 
 ## 5. Les spécialisations de guilde
 
-Le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à toute la guilde, mais impose des règles sur sa composition, vérifiées à chaque arrivée d'un joueur et à chaque changement de métier.
+Un officier ou le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à toute la guilde, mais impose des règles sur sa composition, vérifiées à chaque arrivée d'un joueur et à chaque changement de métier.
 
 | Spécialisation | Bonus | Contraintes |
 | :--- | :--- | :--- |
-| ⚔️ **Légion Guerrière** (combat) | Force I et Résistance I sur vos terres · raids 30 % moins chers · +30 % de dégâts contre les monstres | Au moins 50 % de Rôdeurs et Forgerons · 1 Nain et 1 Sylvain maximum · -25 % de minerais et récoltes sur vos terres |
+| ⚔️ **Légion Guerrière** (combat) | Force I et Résistance I sur vos terres · raids 30 % moins chers · +30 % de dégâts contre les monstres | Au moins 50 % de Rôdeurs et Forgerons · 1 Nain et 1 Sylvain maximum · -25 % de minerais et de récoltes |
 | ⛏️ **Industrie Souterraine** (minage) | Hâte II sur vos terres sous la couche 30 · minerais bruts ×1,5 · pièges du Nexus 50 % moins chers | 1 Rôdeur maximum · potions de niveau II interdites · +20 % de dégâts magiques subis |
 | 🌾 **Enclave Champêtre** (nature) | +2 cœurs de vie · Régénération I et Saturation sur vos terres · récoltes, butin des animaux, bois et pierres ×2 · animaux qui se reproduisent 3× plus vite | Aucun Ingénieur · 1 Forgeron maximum · armures en Netherite interdites |
 | 💰 **Syndicat Marchand** (commerce) | Seule guilde à pouvoir commercer avec les villageois avant l'Âge 4 · +20 % sur les primes de monstres (dont 10 % versés à la banque) · aucune taxe à l'Hôtel des Ventes | Aucun Arcaniste · raids 30 % plus chers · pas de bonus de combat · Nexus -20 % de vie |
@@ -477,7 +477,7 @@ Le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à 
 | 🔱 **Atlante** (océan) | **Dans l'eau** : respiration aquatique, vision nocturne, agilité aquatique, grâce du dauphin et Résistance | **Nexus obligatoirement immergé** (au moins un bloc d'eau contre lui) · **Lenteur hors de l'eau** |
 
 > [!IMPORTANT]
-> Le premier choix est immédiat. Ensuite, on ne peut changer de spécialisation **que lorsqu'un nouveau joueur** (jamais passé par la guilde) la rejoint, au plus une fois tous les 7 jours. Chaque changement offre le droit de [déplacer le Nexus](#déplacer-le-nexus-nexus-move).
+> Le premier choix est immédiat. Ensuite, on ne peut changer de spécialisation **que lorsqu'un nouveau joueur** (jamais passé par la guilde) la rejoint avec **au moins 2 h de jeu** (ou lorsqu'un membre d'une guilde vaincue lui prête allégeance), au plus une fois tous les 7 jours, et jamais pendant un raid, un siège ou dans les 10 minutes qui suivent une attaque du Nexus. Chaque changement offre le droit de [déplacer le Nexus](#déplacer-le-nexus-nexus-move).
 
 **Atlantes** : posez le Nexus contre un bloc d'eau. L'eau est alors autorisée tout autour (pose, seaux, écoulement) dans le chunk du Nexus ; la lave et l'obsidienne restent interdites. Les membres ont tous les avantages sous-marins **dans l'eau** et subissent **Lenteur I sur la terre ferme**.
 
@@ -645,7 +645,7 @@ Ta guilde commence à l'**Âge 1** et peut monter jusqu'à l'**Âge 6**. Pour pa
 | 1. **Rustique** (départ) | Bois et pierre. Le fer est réservé aux métiers spécialisés. Nether et End fermés. |
 | 2. **Métallurgie** | **Le Nether**, les outils en fer et les boucliers pour tous. Le diamant est réservé aux métiers spécialisés. Gares et fret. |
 | 3. **Alchimie** | **L'End**, les outils en diamant et l'armure en fer pour tous. La Netherite est réservée aux métiers spécialisés. |
-| 4. **Guerre Totale** | Pour tous : armures en diamant, commerce avec les villageois, TNT, redstone, pistons, alambics, arcs et arbalètes. Bourse des guildes. **Bonus des joueurs** : Vitesse I, +10 % de dégâts, +25 % d'XP, -20 % de dégâts d'explosion. |
+| 4. **Guerre Totale** | Pour tous : armures en diamant, commerce avec les villageois, TNT, redstone, pistons, alambics, potions jetables, arcs et arbalètes. Bourse des guildes. **Bonus des joueurs** : Vitesse I, +10 % de dégâts, +25 % d'XP, -20 % de dégâts d'explosion. |
 | 5. **Mythique** | La Netherite et les balises pour tous, territoire illimité. **Bonus des joueurs** : Hâte I, Vitesse I, Résistance I, +15 % de dégâts, +50 % d'XP. |
 | 6. **Suprématie** | L'Âge ultime. **Récompense** : un œuf de dragon et un bloc de Netherite pour chaque membre, et un titre dans le tchat : **[Giga Tchad]** si ta session dure moins d'une heure, **[Gros Nerd]** au-delà. |
 

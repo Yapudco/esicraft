@@ -48,7 +48,7 @@ public enum Race {
       "&dArcaniste & Alchimiste",
       Material.BREWING_STAND,
       "&7Magie, potions et enchantements.",
-      List.of("&e• Enchants & Livres (Âges 1-3)", "&e• Splash Potions exclusives", "&e• Alambics (Âges 1-2)", "&e• Pommes Dorées (Âges 1-3)"),
+      List.of("&e• Enchants & Livres (Âges 1-3)", "&e• Splash Potions (Âges 1-3)", "&e• Alambics (Âges 1-3)", "&e• Pommes Dorées (Âges 1-3)"),
       List.of("&a+ +30% d'XP reçue", "&a+ Durée potions +25%", "&a+ -20% dégâts magiques", "&c- +15% dégâts en mêlée subis"),
       16.0
    ),

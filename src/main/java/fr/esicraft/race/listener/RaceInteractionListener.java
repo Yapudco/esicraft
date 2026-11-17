@@ -78,7 +78,16 @@ public class RaceInteractionListener implements Listener {
       Material.POLISHED_GRANITE,
       Material.BLACKSTONE,
       Material.POLISHED_BLACKSTONE,
-      Material.CALCITE
+      Material.CALCITE,
+      Material.STONE,
+      Material.COBBLESTONE,
+      Material.MOSSY_COBBLESTONE,
+      Material.DEEPSLATE,
+      Material.COBBLED_DEEPSLATE,
+      Material.TUFF,
+      Material.DRIPSTONE_BLOCK,
+      Material.BASALT,
+      Material.SMOOTH_BASALT
    );
 
    public RaceInteractionListener(EsicraftPlugin plugin) {
@@ -109,16 +118,17 @@ public class RaceInteractionListener implements Listener {
          && block != null
          && block.getType() == Material.BREWING_STAND
          && race != Race.ARCANIST
-         && age.getLevel() < 3) {
+         && age.getLevel() < 4) {
          event.setCancelled(true);
-         ChatUtil.sendActionbar(player, "&c❌ L'utilisation de l'Alambic est réservée aux Arcanistes jusqu'à l'Âge 3 (Alchimie) !");
+         ChatUtil.sendActionbar(player, "&c❌ L'utilisation de l'Alambic est réservée aux Arcanistes jusqu'à l'Âge 4 (Guerre Totale) !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
       } else if (item != null
          && (item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION)
          && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-         && race != Race.ARCANIST) {
+         && race != Race.ARCANIST
+         && age.getLevel() < 4) {
          event.setCancelled(true);
-         ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) !");
+         ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) avant l'Âge 4 !");
          ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
       } else if (item != null
          && (item.getType() == Material.BOW || item.getType() == Material.CROSSBOW)
@@ -152,14 +162,20 @@ public class RaceInteractionListener implements Listener {
             Guild guild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
             boolean isDruidic = guild != null && guild.getSpecialization() == GuildSpecialization.DRUIDIC_ENCLAVE;
 
-            for (ItemStack drop : drops) {
-               block.getWorld().dropItemNaturally(block.getLocation(), drop);
-               if (isDruidic) {
-                  block.getWorld().dropItemNaturally(block.getLocation(), drop.clone());
+            // La récolte d'un clic droit subit le malus de la Légion Guerrière comme la casse d'une culture.
+            boolean warlordMalus = guild != null && guild.getSpecialization() == GuildSpecialization.WARLORD && ThreadLocalRandom.current().nextDouble() < 0.25;
+            if (warlordMalus) {
+               ChatUtil.sendActionbar(player, "&c⚔️ Malus Légion Guerrière : Récoltes et minerais réduits de 25% !");
+            } else {
+               for (ItemStack drop : drops) {
+                  block.getWorld().dropItemNaturally(block.getLocation(), drop);
+                  if (isDruidic) {
+                     block.getWorld().dropItemNaturally(block.getLocation(), drop.clone());
+                  }
                }
             }
 
-            if (isDruidic) {
+            if (isDruidic && !warlordMalus) {
                ChatUtil.sendActionbar(player, "&a\ud83c\udf43 Récolte d'Enclave : Butin agricole doublé !");
                block.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, block.getLocation().add(0.5, 0.5, 0.5), 6, 0.2, 0.2, 0.2, 0.05);
             }
@@ -307,9 +323,9 @@ public class RaceInteractionListener implements Listener {
    public void onProjectileLaunch(ProjectileLaunchEvent event) {
       if (event.getEntity() instanceof ThrownPotion && event.getEntity().getShooter() instanceof Player player) {
          Race race = this.plugin.getRaceManager().getRace(player);
-         if (race != Race.ARCANIST) {
+         if (race != Race.ARCANIST && this.plugin.getAgeManager().getPlayerAge(player).getLevel() < 4) {
             event.setCancelled(true);
-            ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) !");
+            ChatUtil.sendActionbar(player, "&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) avant l'Âge 4 !");
             ChatUtil.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
          }
       }
@@ -405,7 +421,7 @@ public class RaceInteractionListener implements Listener {
       Guild owner = this.plugin.getGuildManager().getGuildByChunk(new ChunkKey(stand.getWorld().getName(), stand.getX() >> 4, stand.getZ() >> 4));
       boolean allowed = false;
       if (owner != null) {
-         if (owner.getCurrentAge().getLevel() >= 3) {
+         if (owner.getCurrentAge().getLevel() >= 4) {
             allowed = true;
          } else {
             for (java.util.UUID memberUuid : owner.getMembers().keySet()) {
@@ -480,7 +496,8 @@ public class RaceInteractionListener implements Listener {
                boolean isDwarf = race == Race.DWARF;
                boolean isWarlord = spec == GuildSpecialization.WARLORD;
                boolean isDruidic = spec == GuildSpecialization.DRUIDIC_ENCLAVE;
-               if (isWarlord && ThreadLocalRandom.current().nextDouble() < 0.25) {
+               // Malus de la Légion : 25 % de minerais et de récoltes en moins, partout (ni le bois ni la pierre ne sont touchés).
+               if (isWarlord && (isAnOre || this.isCrop(block)) && ThreadLocalRandom.current().nextDouble() < 0.25) {
                   event.setDropItems(false);
                   ChatUtil.sendActionbar(player, "&c⚔️ Malus Légion Guerrière : Récoltes et minerais réduits de 25% !");
                } else if (isDruidic && isADruidicBlock) {
@@ -542,7 +559,7 @@ public class RaceInteractionListener implements Listener {
    public void onFurnaceExtract(FurnaceExtractEvent event) {
       Player player = event.getPlayer();
       Race race = this.plugin.getRaceManager().getRace(player);
-      if (race == Race.BLACKSMITH && event.getItemAmount() > 0) {
+      if (race == Race.BLACKSMITH && event.getItemAmount() > 0 && event.getItemType().name().endsWith("_INGOT")) {
          int amount = event.getItemAmount();
          int bonusCount = 0;
 
@@ -555,16 +572,67 @@ public class RaceInteractionListener implements Listener {
          if (bonusCount > 0) {
             Material itemType = event.getItemType();
             ItemStack bonus = new ItemStack(itemType, bonusCount);
-            player.getInventory().addItem(new ItemStack[]{bonus});
+            // Inventaire plein : le lingot gratuit tombe aux pieds du joueur au lieu d'être perdu.
+            for (ItemStack leftover : player.getInventory().addItem(new ItemStack[]{bonus}).values()) {
+               player.getWorld().dropItemNaturally(player.getLocation(), leftover);
+            }
             ChatUtil.sendActionbar(player, "&c\ud83d\udd28 Maîtrise de la Forge : +" + bonusCount + " " + itemType.name() + " gratuit(s) !");
             ChatUtil.playSound(player, Sound.BLOCK_ANVIL_USE, 0.5F, 1.5F);
          }
       }
    }
 
-   /** Seuls les animaux d'élevage voient leur butin doublé : jamais les bêtes de bât (âne, mulet, lama, cheval) ni celles qui portent un objet (renard, loup). */
-   private static final java.util.Set<org.bukkit.entity.EntityType> DOUBLED_LOOT = java.util.EnumSet.of(org.bukkit.entity.EntityType.COW, org.bukkit.entity.EntityType.MOOSHROOM,
-      org.bukkit.entity.EntityType.PIG, org.bukkit.entity.EntityType.SHEEP, org.bukkit.entity.EntityType.CHICKEN, org.bukkit.entity.EntityType.RABBIT);
+   /**
+    * Butin à ajouter pour doubler celui d'un animal. Les objets que la bête portait (selle, armure, contenu d'un coffre de mulet ou de lama, objet
+    * tenu par un renard…) ne sont jamais doublés : sinon un animal chargé servirait à dupliquer un inventaire.
+    */
+   private static List<ItemStack> doubledLoot(LivingEntity entity, List<ItemStack> drops) {
+      List<ItemStack> carried = new ArrayList<>();
+      org.bukkit.inventory.EntityEquipment equipment = entity.getEquipment();
+      if (equipment != null) {
+         for (org.bukkit.inventory.EquipmentSlot slot : org.bukkit.inventory.EquipmentSlot.values()) {
+            try {
+               ItemStack worn = equipment.getItem(slot);
+               if (worn != null && !worn.getType().isAir()) {
+                  carried.add(worn);
+               }
+            } catch (IllegalArgumentException ignored) {
+               // emplacement que cette bête ne possède pas
+            }
+         }
+      }
+
+      if (entity instanceof org.bukkit.inventory.InventoryHolder holder && holder.getInventory() != null) {
+         for (ItemStack stack : holder.getInventory().getContents()) {
+            if (stack != null && !stack.getType().isAir()) {
+               carried.add(stack);
+            }
+         }
+      }
+
+      List<ItemStack> extra = new ArrayList<>();
+      for (ItemStack drop : drops) {
+         extra.add(drop.clone());
+      }
+
+      for (ItemStack item : carried) {
+         int left = item.getAmount();
+         for (ItemStack copy : extra) {
+            if (left <= 0) {
+               break;
+            }
+
+            if (copy.isSimilar(item)) {
+               int take = Math.min(left, copy.getAmount());
+               copy.setAmount(copy.getAmount() - take);
+               left -= take;
+            }
+         }
+      }
+
+      extra.removeIf(copy -> copy.getAmount() <= 0);
+      return extra;
+   }
 
    @EventHandler(
       priority = EventPriority.MONITOR,
@@ -576,14 +644,9 @@ public class RaceInteractionListener implements Listener {
       if (killer != null) {
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(killer.getUniqueId());
          GuildSpecialization spec = guild != null ? guild.getSpecialization() : GuildSpecialization.NONE;
-         if (entity instanceof Animals && spec == GuildSpecialization.DRUIDIC_ENCLAVE && DOUBLED_LOOT.contains(entity.getType())) {
-            List<ItemStack> extraDrops = new ArrayList<>();
-
-            for (ItemStack drop : event.getDrops()) {
-               extraDrops.add(drop.clone());
-            }
-
-            event.getDrops().addAll(extraDrops);
+         // Tous les animaux (les hoglins, hostiles, gardent leur prime de monstre : ils passent par la branche suivante).
+         if (entity instanceof Animals && !(entity instanceof org.bukkit.entity.Enemy) && spec == GuildSpecialization.DRUIDIC_ENCLAVE) {
+            event.getDrops().addAll(doubledLoot(entity, event.getDrops()));
             ChatUtil.sendActionbar(killer, "&a\ud83c\udf43 Élevage d'Enclave : Butin animal doublé !");
             killer.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, entity.getLocation().add(0.0, 0.5, 0.0), 8, 0.3, 0.3, 0.3, 0.05);
          } else {

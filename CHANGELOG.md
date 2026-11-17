@@ -2,6 +2,20 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 17/11/2026 (métiers et spécialisations alignés sur le guide)
+
+### Corrections
+- **Légion Guerrière** : le malus de -25 % ne touche plus que les minerais et les récoltes (plus le bois ni la pierre), partout, et aussi la récolte d'un clic droit du Sylvain. Le +30 % de dégâts contre les monstres vaut désormais aussi à l'arc, à l'arbalète et au trident.
+- **Enclave Champêtre** : le butin de **tous** les animaux est doublé (sans jamais dupliquer selle, armure, contenu de coffre ni objet porté) ainsi que celui de **toutes** les pierres (pierre, cobblestone, deepslate, tuf, basalte, granite, diorite, andésite, calcite, blackstone, dripstone).
+- **Industrie Souterraine** : le +20 % de dégâts magiques s'applique vraiment (potions, poison, wither, souffle du dragon, et monstres magiques même quand ils tirent).
+- **Conclave Arcanique** : le -50 % de dégâts magiques couvre les mêmes dégâts, poison et wither compris.
+- **Nain** : ne fabrique plus ni épées ni armures en métal, à aucun Âge (il peut toujours en porter et en utiliser). Sa lenteur ne joue plus que de jour, sous un ciel dégagé.
+- **Arcaniste** : potions jetables et alambics deviennent accessibles à tous à l'Âge 4 (réservés à l'Arcaniste avant). La durée +25 % vaut aussi pour les potions jetées.
+- **Forgeron** : le bonus de fonte ne concerne que les lingots, et le lingot gratuit tombe au sol si l'inventaire est plein au lieu d'être perdu.
+
+### Documentation
+- Les officiers peuvent choisir la spécialisation (et pas seulement le chef) ; le guide précise les conditions d'un changement (nouveau membre avec 2 h de jeu, ou allégeance après une conquête ; jamais pendant une attaque).
+
 ## 12/11/2026 (Greed plus lent)
 
 ### Changements

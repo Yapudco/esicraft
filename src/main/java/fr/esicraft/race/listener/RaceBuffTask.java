@@ -42,6 +42,16 @@ public class RaceBuffTask extends BukkitRunnable {
    /** Joueurs auxquels les bonus aquatiques des Atlantes ont été appliqués (pour les retirer hors de l'eau). */
    private final java.util.Set<java.util.UUID> atlanteans = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
+   /** « Plein soleil » : Overworld, de jour (le soleil est levé), temps dégagé et ciel ouvert au-dessus de la tête. */
+   private static boolean isFullSun(Location loc) {
+      org.bukkit.World world = loc.getWorld();
+      return world != null
+         && world.getEnvironment() == org.bukkit.World.Environment.NORMAL
+         && world.getTime() < 12000L
+         && world.isClearWeather()
+         && loc.getBlock().getLightFromSky() >= 14;
+   }
+
    private static boolean inWater(Player p) {
       return p.isInWater() || p.getEyeLocation().getBlock().getType() == Material.WATER;
    }
@@ -123,7 +133,7 @@ public class RaceBuffTask extends BukkitRunnable {
                      if (y <= 0) {
                         buff(player, DWARF_HASTE);
                         buff(player, DWARF_NIGHT_VISION);
-                     } else if (y > 60 && loc.getWorld() != null && loc.getWorld().isClearWeather() && loc.getBlock().getLightFromSky() >= 14) {
+                     } else if (y > 60 && isFullSun(loc)) {
                         buff(player, DWARF_SLOWNESS);
                      }
                      break label65;
