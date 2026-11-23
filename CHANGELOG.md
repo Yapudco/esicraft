@@ -2,6 +2,28 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 23/11/2026 (aéroports, train non instantané, rails protégés, chevaux)
+
+### Nouveautés
+- **Aéroports** : l'élytre ne s'ouvre plus qu'au décollage depuis une piste (bande d'au moins 32 × 3 blocs de béton noir, reconnue automatiquement) et à partir de l'Âge 4. Se poser hors piste abîme l'élytre. Aucune restriction dans l'End ni dans le monde de ressources. Réglages : `airports.*`.
+- **Train non instantané** : `/station` n'est plus une téléportation. Le voyageur et un wagonnet suivent le tracé des rails à grande vitesse, donc plus la ligne est longue, plus le trajet dure (30 blocs par seconde, de 5 secondes à 10 minutes). Le voyageur est invulnérable, ne peut pas frapper, et est déposé à l'arrivée même s'il se déconnecte. Réglages : `rail.ride.*`.
+- **Rails protégés** : hors territoire (terrain neutre compris), les rails posés par une guilde ne se cassent pas à la main depuis une autre guilde ; il faut de la TNT. Alliés, vassaux et opérateurs peuvent les modifier. Les rails posés avant cette règle ou par un joueur sans guilde restent cassables. Réglage : `rail.protection.enabled`.
+- **Chevaux plus rapides** : toute monture de selle (cheval, âne, mulet, lama, chameau) reçoit Vitesse I ; l'Écurie de guilde passe à Vitesse II. Réglages : `mounts.*`.
+
+## 17/11/2026 (métiers et spécialisations alignés sur le guide)
+
+### Corrections
+- **Légion Guerrière** : le malus de -25 % ne touche plus que les minerais et les récoltes (plus le bois ni la pierre), partout, et aussi la récolte d'un clic droit du Sylvain. Le +30 % de dégâts contre les monstres vaut désormais aussi à l'arc, à l'arbalète et au trident.
+- **Enclave Champêtre** : le butin de **tous** les animaux est doublé (sans jamais dupliquer selle, armure, contenu de coffre ni objet porté) ainsi que celui de **toutes** les pierres (pierre, cobblestone, deepslate, tuf, basalte, granite, diorite, andésite, calcite, blackstone, dripstone).
+- **Industrie Souterraine** : le +20 % de dégâts magiques s'applique vraiment (potions, poison, wither, souffle du dragon, et monstres magiques même quand ils tirent).
+- **Conclave Arcanique** : le -50 % de dégâts magiques couvre les mêmes dégâts, poison et wither compris.
+- **Nain** : ne fabrique plus ni épées ni armures en métal, à aucun Âge (il peut toujours en porter et en utiliser). Sa lenteur ne joue plus que de jour, sous un ciel dégagé.
+- **Arcaniste** : potions jetables et alambics deviennent accessibles à tous à l'Âge 4 (réservés à l'Arcaniste avant). La durée +25 % vaut aussi pour les potions jetées.
+- **Forgeron** : le bonus de fonte ne concerne que les lingots, et le lingot gratuit tombe au sol si l'inventaire est plein au lieu d'être perdu.
+
+### Documentation
+- Les officiers peuvent choisir la spécialisation (et pas seulement le chef) ; le guide précise les conditions d'un changement (nouveau membre avec 2 h de jeu, ou allégeance après une conquête ; jamais pendant une attaque).
+
 ## 12/11/2026 (Greed plus lent)
 
 ### Changements

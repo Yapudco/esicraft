@@ -44,7 +44,7 @@ ages:
       CARROT: 750
   age-3:
     name: "Âge de l'Alchimie"
-    description: "Déblocage universel des armures complètes en fer, outils diamant et potions T1."
+    description: "Déblocage universel des armures complètes en fer et outils diamant."
     requirements:
       IRON_INGOT: 3500
       GOLD_INGOT: 1500
@@ -63,7 +63,7 @@ ages:
       BEETROOT: 1500
   age-4:
     name: "Âge de Guerre Totale"
-    description: "Déblocage universel des armures en diamant, enchantements, commerce villageois, TNT et machinerie de siège."
+    description: "Déblocage universel des armures en diamant, enchantements, alambics, potions jetables, commerce villageois, TNT et machinerie de siège."
     requirements:
       DIAMOND: 500
       IRON_BLOCK: 150
@@ -406,6 +406,12 @@ rail:
     hits-to-loot: 25                     # Coups nécessaires pour piller un convoi sur son territoire (sans traité)
     distance-limits: [1000, 3000, 5000, 10000]   # Distances (blocs) entre les gares
     minutes: [4, 8, 12, 15, 20]          # Durée du trajet : <= 1000, <= 3000, <= 5000, <= 10000, au-delà
+  ride:                                  # Trajet des voyageurs : plus de téléportation instantanée, le train suit le tracé des rails
+    blocks-per-second: 30.0              # Vitesse du train (plus la ligne est longue, plus le trajet dure)
+    min-seconds: 5.0                     # Durée minimale d'un trajet
+    max-seconds: 600.0                   # Durée maximale (les très longues lignes sont plafonnées)
+  protection:
+    enabled: true                        # Hors territoire, les rails d'une guilde ne se cassent pas à la main depuis une autre guilde (alliés exceptés) : il faut de la TNT
   enabled: true
   base-fare: 1.0              # Tarif de base d'un trajet (versé à la guilde de la gare d'arrivée)
   default-toll: 2.0           # Péage par défaut d'une guilde dont le territoire est traversé
@@ -415,6 +421,21 @@ rail:
   max-stations-per-guild: 6
   min-age-level: 2             # Âge minimal de la guilde pour créer une gare
   search-max-rails: 30000      # Plafond de rails explorés par recherche
+
+# Aéroports : l'élytre ne s'ouvre qu'au décollage depuis une piste (bande de béton noir), à partir d'un certain Âge
+airports:
+  enabled: true
+  min-age: 4                             # Âge de guilde minimal pour planer
+  length: 32                             # Longueur minimale d'une piste (blocs de béton noir)
+  width: 3                               # Largeur minimale d'une piste
+  bad-landing-damage: 100                # Durabilité perdue par l'élytre en se posant hors piste (0 = aucune)
+  free-in-end: true                      # Aucune restriction dans l'End
+  free-in-resource-world: true           # Aucune restriction dans le monde de ressources
+
+# Montures : de quoi préférer le cheval et la route à l'élytre
+mounts:
+  speed-amplifier: 0                     # Vitesse des chevaux, ânes, mulets, lamas et chameaux montés (0 = Vitesse I, -1 = aucun bonus)
+  stable-speed-amplifier: 1              # Vitesse des montures des membres d'une guilde avec Écurie (1 = Vitesse II)
 
 rivalry:
   half-life-days: 7           # Une rivalité (raids, trahisons, morts) perd la moitié de son poids tous les N jours

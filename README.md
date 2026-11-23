@@ -125,7 +125,7 @@ Une fois dans une guilde, voici une routine efficace :
 | Objectif | Comment |
 | :--- | :--- |
 | **Recruter** | Invite des amis aux métiers différents : 3 métiers = primes de monstres +10 %, jusqu'à 6 métiers = contrats ×1,5. |
-| **Choisir une spécialisation** | Le chef ouvre `/guild spec` (combat, minage, nature, commerce, magie, solitaire, océan). Le premier choix est immédiat ; lis bien les contraintes de composition. |
+| **Choisir une spécialisation** | Un officier ouvre `/guild spec` (combat, minage, nature, commerce, magie, solitaire, océan). Le premier choix est immédiat ; lis bien les contraintes de composition. |
 | **Défendre le Nexus** | Les officiers débloquent des défenses permanentes dans `/nexus` (brasier, toile, foudre, golem…). Sacrifie des ressources avec `/nexus sacrifice`. Soigne-le avec des pommes dorées. |
 | **Monter à l'Âge 2** | Débloque le **Nether**, les outils en fer pour tous, et la possibilité de construire des gares. |
 | **Se protéger** | Signe un traité (`/traite`) avec une guilde voisine : alliance, pacte de non-agression ou vassalité. Les guildes liées ne peuvent pas se raider. |
@@ -158,6 +158,7 @@ Une fois dans une guilde, voici une routine efficace :
 - 🔇 **Les messages privés sont désactivés** (`/msg`, `/tell`, `/w`, `/r`…). Parle dans le chat public ou celui de ta guilde.
 - 🧱 **Chez les autres, tu ne casses ni ne poses rien**, et tu n'ouvres aucun coffre, four ou entonnoir.
 - 🛠 **Certains équipements sont verrouillés par métier ou par Âge** : un objet « interdit » ne peut ni frapper ni miner, même trouvé ou acheté.
+- 🪂 **L'élytre ne s'ouvre que depuis une piste d'aéroport** (au moins 32 × 3 blocs de béton noir) et à partir de l'Âge 4 : pour voyager, construis des routes, monte à cheval ou prends le train (qui n'est plus instantané).
 
 ### 1.9 Le rythme du serveur
 
@@ -230,7 +231,7 @@ Une fois dans une guilde, voici une routine efficace :
 | `/guild claim` | Officier | Revendiquer le chunk où tu te trouves |
 | `/guild claim show` | Tous | Voir les bordures des territoires pendant 1 minute |
 | `/guild unclaim` | Chef | Abandonner le chunk où tu te trouves |
-| `/guild spec` | Chef | Choisir la spécialisation |
+| `/guild spec` | Officier | Choisir la spécialisation |
 | `/guild bank` | Membre | Voir le solde de la banque |
 | `/guild bank <montant>` | Membre | Y déposer des pièces |
 | `/guild nexus` | Membre | État du Nexus |
@@ -299,7 +300,7 @@ Une fois dans une guilde, voici une routine efficace :
 | Commande | À quoi elle sert |
 | :--- | :--- |
 | `/traite` · `/traite liste` | Menu des traités (proposer, accepter, refuser, rompre) |
-| `/station` | Voyager de gare en gare (Maj + clic sur une destination : train de fret) |
+| `/station` | Voyager de gare en gare en wagonnet (le trajet dure selon la distance ; Maj + clic sur une destination : train de fret) |
 | `/station fret confirmer\|annuler\|ajouter\|recuperer [n°]` | Gérer un convoi de fret et récupérer l'arrivage |
 | `/rail` | Gérer son réseau : péage, relations avec les autres guildes (officiers) |
 
@@ -372,7 +373,7 @@ Chaque métier a des **objets qu'il est seul à pouvoir fabriquer**, des **avant
 | 🌿 **Sylvain** (fermier) | Houes, poudre d'os, élevage, pommes dorées | Régénération I pour lui et les membres de sa guilde à moins de 4 blocs · récolte d'un clic droit avec replantation automatique | -20 % de dégâts au corps à corps |
 | 🔨 **Forgeron** | Armures, épées, haches, boucliers, enclumes, meules, hauts-fourneaux | Résistance au feu permanente · 35 % de chances de doubler un lingot au four · enclume 2× moins chère en XP | Il a faim 25 % plus vite |
 | 🏹 **Rôdeur** (archer) | Arcs, arbalètes et flèches (jusqu'à l'Âge 3) | Ses flèches empoisonnent · +25 % de dégâts à distance · Vitesse I dans les plaines, forêts, jungles et taïgas | Lenteur I avec un plastron en diamant ou Netherite |
-| 🧪 **Arcaniste** (mage) | Enchantements, potions jetables, alambics (jusqu'à l'Âge 3) | +30 % d'XP · potions qui durent 25 % plus longtemps · -20 % de dégâts magiques subis | +15 % de dégâts subis au corps à corps |
+| 🧪 **Arcaniste** (mage) | Enchantements, potions jetables, alambics (jusqu'à l'Âge 3) | +30 % d'XP · potions (bues ou jetées) qui durent 25 % plus longtemps · -20 % de dégâts magiques subis | +15 % de dégâts subis au corps à corps |
 | ⚙ **Ingénieur** | Redstone, pistons, entonnoirs, distributeurs et **TNT** (jusqu'à l'Âge 3) | -40 % de dégâts d'explosion subis | -20 % de dégâts au corps à corps |
 
 <details>
@@ -399,8 +400,8 @@ Chaque métier a des **objets qu'il est seul à pouvoir fabriquer**, des **avant
 
 | Rôle | Ce qu'il peut faire |
 | :--- | :--- |
-| 👑 **Chef** | Tout, plus : nommer des officiers, céder la guilde (`/guild transfer`), la dissoudre (`/guild disband`), abandonner un chunk, choisir la spécialisation |
-| 🛡 **Officier** | Inviter, expulser, revendiquer des terres, poser le Nexus, débloquer des défenses, lancer des raids, signer des traités, gérer les gares |
+| 👑 **Chef** | Tout, plus : nommer des officiers, céder la guilde (`/guild transfer`), la dissoudre (`/guild disband`), abandonner un chunk |
+| 🛡 **Officier** | Inviter, expulser, revendiquer des terres, poser le Nexus, choisir la spécialisation, débloquer des défenses, lancer des raids, signer des traités, gérer les gares |
 | 🙂 **Membre** | Déposer de l'argent dans la banque, donner des ressources pour l'Âge, défendre |
 
 - **10 joueurs maximum** par guilde, et on ne peut être que dans **une seule guilde**.
@@ -458,17 +459,17 @@ Comme la taverne, un bâtiment est un **chunk de son territoire** (jamais celui 
 | :--- | :--- | :--- |
 | ⚒ **Forge** | Une enclume, un haut fourneau (sous un toit) et une table de forgeron | Outils et armures s'usent **20 % moins vite** ; les enclumes de la forge coûtent **moitié moins** d'expérience |
 | 📚 **Bibliothèque** | Une table d'enchantement (sous un toit), un pupitre et **15 bibliothèques** | **+15 % d'expérience** ; enchanter sur la table de la bibliothèque **rend 1 niveau** |
-| 🐎 **Écurie** | **6 bottes de foin** et **8 clôtures** (ou portillons) | Les montures (chevaux, ânes, mules, chameaux, cochons, arpenteurs) reçoivent **Vitesse et Régénération** |
+| 🐎 **Écurie** | **6 bottes de foin** et **8 clôtures** (ou portillons) | Les montures (chevaux, ânes, mules, chameaux, cochons, arpenteurs) reçoivent **Vitesse II et Régénération** (sans écurie, chevaux, ânes, mules, lamas et chameaux ont déjà Vitesse I) |
 
 ---
 
 ## 5. Les spécialisations de guilde
 
-Le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à toute la guilde, mais impose des règles sur sa composition, vérifiées à chaque arrivée d'un joueur et à chaque changement de métier.
+Un officier ou le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à toute la guilde, mais impose des règles sur sa composition, vérifiées à chaque arrivée d'un joueur et à chaque changement de métier.
 
 | Spécialisation | Bonus | Contraintes |
 | :--- | :--- | :--- |
-| ⚔️ **Légion Guerrière** (combat) | Force I et Résistance I sur vos terres · raids 30 % moins chers · +30 % de dégâts contre les monstres | Au moins 50 % de Rôdeurs et Forgerons · 1 Nain et 1 Sylvain maximum · -25 % de minerais et récoltes sur vos terres |
+| ⚔️ **Légion Guerrière** (combat) | Force I et Résistance I sur vos terres · raids 30 % moins chers · +30 % de dégâts contre les monstres | Au moins 50 % de Rôdeurs et Forgerons · 1 Nain et 1 Sylvain maximum · -25 % de minerais et de récoltes |
 | ⛏️ **Industrie Souterraine** (minage) | Hâte II sur vos terres sous la couche 30 · minerais bruts ×1,5 · pièges du Nexus 50 % moins chers | 1 Rôdeur maximum · potions de niveau II interdites · +20 % de dégâts magiques subis |
 | 🌾 **Enclave Champêtre** (nature) | +2 cœurs de vie · Régénération I et Saturation sur vos terres · récoltes, butin des animaux, bois et pierres ×2 · animaux qui se reproduisent 3× plus vite | Aucun Ingénieur · 1 Forgeron maximum · armures en Netherite interdites |
 | 💰 **Syndicat Marchand** (commerce) | Seule guilde à pouvoir commercer avec les villageois avant l'Âge 4 · +20 % sur les primes de monstres (dont 10 % versés à la banque) · aucune taxe à l'Hôtel des Ventes | Aucun Arcaniste · raids 30 % plus chers · pas de bonus de combat · Nexus -20 % de vie |
@@ -477,7 +478,7 @@ Le chef choisit une spécialisation dans `/guild spec`. Elle donne des bonus à 
 | 🔱 **Atlante** (océan) | **Dans l'eau** : respiration aquatique, vision nocturne, agilité aquatique, grâce du dauphin et Résistance | **Nexus obligatoirement immergé** (au moins un bloc d'eau contre lui) · **Lenteur hors de l'eau** |
 
 > [!IMPORTANT]
-> Le premier choix est immédiat. Ensuite, on ne peut changer de spécialisation **que lorsqu'un nouveau joueur** (jamais passé par la guilde) la rejoint, au plus une fois tous les 7 jours. Chaque changement offre le droit de [déplacer le Nexus](#déplacer-le-nexus-nexus-move).
+> Le premier choix est immédiat. Ensuite, on ne peut changer de spécialisation **que lorsqu'un nouveau joueur** (jamais passé par la guilde) la rejoint avec **au moins 2 h de jeu** (ou lorsqu'un membre d'une guilde vaincue lui prête allégeance), au plus une fois tous les 7 jours, et jamais pendant un raid, un siège ou dans les 10 minutes qui suivent une attaque du Nexus. Chaque changement offre le droit de [déplacer le Nexus](#déplacer-le-nexus-nexus-move).
 
 **Atlantes** : posez le Nexus contre un bloc d'eau. L'eau est alors autorisée tout autour (pose, seaux, écoulement) dans le chunk du Nexus ; la lave et l'obsidienne restent interdites. Les membres ont tous les avantages sous-marins **dans l'eau** et subissent **Lenteur I sur la terre ferme**.
 
@@ -645,7 +646,7 @@ Ta guilde commence à l'**Âge 1** et peut monter jusqu'à l'**Âge 6**. Pour pa
 | 1. **Rustique** (départ) | Bois et pierre. Le fer est réservé aux métiers spécialisés. Nether et End fermés. |
 | 2. **Métallurgie** | **Le Nether**, les outils en fer et les boucliers pour tous. Le diamant est réservé aux métiers spécialisés. Gares et fret. |
 | 3. **Alchimie** | **L'End**, les outils en diamant et l'armure en fer pour tous. La Netherite est réservée aux métiers spécialisés. |
-| 4. **Guerre Totale** | Pour tous : armures en diamant, commerce avec les villageois, TNT, redstone, pistons, alambics, arcs et arbalètes. Bourse des guildes. **Bonus des joueurs** : Vitesse I, +10 % de dégâts, +25 % d'XP, -20 % de dégâts d'explosion. |
+| 4. **Guerre Totale** | Pour tous : armures en diamant, commerce avec les villageois, TNT, redstone, pistons, alambics, potions jetables, arcs et arbalètes, **vol en élytre** (depuis une piste d'aéroport). Bourse des guildes. **Bonus des joueurs** : Vitesse I, +10 % de dégâts, +25 % d'XP, -20 % de dégâts d'explosion. |
 | 5. **Mythique** | La Netherite et les balises pour tous, territoire illimité. **Bonus des joueurs** : Hâte I, Vitesse I, Résistance I, +15 % de dégâts, +50 % d'XP. |
 | 6. **Suprématie** | L'Âge ultime. **Récompense** : un œuf de dragon et un bloc de Netherite pour chaque membre, et un titre dans le tchat : **[Giga Tchad]** si ta session dure moins d'une heure, **[Gros Nerd]** au-delà. |
 
@@ -781,12 +782,13 @@ Un officier propose un traité à une autre guilde, qui a 10 minutes pour accept
 
 ### Le train (`/station`, `/rail`)
 
-Le réseau ferroviaire permet de **se téléporter de gare en gare**, à condition qu'une **ligne de rails continue** les relie (embranchements et croisements compris).
+Le réseau ferroviaire relie les gares, à condition qu'une **ligne de rails continue** les relie (embranchements et croisements compris). Le trajet **n'est pas instantané** : tu voyages dans un wagonnet qui suit le tracé réel des rails à grande vitesse (30 blocs par seconde par défaut, `rail.ride.*`), donc **plus la ligne est longue, plus le trajet dure** (5 secondes au minimum, 10 minutes au maximum). Pendant le voyage tu ne peux ni frapper ni être blessé, et tu es déposé à la gare d'arrivée (même si tu te déconnectes).
 
 - **Voyager** : près d'une gare (panneau `[Gare]`), tape `/station` et choisis ta destination.
 - **Prix** : 1 pièce pour la guilde de la gare d'arrivée, plus le **péage** de chaque guilde dont tu traverses les terres. Ta propre guilde et ses alliés ne font pas payer.
 - **Construire une gare** : un officier pose un panneau avec `[Gare]` sur la 1re ligne et le nom de la gare sur la 2e, à moins de 2 blocs d'un rail. Il faut être à l'Âge 2, payer 500 pièces avec la banque (dans la limite du plafond quotidien des officiers), et pas plus de 6 gares par guilde.
 - **Gérer son réseau** (`/rail`, officiers) : fixer son péage (**toutes les spécialisations jusqu'à 10 pièces, le Syndicat Marchand jusqu'à 100**), et pour chaque autre guilde choisir **Normale**, **Alliée** (gratuit) ou **Bannie** (les lignes qui passent chez vous lui sont coupées).
+- **Sabotage** : hors de tout territoire (terrain neutre compris), les rails posés par une guilde ne se cassent pas à la main depuis une autre guilde : il faut de la **TNT** (ou une autre explosion). Les alliés et vassaux peuvent modifier la ligne. Sur un territoire de guilde, la protection du territoire s'applique déjà. Les rails posés par un joueur sans guilde, ou avant cette règle, restent cassables par tous (`rail.protection.enabled`).
 
 #### 📦 Train de fret
 
@@ -801,6 +803,20 @@ Un **wagonnet à coffre** part tout seul et suit le tracé des rails, **lentemen
 À l'arrivée, les objets utiles à l'Âge suivant sont **donnés automatiquement** si la gare est à vous ; le reste est déposé dans la **boîte de la gare d'arrivée, ouverte à tous les joueurs présents** (`/station fret recuperer [numéro de coffre]`, jusqu'à 30 coffres) : le fret sert aussi d'**échange entre guildes** (la guilde de la gare est prévenue de l'arrivée). Deux convois par guilde au plus.
 
 **🏹 Attaquer un convoi** : quand un convoi traverse le territoire d'une guilde **sans traité** avec l'expéditeur, ses membres le frappent (**25 coups**) pour le **piller** : le butin tombe sur les rails. Les deux guildes sont prévenues à chaque frontière franchie. Succès *Pilleur de convois* et *Roi du fret*.
+
+### ✈️ Aéroports et élytres
+
+L'élytre n'est plus un moyen de traverser la carte à volonté : pour planer, il faut **partir d'une piste d'aéroport**.
+
+- **Âge 4 minimum** : tant que ta guilde n'a pas atteint l'Âge 4 (`airports.min-age`), l'élytre refuse de s'ouvrir.
+- **Construire une piste** : une bande d'**au moins 32 × 3 blocs de béton noir**, au même niveau, dans le sens que tu veux. Aucun panneau ni commande : la piste est reconnue d'elle-même quand quelqu'un tente de décoller. N'importe qui peut en construire, n'importe où (territoire de guilde ou terrain neutre).
+- **Décoller** : saute depuis la piste, puis ouvre l'élytre (double saut) à moins de 4 blocs au-dessus d'elle. Partout ailleurs (falaise, chute, montagne, bateau), l'élytre ne s'ouvre pas.
+- **Se poser** : sur une piste. Un atterrissage hors piste endommage l'élytre (100 points de durabilité, `airports.bad-landing-damage`) ; il faut ensuite rejoindre une piste à pied, à cheval ou en train pour redécoller.
+- **Exceptions** : l'**End** et le **monde de ressources** ne sont pas concernés (`airports.free-in-end`, `airports.free-in-resource-world`). Les opérateurs ne sont pas dispensés.
+
+#### 🐎 Chevaux
+
+Pour que la route et le cheval valent mieux que l'élytre, toute monture de selle (cheval, âne, mulet, lama, chameau) reçoit **Vitesse I** sous son cavalier (`mounts.speed-amplifier`). Les membres d'une guilde qui a une **Écurie** montent encore plus vite (**Vitesse II**, `mounts.stable-speed-amplifier`) et leurs montures se soignent.
 
 ---
 
@@ -1016,7 +1032,9 @@ Un vote par catégorie, modifiable, jamais pour soi ; comptes de moins de 2 jour
 | `taverns` | Mise max et réglage de chaque jeu |
 | `resource-world` | Nom, bordure, jour et heure de remise à neuf |
 | `guild-merchant` | Heure, durée, offres, commission |
-| `rail` | Prix des trajets et des gares, péage max, Âge minimum, fret |
+| `rail` | Prix des trajets et des gares, péage max, Âge minimum, fret, vitesse du train (`rail.ride.*`), protection des rails (`rail.protection.*`) |
+| `airports` | Aéroports : Âge minimum, taille d'une piste, dégâts d'un atterrissage hors piste, zones libres (End, monde de ressources) |
+| `mounts` | Vitesse des chevaux et des montures d'écurie |
 | `treaties` · `rivalry` | Durée des pactes, tribut, indemnité, préavis, protection entre alliés, demi-vie des rivalités |
 | `loans` · `ransom` | Taux, délais, saisies · durée et montants des rançons |
 | `bourse` | Cours, volatilité, dividendes, pondération de la valeur (`bourse.weights.*`) |

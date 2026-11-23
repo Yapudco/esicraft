@@ -77,7 +77,7 @@ public class CraftRestrictionListener implements Listener {
          AgeType age = this.plugin.getAgeManager().getPlayerAge(player);
          if (!this.canCraft(mat, player, race, age)) {
             event.setCancelled(true);
-            String requiredInfo = this.getRequiredInfo(mat);
+            String requiredInfo = this.getRequiredInfo(mat, race);
             ChatUtil.sendActionbar(player, "&c❌ Craft verrouillé ! &7" + requiredInfo);
             ChatUtil.sendMessage(player, "&cVous n'avez pas la classe ou l'Âge requis pour fabriquer cet objet ! (&7" + requiredInfo + "&c)");
          }
@@ -113,7 +113,7 @@ public class CraftRestrictionListener implements Listener {
             AgeType age = this.plugin.getAgeManager().getPlayerAge(player);
             if (!this.canCraft(mat, player, race, age)) {
                event.setCancelled(true);
-               String requiredInfo = this.getRequiredInfo(mat);
+               String requiredInfo = this.getRequiredInfo(mat, race);
                ChatUtil.sendActionbar(player, "&c❌ Forge verrouillée ! &7" + requiredInfo);
                ChatUtil.sendMessage(player, "&cVous n'avez pas la classe ou l'Âge requis pour forger cet objet ! (&7" + requiredInfo + "&c)");
             }
@@ -144,7 +144,8 @@ public class CraftRestrictionListener implements Listener {
 
       Material m = item.getType();
       boolean gear = this.isDiamondGear(m) || this.isNetheriteGear(m) || this.isIronCombatGear(m) || this.isIronTool(m) || m == Material.BOW || m == Material.CROSSBOW;
-      return gear && !this.canCraft(m, player, this.plugin.getRaceManager().getRace(player), this.plugin.getAgeManager().getPlayerAge(player));
+      // Le défaut du Nain ne concerne que la fabrication : il peut porter et utiliser l'équipement en métal qu'il a acheté ou trouvé.
+      return gear && !this.meetsRequirements(m, player, this.plugin.getRaceManager().getRace(player), this.plugin.getAgeManager().getPlayerAge(player));
    }
 
    /** Acheter l'équipement interdit (marché, villageois, coffres) ne suffit plus : on ne frappe ni ne mine avec tant que l'Âge ou le métier manque. */
@@ -165,7 +166,27 @@ public class CraftRestrictionListener implements Listener {
       }
    }
 
+   /** Défaut du Nain : il ne fabrique ni armes ni armures en métal (épées et armures en fer, or, cotte de mailles, diamant ou Netherite), à aucun Âge. */
+   private boolean dwarfForbids(Material mat, Race race) {
+      if (race != Race.DWARF) {
+         return false;
+      }
+
+      String name = mat.name();
+      boolean metal = name.startsWith("IRON_")
+         || name.startsWith("GOLDEN_")
+         || name.startsWith("CHAINMAIL_")
+         || name.startsWith("DIAMOND_")
+         || name.startsWith("NETHERITE_");
+      return metal && (this.isArmor(mat) || name.endsWith("_SWORD"));
+   }
+
    public boolean canCraft(Material mat, Player player, Race race, AgeType age) {
+      return !this.dwarfForbids(mat, race) && this.meetsRequirements(mat, player, race, age);
+   }
+
+   /** Métier et Âge requis pour fabriquer (ou, pour l'équipement, utiliser) un objet, sans le défaut propre au Nain. */
+   private boolean meetsRequirements(Material mat, Player player, Race race, AgeType age) {
       int ageLevel = age.getLevel();
       if (this.isBasicMaterial(mat)) {
          return true;
@@ -237,7 +258,7 @@ public class CraftRestrictionListener implements Listener {
                return ageLevel >= 3 && this.isLoneRanger(player) ? true : race == Race.ARCANIST;
             }
          } else if (mat == Material.BREWING_STAND) {
-            return ageLevel >= 3 ? true : race == Race.ARCANIST;
+            return ageLevel >= 4 ? true : race == Race.ARCANIST;
          } else if (FORGE_STATIONS.contains(mat)) {
             return ageLevel >= 3 ? true : race == Race.BLACKSMITH;
          } else if (mat == Material.GOLDEN_APPLE) {
@@ -266,6 +287,11 @@ public class CraftRestrictionListener implements Listener {
       }
    }
 
+   /** Message affiché quand la fabrication est refusée : le défaut du Nain n'a rien à voir avec l'Âge ni le métier requis. */
+   private String getRequiredInfo(Material mat, Race race) {
+      return this.dwarfForbids(mat, race) ? "Les Nains ne forgent ni armes ni armures en métal" : this.getRequiredInfo(mat);
+   }
+
    private String getRequiredInfo(Material mat) {
       if (this.isIronTool(mat)) {
          return "Requis: Nain / Forgeron ou Âge 2 (Métallurgie)";
@@ -280,7 +306,7 @@ public class CraftRestrictionListener implements Listener {
       } else if (mat == Material.ENCHANTING_TABLE) {
          return "Requis: Arcaniste, Rôdeur Solitaire (Âge 3) ou Âge 4";
       } else if (mat == Material.BREWING_STAND) {
-         return "Requis: Arcaniste ou Âge 3 (Alchimie)";
+         return "Requis: Arcaniste ou Âge 4 (Guerre Totale)";
       } else if (FORGE_STATIONS.contains(mat)) {
          return "Requis: Forgeron ou Âge 3 (Alchimie)";
       } else {

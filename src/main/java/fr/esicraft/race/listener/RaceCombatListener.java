@@ -99,6 +99,12 @@ public class RaceCombatListener implements Listener {
             }
          }
 
+         // Légion Guerrière : +30 % de dégâts contre les monstres, à distance comme au corps à corps.
+         Guild shooterGuild = this.plugin.getGuildManager().getGuildByPlayer(shooter.getUniqueId());
+         if (shooterGuild != null && shooterGuild.getSpecialization() == GuildSpecialization.WARLORD && event.getEntity() instanceof Monster) {
+            event.setDamage(event.getDamage() * 1.3);
+         }
+
          if (shooterAge == AgeType.TOTAL_WAR) {
             event.setDamage(event.getDamage() * 1.1);
          } else if (shooterAge == AgeType.MYTHIC || shooterAge == AgeType.SUPREMACY) {
@@ -112,35 +118,54 @@ public class RaceCombatListener implements Listener {
             event.setDamage(event.getDamage() * 1.15);
          }
 
-         Guild guildx = this.plugin.getGuildManager().getGuildByPlayer(victim.getUniqueId());
-         if (guildx != null && guildx.getSpecialization() == GuildSpecialization.UNDERGROUND_INDUSTRY) {
-            Entity damager = event.getDamager();
-            if (damager instanceof Monster
-               && (
-                  damager.getType() == EntityType.BLAZE
-                     || damager.getType() == EntityType.GHAST
-                     || damager.getType() == EntityType.WITCH
-                     || damager.getType() == EntityType.WITHER_SKELETON
-                     || damager.getType() == EntityType.SHULKER
-                     || damager.getType() == EntityType.EVOKER
-                     || damager.getType() == EntityType.VEX
-               )) {
-               event.setDamage(event.getDamage() * 1.2);
-            }
-         }
-
-         if (guildx != null && guildx.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE) {
-            Entity damager = event.getDamager();
-            if (damager instanceof ThrownPotion
-               || damager instanceof AreaEffectCloud
-               || damager instanceof EvokerFangs
-               || damager instanceof WitherSkull
-               || damager instanceof DragonFireball
-               || damager instanceof ShulkerBullet) {
-               event.setDamage(event.getDamage() * 0.5);
-            }
-         }
+         // Les modificateurs de dégâts magiques (Arcaniste, Conclave Arcanique, Industrie Souterraine) sont dans onEntityDamage.
       }
+   }
+
+   /**
+    * Dégâts « magiques » : effets de potion (poison, wither, dégâts instantanés), souffle du dragon, ainsi que les potions jetées, nuages,
+    * crocs d'évocateur, crânes de wither, boules de feu du dragon et balles de shulker.
+    */
+   private static boolean isMagicDamage(EntityDamageEvent event) {
+      DamageCause cause = event.getCause();
+      if (cause == DamageCause.MAGIC || cause == DamageCause.POISON || cause == DamageCause.WITHER || cause == DamageCause.DRAGON_BREATH) {
+         return true;
+      }
+
+      if (event instanceof EntityDamageByEntityEvent byEntity) {
+         Entity damager = byEntity.getDamager();
+         return damager instanceof ThrownPotion
+            || damager instanceof AreaEffectCloud
+            || damager instanceof EvokerFangs
+            || damager instanceof WitherSkull
+            || damager instanceof DragonFireball
+            || damager instanceof ShulkerBullet;
+      }
+
+      return false;
+   }
+
+   /** Vrai si l'attaque vient d'un monstre « magique », qu'il frappe lui-même ou qu'il tire (boule de feu, potion, crocs, balle). */
+   private static boolean isFromMagicalMonster(EntityDamageEvent event) {
+      if (!(event instanceof EntityDamageByEntityEvent byEntity)) {
+         return false;
+      }
+
+      Entity source = byEntity.getDamager();
+      if (source instanceof Projectile projectile && projectile.getShooter() instanceof Entity shooter) {
+         source = shooter;
+      } else if (source instanceof EvokerFangs fangs && fangs.getOwner() != null) {
+         source = fangs.getOwner();
+      }
+
+      EntityType type = source.getType();
+      return type == EntityType.BLAZE
+         || type == EntityType.GHAST
+         || type == EntityType.WITCH
+         || type == EntityType.WITHER_SKELETON
+         || type == EntityType.SHULKER
+         || type == EntityType.EVOKER
+         || type == EntityType.VEX;
    }
 
    @EventHandler(
@@ -182,11 +207,20 @@ public class RaceCombatListener implements Listener {
             event.setDamage(event.getDamage() * 0.8);
          }
 
-         if (var6 == Race.ARCANIST) {
-            DamageCause cause = event.getCause();
-            if (cause == DamageCause.MAGIC || cause == DamageCause.POISON || cause == DamageCause.WITHER || cause == DamageCause.DRAGON_BREATH) {
-               event.setDamage(event.getDamage() * 0.8);
-            }
+         boolean magic = isMagicDamage(event);
+         if (magic && var6 == Race.ARCANIST) {
+            event.setDamage(event.getDamage() * 0.8);
+         }
+
+         Guild victimGuild = this.plugin.getGuildManager().getGuildByPlayer(player.getUniqueId());
+         GuildSpecialization victimSpec = victimGuild != null ? victimGuild.getSpecialization() : GuildSpecialization.NONE;
+         if (magic && victimSpec == GuildSpecialization.ARCANE_CONCLAVE) {
+            event.setDamage(event.getDamage() * 0.5);
+         }
+
+         // Industrie Souterraine : +20 % de dégâts magiques subis, y compris ceux des monstres magiques (même à distance).
+         if (victimSpec == GuildSpecialization.UNDERGROUND_INDUSTRY && (magic || isFromMagicalMonster(event))) {
+            event.setDamage(event.getDamage() * 1.2);
          }
       }
    }
@@ -281,13 +315,23 @@ public class RaceCombatListener implements Listener {
    public void onPotionSplash(PotionSplashEvent event) {
       if (event.getPotion().getShooter() instanceof Player shooter) {
          Guild guild = this.plugin.getGuildManager().getGuildByPlayer(shooter.getUniqueId());
-         if (guild != null && guild.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE) {
+         boolean conclave = guild != null && guild.getSpecialization() == GuildSpecialization.ARCANE_CONCLAVE;
+         boolean arcanist = this.plugin.getRaceManager().getRace(shooter) == Race.ARCANIST;
+         if (conclave || arcanist) {
+            // Arcaniste : durée +25 % ; Conclave Arcanique : un niveau de plus. Comme pour les potions bues, les deux se cumulent.
+            double durationMultiplier = arcanist ? 1.25 : 1.0;
+            int ampBoost = conclave ? 1 : 0;
             for (LivingEntity affected : event.getAffectedEntities()) {
                double intensity = event.getIntensity(affected);
 
                for (PotionEffect pe : event.getPotion().getEffects()) {
-                  int dur = Math.max(20, (int)((double)pe.getDuration() * intensity));
-                  int amp = pe.getAmplifier() + 1;
+                  // Un effet instantané n'a pas de durée : rallonger la sienne ne ferait que l'appliquer deux fois.
+                  if (ampBoost == 0 && (pe.getType() == PotionEffectType.INSTANT_HEALTH || pe.getType() == PotionEffectType.INSTANT_DAMAGE)) {
+                     continue;
+                  }
+
+                  int dur = Math.max(20, (int)((double)pe.getDuration() * intensity * durationMultiplier));
+                  int amp = pe.getAmplifier() + ampBoost;
                   affected.addPotionEffect(new PotionEffect(pe.getType(), dur, amp, pe.isAmbient(), pe.hasParticles(), pe.hasIcon()));
                }
             }

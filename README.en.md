@@ -128,7 +128,7 @@ Once in a guild, here's an efficient routine:
 | Goal | How |
 | :--- | :--- |
 | **Recruit** | Invite friends with different professions: 3 professions = monster bounties +10%, up to 6 professions = contracts ×1.5. |
-| **Choose a specialization** | The leader opens `/guild spec` (combat, mining, nature, trade, magic, solo, ocean). The first choice is immediate; read the composition constraints carefully. |
+| **Choose a specialization** | An officer opens `/guild spec` (combat, mining, nature, trade, magic, solo, ocean). The first choice is immediate; read the composition constraints carefully. |
 | **Defend the Nexus** | Officers unlock permanent defenses in `/nexus` (blaze, web, lightning, golem…). Sacrifice resources with `/nexus sacrifice`. Heal it with golden apples. |
 | **Reach Age 2** | Unlocks the **Nether**, iron tools for everyone, and the ability to build stations. |
 | **Protect yourself** | Sign a treaty (`/traite`) with a neighboring guild: alliance, non-aggression pact or vassalage. Guilds bound by a treaty can't raid each other. |
@@ -161,6 +161,7 @@ Once in a guild, here's an efficient routine:
 - 🔇 **Private messages are disabled** (`/msg`, `/tell`, `/w`, `/r`…). Talk in public chat or your guild's.
 - 🧱 **On other people's land you can't break or place anything**, nor open any chest, furnace or hopper.
 - 🛠 **Some gear is locked by profession or Age**: a "forbidden" item can neither hit nor mine, even if found or bought.
+- 🪂 **The elytra only opens from an airport runway** (at least 32 × 3 black concrete blocks) and from Age 4: to travel, build roads, ride a horse or take the train (which is no longer instant).
 
 ### 1.9 The server's rhythm
 
@@ -233,7 +234,7 @@ Once in a guild, here's an efficient routine:
 | `/guild claim` | Officer | Claim the chunk you're standing in |
 | `/guild claim show` | Everyone | See territory borders for 1 minute |
 | `/guild unclaim` | Leader | Give up the chunk you're standing in |
-| `/guild spec` | Leader | Choose the specialization |
+| `/guild spec` | Officer | Choose the specialization |
 | `/guild bank` | Member | See the bank balance |
 | `/guild bank <amount>` | Member | Deposit coins into it |
 | `/guild nexus` | Member | Nexus status |
@@ -302,7 +303,7 @@ Once in a guild, here's an efficient routine:
 | Command | What it does |
 | :--- | :--- |
 | `/traite` · `/traite liste` | Treaty menu (propose, accept, refuse, break) |
-| `/station` | Travel from station to station (Shift + click a destination: freight train) |
+| `/station` | Travel from station to station by minecart (the trip lasts according to distance; Shift + click a destination: freight train) |
 | `/station fret confirmer\|annuler\|ajouter\|recuperer [no.]` | Manage a freight convoy and collect arrivals |
 | `/rail` | Manage your network: toll, relations with other guilds (officers) |
 
@@ -375,7 +376,7 @@ Each profession has **items only it can craft**, some **strengths** and one **we
 | 🌿 **Sylvan** (*Sylvain*, farmer) | Hoes, bone meal, breeding, golden apples | Regeneration I for themselves and guildmates within 4 blocks · right-click harvest with automatic replanting | -20% melee damage |
 | 🔨 **Blacksmith** (*Forgeron*) | Armor, swords, axes, shields, anvils, grindstones, blast furnaces | Permanent Fire Resistance · 35% chance to double an ingot from a furnace · anvil costs half the XP | Gets hungry 25% faster |
 | 🏹 **Ranger** (*Rôdeur*, archer) | Bows, crossbows and arrows (until Age 3) | Arrows poison their target · +25% ranged damage · Speed I in plains, forests, jungles and taigas | Slowness I when wearing a diamond or Netherite chestplate |
-| 🧪 **Arcanist** (*Arcaniste*, mage) | Enchanting, splash potions, brewing stands (until Age 3) | +30% XP · potions last 25% longer · -20% magic damage taken | +15% melee damage taken |
+| 🧪 **Arcanist** (*Arcaniste*, mage) | Enchanting, splash potions, brewing stands (until Age 3) | +30% XP · potions (drunk or thrown) last 25% longer · -20% magic damage taken | +15% melee damage taken |
 | ⚙ **Engineer** (*Ingénieur*) | Redstone, pistons, hoppers, dispensers and **TNT** (until Age 3) | -40% explosion damage taken | -20% melee damage |
 
 <details>
@@ -402,8 +403,8 @@ At Age 5, Netherite is available to everyone.
 
 | Role | What they can do |
 | :--- | :--- |
-| 👑 **Leader** (*Chef*) | Everything, plus: appoint officers, hand the guild over (`/guild transfer`), disband it (`/guild disband`), give up a chunk, choose the specialization |
-| 🛡 **Officer** | Invite, kick, claim land, place the Nexus, unlock defenses, launch raids, sign treaties, manage stations |
+| 👑 **Leader** (*Chef*) | Everything, plus: appoint officers, hand the guild over (`/guild transfer`), disband it (`/guild disband`), give up a chunk |
+| 🛡 **Officer** | Invite, kick, claim land, place the Nexus, choose the specialization, unlock defenses, launch raids, sign treaties, manage stations |
 | 🙂 **Member** | Deposit money in the bank, donate resources for the Age, defend |
 
 - **10 players maximum** per guild, and you can only be in **one guild**.
@@ -461,17 +462,17 @@ Like a tavern, a building is a **chunk of your territory** (never the Nexus one,
 | :--- | :--- | :--- |
 | ⚒ **Forge** | An anvil, a blast furnace (under a roof) and a smithing table | Tools and armor wear out **20% slower**; the forge's anvils cost **half** the experience |
 | 📚 **Library** (*Bibliothèque*) | An enchanting table (under a roof), a lectern and **15 bookshelves** | **+15% experience**; enchanting at the library table **refunds 1 level** |
-| 🐎 **Stable** (*Écurie*) | **6 hay bales** and **8 fences** (or fence gates) | Mounts (horses, donkeys, mules, camels, pigs, striders) get **Speed and Regeneration** |
+| 🐎 **Stable** (*Écurie*) | **6 hay bales** and **8 fences** (or fence gates) | Mounts (horses, donkeys, mules, camels, pigs, striders) get **Speed II and Regeneration** (without a stable, horses, donkeys, mules, llamas and camels already have Speed I) |
 
 ---
 
 ## 5. Guild specializations
 
-The leader chooses a specialization in `/guild spec`. It gives bonuses to the whole guild, but imposes rules on its composition, checked whenever a player joins and whenever someone changes profession.
+An officer or the leader chooses a specialization in `/guild spec`. It gives bonuses to the whole guild, but imposes rules on its composition, checked whenever a player joins and whenever someone changes profession.
 
 | Specialization | Bonus | Constraints |
 | :--- | :--- | :--- |
-| ⚔️ **Warrior Legion** (*Légion Guerrière*, combat) | Strength I and Resistance I on your land · raids 30% cheaper · +30% damage against monsters | At least 50% Rangers and Blacksmiths · max 1 Dwarf and 1 Sylvan · -25% ores and crops on your land |
+| ⚔️ **Warrior Legion** (*Légion Guerrière*, combat) | Strength I and Resistance I on your land · raids 30% cheaper · +30% damage against monsters | At least 50% Rangers and Blacksmiths · max 1 Dwarf and 1 Sylvan · -25% ores and crops |
 | ⛏️ **Underground Industry** (*Industrie Souterraine*, mining) | Haste II on your land below layer 30 · raw ores ×1.5 · Nexus traps 50% cheaper | Max 1 Ranger · level II potions forbidden · +20% magic damage taken |
 | 🌾 **Rural Enclave** (*Enclave Champêtre*, nature) | +2 hearts of health · Regeneration I and Saturation on your land · crops, animal loot, wood and stone ×2 · animals breed 3× faster | No Engineer · max 1 Blacksmith · Netherite armor forbidden |
 | 💰 **Merchant Syndicate** (*Syndicat Marchand*, trade) | Only guild allowed to trade with villagers before Age 4 · +20% on monster bounties (10% of which goes to the bank) · no Auction House tax | No Arcanist · raids 30% more expensive · no combat bonuses · Nexus -20% health |
@@ -480,7 +481,7 @@ The leader chooses a specialization in `/guild spec`. It gives bonuses to the wh
 | 🔱 **Atlantean** (*Atlante*, ocean) | **While in water**: water breathing, night vision, aquatic agility, dolphin's grace and Resistance | **Nexus must be submerged** (at least one water block against it) · **Slowness out of water** |
 
 > [!IMPORTANT]
-> The first choice is immediate. After that, a guild can only change specialization **when a new player** (who has never been in the guild) joins, at most once every 7 days. Each change grants the right to [move the Nexus](#moving-the-nexus-nexus-move).
+> The first choice is immediate. After that, a guild can only change specialization **when a new player** (who has never been in the guild) joins with **at least 2 h of playtime** (or when a member of a defeated guild pledges allegiance), at most once every 7 days, and never during a raid, a siege or within 10 minutes of an attack on the Nexus. Each change grants the right to [move the Nexus](#moving-the-nexus-nexus-move).
 
 **Atlanteans**: place the Nexus against a water block. Water is then allowed all around it (placing, buckets, flow) in the Nexus chunk; lava and obsidian remain forbidden. Members get every underwater advantage **in water** and suffer **Slowness I on dry land**.
 
@@ -648,7 +649,7 @@ Your guild starts at **Age 1** and can go up to **Age 6**. To reach the next Age
 | 1. **Rustic** (*Rustique*, start) | Wood and stone. Iron is reserved for specialized professions. Nether and End closed. |
 | 2. **Metallurgy** (*Métallurgie*) | **The Nether**, iron tools and shields for everyone. Diamond is reserved for specialized professions. Stations and freight. |
 | 3. **Alchemy** (*Alchimie*) | **The End**, diamond tools and iron armor for everyone. Netherite is reserved for specialized professions. |
-| 4. **Total War** (*Guerre Totale*) | For everyone: diamond armor, villager trading, TNT, redstone, pistons, brewing stands, bows and crossbows. Guild stock exchange. **Player bonuses**: Speed I, +10% damage, +25% XP, -20% explosion damage. |
+| 4. **Total War** (*Guerre Totale*) | For everyone: diamond armor, villager trading, TNT, redstone, pistons, brewing stands, splash potions, bows and crossbows, **elytra flight** (from an airport runway). Guild stock exchange. **Player bonuses**: Speed I, +10% damage, +25% XP, -20% explosion damage. |
 | 5. **Mythic** (*Mythique*) | Netherite and beacons for everyone, unlimited land. **Player bonuses**: Haste I, Speed I, Resistance I, +15% damage, +50% XP. |
 | 6. **Supremacy** (*Suprématie*) | The ultimate Age. **Reward**: a dragon egg and a block of Netherite for every member, plus a chat title: **[Giga Tchad]** if your session is under an hour, **[Gros Nerd]** beyond that. |
 
@@ -784,12 +785,13 @@ An officer proposes a treaty to another guild, which has 10 minutes to accept (l
 
 ### The train (`/station`, `/rail`)
 
-The rail network lets you **teleport from station to station**, provided a **continuous rail line** connects them (branches and crossings included).
+The rail network links stations, provided a **continuous rail line** connects them (branches and crossings included). The trip is **not instant**: you ride a minecart that follows the real route of the rails at high speed (30 blocks per second by default, `rail.ride.*`), so **the longer the line, the longer the trip** (5 seconds at least, 10 minutes at most). During the trip you can neither attack nor be hurt, and you are dropped at the arrival station (even if you log out).
 
 - **Traveling**: near a station (`[Gare]` sign), type `/station` and pick your destination.
 - **Price**: 1 coin for the arrival station's guild, plus the **toll** of every guild whose land you cross. Your own guild and its allies don't charge.
 - **Building a station**: an officer places a sign with `[Gare]` on the 1st line and the station's name on the 2nd, within 2 blocks of a rail. You need Age 2, pay 500 coins from the bank (within the officers' daily cap), and no more than 6 stations per guild.
 - **Managing your network** (`/rail`, officers): set your toll (**up to 10 coins for every specialization, up to 100 for the Merchant Syndicate**), and for each other guild choose **Normal**, **Allied** (free) or **Banned** (lines through your land are cut for them).
+- **Sabotage**: outside any territory (neutral land included), rails placed by a guild can't be broken by hand from another guild: you need **TNT** (or another explosion). Allies and vassals can modify the line. On guild territory, territory protection already applies. Rails placed by a player with no guild, or before this rule, stay breakable by everyone (`rail.protection.enabled`).
 
 #### 📦 Freight train
 
@@ -804,6 +806,20 @@ A **chest minecart** leaves on its own and follows the rails, **slowly**: **4 mi
 On arrival, items useful for the next Age are **donated automatically** if the station is yours; the rest goes into the **arrival station's box, open to every player present** (`/station fret recuperer [chest number]`, up to 30 chests): freight also works as an **exchange between guilds** (the station's guild is told of the arrival). Two convoys per guild at most.
 
 **🏹 Attacking a convoy**: when a convoy crosses the territory of a guild with **no treaty** with the sender, its members hit it (**25 hits**) to **loot** it: the loot spills on the rails. Both guilds are warned at each border crossed. *Convoy looter* and *Freight king* achievements.
+
+### ✈️ Airports and elytra
+
+The elytra is no longer a way to cross the map at will: to glide, you must **take off from an airport runway**.
+
+- **Age 4 minimum**: until your guild reaches Age 4 (`airports.min-age`), the elytra refuses to open.
+- **Building a runway**: a strip of **at least 32 × 3 black concrete blocks**, on one level, in whichever direction you like. No sign or command: the runway is recognized on its own when someone tries to take off. Anyone can build one, anywhere (guild territory or neutral land).
+- **Taking off**: jump from the runway, then open the elytra (double jump) within 4 blocks above it. Anywhere else (cliff, fall, mountain, boat), the elytra won't open.
+- **Landing**: on a runway. Landing off a runway damages the elytra (100 durability points, `airports.bad-landing-damage`); you then have to reach a runway on foot, by horse or by train to take off again.
+- **Exceptions**: the **End** and the **resource world** are not affected (`airports.free-in-end`, `airports.free-in-resource-world`). Operators are not exempt.
+
+#### 🐎 Horses
+
+So that roads and horses beat the elytra, every saddle mount (horse, donkey, mule, llama, camel) gets **Speed I** under its rider (`mounts.speed-amplifier`). Members of a guild with a **Stable** ride even faster (**Speed II**, `mounts.stable-speed-amplifier`) and their mounts heal.
 
 ---
 
@@ -1019,7 +1035,9 @@ One vote per category, changeable, never for yourself; accounts under 2 days old
 | `taverns` | Max bet and each game's settings |
 | `resource-world` | Name, border, reset day and hour |
 | `guild-merchant` | Time, duration, offers, commission |
-| `rail` | Trip and station prices, max toll, minimum Age, freight |
+| `rail` | Trip and station prices, max toll, minimum Age, freight, train speed (`rail.ride.*`), rail protection (`rail.protection.*`) |
+| `airports` | Airports: minimum Age, runway size, off-runway landing damage, free zones (End, resource world) |
+| `mounts` | Speed of horses and stable mounts |
 | `treaties` · `rivalry` | Pact duration, tribute, compensation, grace period, ally protection, rivalry half-life |
 | `loans` · `ransom` | Rates, deadlines, seizures · ransom duration and amounts |
 | `bourse` | Prices, volatility, dividends, value weighting (`bourse.weights.*`) |

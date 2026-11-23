@@ -996,8 +996,8 @@ La lave	Lava
 &dArcaniste & Alchimiste	&dArcanist & Alchemist
 &7Magie, potions et enchantements.	&7Magic, potions and enchantments.
 &e• Enchants & Livres (Âges 1-3)	&e• Enchants & Books (Ages 1-3)
-&e• Splash Potions exclusives	&e• Exclusive Splash Potions
-&e• Alambics (Âges 1-2)	&e• Brewing Stands (Ages 1-2)
+&e• Splash Potions (Âges 1-3)	&e• Splash Potions (Ages 1-3)
+&e• Alambics (Âges 1-3)	&e• Brewing Stands (Ages 1-3)
 &e• Pommes Dorées (Âges 1-3)	&e• Golden Apples (Ages 1-3)
 &a+ +30% d'XP reçue	&a+ +30% XP gained
 &a+ Durée potions +25%	&a+ Potion duration +25%
@@ -1034,7 +1034,7 @@ Requis: Forgeron (Âge 2+) ou Âge 4 (Guerre Totale)	Required: Blacksmith (Age 2
 Requis: Métiers spécialisés (Âge 2) ou Âge 3 (Alchimie)	Required: Specialized jobs (Age 2) or Age 3 (Alchemy)
 Requis: Spécialistes / Rôdeur Solitaire (Âge 3+) ou Âge 5	Required: Specialists / Lone Ranger (Age 3+) or Age 5
 Requis: Arcaniste, Rôdeur Solitaire (Âge 3) ou Âge 4	Required: Arcanist, Lone Ranger (Age 3) or Age 4
-Requis: Arcaniste ou Âge 3 (Alchimie)	Required: Arcanist or Age 3 (Alchemy)
+Requis: Arcaniste ou Âge 4 (Guerre Totale)	Required: Arcanist or Age 4 (Total War)
 Requis: Ingénieur ou Âge 4	Required: Engineer or Age 4
 Niveau technologique insuffisant	Insufficient technology level
 &6🛡️ Blindage d'Ingénieur : -40% dégâts d'explosion !	&6🛡️ Engineer Armor: -40% explosion damage!
@@ -1044,8 +1044,8 @@ Niveau technologique insuffisant	Insufficient technology level
 &c❌ Seuls les Arcanistes (ou Âge 4+ / Rôdeur Solitaire Âge 3+) peuvent appliquer des livres enchantés !	&c❌ Only Arcanists (or Age 4+ / Lone Ranger Age 3+) can apply enchanted books!
 &e⚠️ Vos enchantements ont été ramenés à leur niveau standard (spécialisation non-arcanique).	&e⚠️ Your enchantments were brought back to their standard level (non-arcane specialization).
 &c❌ L'utilisation de la Table d'Enchantement est réservée aux Arcanistes (ou Rôdeur Solitaire Âge 3+) jusqu'à l'Âge 4 !	&c❌ The Enchanting Table is reserved for Arcanists (or Lone Ranger Age 3+) until Age 4!
-&c❌ L'utilisation de l'Alambic est réservée aux Arcanistes jusqu'à l'Âge 3 (Alchimie) !	&c❌ The Brewing Stand is reserved for Arcanists until Age 3 (Alchemy)!
-&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) !	&c❌ Only Arcanists can throw Splash Potions!
+&c❌ L'utilisation de l'Alambic est réservée aux Arcanistes jusqu'à l'Âge 4 (Guerre Totale) !	&c❌ The Brewing Stand is reserved for Arcanists until Age 4 (Total War)!
+&c❌ Seuls les Arcanistes peuvent lancer des potions jetables (Splash Potions) avant l'Âge 4 !	&c❌ Only Arcanists can throw Splash Potions before Age 4!
 &c❌ L'utilisation de l'arc est réservée aux Rôdeurs jusqu'à l'Âge 4 (Guerre Totale) !	&c❌ The bow is reserved for Rangers until Age 4 (Total War)!
 &c❌ Seuls les Sylvains (ou Âge de guilde 3+) peuvent utiliser la Bone Meal !	&c❌ Only Sylvans (or guild Age 3+) can use Bone Meal!
 &c❌ Territoire protégé de la guilde &6	&c❌ Protected territory of the guild &6
@@ -1213,7 +1213,7 @@ La banque de guilde doit contenir 	The guild bank must contain
 &c❌ Une guilde traversée par cette ligne vous interdit désormais le passage.	&c❌ A guild crossed by this line now forbids you passage.
 &c❌ Il vous faut &6	&c❌ You need &6
  pièces &cpour ce trajet.	 coins &cfor this trip.
-&a🚆 Bon voyage ! Arrivée à &e	&a🚆 Have a good trip! Arrival at &e
+&a🚆 Terminus ! Arrivée à &e	&a🚆 Last stop! Arrival at &e
  pièces)	 coins)
 &cLe voyage a échoué, vous avez été remboursé.	&cThe trip failed, you were refunded.
 &fNormale	&fNormal
@@ -1960,3 +1960,16 @@ Entrer dans une taverne	Step into a tavern
 &a(gain net 	&a(net gain
 &7a encaissé un &a×	&7cashed out a &a×
 &7au Greed de la taverne de 	&7at the Greed table of the tavern of
+Les Nains ne forgent ni armes ni armures en métal	Dwarves do not forge metal weapons or armor
+&c❌ Le vol en élytre est réservé aux guildes de l'Âge 	&c❌ Elytra flight is reserved for guilds at Age 
+ (ou plus) !	 (or higher)!
+&c❌ Décollage impossible : l'élytre ne s'ouvre que depuis une piste d'aéroport (au moins 	&c❌ Takeoff impossible: the elytra only opens from an airport runway (at least 
+ blocs de béton noir) !	 black concrete blocks)!
+&c💥 Atterrissage hors piste : votre élytre est endommagée ! Posez-vous sur une piste d'aéroport.	&c💥 Off-runway landing: your elytra is damaged! Land on an airport runway.
+&a🚆 En voiture pour &e	&a🚆 All aboard for &e
+ &a! Durée du trajet : &e	 &a! Trip duration: &e
+&a. Vous ne pouvez ni frapper ni être blessé pendant le voyage.	&a. You can neither attack nor be hurt during the trip.
+&e🚆 En route… arrivée dans &6	&e🚆 On the way… arrival in &6
+&c❌ Vous êtes déjà en route : attendez d'arriver à destination.	&c❌ You are already on your way: wait until you reach your destination.
+&c❌ Ces rails appartiennent à la guilde &6	&c❌ These rails belong to the guild &6
+ &c: seule la TNT peut les saboter !	 &c: only TNT can sabotage them!
