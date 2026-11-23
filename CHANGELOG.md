@@ -2,6 +2,14 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 23/11/2026 (aéroports, train non instantané, rails protégés, chevaux)
+
+### Nouveautés
+- **Aéroports** : l'élytre ne s'ouvre plus qu'au décollage depuis une piste (bande d'au moins 32 × 3 blocs de béton noir, reconnue automatiquement) et à partir de l'Âge 4. Se poser hors piste abîme l'élytre. Aucune restriction dans l'End ni dans le monde de ressources. Réglages : `airports.*`.
+- **Train non instantané** : `/station` n'est plus une téléportation. Le voyageur et un wagonnet suivent le tracé des rails à grande vitesse, donc plus la ligne est longue, plus le trajet dure (30 blocs par seconde, de 5 secondes à 10 minutes). Le voyageur est invulnérable, ne peut pas frapper, et est déposé à l'arrivée même s'il se déconnecte. Réglages : `rail.ride.*`.
+- **Rails protégés** : hors territoire (terrain neutre compris), les rails posés par une guilde ne se cassent pas à la main depuis une autre guilde ; il faut de la TNT. Alliés, vassaux et opérateurs peuvent les modifier. Les rails posés avant cette règle ou par un joueur sans guilde restent cassables. Réglage : `rail.protection.enabled`.
+- **Chevaux plus rapides** : toute monture de selle (cheval, âne, mulet, lama, chameau) reçoit Vitesse I ; l'Écurie de guilde passe à Vitesse II. Réglages : `mounts.*`.
+
 ## 17/11/2026 (métiers et spécialisations alignés sur le guide)
 
 ### Corrections

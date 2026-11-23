@@ -1213,7 +1213,7 @@ La banque de guilde doit contenir 	The guild bank must contain
 &c❌ Une guilde traversée par cette ligne vous interdit désormais le passage.	&c❌ A guild crossed by this line now forbids you passage.
 &c❌ Il vous faut &6	&c❌ You need &6
  pièces &cpour ce trajet.	 coins &cfor this trip.
-&a🚆 Bon voyage ! Arrivée à &e	&a🚆 Have a good trip! Arrival at &e
+&a🚆 Terminus ! Arrivée à &e	&a🚆 Last stop! Arrival at &e
  pièces)	 coins)
 &cLe voyage a échoué, vous avez été remboursé.	&cThe trip failed, you were refunded.
 &fNormale	&fNormal
@@ -1961,3 +1961,15 @@ Entrer dans une taverne	Step into a tavern
 &7a encaissé un &a×	&7cashed out a &a×
 &7au Greed de la taverne de 	&7at the Greed table of the tavern of
 Les Nains ne forgent ni armes ni armures en métal	Dwarves do not forge metal weapons or armor
+&c❌ Le vol en élytre est réservé aux guildes de l'Âge 	&c❌ Elytra flight is reserved for guilds at Age 
+ (ou plus) !	 (or higher)!
+&c❌ Décollage impossible : l'élytre ne s'ouvre que depuis une piste d'aéroport (au moins 	&c❌ Takeoff impossible: the elytra only opens from an airport runway (at least 
+ blocs de béton noir) !	 black concrete blocks)!
+&c💥 Atterrissage hors piste : votre élytre est endommagée ! Posez-vous sur une piste d'aéroport.	&c💥 Off-runway landing: your elytra is damaged! Land on an airport runway.
+&a🚆 En voiture pour &e	&a🚆 All aboard for &e
+ &a! Durée du trajet : &e	 &a! Trip duration: &e
+&a. Vous ne pouvez ni frapper ni être blessé pendant le voyage.	&a. You can neither attack nor be hurt during the trip.
+&e🚆 En route… arrivée dans &6	&e🚆 On the way… arrival in &6
+&c❌ Vous êtes déjà en route : attendez d'arriver à destination.	&c❌ You are already on your way: wait until you reach your destination.
+&c❌ Ces rails appartiennent à la guilde &6	&c❌ These rails belong to the guild &6
+ &c: seule la TNT peut les saboter !	 &c: only TNT can sabotage them!

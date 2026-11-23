@@ -254,7 +254,7 @@ public class CombatManager implements Listener {
       PlayerTeleportEvent.TeleportCause cause = event.getCause();
       // Les téléportations imposées par le jeu lui-même (mise en cellule d'un captif, retour de duel) ne sont pas des fuites :
       // un captif est presque toujours marqué en combat, et sa mise en cellule était annulée.
-      if (this.plugin.getRansom().isInternalTeleport() || this.plugin.getDuels().isInternalTeleport()) {
+      if (this.plugin.getRansom().isInternalTeleport() || this.plugin.getDuels().isInternalTeleport() || this.plugin.getTrainRides().isInternalTeleport()) {
          return;
       }
 

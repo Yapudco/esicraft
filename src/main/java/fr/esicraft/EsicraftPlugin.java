@@ -121,6 +121,8 @@ public final class EsicraftPlugin extends JavaPlugin {
    private fr.esicraft.nexus.NexusGamble nexusGamble;
    private fr.esicraft.nexus.NexusTech nexusTech;
    private fr.esicraft.rail.FreightManager freight;
+   private fr.esicraft.rail.TrainRideManager trainRides;
+   private fr.esicraft.rail.RailOwnerTracker railOwners;
    private fr.esicraft.game.SiegeManager siege;
    private fr.esicraft.game.BourseManager bourse;
    private fr.esicraft.world.ResourceWorldManager resourceWorld;
@@ -219,6 +221,10 @@ public final class EsicraftPlugin extends JavaPlugin {
       this.railManager.load();
       this.freight = new fr.esicraft.rail.FreightManager(this, this.railManager);
       this.freight.init();
+      this.trainRides = new fr.esicraft.rail.TrainRideManager(this);
+      this.trainRides.init();
+      this.railOwners = new fr.esicraft.rail.RailOwnerTracker(this);
+      this.railOwners.init();
       this.treatyManager.load();
       this.webServer = new WebServer(this);
       this.webServer.start();
@@ -257,6 +263,9 @@ public final class EsicraftPlugin extends JavaPlugin {
       pm.registerEvents(this.eventManager, this);
       pm.registerEvents(new RailListener(this), this);
       pm.registerEvents(this.freight, this);
+      pm.registerEvents(this.trainRides, this);
+      pm.registerEvents(this.railOwners, this);
+      pm.registerEvents(new fr.esicraft.airport.AirportListener(this), this);
       pm.registerEvents(new RailGuiListener(this), this);
       pm.registerEvents(new NexusListener(this), this);
       pm.registerEvents(this.raidManager, this);
@@ -288,6 +297,14 @@ public final class EsicraftPlugin extends JavaPlugin {
 
       if (this.freight != null) {
          this.freight.shutdown();
+      }
+
+      if (this.trainRides != null) {
+         this.trainRides.shutdown();
+      }
+
+      if (this.railOwners != null) {
+         this.railOwners.shutdown();
       }
 
       if (this.duels != null) {
@@ -544,6 +561,10 @@ public final class EsicraftPlugin extends JavaPlugin {
 
    public fr.esicraft.rail.FreightManager getFreight() {
       return this.freight;
+   }
+
+   public fr.esicraft.rail.TrainRideManager getTrainRides() {
+      return this.trainRides;
    }
 
    public fr.esicraft.nexus.NexusTech getNexusTech() {

@@ -454,18 +454,28 @@ public class GuildBuildingManager implements CommandExecutor, TabCompleter, List
       }
    }
 
-   /** Écurie : Vitesse et Régénération pour les montures des membres. */
+   /**
+    * Montures : toute monture de selle (cheval, âne, mulet, lama, chameau…) va plus vite sous son cavalier ({@code mounts.speed-amplifier}, 0 = Vitesse I,
+    * -1 pour couper), afin que routes et chevaux valent la peine face à l'élytre. L'Écurie de guilde fait mieux : Vitesse supérieure
+    * ({@code mounts.stable-speed-amplifier}) et Régénération pour les montures de ses membres (cochon et arpenteur compris).
+    */
    private void mountTick() {
-      if (this.buildings.isEmpty()) {
-         return;
-      }
-
+      boolean anyStable = !this.buildings.isEmpty();
+      int base = this.plugin.getConfig().getInt("mounts.speed-amplifier", 0);
+      int stableAmplifier = Math.max(base, this.plugin.getConfig().getInt("mounts.stable-speed-amplifier", 1));
       for (Player p : Bukkit.getOnlinePlayers()) {
          Entity mount = p.getVehicle();
-         if (mount instanceof LivingEntity living && !(mount instanceof Player) && (mount instanceof AbstractHorse || mount.getType().name().equals("PIG") || mount.getType().name().equals("STRIDER")
-            || mount.getType().name().equals("CAMEL")) && this.memberHas(p, Type.STABLE)) {
-            living.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, 0, true, false));
+         if (!(mount instanceof LivingEntity living) || mount instanceof Player) {
+            continue;
+         }
+
+         String type = mount.getType().name();
+         boolean saddle = mount instanceof AbstractHorse || type.equals("CAMEL");
+         if (anyStable && (saddle || type.equals("PIG") || type.equals("STRIDER")) && this.memberHas(p, Type.STABLE)) {
+            living.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, stableAmplifier, true, false));
             living.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 140, 0, true, false));
+         } else if (saddle && base >= 0) {
+            living.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, base, true, false));
          }
       }
    }

@@ -378,6 +378,11 @@ public class RailManager {
          return;
       }
 
+      if (this.plugin.getTrainRides().isRiding(player.getUniqueId())) {
+         ChatUtil.sendMessage(player, "&c❌ Vous êtes déjà en route : attendez d'arriver à destination.");
+         return;
+      }
+
       Station dest = trip.station();
       Location arrival = this.arrivalOf(dest);
       if (arrival == null || !this.stations.containsKey(dest.getId())) {
@@ -406,14 +411,8 @@ public class RailManager {
       }
 
       this.plugin.getDataManager().savePlayer(data);
-      Location from = player.getLocation();
-      if (player.isInsideVehicle()) {
-         player.leaveVehicle();
-      }
-
-      arrival.setYaw(from.getYaw());
-      arrival.setPitch(from.getPitch());
-      player.teleportAsync(arrival).thenAccept(ok -> Bukkit.getScheduler().runTask(this.plugin, () -> {
+      // Le voyage n'est plus instantané : le voyageur et un wagonnet suivent le tracé des rails, puis la suite (péages, succès) s'exécute à l'arrivée.
+      this.plugin.getTrainRides().start(player, trip.path(), dest.getName(), arrival, ok -> {
          if (ok) {
          for (Map.Entry<Guild, Double> toll : quote.tolls().entrySet()) {
             toll.getKey().depositBank(toll.getValue());
@@ -427,7 +426,7 @@ public class RailManager {
             this.plugin.getDataManager().saveGuild(destGuild);
          }
 
-            ChatUtil.sendMessage(player, "&a🚆 Bon voyage ! Arrivée à &e" + dest.getName() + " &7(-" + String.format(Locale.ROOT, "%.2f", quote.total()) + " pièces)");
+            ChatUtil.sendMessage(player, "&a🚆 Terminus ! Arrivée à &e" + dest.getName() + " &7(-" + String.format(Locale.ROOT, "%.2f", quote.total()) + " pièces)");
             this.plugin.getAchievements().grant(player.getUniqueId(), fr.esicraft.life.Achievement.TRAVELER);
             this.plugin.getAchievements().addStat(player.getUniqueId(), fr.esicraft.life.AchievementManager.STAT_TRIPS, 1L);
             player.getWorld().spawnParticle(Particle.CLOUD, arrival, 25, 0.6, 0.3, 0.6, 0.02);
@@ -436,6 +435,6 @@ public class RailManager {
             data.addCoins(quote.total());
             ChatUtil.sendMessage(player, "&cLe voyage a échoué, vous avez été remboursé.");
          }
-      }));
+      });
    }
 }
