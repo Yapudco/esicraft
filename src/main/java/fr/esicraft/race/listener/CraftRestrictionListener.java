@@ -23,7 +23,7 @@ public class CraftRestrictionListener implements Listener {
    private final EsicraftPlugin plugin;
    private static final EnumSet<Material> BASIC_MATERIALS = EnumSet.noneOf(Material.class);
    private static final EnumSet<Material> IRON_TOOLS = EnumSet.of(
-      Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SHOVEL, Material.IRON_HOE, Material.BUCKET, Material.SHEARS
+      Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SHOVEL, Material.IRON_HOE, Material.SHEARS
    );
    private static final EnumSet<Material> IRON_COMBAT_GEAR = EnumSet.of(
       Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS, Material.IRON_SWORD, Material.SHIELD

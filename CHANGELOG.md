@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 27/11/2026 (seau libre)
+
+### Changements
+- **Seau** : il n'est plus verrouillé avant l'Âge 2 et peut être fabriqué par tous les métiers dès l'Âge 1. Les cisailles et les outils en fer restent réservés comme avant.
+
 ## 23/11/2026 (aéroports, train non instantané, rails protégés, chevaux)
 
 ### Nouveautés
