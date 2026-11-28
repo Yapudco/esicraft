@@ -659,7 +659,7 @@ Your guild starts at **Age 1** and can go up to **Age 6**. To reach the next Age
 <details>
 <summary><b>Resources to donate for each Age</b></summary>
 
-- **Age 2**: 750 copper ingots, 256 leather, 750 raw iron, 1,000 oak logs, 1,500 wheat, 750 carrots.
+- **Age 2**: 750 copper ingots, 256 leather, 375 raw iron, 1,000 oak logs, 1,500 wheat, 750 carrots.
 - **Age 3**: 3,500 iron ingots, 1,500 gold ingots, 1,500 lapis lazuli, 1,000 quartz, 750 nether wart, 150 blaze rods, 150 magma cream, 15 ghast tears, 750 glowstone dust, 3,500 feathers, 6,000 potatoes, 6,000 sugar cane, 1,000 pumpkins, 2,500 melon slices, 1,500 beetroot.
 - **Age 4**: 500 diamonds, 150 iron blocks, 100 gold blocks, 1,000 obsidian, 200 crying obsidian, 500 ender pearls, 1 pair of elytra, 2,500 golden carrots, 150 golden apples, 1,200 hay bales, 800 honey bottles, 800 slime balls, 6,000 redstone dust, 400 repeaters, 350 pistons, 200 sticky pistons, 150 dispensers, 2,500 gunpowder, 250 TNT, 750 rockets, 32 anvils.
 - **Age 5**: 16 Netherite ingots, 5 nether stars, 4 beacons, 8 totems of undying, 16 echo shards, 16 catalysts, 16 shriekers and 64 sculk sensors, 64 shulker shells, 2,500 end stone, 1,200 purpur blocks, 2,500 chorus fruit and 1,000 popped chorus fruit, 1,000 redstone blocks, 400 comparators, 400 observers, 250 hoppers, 150 targets, 150 emerald blocks.

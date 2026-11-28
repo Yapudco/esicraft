@@ -2,6 +2,11 @@
 
 Les changements récents du plugin, du plus récent au plus ancien. Le guide du joueur est dans le [README](README.md).
 
+## 28/11/2026 (quota de fer de l'Âge 1 divisé par deux)
+
+### Changements
+- **Âge 2** : le quota de **fer brut** à donner depuis l'Âge 1 passe de 750 à 375 (pour une guilde d'un joueur ; il grandit toujours avec le nombre de membres). Les serveurs déjà installés doivent modifier `ages.age-2.requirements.RAW_IRON` dans leur `config.yml`, puis taper `/esicraft reload`.
+
 ## 27/11/2026 (seau libre)
 
 ### Changements
