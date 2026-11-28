@@ -656,7 +656,7 @@ Ta guilde commence à l'**Âge 1** et peut monter jusqu'à l'**Âge 6**. Pour pa
 <details>
 <summary><b>Ressources à donner pour chaque Âge</b></summary>
 
-- **Âge 2** : 750 lingots de cuivre, 256 cuirs, 750 fer brut, 1 000 bûches de chêne, 1 500 blé, 750 carottes.
+- **Âge 2** : 750 lingots de cuivre, 256 cuirs, 375 fer brut, 1 000 bûches de chêne, 1 500 blé, 750 carottes.
 - **Âge 3** : 3 500 lingots de fer, 1 500 lingots d'or, 1 500 lapis-lazuli, 1 000 quartz, 750 verrues du Nether, 150 bâtons de Blaze, 150 crèmes de magma, 15 larmes de Ghast, 750 poudres lumineuses, 3 500 plumes, 6 000 pommes de terre, 6 000 cannes à sucre, 1 000 citrouilles, 2 500 tranches de pastèque, 1 500 betteraves.
 - **Âge 4** : 500 diamants, 150 blocs de fer, 100 blocs d'or, 1 000 obsidiennes, 200 obsidiennes pleureuses, 500 perles de l'Ender, 1 paire d'élytres, 2 500 carottes dorées, 150 pommes dorées, 1 200 bottes de foin, 800 fioles de miel, 800 boules de slime, 6 000 poudres de redstone, 400 répéteurs, 350 pistons, 200 pistons collants, 150 distributeurs, 2 500 poudres à canon, 250 TNT, 750 fusées, 32 enclumes.
 - **Âge 5** : 16 lingots de Netherite, 5 étoiles du Nether, 4 balises, 8 totems d'immortalité, 16 éclats d'écho, 16 catalyseurs, 16 hurleurs et 64 capteurs de sculk, 64 carapaces de shulker, 2 500 pierres de l'End, 1 200 blocs de purpur, 2 500 fruits de Chorus et 1 000 fruits de Chorus éclatés, 1 000 blocs de redstone, 400 comparateurs, 400 observateurs, 250 entonnoirs, 150 cibles, 150 blocs d'émeraude.

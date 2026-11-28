@@ -38,7 +38,7 @@ ages:
     requirements:
       COPPER_INGOT: 750
       LEATHER: 256
-      RAW_IRON: 750
+      RAW_IRON: 375
       OAK_LOG: 1000
       WHEAT: 1500
       CARROT: 750
